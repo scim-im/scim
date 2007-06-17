@@ -1,0 +1,14 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+localedir=@datadir@/locale
+datadir=@datadir@
+sysconfdir=@sysconfdir@
+
+Name: scim-gtkutils
+Description: GTK Utilities for Smart Common Input Method platform
+Version: @SCIM_VERSION@
+Requires: gtk+-2.0 scim 
+Libs: -L${libdir} -lscim-gtkutils@SCIM_EPOCH@
+Cflags: -I${includedir}/scim@SCIM_EPOCH@

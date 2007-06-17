@@ -1,0 +1,16 @@
+SCIM_CONFIG_1.0 {
+    global:
+        extern "C" {
+            *scim_config_module_create_config*;
+            *scim_config_module_init*;
+            *scim_module_exit*;
+            *scim_module_init*;
+        };
+
+    local:
+        extern "C++" {
+            scim::*;
+            std::*;
+            __gnu_cxx::*;
+        };
+};

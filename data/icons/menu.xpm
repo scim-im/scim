@@ -1,0 +1,26 @@
+/* XPM */
+static char *menu_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 4 1",
+"  c black",
+". c #1F4AEA",
+"X c gray100",
+"o c None",
+/* pixels */
+"oooooooooooooooo",
+"oo           ooo",
+"oo XXXXXXXXX ooo",
+"oo X       X ooo",
+"oo XXXXXXXXX ooo",
+"oo X    .  X ooo",
+"oo XXXXX..XX ooo",
+"oo X    .X.X ooo",
+"oo XXXXX.XX. ooo",
+"oo X    .XXX.ooo",
+"oo XXXXX.XXXX.oo",
+"oo X    .XXX...o",
+"oo XXXXX.X.X.ooo",
+"oo      .. .X.oo",
+"oooooooo.oo.X.oo",
+"oooooooooooo..oo"
+};

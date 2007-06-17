@@ -1,0 +1,16 @@
+IM_SCIM_1.0 {
+    global:
+        extern "C" {
+            im_module_init;
+            im_module_create;
+            im_module_list;
+            im_module_exit;
+        };
+
+    local:
+        extern "C++" {
+            __gnu_cxx::*;
+	    std::*;
+	    *std::*_S_construct*;
+	};
+};
