@@ -1,0 +1,9 @@
+Stage 1:
+* Hotkeys for Helper Module and Panel.
+* Refactory FrontEndBase class to make it into a generic SCIM Client interface.
+* Common GUI Setup framework
+* Common storage framework
+
+Stage 2:
+* Modulize Panel component, use an UI independent hub server to manage all client components, including FrontEnds, Helpers, Common UI components etc.
+* Multi-user enabled Socket FrontEnd and Socket IMEngine/Config.

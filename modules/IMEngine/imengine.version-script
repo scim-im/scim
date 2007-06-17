@@ -1,0 +1,16 @@
+SCIM_IMENGINE_1.0 {
+    global:
+        extern "C" {
+            *scim_imengine_module_create_factory*;
+            *scim_imengine_module_init*;
+            *scim_module_exit*;
+            *scim_module_init*;
+        };
+
+    local:
+        extern "C++" {
+            scim::*;
+            std::*;
+            __gnu_cxx::*;
+        };
+};

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+_Name=SCIM Input Method Setup
+_Comment=Setup utility for Smart Common Input Method platform
+Exec=scim-setup
+Icon=scim-setup.png
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=Applications;Settings;

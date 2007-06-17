@@ -1,0 +1,76 @@
+Future development plan for SCIM
+================================
+
+I. Plan for SCIM Core:
+======================
+1. Unified GUI framework for Setup UI and Helper module.
+* Current status:
+  Currently there are two independent UIs for SCIM, one is gtk based
+  (shipped in SCIM package), another is KDE based (skim).
+  Each UI has its own Setup UI framework, then each IMEngine must
+  provide two different Setup modules for these two UI frameworks.
+  It's UGLY!
+* Plan:
+  Implement an Unified GUI framework for Setup UI and Helper module.
+  So that IMEngine developers could use this framework to write Setup UI
+  modules and Helper modules to make their IMEngines being totally
+  independent from Window systems and widget libraries.
+* Possible way:
+  1) Implement a XML based GUI framework
+    Good: Easy to use.
+    Bad:  Not flexible enough, hard to implement. Too complex, think about XUL.
+  2) Implement a generic GUI widget API set
+    Good: Could be flexible enough.
+    Bad:  Hard to use, hard to implement too.
+
+2. Modulize client site architecture.
+* Current status:
+  Currently, on the client side, an independent Panel process is in charge of
+  providing default UI components and managing Helper modules. Two different
+  Panel programs are available now, scim-panel-gtk and scim-panel-kde (skim).
+* Plan:
+  Implement a client manager which is independent from Window system, which is
+  in charge of any other client components, including default UI components,
+  Helper modules, etc. Client manager and client components communicate with
+  each other via socket. Client manager acts like a hub.
+  And further more, default UI components and Helper modules could be unified
+  into a same interface, so that all client components could be managed in the
+  same way.
+* Possible way:
+  1) Implement own communication protocol based on scim::Transaction.
+  2) Use D-BUS as the communication infrastructure.
+
+3. Load and initialize IMEngine modules on demand (Lazy loading).
+
+4. Multi-user enabled Socket FrontEnd and Socket IMEngine/Config,
+   based on multi-processes.
+
+5. Encryption support in Socket communication.
+ 
+6. Refactory scim::FrontEndBase to make it into a generic SCIM Client
+   interface, to make it easier to implement SCIM support
+   in client applications.
+
+7. Port SCIM to other system, like MacOS, Windows etc.
+
+
+II. Plan for SCIM based components:
+===================================
+1. Implement UTF-8 console FrontEnd
+   So that we could use SCIM in any UTF-8 console, like fbiterm etc.
+
+2. Port kanjipad (or other similar application) to scim Helper API
+   So that we could use kanjipad to input in any applications directly.
+
+3. Implement scim-iiimf, an IMEngine which makes use of IIIMF service.
+   So that we could use IIIMF LEs via SCIM.
+
+4. Implement some useful Filter modules, for example:
+   1) Word based Simplified Chinese <-> Traditional Chinese translation filter.
+   2) Generic dictionary filter to display various explaination for selected
+      candidates or preedit string. For example Unicode definition lookup etc.
+
+5. Implement some common Helper module, for example:
+   1) Virtual Keyboard Helper module
+   2) Generic information display Helper module, to display some information
+      (HTML based).

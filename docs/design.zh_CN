@@ -1,0 +1,90 @@
+SCIM 设计概要
+=============
+
+    SCIM 库是一个通用的输入法开发平台, 可以大大简化输入法的开发难度. 在 SCIM 中, 输入法被分为三大部分: FrontEnd, IMEngine 和 BackEnd. 这三部分的功能是:
+    FrontEnd: 负责用户界面的显示, 与客户程序通讯, 将客户程序的按键请求转发给 IMEngine, 执行 IMEngine 发出的各种命令, 如绘制预编辑字符串等等.
+    IMEngine:   接收由 FrontEnd 发送的按键事件, 并向 FrontEnd 发送相应的命令, 如显示预编辑字符串, 向客户程序提交字符串等等.
+    BackEnd:  管理所有的 IMEngine.
+
+    以上三大部分通过四个虚基类(FrontEndBase, IMEngineFactoryBase, IMEngineInstanceBase, BackEndBase)定义了统一的接口, 所有具体实现必须由这些基类派生出来. SCIM 还提供了丰富的工具函数和类, 如负责做编码转换的 IConvert 类, 负责管理候选字(词)查找表的 LookupTable 类, 读写配置文件的 ConfigBase 类等等.
+    SCIM 的一个显著特点是, FrontEnd, IMEngine, Config 等部分都实现了模块化, 可以通过动态模块来实现具体的功能, 支持不同的系统和环境. 大大增强了 SCIM 的灵活性和可移植性.
+
+    SCIM 的工作原理:
+    在 SCIM 中最关键的部分是 FrontEnd 和 IMEngine. 这两部分的实现及其之间的通讯方式是 SCIM 与其它同类平台最不一样的地方. 首先介绍一下 IMEgine 部分的组成. IMEngine 部分分为 IMEngineFactory 和 IMengineInstance 两个接口类. 每个输入法引擎都要提供这两个类的具体实现. IMengineFactory 负责管理输入法使用的公共数据, 如词库等等, 它还负责创建 IMEngineInstance 实例. IMEngineInstance 类负责实际的按键到字符串的转换工作.
+    现有输入法开发平台中的 IC (Input Context) 部分其实就是对应 IMEngineInstance 类. IMEngineInstance 类就是 IC 的数据与处理函数的封装. 每个 IC 对应一个 IMEngineInstance 实例. 所有 IMEngineInstance 实例由 FrontEnd 基类管理. 每个 IC 对应的状态变量, 分为两部分, 其中预编辑字符串等与用户界面无关的数据都保存在 IMEngineInstance 实例中; 而输入窗口位置等与用户界面相关的数据则由 FrontEnd 派生类负责管理. FrontEnd 的详细内容将在下面介绍.
+    下面介绍一下 FrontEnd 和 IMEngine 之间的数据交换和通讯方式. 为了简化编程接口, 在 FrontEnd 和 IMEngine 之间采用了一种松散的接口形式, 即 signal-slot 技术. 首先, 将输入法所需的所有动作以及用户界面中包含的所有基本元素总结归纳出来, 其中, 输入法中所需要的元素包括:
+    预编辑字符串 (Preedit String): 用户输入的字符在转换成实际字符串提交给客户程序之前, 将显示在预编辑字符串区域中.
+    预编辑光标 (Preedit Caret): 预编辑字符串中的光标, 用户可以利用这个光标对预编辑字符串进行编辑.
+    状态字符串 (Status String): 显示输入法引擎当前的状态, 如当前编码, 语言等.
+    候选字/词查找表 (Lookup Table): 用户输入的按键与结果字符串可能是一对多的关系, 一个(组)按键对应的所有可能的结果字符串将显示在查找表内, 供用户选择.
+    辅助字符串 (Aux String): 输入法可能需要显示某些辅助信息, 可以显示在这个区域.
+    另外, 对于亚洲语言来说(尤其是中文), 还需要显示字符和标点(全角/半角)状态.
+
+    由此可以归纳出输入法引擎所需的所有动作:
+    * 显示/隐藏/更新 预编辑字符串
+    * 更新 预编辑光标
+    * 显示/隐藏/更新 状态字符串
+    * 显示/隐藏/更新 辅助字符串
+    * 显示/隐藏/更新 查找表
+    * 向客户程序提交结果字符串
+    * 注册屬性列表 (如全角半角标点)
+    * 更新一个屬性
+
+    而输入法引擎需要处理的事件有:
+    * 用户的按键事件
+    * 用户选择查找表的事件
+    * 用户请求移动预编辑光标的事件
+    * 获得/丢失输入焦点的事件
+    * 用户触发某一个屬性的事件
+
+    为了简化设计, 采用了单向的 signal-slot 结构, 即输入法引擎所需的所有动作都经由signal-slot 发送给 FrontEnd, 而输入法引擎需要处理的事件则直接由 FrontEnd 调用 IMEngineInstance 类的相应函数来传递.
+    所有动作信号的触发与事件函数的调用都封装在 IMEngineInstance 和 FrontEnd 基类里. 派生类只需要调用基类的相应函数即可, 完全不用关心 FrontEnd 和 IMEngineInstance 之间的具体通讯方式.
+
+    FrontEnd 的工作机理:
+    FrontEnd 除了负责用户界面的绘制, 及与客户程序交互的功能以外, FrontEndBase 基类还负责管理所有 IMEngineInstance 实例. 每个 IMEngineInstance 实例都被赋予了一个唯一的 id, FrontEnd 派生类无需直接处理 IMEngineInstance 实例或者其指针. 所有对 IMEngineInstance 的操作都由 FrontEndBase 类提供的函数和 IMEngineInstance 的 id 来完成. 目前 FrontEndBase 类提供以下一些函数来管理 IMEngineInstance 和 IMEngineFactory:
+    
+    * int  get_server_factory_list (vector<int>& ids, vector<WideString>& names, const String &encoding); 
+    取得支持特定编码的所有 IMEngineFactory 的列表. 这个函数主要用于 FrontEnd 派生类显示输入法列表. 每个 IMEngineFactory 对应一个唯一的 id. 可以用下面的函数选择当前的 IMEngineFactory.
+
+    * int  new_server_instance (int server_factory_id, const String& encoding);
+    从特定的 IMEngineFactory 创建一个支持特定编码的 IMEngineInstance, 返回这个
+    IMEngineInstance 的 id. FrontEnd 派生类应当保存这个 id,
+    以用来和这个 IMEngineInstance 通讯, 和销毁这个 IMEngineInstance.
+
+    * bool delete_server_instance (int id);
+    销毁一个 IMEngineInstance.
+
+
+    * WideString get_server_instance_name (int id);
+    取得 IMEngineInstance 的名称, 即输入法的名称.
+
+    * void delete_all_server_instances ();
+    销毁所有 IMEngineInstance.
+
+    以下函数用来和特定的 IMEngineInstance 通讯:
+    * bool process_key_event (int id, KeyEvent& key);
+    * void reset_server_instance (int id);
+    * void focus_in_server_instance (int id);
+    * void focus_out_server_instance (int id);
+    * void select_lookup_table (int id, unsigned int item);
+    * void move_preedit_caret (int id, unsigned int pos);
+    * void update_lookup_table_page_size (int id, unsigned int page_size);
+    * void trigger_property (int id, const String &property);
+
+    FrontEnd 派生类通过继承 FrontEndBase 提供的一系列纯虚函数来处理 IMEngineInstance 发出的动作请求. 这些接口函数有:
+
+    virtual void show_preedit_string (int id) = 0;
+    virtual void show_aux_string     (int id) = 0;
+    virtual void show_lookup_table   (int id) = 0;
+    virtual void hide_preedit_string (int id) = 0;
+    virtual void hide_aux_string     (int id) = 0;
+    virtual void hide_lookup_table   (int id) = 0;
+    virtual void update_preedit_caret  (int id, int caret) = 0;
+    virtual void update_aux_string     (int id, const WideString & str) = 0;
+    virtual void update_lookup_table   (int id, const LookupTable & table) = 0;
+    virtual void commit_string         (int id, const WideString & str) = 0;
+    virtual void forward_keypress      (int id, const KeyEvent & key) = 0;
+    virtual void register_properties   (int id, const PropertyList & properties) = 0;
+    virtual void update_property       (int id, const Property & property) = 0;
+    这些函数由 FrontEndBase 类调用. 参数 id 为发出动作请求的 IMEngineInstance 的 id.
+

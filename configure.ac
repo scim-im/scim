@@ -1,0 +1,607 @@
+# Process this file with autoconf to produce a configure script
+AC_INIT(scim, 1.4.6, suzhe@tsinghua.org.cn)
+AC_CONFIG_SRCDIR([src/scim.h])
+
+###########################################################
+##          Some definitions of Version macros.          ##
+###########################################################
+
+SCIM_MAJOR_VERSION=1
+SCIM_MINOR_VERSION=4
+SCIM_MICRO_VERSION=6
+
+SCIM_VERSION=$SCIM_MAJOR_VERSION.$SCIM_MINOR_VERSION.$SCIM_MICRO_VERSION
+
+AC_SUBST(SCIM_MAJOR_VERSION)
+AC_SUBST(SCIM_MINOR_VERSION)
+AC_SUBST(SCIM_MICRO_VERSION)
+AC_SUBST(SCIM_VERSION)
+
+# libtool versioning for SCIM
+
+# increment if the interface has additions, changes, removals.
+SCIM_CURRENT=10
+
+# increment any time the source changes; set to 0 if you increment CURRENT
+SCIM_REVISION=2
+
+# increment if any interfaces have been added; set to 0
+# if any interfaces have been removed. removal has 
+# precedence over adding, so set to 0 if both happened.
+SCIM_AGE=2
+
+AC_SUBST(SCIM_CURRENT)
+AC_SUBST(SCIM_REVISION)
+AC_SUBST(SCIM_AGE)
+
+# Define a string for the earliest version that this release cannot
+# coexist with. This is used for directory hierarchies.
+#
+SCIM_EPOCH=-1.0
+AC_SUBST(SCIM_EPOCH)
+
+# Define a string for the earliest version that this release has
+# binary compatibility with. This is used for module locations.
+#
+SCIM_BINARY_VERSION=1.4.0
+AC_SUBST(SCIM_BINARY_VERSION)
+
+AC_DEFINE_UNQUOTED(SCIM_BINARY_VERSION, "$SCIM_BINARY_VERSION", [The binary version of SCIM library.])
+AC_DEFINE_UNQUOTED(SCIM_VERSION, "$SCIM_VERSION", [The release version of SCIM library.])
+AC_DEFINE_UNQUOTED(SCIM_MAJOR_VERSION, $SCIM_MAJOR_VERSION, [The Major version of SCIM library.])
+AC_DEFINE_UNQUOTED(SCIM_MINOR_VERSION, $SCIM_MINOR_VERSION, [The Minor version of SCIM library.])
+AC_DEFINE_UNQUOTED(SCIM_MICRO_VERSION, $SCIM_MICRO_VERSION, [The Micro version of SCIM library.])
+
+GETTEXT_PACKAGE=scim
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [The gettext domain])
+
+###########################################################
+##                  Start Configuration.                 ##
+###########################################################
+
+# Init automake stuff
+AM_INIT_AUTOMAKE
+AM_CONFIG_HEADER([config.h])
+
+# Init gettext
+ALL_LINGUAS="zh_CN zh_TW ja ko de fr it cs pa fi sv nl"
+AM_GNU_GETTEXT
+
+# Init libtool
+AC_LIBTOOL_DLOPEN
+AC_PROG_LIBTOOL
+AC_LIB_LTDL
+AC_SUBST(LIBTOOL_DEPS)
+
+# libtool option to control which symbols are exported
+# right now, symbols starting with _ are not exported
+# !!! DO NOT USE IT !!!
+LIBTOOL_EXPORT_OPTIONS=''
+AC_SUBST(LIBTOOL_EXPORT_OPTIONS)
+
+# Checks for programs.
+AC_PROG_CXX
+AC_PROG_CC
+AC_LANG(C++)
+
+# Checks if doxygen is avaiable
+
+AC_ARG_WITH([doxygen],
+  AS_HELP_STRING([--without-doxygen], [Don't build API documentation]) )
+ 
+DOXYGEN=no
+if test "x$with_doxygen" != "xno"; then
+  AC_PATH_PROG(DOXYGEN, doxygen, no)
+fi
+ 
+AM_CONDITIONAL(HAVE_DOXYGEN, test x$DOXYGEN != xno)
+AC_SUBST(DOXYGEN)
+
+# Checks if graphviz is available
+AC_CHECK_PROG(HAVE_GRAPHVIZ, dot, YES, NO)
+AC_PATH_PROG(DOT, dot)
+DOT=`dirname $DOT`
+AC_SUBST(DOT)
+
+AC_PATH_PROG(PERL, perl)
+AC_SUBST(PERL)
+
+# Checks if xsltproc is available
+AC_PATH_PROG(XSLTPROC, xsltproc, no)
+AM_CONDITIONAL(HAVE_XSLTPROC, test x$XSLTPROC != xno)
+AC_SUBST(XSLTPROC)
+
+# Checks if docbook-style-xsl is available
+AC_CHECK_FILE(
+ [/usr/share/sgml/docbook/xsl-stylesheets/html/tldp-html.xsl],
+ [DOCBOOK_XSL=/usr/share/sgml/docbook/xsl-stylesheets/html/tldp-html.xsl],
+ [AC_CHECK_FILE(
+  [/usr/share/sgml/docbook/xsl-stylesheets/html/docbook.xsl],
+  [DOCBOOK_XSL=/usr/share/sgml/docbook/xsl-stylesheets/html/docbook.xsl],
+   [AC_CHECK_FILE(
+    [/usr/share/xml/docbook/stylesheet/nwalsh/current/html/docbook.xsl],
+    [DOCBOOK_XSL=/usr/share/xml/docbook/stylesheet/nwalsh/current/html/docbook.xsl],
+    [DOCBOOK_XSL=no]
+    )]
+  )]
+)
+
+AC_SUBST(DOCBOOK_XSL)
+
+AM_CONDITIONAL(HAVE_DOCBOOK, test x$DOCBOOK_XSL != xno)
+AM_CONDITIONAL(BUILD_MANUAL, test x$XSLTPROC != xno -a x$DOCBOOK_XSL != xno)
+
+# Check intltool
+IT_PROG_INTLTOOL([0.33], [no-xml])
+
+# Checks for libraries.
+AC_HEADER_STDC
+AC_HEADER_TIME
+AC_CHECK_HEADERS([langinfo.h libintl.h string.h dirent.h hash_map ext/hash_map])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
+if test x$ac_cv_type_size_t != xyes; then
+  AC_MSG_ERROR([No type size_t, but SCIM needs it!])
+fi
+
+AC_CHECK_SIZEOF(char)
+AC_CHECK_SIZEOF(unsigned short int)
+AC_CHECK_SIZEOF(unsigned int)
+AC_CHECK_SIZEOF(unsigned long int)
+AC_CHECK_SIZEOF(unsigned long long int)
+AC_CHECK_HEADERS([stdint.h],[has_stdint=yes],[has_stdint=no])
+
+if test x$ac_cv_sizeof_unsigned_short_int = x2 && test x$ac_cv_sizeof_char = x1 ; then
+  :
+else
+  AC_MSG_ERROR([
+*** SCIM requires
+***      sizeof (unsigned short int)  == 2
+***      sizeof (char)                == 1
+*** You might want to consider using the GNU C compiler.
+])
+fi
+
+if test x$ac_cv_sizeof_wchar_t = x0 ; then
+  AC_MSG_ERROR([
+*** SCIM requires a compiler that supports wchar_t,
+*** You might want to consider using the GNU C compiler.
+])
+fi
+
+if test x$has_stdint = xyes; then
+  INCLUDE_STDINT="#include <stdint.h>"
+  UINT16="uint16_t"
+  UINT32="uint32_t"
+  UINT64="uint64_t"
+else
+  INCLUDE_STDINT="//#include <stdint.h>"
+  UINT16="unsigned short int"
+  if test x$ac_cv_sizeof_unsigned_int = x4; then
+    UINT32="unsigned int"
+  else
+    if test x$ac_cv_sizeof_unsigned_long_int = x4; then
+      UINT32="unsigned long int"
+    else
+      AC_MSG_ERROR([*** No suitable integer type for uint32 found.])
+    fi
+  fi
+  if test x$ac_cv_sizeof_unsigned_long_long_int = x8; then
+    UINT64="unsigned long long int"
+  else
+    AC_MSG_ERROR([*** No suitable integer type for uint64 found.])
+  fi
+fi
+AC_SUBST(INCLUDE_STDINT)
+AC_SUBST(UINT16)
+AC_SUBST(UINT32)
+AC_SUBST(UINT64)
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([gettimeofday memmove memset nl_langinfo setlocale daemon])
+AC_CHECK_FUNCS([opendir closedir readdir])
+AC_CHECK_FUNCS([usleep nanosleep])
+AC_CHECK_FUNCS([gethostbyname gethostbyname_r socket bind accept connect listen],
+	       [socket_ok=yes],
+	       [socket_ok=no])
+
+AM_ICONV
+
+# Check if we should build scim-panel-gtk daemon
+PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.4.0 pango >= 1.1.0 gdk-pixbuf-2.0 >= 2.4.0],
+			[SCIM_HAS_GTK2=yes],
+			[SCIM_HAS_GTK2=no])
+
+SCIM_HAS_GTK2_2=no
+if test "$SCIM_HAS_GTK2" = "yes"; then
+  if $PKG_CONFIG --exists "gtk+-2.0 >= 2.2" ; then
+    SCIM_HAS_GTK2_2=yes
+    GTK_VERSION=2.2.0
+    AC_DEFINE(GDK_MULTIHEAD_SAFE,1,[Force use of GDK's multihead-safe APIs.])
+  fi
+  if $PKG_CONFIG --exists "gtk+-2.0 >= 2.3.5" ; then
+    SCIM_HAS_GTK2_4=yes
+    GTK_VERSION=2.3.5
+    AC_DEFINE(HAVE_GTK_DRAW_INSERTION_CURSOR,1,[Have gtk_draw_insertion_cursor ().])
+  fi
+  GTK_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk+-2.0`
+  GTK_LIBDIR=`$PKG_CONFIG --variable=libdir gtk+-2.0`
+  if test -z "$GTK_LIBDIR)"; then
+    GTK_LIBDIR="$libdir"
+  fi
+  GTK_IM_MODULEDIR=$GTK_LIBDIR/gtk-2.0/immodules
+  AC_SUBST(GTK_LIBDIR)
+  AC_SUBST(GTK_IM_MODULEDIR)
+  AC_SUBST(GTK_VERSION)
+  AC_SUBST(GTK_BINARY_VERSION)
+fi
+
+# Check if we have gthread
+PKG_CHECK_MODULES(GTHREAD2,[gthread-2.0 >= 2.0.0],
+			[SCIM_HAS_GTHREAD2=yes],
+			[SCIM_HAS_GTHREAD2=no])
+
+# Checks for X11 header files.
+AC_PATH_XTRA
+
+# Add -lX11 to X_LIBS
+if test "$have_x" = "yes"; then
+  X_LIBS="$X_LIBS -lX11"
+fi
+
+###########################################################
+##             Definiation of compile args.              ##
+###########################################################
+AC_ARG_WITH(gtk-im-module-dir,
+	    AS_HELP_STRING([--with-gtk-im-module-dir=dir],
+			   [Select gtk immodule dir]),
+	    GTK_IM_MODULEDIR=$with_gtk_im_module_dir)
+
+AC_ARG_ENABLE(ld-version-script,
+	      [  --enable-ld-version-script Use ld version script to limit exported symbols],
+       	      enable_ld_version_script=yes,
+       	      enable_ld_version_script=no)
+
+AC_ARG_ENABLE(debug,
+	      [  --enable-debug            Turn on debugging],
+       	      enable_debug=yes,
+	      enable_debug=no)
+
+AC_ARG_ENABLE(tests,
+	      [  --enable-tests            Build tests/*],
+       	      enable_tests=yes,
+       	      enable_tests=no)
+
+AC_ARG_ENABLE(hash-map,
+	      [  --enable-hash-map         Use hast_map instead of std::map internally],
+       	      enable_hash_map=yes,
+	      enable_hash_map=no)
+
+AC_ARG_ENABLE(config-simple,
+	      [  --disable-config-simple   Do not build Simple Config module],
+       	      enable_config_simple=no,
+       	      enable_config_simple=yes)
+
+AC_ARG_ENABLE(config-socket,
+	      [  --disable-config-socket   Do not build Socket Config module],
+       	      enable_config_socket=no,
+       	      enable_config_socket=yes)
+
+AC_ARG_ENABLE(frontend-x11,
+	      [  --disable-frontend-x11    Do not build X11 FrontEnd module],
+       	      enable_frontend_x11=no,
+       	      enable_frontend_x11=yes)
+
+AC_ARG_ENABLE(frontend-socket,
+	      [  --disable-frontend-socket Do not build Socket FrontEnd module],
+       	      enable_frontend_socket=no,
+       	      enable_frontend_socket=yes)
+
+AC_ARG_ENABLE(im-rawcode,
+	      [  --disable-im-rawcode      Do not build RawCode IMEngine module],
+       	      enable_im_rawcode=no,
+       	      enable_im_rawcode=yes)
+
+AC_ARG_ENABLE(im-socket,
+	      [  --disable-im-socket       Do not build Socket IMEngine module],
+       	      enable_im_socket=no,
+       	      enable_im_socket=yes)
+
+AC_ARG_ENABLE(filter-sctc,
+	      [  --disable-filter-sctc     Do not build Simplified/Traditional Chinese conversion Filter module],
+       	      enable_filter_sctc=no,
+       	      enable_filter_sctc=yes)
+
+AC_ARG_ENABLE(gtk2-immodule,
+	      [  --disable-gtk2-immodule   Do not build GTK2 IMModule],
+       	      enable_gtk2_immodule=no,
+       	      enable_gtk2_immodule=yes)
+
+AC_ARG_ENABLE(panel-gtk,
+              [  --disable-panel-gtk       Do not build GTK2 Panel],
+              enable_panel_gtk=no,
+              enable_panel_gtk=check)
+
+AC_ARG_ENABLE(setup-ui,
+	      [  --disable-setup-ui        Do not build Setup UI],
+       	      enable_setup_ui=no,
+       	      enable_setup_ui=yes)
+
+if test "$have_x" = "yes"; then
+  SCIM_BUILD_X11_UTILS=1
+  enable_x11_utils=yes
+else
+  SCIM_BUILD_X11_UTILS=0
+  enable_x11_utils=no
+fi
+
+if test "$enable_hash_map" = "yes"; then
+  AC_DEFINE(ENABLE_HASH_MAP,1,[Use hash map instead of map in libscim])
+fi
+
+if test "$enable_debug" = "yes"; then
+  AC_DEFINE(ENABLE_DEBUG,1,[Define this to enable the debug facility in libscim])
+  CFLAGS="$CFLAGS -g"
+  CXXFLAGS="$CXXFLAGS -g"
+fi
+
+if test "$enable_tests" = "yes"; then
+  SCIM_BUILD_TESTS=1
+else
+  SCIM_BUILD_TESTS=0
+  enable_tests=no
+fi
+
+if test "$enable_config_simple" = "yes"; then
+  SCIM_BUILD_CONFIG_SIMPLE=1
+else
+  SCIM_BUILD_CONFIG_SIMPLE=0
+  enable_config_simple=no
+fi
+
+if test "$enable_config_socket" = "yes" -a "$socket_ok" = "yes"; then
+  SCIM_BUILD_CONFIG_SOCKET=1
+else
+  SCIM_BUILD_CONFIG_SOCKET=0
+  enable_config_socket=no
+fi
+ 
+if test "$enable_frontend_x11" = "yes" -a "$have_x" = "yes"; then
+  SCIM_BUILD_FRONTEND_X11=1
+else
+  SCIM_BUILD_FRONTEND_X11=0
+  enable_frontend_x11=no
+fi
+
+if test "$enable_frontend_socket" = "yes" -a "$socket_ok" = "yes"; then
+  SCIM_BUILD_FRONTEND_SOCKET=1
+else
+  SCIM_BUILD_FRONTEND_SOCKET=0
+  enable_frontend_socket=no
+fi
+
+if test "$enable_im_rawcode" = "yes"; then
+  SCIM_BUILD_IMENGINE_RAWCODE=1
+else
+  SCIM_BUILD_IMENGINE_RAWCODE=0
+  enable_im_rawcode=no
+fi
+
+if test "$enable_im_socket" = "yes" -a "$socket_ok" = "yes"; then
+  SCIM_BUILD_IMENGINE_SOCKET=1
+else
+  SCIM_BUILD_IMENGINE_SOCKET=0
+  enable_im_socket=no
+fi
+
+if test "$enable_filter_sctc" = "yes"; then
+  SCIM_BUILD_FILTER_SCTC=1
+else
+  SCIM_BUILD_FILTER_SCTC=0
+  enable_filter_sctc=no
+fi
+
+if test "$enable_gtk2_immodule" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
+  SCIM_BUILD_GTK2_IMMODULE=1
+else
+  SCIM_BUILD_GTK2_IMMODULE=0
+  enable_gtk2_immodule=no
+fi
+
+if test "$enable_setup_ui" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
+  SCIM_BUILD_SCIM_SETUP=1
+  AC_DEFINE(HAVE_SCIM_SETUP,1,[Have scim-setup program.])
+else
+  SCIM_BUILD_SCIM_SETUP=0
+  enable_setup_ui=no
+fi
+
+if test "$SCIM_HAS_GTK2" = "yes"; then
+  enable_gtk_utils=yes
+  SCIM_BUILD_GTK_UTILS=1
+else
+  enable_gtk_utils=no
+  SCIM_BUILD_GTK_UTILS=0
+fi
+
+enable_tray_icon=no
+if test "$SCIM_HAS_GTK2_2" = "yes" -a "$no_x" != "yes"; then
+  enable_tray_icon=yes
+  AC_DEFINE(ENABLE_TRAY_ICON,1,[Enable the TrayIcon code.])
+fi
+
+SCIM_BUILD_PANEL_GTK=0
+if test "$enable_panel_gtk" != "no"; then
+  enable_panel_gtk=no
+  if test "$SCIM_HAS_GTHREAD2" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
+    SCIM_BUILD_PANEL_GTK=1
+    enable_panel_gtk=yes
+  fi
+fi
+
+#if nothing needs libscim-gtkutils, just disable it
+if test "$enable_panel_gtk" != "yes" -a "$enable_setup_ui" != "yes"; then
+  enable_gtk_utils=no
+  SCIM_BUILD_GTK_UTILS=0
+fi
+
+AM_CONDITIONAL(SCIM_LD_VERSION_SCRIPT,
+		[test "$enable_ld_version_script" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_TESTS,
+		[test "$enable_tests" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_CONFIG_SIMPLE,
+		[test "$enable_config_simple" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_CONFIG_SOCKET,
+		[test "$enable_config_socket" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_FRONTEND_X11,
+		[test "$enable_frontend_x11" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_FRONTEND_SOCKET,
+		[test "$enable_frontend_socket" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_IMENGINE_SOCKET,
+		[test "$enable_im_socket" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_IMENGINE_RAWCODE,
+		[test "$enable_im_rawcode" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_GTK2_IMMODULE,
+		[test "$enable_gtk2_immodule" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_FILTER_SCTC,
+		[test "$enable_filter_sctc" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_SCIM_SETUP,
+		[test "$enable_setup_ui" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_GTK_UTILS,
+	        [test "$enable_gtk_utils" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_X11_UTILS,
+	        [test "$enable_x11_utils" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_TRAY_ICON,
+	        [test "$enable_tray_icon" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_PANEL_GTK,
+	        [test "$enable_panel_gtk" = "yes"])
+
+AC_SUBST(SCIM_BUILD_TESTS)
+AC_SUBST(SCIM_BUILD_CONFIG_SIMPLE)
+AC_SUBST(SCIM_BUILD_CONFIG_SOCKET)
+AC_SUBST(SCIM_BUILD_FRONTEND_X11)
+AC_SUBST(SCIM_BUILD_FRONTEND_SOCKET)
+AC_SUBST(SCIM_BUILD_IMENGINE_RAWCODE)
+AC_SUBST(SCIM_BUILD_IMENGINE_TABLE)
+AC_SUBST(SCIM_BUILD_IMENGINE_SOCKET)
+AC_SUBST(SCIM_BUILD_FILTER_SCTC)
+AC_SUBST(SCIM_BUILD_GTK2_IMMODULE)
+AC_SUBST(SCIM_BUILD_SCIM_SETUP)
+AC_SUBST(SCIM_BUILD_PANEL_GTK)
+AC_SUBST(SCIM_BUILD_GTK_UTILS)
+AC_SUBST(SCIM_BUILD_X11_UTILS)
+
+# Output All necessary Paths.
+SCIM_DATADIR="$datadir/scim"
+SCIM_SYSCONFDIR="$sysconfdir"
+SCIM_ICONDIR="$datadir/scim/icons"
+SCIM_MODULE_PATH="$libdir/scim$SCIM_EPOCH"
+SCIM_LIBEXECDIR="$libdir/scim$SCIM_EPOCH"
+SCIM_LOCALEDIR="$datadir/locale"
+SCIM_TEMPDIR="/tmp"
+
+AC_SUBST(SCIM_DATADIR)
+AC_SUBST(SCIM_SYSCONFDIR)
+AC_SUBST(SCIM_ICONDIR)
+AC_SUBST(SCIM_MODULE_PATH)
+AC_SUBST(SCIM_LIBEXECDIR)
+AC_SUBST(SCIM_LOCALEDIR)
+AC_SUBST(SCIM_TEMPDIR)
+
+###########################################################
+##                      Output files.                    ##
+###########################################################
+AC_SUBST(ac_aux_dir)
+AC_CONFIG_FILES([Makefile
+		 m4/Makefile 
+		 intl/Makefile
+		 po/Makefile.in
+		 src/Makefile
+		 src/scim_types.h
+		 utils/Makefile
+		 data/Makefile
+		 data/icons/Makefile
+		 data/pixmaps/Makefile
+		 modules/Makefile
+		 modules/FrontEnd/IMdkit/Makefile
+		 modules/FrontEnd/Makefile
+		 modules/IMEngine/Makefile
+		 modules/Filter/Makefile
+		 modules/Config/Makefile
+		 modules/SetupUI/Makefile
+	 	 docs/scim.cfg
+	 	 docs/Makefile
+	 	 docs/manual/Makefile
+	 	 docs/manual/zh_CN/Makefile
+		 docs/manual/zh_CN/figures/Makefile
+	 	 configs/Makefile
+		 extras/Makefile
+		 extras/gtk2_immodule/Makefile
+		 extras/setup/Makefile
+		 extras/setup/scim-setup
+		 extras/panel/Makefile
+		 tests/Makefile
+		 intltool-extract
+		 intltool-merge
+		 intltool-update
+		 scim.pc
+		 scim-gtkutils.pc
+		 scim-x11utils.pc
+		 scim.spec])
+AC_OUTPUT
+
+AC_MSG_RESULT([
+Build options:
+  Version                  $SCIM_VERSION
+  Install prefix           $prefix
+  Build shared libs        $enable_shared
+  Build static libs        $enable_static
+  Build tests/*            $enable_tests
+  Enable debug             $enable_debug
+  Enable ld version script $enable_ld_version_script
+
+Module options:           
+  Simple config module     $enable_config_simple
+  Socket config module     $enable_config_socket
+
+  X11 FrontEnd module      $enable_frontend_x11
+  Socket FrontEnd module   $enable_frontend_socket
+
+  RawCode IMEngine module  $enable_im_rawcode
+  Socket IMEngine module   $enable_im_socket
+
+  SCTC Filter module       $enable_filter_sctc
+
+  GTK2 Utility Library     $enable_gtk_utils
+  X11 Utility Library      $enable_x11_utils
+
+  GTK2 IMModule            $enable_gtk2_immodule
+  GTK2 IMModule dir        $GTK_IM_MODULEDIR
+
+  GUI Setup Utility        $enable_setup_ui
+
+  GTK2 Panel GUI           $enable_panel_gtk
+
+  Enable TrayIcon          $enable_tray_icon
+])
+

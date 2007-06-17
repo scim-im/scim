@@ -1,0 +1,14 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+localedir=@datadir@/locale
+datadir=@datadir@
+sysconfdir=@sysconfdir@
+
+Name: scim-x11utils
+Description: X11 Utilities for Smart Common Input Method platform
+Version: @SCIM_VERSION@
+Requires: scim 
+Libs: -L${libdir} -lscim-x11utils@SCIM_EPOCH@ @X_LIBS@
+Cflags: -I${includedir}/scim@SCIM_EPOCH@ @X_CFLAGS@
