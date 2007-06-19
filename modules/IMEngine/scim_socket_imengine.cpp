@@ -840,7 +840,7 @@ SocketInstance::commit_transaction (Transaction &trans)
 bool
 SocketInstance::do_transaction (Transaction &trans, bool &ret)
 {
-    int cmd;
+    int cmd = -1;
     bool cont = false;
 
     ret = false;
@@ -1048,8 +1048,12 @@ SocketInstance::do_transaction (Transaction &trans, bool &ret)
                     cont = true;
                     break;
                 }
+                default:
+                    SCIM_DEBUG_IMENGINE(3) << "  Strange cmd: " << cmd << "\n";;
             }
         }
+    } else {
+        SCIM_DEBUG_IMENGINE(3) << "  Failed to get cmd: " << cmd << "\n";
     }
 
     SCIM_DEBUG_IMENGINE(2) << " End of Do transaction\n";

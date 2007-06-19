@@ -672,15 +672,22 @@ gtk_im_context_scim_reset (GtkIMContext *context)
 static void
 gtk_im_context_scim_focus_in (GtkIMContext *context)
 {
-    SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_focus_in...\n";
-
     GtkIMContextSCIM *context_scim = GTK_IM_CONTEXT_SCIM (context);
 
-    if (_focused_ic)
+    SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_focus_in(" << context_scim->id << ")...\n";
+
+    if (_focused_ic) {
+        if (_focused_ic == context_scim) {
+            SCIM_DEBUG_FRONTEND(1) << "It's already focused.\n";
+            return;
+        }
+        SCIM_DEBUG_FRONTEND(1) << "Focus out previous IC first: " << _focused_ic->id << "\n";
         gtk_im_context_scim_focus_out (GTK_IM_CONTEXT (_focused_ic));
+    }
 
     // Only use key snooper when use_key_snooper option is enabled and a gtk main loop is running.
     if (_use_key_snooper && !_snooper_installed && gtk_main_level () > 0) {
+        SCIM_DEBUG_FRONTEND(2) << "Install key snooper.\n";
         _snooper_id = gtk_key_snooper_install ((GtkKeySnoopFunc)gtk_scim_key_snooper, NULL);
         _snooper_installed = true;
     }
@@ -761,14 +768,15 @@ gtk_im_context_scim_focus_in (GtkIMContext *context)
 static void
 gtk_im_context_scim_focus_out (GtkIMContext *context)
 {
-    SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_focus_out...\n";
+    GtkIMContextSCIM *context_scim = GTK_IM_CONTEXT_SCIM (context);
+
+    SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_focus_out(" << context_scim->id << ")...\n";
 
     if (_snooper_installed) {
+        SCIM_DEBUG_FRONTEND(2) << "Remove key snooper.\n";
         gtk_key_snooper_remove (_snooper_id);
         _snooper_installed = false;
     }
-
-    GtkIMContextSCIM *context_scim = GTK_IM_CONTEXT_SCIM (context);
 
     if (context_scim && context_scim->impl && context_scim == _focused_ic) {
         _panel_client.prepare (context_scim->id);
@@ -982,6 +990,9 @@ gtk_scim_key_snooper (GtkWidget    *grab_widget,
 
         if (!filter_hotkeys (_focused_ic, key)) {
             if (!_focused_ic->impl->is_on || !_focused_ic->impl->si->process_key_event (key)) {
+                SCIM_DEBUG_FRONTEND(3) << "Failed to process: "
+                                       << (!_focused_ic->impl->is_on ? "IC is off" : "IC doesn't process")
+                                       << ".\n";
                 ret = _fallback_instance->process_key_event (key);
             } else {
                 ret = TRUE;
@@ -993,6 +1004,11 @@ gtk_scim_key_snooper (GtkWidget    *grab_widget,
         _panel_client.send ();
 
         _focused_widget = 0;
+    } else {
+        SCIM_DEBUG_FRONTEND(3) << "Failed snooper: "
+                               << ((!_focused_ic || !_focused_ic->impl) ? "Invalid focused ic" :
+                                   (event->send_event ? "send event is set" : "unknown"))
+                               << "\n";
     }
 
     return ret;
