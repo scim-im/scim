@@ -45,6 +45,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <signal.h>
+#include <sys/time.h>
 
 #include "scim_private.h"
 #include "scim.h"
@@ -325,8 +326,15 @@ public:
         if (m_id < 0) { m_err = EBADF; return -1; }
 
         m_err = 0;
-        int ret = ::read (m_id, buf, size);
-        if (ret < 0) m_err = errno;
+        int ret;
+        while (1) {
+            ret = ::read (m_id, buf, size);
+            if (ret >= 0)
+                break;
+            if (errno == EINTR)
+                continue;
+            m_err = errno;
+        }
         return ret;
     }
 
@@ -342,7 +350,7 @@ public:
         char *cbuf = static_cast<char *> (buf);
  
         while (size > 0) {
-            ret = wait_for_data (timeout);
+            ret = wait_for_data_internal (&timeout);
  
             if (ret < 0) return ret;
             if (ret == 0) return nbytes;
@@ -374,13 +382,17 @@ public:
 
         while (size > 0) {
             ret = ::write (m_id, cbuf, size);
-            if (ret <= 0) break;
-            size -= (size_t) ret;
-            cbuf += ret;
+            if (ret > 0) {
+                size -= (size_t) ret;
+                cbuf += ret;
+                continue;
+            }
+            if (errno == EINTR)
+                continue;
+            break;
         }
  
-        if (ret == 0) m_err = EPIPE;
-        else if (ret < 0) m_err = errno;
+        m_err = errno;
  
         if (orig_handler != SIG_ERR)
             signal (SIGPIPE, orig_handler);
@@ -392,27 +404,7 @@ public:
 
     int wait_for_data (int timeout = -1) {
         if (m_id < 0) { m_err = EBADF; return -1; }
- 
-        struct timeval tv;
-        fd_set         fds;
-        int            ret;
- 
-        FD_ZERO( &fds );
-        FD_SET( m_id, &fds );
- 
-        m_err = 0;
-
-        if (timeout >= 0) {
-            tv.tv_sec = timeout / 1000;
-            tv.tv_usec = (timeout % 1000) * 1000;
-            ret = ::select (m_id+1, &fds, 0, 0, &tv);
-        } else {
-            ret = ::select (m_id+1, &fds, 0, 0, 0);
-        }
- 
-        if (ret < 0) m_err = errno;
- 
-        return ret;
+        return wait_for_data_internal (&timeout);
     }
 
     int get_error_number () const {
@@ -598,6 +590,59 @@ public:
         m_no_close = false;
         m_family = SCIM_SOCKET_UNKNOWN;
         m_address = SocketAddress ();
+    }
+
+private:
+    int wait_for_data_internal (int *timeout) {
+        fd_set fds;
+        struct timeval tv;
+        struct timeval begin_tv;
+        int ret;
+
+        if (*timeout >= 0) {
+            gettimeofday(&begin_tv, 0);
+            tv.tv_sec = *timeout / 1000;
+            tv.tv_usec = (*timeout % 1000) * 1000;
+        }
+
+        m_err = 0;
+
+        while (1) {
+            FD_ZERO(&fds);
+            FD_SET(m_id, &fds);
+
+            ret = select(m_id + 1, &fds, NULL, NULL, (*timeout >= 0) ? &tv : NULL);
+            if (*timeout > 0) {
+                int elapsed;
+                struct timeval cur_tv;
+                gettimeofday (&cur_tv, 0);
+                elapsed = (cur_tv.tv_sec - begin_tv.tv_sec) * 1000 +
+                          (cur_tv.tv_usec - begin_tv.tv_usec) / 1000;
+                *timeout = *timeout - elapsed;
+                if (*timeout > 0) {
+                    tv.tv_sec = *timeout / 1000;
+                    tv.tv_usec = (*timeout % 1000) * 1000;
+                } else {
+                    tv.tv_sec = 0;
+                    tv.tv_usec = 0;
+                    *timeout = 0;
+                }
+            }
+            if (ret > 0) {
+                return ret;
+            } else if (ret == 0) {
+                if (*timeout == 0)
+                    return ret;
+                else
+                    continue;
+            }
+
+            if (errno == EINTR)
+                continue;
+
+            m_err = errno;
+            return ret;
+        }
     }
 };
 
