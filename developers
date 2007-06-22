@@ -1,15 +1,48 @@
-baohaojun:'baohaojun@users.sourceforge.net'
-cooleyes_lf:'cooleyes.lin <cooleyes_lf@users.sourceforge.net>'
-hwanjin:'Choe Hwanjin <hwanjin@users.sourceforge.net>'
-janhefti:'Jan Hefti <janhefti@users.sourceforge.net>'
-juhp:'Jens-Ulrik Petersen <juhp@users.sourceforge.net>'
-linshiqun:'lin shiqun <linshiqun@users.sourceforge.net>'
-liuspider:'LiuCougar <liuspider@users.sourceforge.net>'
-mfabian:'Mike FABIAN <mfabian@users.sourceforge.net>'
-neeum:'Kitae <neeum@users.sourceforge.net>'
-ryo-dairiki:'ryo-dairiki@users.sourceforge.net'
-subbo:'Subbo <subbo@users.sourceforge.net>'
-suzhe:'James Su <suzhe@tsinghua.org.cn>'
-voidoo:'Roy Chan <voidoo@users.sourceforge.net>'
-wjbeksi:'William J Beksi <wjbeksi@users.sourceforge.net>'
-ybando:'Yukiko Bando <ybando@users.sourceforge.net>'
+<?xml version="1.0" encoding="utf-8"?>
+<authors xmlns:html="http://www.w3.org/1999/xhtml">
+ <author uid="suzhe">
+  James Su &lt;suzhe@tsinghua.org.cn&gt;
+ </author>
+ <author uid="baohaojun">
+  Bao haojun &lt;baohaojun@users.sourceforge.net&gt;
+ </author>
+ <author uid="cooleyes_lf">
+  cooleyes.lin &lt;cooleyes_lf@users.sourceforge.net&gt;
+ </author>
+ <author uid="hwanjin">
+  Choe Hwanjin &lt;hwanjin@users.sourceforge.net&gt;
+ </author>
+ <author uid="janhefti">
+  Jan Hefti &lt;janhefti@users.sourceforge.net&gt;
+ </author>
+ <author uid="juhp">
+  Jens-Ulrik Petersen &lt;juhp@users.sourceforge.net&gt;
+ </author>
+ <author uid="linshiqun">
+  lin shiqun &lt;linshiqun@users.sourceforge.net&gt;
+ </author>
+ <author uid="liuspider">
+  LiuCougar &lt;liuspider@users.sourceforge.net&gt;
+ </author>
+ <author uid="mfabian">
+  Mike FABIAN &lt;mfabian@users.sourceforge.net&gt;
+ </author>
+ <author uid="neeum">
+  Kitae &lt;neeum@users.sourceforge.net&gt;
+ </author>
+ <author uid="ryo-dairiki">
+  Ryo Dairiki &lt;ryo-dairiki@users.sourceforge.net&gt;
+ </author>
+ <author uid="subbo">
+  Subbo &lt;subbo@users.sourceforge.net&gt;
+ </author>
+ <author uid="voidoo">
+  Roy Chan &lt;voidoo@users.sourceforge.net&gt;
+ </author>
+ <author uid="wjbeksi">
+  William J Beksi &lt;wjbeksi@users.sourceforge.net&gt;
+ </author>
+ <author uid="ybando">
+  Yukiko Bando &lt;ybando@users.sourceforge.net&gt;
+ </author>
+</authors>
