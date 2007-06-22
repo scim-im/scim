@@ -26,6 +26,7 @@
 #define Uses_SCIM_GLOBAL_CONFIG
 #define Uses_SCIM_CONFIG_PATH
 #define Uses_C_STDIO
+#define Uses_C_STRING
 #include "scim_private.h"
 #include "scim.h"
 #include "scim_stl_map.h"
