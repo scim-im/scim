@@ -36,6 +36,7 @@
 #define Uses_SCIM_TRANSACTION
 #define Uses_SCIM_HOTKEY
 #define Uses_SCIM_PANEL_CLIENT
+#define Uses_C_STRING
 #include <iostream>
 
 #include <stdio.h>
