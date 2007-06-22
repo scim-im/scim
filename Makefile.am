@@ -66,4 +66,4 @@ ACLOCAL_AMFLAGS = -I m4
 .PHONY: update-ChangeLog
 
 update-ChangeLog:
-	/bin/sh $(top_srcdir)/cvs2cl.pl --gmt -P -r -b -T -S -U $(top_srcdir)/developers -f $(top_srcdir)/ChangeLog
+	/bin/sh $(top_srcdir)/svn2cl.sh --authors=$(top_srcdir)/developers -f $(top_srcdir)/ChangeLog
