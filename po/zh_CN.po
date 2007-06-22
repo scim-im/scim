@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: zh_CN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-10 17:36+0800\n"
+"POT-Creation-Date: 2007-06-22 11:40-0700\n"
 "PO-Revision-Date: 2004-06-20 14:57+0800\n"
 "Last-Translator: James Su <suzhe@tsinghua.org.cn>\n"
 "Language-Team: Simplified Chinese <zh@li.org>\n"
@@ -21,9 +21,9 @@ msgstr "英语/欧洲语"
 
 #. Append an entry for forward mode.
 #: ../src/scim_imengine.cpp:638 ../src/scim_utility.cpp:693
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1906
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1258
-#: ../extras/panel/scim_panel_gtk.cpp:2778
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1897
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1281
+#: ../extras/panel/scim_panel_gtk.cpp:2814
 msgid "English/Keyboard"
 msgstr "英语键盘"
 
@@ -517,31 +517,31 @@ msgstr "简->繁"
 msgid "TC->SC"
 msgstr "繁->简"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1208
-#: ../extras/panel/scim_panel_gtk.cpp:2275
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1845
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1231
+#: ../extras/panel/scim_panel_gtk.cpp:2304
 msgid "Smart Common Input Method platform "
 msgstr "智能通用输入法平台"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1856
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1210
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1847
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1233
 msgid ""
 "\n"
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
 "\n"
 msgstr ""
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1860
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1215
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1238
 msgid ""
 ":\n"
 "\n"
 msgstr ""
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1863
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1866
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1218
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1221
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1857
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1241
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1244
 msgid ""
 "\n"
 "\n"
@@ -1074,7 +1074,7 @@ msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
 msgstr "<span size=\"x-large\">%s模块的设置.</span>"
 
 #: ../extras/setup/scim_setup_ui.cpp:456
-msgid "Are you sure to quit SCIM Setup?"
+msgid "Are you sure you want to quit SCIM Setup?"
 msgstr "你确定要退出 SCIM 设置程序么?"
 
 #: ../extras/setup/scim_setup_ui.cpp:685
@@ -1096,27 +1096,27 @@ msgstr "基于 GTK 控件库的集成设置工具."
 msgid "Setup utility for Smart Common Input Method platform"
 msgstr "智能通用输入法平台的设置工具"
 
-#: ../extras/panel/scim_panel_gtk.cpp:971
+#: ../extras/panel/scim_panel_gtk.cpp:982
 msgid "SCIM Help"
 msgstr "SCIM 帮助"
 
-#: ../extras/panel/scim_panel_gtk.cpp:988
+#: ../extras/panel/scim_panel_gtk.cpp:999
 msgid "Smart Common Input Method"
 msgstr "智能通用输入法平台"
 
-#: ../extras/panel/scim_panel_gtk.cpp:1047
+#: ../extras/panel/scim_panel_gtk.cpp:1058
 msgid "Stick/unstick the input window and the toolbar."
 msgstr "粘住/放开 输入窗口和工具条."
 
-#: ../extras/panel/scim_panel_gtk.cpp:1052
+#: ../extras/panel/scim_panel_gtk.cpp:1063
 msgid "Show a brief help about SCIM and the current input method."
 msgstr "显示关于 SCIM 和当前输入法的简单帮助."
 
-#: ../extras/panel/scim_panel_gtk.cpp:1057
+#: ../extras/panel/scim_panel_gtk.cpp:1068
 msgid "Show command menu."
 msgstr "显示命令菜单."
 
-#: ../extras/panel/scim_panel_gtk.cpp:2277
+#: ../extras/panel/scim_panel_gtk.cpp:2306
 msgid ""
 "\n"
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
@@ -1125,27 +1125,27 @@ msgstr ""
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
 
 #. Reload Configuration.
-#: ../extras/panel/scim_panel_gtk.cpp:2356
+#: ../extras/panel/scim_panel_gtk.cpp:2385
 msgid "Reload Configuration"
 msgstr "重新加载配置"
 
 #. Stick
-#: ../extras/panel/scim_panel_gtk.cpp:2366
+#: ../extras/panel/scim_panel_gtk.cpp:2395
 msgid "Stick Windows"
 msgstr "粘住窗口"
 
 #. Toolbar
-#: ../extras/panel/scim_panel_gtk.cpp:2375
+#: ../extras/panel/scim_panel_gtk.cpp:2404
 msgid "Hide Toolbar"
 msgstr "隱藏工具条"
 
 #. Help
-#: ../extras/panel/scim_panel_gtk.cpp:2384
+#: ../extras/panel/scim_panel_gtk.cpp:2413
 msgid "Help ..."
 msgstr "帮助 ..."
 
 #. Clients exit.
-#: ../extras/panel/scim_panel_gtk.cpp:2402
+#: ../extras/panel/scim_panel_gtk.cpp:2431
 msgid "Exit"
 msgstr "退出"
 
