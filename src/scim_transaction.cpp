@@ -30,6 +30,7 @@
 #define Uses_SCIM_TRANSACTION
 #define Uses_STL_ALGORITHM
 #define Uses_C_STDLIB
+#define Uses_C_STRING
 
 #include "scim_private.h"
 #include "scim.h"
