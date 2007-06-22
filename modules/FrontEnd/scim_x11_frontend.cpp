@@ -449,24 +449,22 @@ X11FrontEnd::run ()
     FD_SET (panel_fd, &active_fds);
     FD_SET (xserver_fd, &active_fds);
 
-    // Process the events which are already send to me from the X Server.
-    while (XPending (m_display)) {
-        XNextEvent (m_display, &event);
-        XFilterEvent (&event, None);
-    }
-
     m_should_exit = false;
 
     // Select between the X Server and the Panel GUI.
     while (!m_should_exit) {
-        struct timeval tval;
         int ret;
 
         read_fds = active_fds;
-        tval.tv_usec = 100000;
-        tval.tv_sec = 0;
 
-        if ((ret = select (max_fd + 1, &read_fds, NULL, NULL, &tval)) < 0) {
+        // Process the events which are already send to me from the X Server
+        // before calling select.
+        while (XPending (m_display)) {
+            XNextEvent (m_display, &event);
+            XFilterEvent (&event, None);
+        }
+
+        if ((ret = select (max_fd + 1, &read_fds, NULL, NULL, NULL)) < 0) {
             SCIM_DEBUG_FRONTEND(1) << "X11 -- Error when watching events!\n";
             return;
         }
@@ -493,13 +491,7 @@ X11FrontEnd::run ()
                 }
             }
         }
-
-        if (FD_ISSET (xserver_fd, &read_fds) || ret == 0) {
-            while (XPending (m_display)) {
-                XNextEvent (m_display, &event);
-                XFilterEvent (&event, None);
-            }
-        }
+        // X Events will be processed at beginning of the loop.
     }
 }
 
