@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pa\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-10 17:36+0800\n"
+"POT-Creation-Date: 2007-06-22 11:40-0700\n"
 "PO-Revision-Date: 2005-12-13 08:28+0530\n"
 "Last-Translator: Amanpreet Singh Alam <amanpreetalam@yahoo.com>\n"
 "Language-Team: Punjabi <fedora-trans-pa@redhat.com>\n"
@@ -25,9 +25,9 @@ msgstr "ਅੰਗਰੇਜ਼ੀ/ਯੂਰਪ"
 
 #. Append an entry for forward mode.
 #: ../src/scim_imengine.cpp:638 ../src/scim_utility.cpp:693
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1906
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1258
-#: ../extras/panel/scim_panel_gtk.cpp:2778
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1897
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1281
+#: ../extras/panel/scim_panel_gtk.cpp:2814
 msgid "English/Keyboard"
 msgstr "ਅੰਗਰੇਜ਼ੀ/ਕੀ-ਬੋਰਡ"
 
@@ -523,14 +523,14 @@ msgstr "SC->TC"
 msgid "TC->SC"
 msgstr "TC->SC"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1208
-#: ../extras/panel/scim_panel_gtk.cpp:2275
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1845
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1231
+#: ../extras/panel/scim_panel_gtk.cpp:2304
 msgid "Smart Common Input Method platform "
 msgstr "ਸਮਾਰਟ ਕਾਮਨ ਇੰਪੁੱਟ ਮੈਥਡ ਪਲੇਟਫਾਰਮ"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1856
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1210
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1847
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1233
 msgid ""
 "\n"
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
@@ -540,8 +540,8 @@ msgstr ""
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
 "\n"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1860
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1215
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1238
 msgid ""
 ":\n"
 "\n"
@@ -549,10 +549,10 @@ msgstr ""
 ":\n"
 "\n"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1863
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1866
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1218
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1221
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1857
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1241
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1244
 msgid ""
 "\n"
 "\n"
@@ -1090,7 +1090,7 @@ msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
 msgstr "<span size=\"x-large\">%s ਮੈਡੀਊਲ ਲਈ ਸੈਟਅੱਪ ਹੈ।</span>"
 
 #: ../extras/setup/scim_setup_ui.cpp:456
-msgid "Are you sure to quit SCIM Setup?"
+msgid "Are you sure you want to quit SCIM Setup?"
 msgstr "ਕੀ ਤੁਸੀਂ SCIM ਸੈਟਅੱਪ ਨੂੰ ਬੰਦ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
 
 #: ../extras/setup/scim_setup_ui.cpp:685
@@ -1113,27 +1113,27 @@ msgstr "GTK ਵਿਦਗਿਟ ਲਾਇਬਰੇਰੀ 'ਤੇ ਅਧਾਰਤ 
 msgid "Setup utility for Smart Common Input Method platform"
 msgstr "ਸਮਾਰਟ ਕਾਮਨ ਇੰਪੁੱਟ ਮੈਂਥਸਡ ਪਲੇਟਫਾਰਮ ਲਈ ਸੈਟਅੱਪ ਸਹੂਲਤ"
 
-#: ../extras/panel/scim_panel_gtk.cpp:971
+#: ../extras/panel/scim_panel_gtk.cpp:982
 msgid "SCIM Help"
 msgstr "SCIM ਸਹਾਇਤਾ"
 
-#: ../extras/panel/scim_panel_gtk.cpp:988
+#: ../extras/panel/scim_panel_gtk.cpp:999
 msgid "Smart Common Input Method"
 msgstr "ਸਮਾਰਟ ਕਾਮਨ ਇੰਪੁੱਟ ਮੈਂਥਡ"
 
-#: ../extras/panel/scim_panel_gtk.cpp:1047
+#: ../extras/panel/scim_panel_gtk.cpp:1058
 msgid "Stick/unstick the input window and the toolbar."
 msgstr "ਇੰਪੁੱਟ ਝਰੋਖਾ ਅਤੇ ਸੰਦ-ਪੱਟੀ ਸਟਿੱਕੀ/ਨਾ-ਸਟਿੱਕੀ ਹੈ।"
 
-#: ../extras/panel/scim_panel_gtk.cpp:1052
+#: ../extras/panel/scim_panel_gtk.cpp:1063
 msgid "Show a brief help about SCIM and the current input method."
 msgstr "SCIM ਅਤੇ ਮੌਜੂਦਾ ਇੰਪੁੱਟ ਢੰਗ ਬਾਰੇ ਸੰਖੇਪ ਸਹਾਇਤਾ ਵਿਖਾਓ।"
 
-#: ../extras/panel/scim_panel_gtk.cpp:1057
+#: ../extras/panel/scim_panel_gtk.cpp:1068
 msgid "Show command menu."
 msgstr "ਕਮਾਂਡ ਮੇਨ ਵੇਖਾਓ।"
 
-#: ../extras/panel/scim_panel_gtk.cpp:2277
+#: ../extras/panel/scim_panel_gtk.cpp:2306
 msgid ""
 "\n"
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
@@ -1142,27 +1142,27 @@ msgstr ""
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
 
 #. Reload Configuration.
-#: ../extras/panel/scim_panel_gtk.cpp:2356
+#: ../extras/panel/scim_panel_gtk.cpp:2385
 msgid "Reload Configuration"
 msgstr "ਸੰਰਚਨਾ ਮੁੜ-ਲੋਡ"
 
 #. Stick
-#: ../extras/panel/scim_panel_gtk.cpp:2366
+#: ../extras/panel/scim_panel_gtk.cpp:2395
 msgid "Stick Windows"
 msgstr "ਸਟਿੱਕੀ ਝਰੋਖੇ"
 
 #. Toolbar
-#: ../extras/panel/scim_panel_gtk.cpp:2375
+#: ../extras/panel/scim_panel_gtk.cpp:2404
 msgid "Hide Toolbar"
 msgstr "ਸੰਦ-ਪੱਟੀ ਓਹਲੇ"
 
 #. Help
-#: ../extras/panel/scim_panel_gtk.cpp:2384
+#: ../extras/panel/scim_panel_gtk.cpp:2413
 msgid "Help ..."
 msgstr "ਸਹਾਇਤਾ ..."
 
 #. Clients exit.
-#: ../extras/panel/scim_panel_gtk.cpp:2402
+#: ../extras/panel/scim_panel_gtk.cpp:2431
 msgid "Exit"
 msgstr "ਬਾਹਰ"
 

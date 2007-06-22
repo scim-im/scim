@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-21 22:45-0700\n"
+"POT-Creation-Date: 2007-06-22 11:40-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,8 +22,8 @@ msgstr ""
 
 #. Append an entry for forward mode.
 #: ../src/scim_imengine.cpp:638 ../src/scim_utility.cpp:693
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1906
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1264
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1897
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1281
 #: ../extras/panel/scim_panel_gtk.cpp:2814
 msgid "English/Keyboard"
 msgstr ""
@@ -518,31 +518,31 @@ msgstr ""
 msgid "TC->SC"
 msgstr ""
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1214
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1845
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1231
 #: ../extras/panel/scim_panel_gtk.cpp:2304
 msgid "Smart Common Input Method platform "
 msgstr ""
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1856
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1216
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1847
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1233
 msgid ""
 "\n"
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
 "\n"
 msgstr ""
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1860
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1221
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1238
 msgid ""
 ":\n"
 "\n"
 msgstr ""
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1863
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1866
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1224
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1227
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1857
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1241
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1244
 msgid ""
 "\n"
 "\n"
@@ -1047,7 +1047,7 @@ msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
 msgstr ""
 
 #: ../extras/setup/scim_setup_ui.cpp:456
-msgid "Are you sure to quit SCIM Setup?"
+msgid "Are you sure you want to quit SCIM Setup?"
 msgstr ""
 
 #: ../extras/setup/scim_setup_ui.cpp:685

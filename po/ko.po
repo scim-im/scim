@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SCIM\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-10 17:36+0800\n"
+"POT-Creation-Date: 2007-06-22 11:40-0700\n"
 "PO-Revision-Date: 2005-07-08 18:16+0900\n"
 "Last-Translator: Choe Hwanjin <choe.hwanjin@gmail.com>\n"
 "Language-Team: Korean <en@li.org>\n"
@@ -23,9 +23,9 @@ msgstr "영어/유럽어"
 
 #. Append an entry for forward mode.
 #: ../src/scim_imengine.cpp:638 ../src/scim_utility.cpp:693
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1906
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1258
-#: ../extras/panel/scim_panel_gtk.cpp:2778
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1897
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1281
+#: ../extras/panel/scim_panel_gtk.cpp:2814
 msgid "English/Keyboard"
 msgstr "영어/키보드"
 
@@ -521,14 +521,14 @@ msgstr "간체->번체"
 msgid "TC->SC"
 msgstr "번체->간체"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1208
-#: ../extras/panel/scim_panel_gtk.cpp:2275
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1845
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1231
+#: ../extras/panel/scim_panel_gtk.cpp:2304
 msgid "Smart Common Input Method platform "
 msgstr "똑똑한 일반 입력 방식 플랫폼 "
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1856
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1210
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1847
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1233
 msgid ""
 "\n"
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
@@ -538,8 +538,8 @@ msgstr ""
 "(C) 2002-2005 제임스 수 <suzhe@tsinghua.org.cn>\n"
 "\n"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1860
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1215
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1238
 msgid ""
 ":\n"
 "\n"
@@ -547,10 +547,10 @@ msgstr ""
 ":\n"
 "\n"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1863
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1866
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1218
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1221
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1857
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1241
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1244
 msgid ""
 "\n"
 "\n"
@@ -1089,7 +1089,7 @@ msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
 msgstr "<span size=\"x-large\">%s 모듈을 위한 설정.</span>"
 
 #: ../extras/setup/scim_setup_ui.cpp:456
-msgid "Are you sure to quit SCIM Setup?"
+msgid "Are you sure you want to quit SCIM Setup?"
 msgstr "SCIM 설정을 종료하시겠습니까?"
 
 #: ../extras/setup/scim_setup_ui.cpp:685
@@ -1112,27 +1112,27 @@ msgstr "GTK 라이브러리 기반의 설정 프로그램"
 msgid "Setup utility for Smart Common Input Method platform"
 msgstr "똑똑한 공통 입력 방법 (SCIM)을 위한 설정 프로그램"
 
-#: ../extras/panel/scim_panel_gtk.cpp:971
+#: ../extras/panel/scim_panel_gtk.cpp:982
 msgid "SCIM Help"
 msgstr "SCIM 도움말"
 
-#: ../extras/panel/scim_panel_gtk.cpp:988
+#: ../extras/panel/scim_panel_gtk.cpp:999
 msgid "Smart Common Input Method"
 msgstr "똑똑한 공통 입력 방법"
 
-#: ../extras/panel/scim_panel_gtk.cpp:1047
+#: ../extras/panel/scim_panel_gtk.cpp:1058
 msgid "Stick/unstick the input window and the toolbar."
 msgstr "입력창과 도구상자 고정/비고정."
 
-#: ../extras/panel/scim_panel_gtk.cpp:1052
+#: ../extras/panel/scim_panel_gtk.cpp:1063
 msgid "Show a brief help about SCIM and the current input method."
 msgstr "SCIM 과 현재 입력 방법에 대한 간단한 도움말을 보여줌."
 
-#: ../extras/panel/scim_panel_gtk.cpp:1057
+#: ../extras/panel/scim_panel_gtk.cpp:1068
 msgid "Show command menu."
 msgstr "명령 메뉴를 보임."
 
-#: ../extras/panel/scim_panel_gtk.cpp:2277
+#: ../extras/panel/scim_panel_gtk.cpp:2306
 msgid ""
 "\n"
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
@@ -1141,27 +1141,27 @@ msgstr ""
 "(C) 2002-2005 제임스 수 <suzhe@tsinghua.org.cn>"
 
 #. Reload Configuration.
-#: ../extras/panel/scim_panel_gtk.cpp:2356
+#: ../extras/panel/scim_panel_gtk.cpp:2385
 msgid "Reload Configuration"
 msgstr "설정 새로 불러오기"
 
 #. Stick
-#: ../extras/panel/scim_panel_gtk.cpp:2366
+#: ../extras/panel/scim_panel_gtk.cpp:2395
 msgid "Stick Windows"
 msgstr "윈도우 고정"
 
 #. Toolbar
-#: ../extras/panel/scim_panel_gtk.cpp:2375
+#: ../extras/panel/scim_panel_gtk.cpp:2404
 msgid "Hide Toolbar"
 msgstr "도구바 숨김"
 
 #. Help
-#: ../extras/panel/scim_panel_gtk.cpp:2384
+#: ../extras/panel/scim_panel_gtk.cpp:2413
 msgid "Help ..."
 msgstr "도움말 ..."
 
 #. Clients exit.
-#: ../extras/panel/scim_panel_gtk.cpp:2402
+#: ../extras/panel/scim_panel_gtk.cpp:2431
 msgid "Exit"
 msgstr "끝내기"
 

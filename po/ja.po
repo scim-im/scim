@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-10 17:36+0800\n"
+"POT-Creation-Date: 2007-06-22 11:40-0700\n"
 "PO-Revision-Date: 2005-12-11 11:00+0900\n"
 "Last-Translator: Yukiko Bando <ybando@k6.dion.ne.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -21,9 +21,9 @@ msgstr "英語/ヨーロッパ言語"
 
 #. Append an entry for forward mode.
 #: ../src/scim_imengine.cpp:638 ../src/scim_utility.cpp:693
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1906
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1258
-#: ../extras/panel/scim_panel_gtk.cpp:2778
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1897
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1281
+#: ../extras/panel/scim_panel_gtk.cpp:2814
 msgid "English/Keyboard"
 msgstr "英語/キーボード"
 
@@ -520,14 +520,14 @@ msgstr "簡体->繁体"
 msgid "TC->SC"
 msgstr "繁体->簡体"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1208
-#: ../extras/panel/scim_panel_gtk.cpp:2275
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1845
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1231
+#: ../extras/panel/scim_panel_gtk.cpp:2304
 msgid "Smart Common Input Method platform "
 msgstr "Smart Common Input Method platform"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1856
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1210
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1847
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1233
 msgid ""
 "\n"
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
@@ -537,8 +537,8 @@ msgstr ""
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
 "\n"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1860
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1215
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1238
 msgid ""
 ":\n"
 "\n"
@@ -546,10 +546,10 @@ msgstr ""
 ":\n"
 "\n"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1863
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1866
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1218
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1221
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1857
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1241
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1244
 msgid ""
 "\n"
 "\n"
@@ -1120,7 +1120,7 @@ msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
 msgstr "<span size=\"x-large\">%s モジュールの設定</span>"
 
 #: ../extras/setup/scim_setup_ui.cpp:456
-msgid "Are you sure to quit SCIM Setup?"
+msgid "Are you sure you want to quit SCIM Setup?"
 msgstr "SCIMの設定を終了しますか？"
 
 #: ../extras/setup/scim_setup_ui.cpp:685
@@ -1143,27 +1143,27 @@ msgstr "GTK Widget library に基づく統合設定ユーティリティ"
 msgid "Setup utility for Smart Common Input Method platform"
 msgstr "Smart Common Input Method platform セットアップユーティリティ"
 
-#: ../extras/panel/scim_panel_gtk.cpp:971
+#: ../extras/panel/scim_panel_gtk.cpp:982
 msgid "SCIM Help"
 msgstr "SCIMヘルプ"
 
-#: ../extras/panel/scim_panel_gtk.cpp:988
+#: ../extras/panel/scim_panel_gtk.cpp:999
 msgid "Smart Common Input Method"
 msgstr "Smart Common Input Method"
 
-#: ../extras/panel/scim_panel_gtk.cpp:1047
+#: ../extras/panel/scim_panel_gtk.cpp:1058
 msgid "Stick/unstick the input window and the toolbar."
 msgstr "入力ウィンドウ・ツールバーを固定する/固定しない"
 
-#: ../extras/panel/scim_panel_gtk.cpp:1052
+#: ../extras/panel/scim_panel_gtk.cpp:1063
 msgid "Show a brief help about SCIM and the current input method."
 msgstr "SCIMと現在の入力メソッドについて簡単なヘルプを表示します"
 
-#: ../extras/panel/scim_panel_gtk.cpp:1057
+#: ../extras/panel/scim_panel_gtk.cpp:1068
 msgid "Show command menu."
 msgstr "コマンドメニューを表示"
 
-#: ../extras/panel/scim_panel_gtk.cpp:2277
+#: ../extras/panel/scim_panel_gtk.cpp:2306
 msgid ""
 "\n"
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
@@ -1172,27 +1172,27 @@ msgstr ""
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
 
 #. Reload Configuration.
-#: ../extras/panel/scim_panel_gtk.cpp:2356
+#: ../extras/panel/scim_panel_gtk.cpp:2385
 msgid "Reload Configuration"
 msgstr "設定をリロード"
 
 #. Stick
-#: ../extras/panel/scim_panel_gtk.cpp:2366
+#: ../extras/panel/scim_panel_gtk.cpp:2395
 msgid "Stick Windows"
 msgstr "ウィンドウを固定"
 
 #. Toolbar
-#: ../extras/panel/scim_panel_gtk.cpp:2375
+#: ../extras/panel/scim_panel_gtk.cpp:2404
 msgid "Hide Toolbar"
 msgstr "ツールバーを隠す"
 
 #. Help
-#: ../extras/panel/scim_panel_gtk.cpp:2384
+#: ../extras/panel/scim_panel_gtk.cpp:2413
 msgid "Help ..."
 msgstr "ヘルプ..."
 
 #. Clients exit.
-#: ../extras/panel/scim_panel_gtk.cpp:2402
+#: ../extras/panel/scim_panel_gtk.cpp:2431
 msgid "Exit"
 msgstr "終了"
 
