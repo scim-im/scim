@@ -26,7 +26,7 @@
  * $Id: scim_private.cpp,v 1.6.4.1 2007/03/11 12:35:10 suzhe Exp $
  *
  */
-
+#define Uses_C_STRING
 #include "scim_private.h"
 #include "scim.h"
 
