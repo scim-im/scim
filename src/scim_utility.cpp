@@ -595,7 +595,7 @@ scim_get_user_data_dir ()
 String
 scim_get_current_locale ()
 {
-    char *locale = setlocale (LC_CTYPE, 0);
+    char *locale = setlocale (LC_MESSAGES, 0);
 
     if (locale) return String (locale);
     return String ();
