@@ -50,8 +50,11 @@ public:
 
 #ifdef HAVE_SETLOCALE
         char *locale = setlocale (LC_MESSAGES, 0);
-        if (!locale || *locale == 'C')
+        if (!locale || strcmp (locale, "C") == 0 || strcmp (locale, "POSIX") == 0)
             setlocale (LC_MESSAGES, "");
+        locale = setlocale (LC_CTYPE, 0);
+        if (!locale || strcmp (locale, "C") == 0 || strcmp (locale, "POSIX") == 0)
+            setlocale (LC_CTYPE, "");
 #endif
 
         bindtextdomain (GETTEXT_PACKAGE, SCIM_LOCALEDIR);
