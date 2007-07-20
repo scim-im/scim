@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-22 11:40-0700\n"
+"POT-Creation-Date: 2007-07-20 09:50+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1046,11 +1046,7 @@ msgstr ""
 msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
 msgstr ""
 
-#: ../extras/setup/scim_setup_ui.cpp:456
-msgid "Are you sure you want to quit SCIM Setup?"
-msgstr ""
-
-#: ../extras/setup/scim_setup_ui.cpp:685
+#: ../extras/setup/scim_setup_ui.cpp:661
 msgid ""
 "Not all configuration can be reloaded on the fly. Don't forget to restart "
 "SCIM in order to let all of the new configuration take effect."

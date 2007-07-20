@@ -213,6 +213,8 @@ AC_CHECK_FUNCS([gethostbyname gethostbyname_r socket bind accept connect listen]
 
 AM_ICONV
 
+PKG_PROG_PKG_CONFIG
+
 # Check if we should build scim-panel-gtk daemon
 PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.4.0 pango >= 1.1.0 gdk-pixbuf-2.0 >= 2.4.0],
 			[SCIM_HAS_GTK2=yes],

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SCIM\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-22 11:40-0700\n"
+"POT-Creation-Date: 2007-07-20 09:50+0800\n"
 "PO-Revision-Date: 2005-07-08 18:16+0900\n"
 "Last-Translator: Choe Hwanjin <choe.hwanjin@gmail.com>\n"
 "Language-Team: Korean <en@li.org>\n"
@@ -1088,11 +1088,7 @@ msgstr ""
 msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
 msgstr "<span size=\"x-large\">%s 모듈을 위한 설정.</span>"
 
-#: ../extras/setup/scim_setup_ui.cpp:456
-msgid "Are you sure you want to quit SCIM Setup?"
-msgstr "SCIM 설정을 종료하시겠습니까?"
-
-#: ../extras/setup/scim_setup_ui.cpp:685
+#: ../extras/setup/scim_setup_ui.cpp:661
 msgid ""
 "Not all configuration can be reloaded on the fly. Don't forget to restart "
 "SCIM in order to let all of the new configuration take effect."
@@ -1324,6 +1320,9 @@ msgstr "방향"
 #: ../utils/scimtrayicon.c:109
 msgid "The orientation of the tray."
 msgstr "트레이의 방향."
+
+#~ msgid "Are you sure you want to quit SCIM Setup?"
+#~ msgstr "SCIM 설정을 종료하시겠습니까?"
 
 #~ msgid "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
 #~ msgstr "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"

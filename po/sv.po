@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: scim\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-22 11:40-0700\n"
+"POT-Creation-Date: 2007-07-20 09:50+0800\n"
 "PO-Revision-Date: 2006-09-09 21:37+0200\n"
 "Last-Translator:  <>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -1116,11 +1116,7 @@ msgstr ""
 msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
 msgstr "<span size=\"x-large\">Inställningar för %s-moduler.</span>"
 
-#: ../extras/setup/scim_setup_ui.cpp:456
-msgid "Are you sure you want to quit SCIM Setup?"
-msgstr "Vill du avsluta inställningsverktyget för Scim?"
-
-#: ../extras/setup/scim_setup_ui.cpp:685
+#: ../extras/setup/scim_setup_ui.cpp:661
 msgid ""
 "Not all configuration can be reloaded on the fly. Don't forget to restart "
 "SCIM in order to let all of the new configuration take effect."
@@ -1354,3 +1350,6 @@ msgstr "Riktning"
 #: ../utils/scimtrayicon.c:109
 msgid "The orientation of the tray."
 msgstr "Panelens riktning."
+
+#~ msgid "Are you sure you want to quit SCIM Setup?"
+#~ msgstr "Vill du avsluta inställningsverktyget för Scim?"
