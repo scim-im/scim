@@ -717,6 +717,7 @@ static __Language __languages [] = {
     { "en_GB",    NULL, N_("English (British)"), "British English", ".iso885915" },
     { "en_IE",    NULL, N_("English (Ireland)"), "Irish English", NULL },
     { "en_US",    NULL, N_("English (American)"), "American English", ".iso885915" },
+    { "eo",       NULL, N_("Esperanto"), "Esperanto", NULL },
     { "es",    "es_ES", N_("Spanish"), "Español", NULL },
     { "es_ES",    NULL, N_("Spanish"), "Español", "@euro" },
     { "es_MX",    NULL, N_("Spanish (Mexico)"), "Español (Mexico)", NULL },
