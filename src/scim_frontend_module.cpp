@@ -69,7 +69,10 @@ FrontEndModule::load (const String &name,
 
         m_frontend_init (backend, config, argc, argv);
     } catch (...) {
-        m_module.unload ();
+        /* Don't unload FrontEnd module to avoid possible crash, when the
+         * exception is thrown by the module itself.
+         * m_module.unload ();
+         */
         m_frontend_init = 0;
         m_frontend_run = 0;
         return false;
