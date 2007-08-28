@@ -25,8 +25,8 @@
  * Boston, MA  02111-1307  USA
  */
  
-#ifndef SCIM_BRIDGE_LOOKUP_H_
-#define SCIM_BRIDGE_LOOKUP_H_
+#ifndef SCIM_BRIDGE_LOOKUP_TABLE_H_
+#define SCIM_BRIDGE_LOOKUP_TABLE_H_
 
 #include <stdlib.h>
 
@@ -38,4 +38,32 @@
  */
 typedef struct _ScimLookupTable ScimLookupTable;
 
-#endif /*SCIM_BRIDGE_LOOKUP_H_*/
+/**
+ * Allocate a new lookup table.
+ * 
+ * @return A new lookup table.
+ */
+ScimLookupTable *scim_alloc_lookup_table ();
+
+/**
+ * Free a lookup table.
+ * 
+ * @param lookup_table A lookup table.
+ */
+void scim_free_lookup_table (ScimLookupTable *lookup_table);
+
+/**
+ * Move the cursor up in the lookup table.
+ * 
+ * @param lookup_table The lookup table.
+ */
+void scim_lookup_table_cursor_up (ScimLookupTable *lookup_table);
+
+/**
+ * Move the cursor down in the lookup table.
+ * 
+ * @param lookup_table The lookup table.
+ */
+void scim_lookup_table_cursor_down (ScimLookupTable *lookup_table);
+
+#endif /*SCIM_BRIDGE_LOOKUP_TABLE_H_*/
