@@ -49,6 +49,20 @@ void scim_free_attribute_list (ScimAttributeList *attribute_list)
     free (attribute_list);
 }
 
+void scim_copy_attribute_list (ScimAttributeList *dst, const ScimAttributeList *src)
+{
+    if (dst->capacity < src->size) {
+        dst->capacity = src->size + 10;
+        free (dst->elements);
+        dst->elements = malloc (sizeof (ScimAttributeList) * dst->capacity);
+    }
+    
+    int i;
+    for (i = 0; i < src->size; ++i)
+        dst->elements[i] = src->elements[i];
+    dst->size = src->size;
+}
+
 size_t scim_attribute_list_get_size (const ScimAttributeList *attribute_list)
 {
     return attribute_list->size;

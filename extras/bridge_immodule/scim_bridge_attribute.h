@@ -92,6 +92,14 @@ ScimAttributeList *scim_alloc_attribute_list ();
 void scim_free_attribute_list (ScimAttributeList *attribute_list);
 
 /**
+ * @brief Copy a string attribute list into another.
+ * 
+ * @param dst The copy destination.
+ * @param src The copy source.
+ */
+void scim_copy_attribute_list (ScimAttributeList *dst, const ScimAttributeList *src);
+
+/**
  * @brief Get the size of the attribute list.
  * 
  * @param attribute_list The attribute list.

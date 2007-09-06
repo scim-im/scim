@@ -259,78 +259,64 @@ fi
 ##             Definiation of compile args.              ##
 ###########################################################
 AC_ARG_WITH(gtk-im-module-dir,
-	    AS_HELP_STRING([--with-gtk-im-module-dir=dir],
-			   [Select gtk immodule dir]),
+	    AS_HELP_STRING([--with-gtk-im-module-dir=dir], 
+	    [Select gtk immodule dir]),
 	    GTK_IM_MODULEDIR=$with_gtk_im_module_dir)
 
 AC_ARG_ENABLE(ld-version-script,
-	      [  --enable-ld-version-script Use ld version script to limit exported symbols],
-       	      enable_ld_version_script=yes,
+	      [  --enable-ld-version-script Use ld version script to limit exported symbols], ,
        	      enable_ld_version_script=no)
 
 AC_ARG_ENABLE(debug,
-	      [  --enable-debug            Turn on debugging],
-       	      enable_debug=yes,
+	      [  --enable-debug            Turn on debugging], , 
 	      enable_debug=no)
 
 AC_ARG_ENABLE(tests,
-	      [  --enable-tests            Build tests/*],
-       	      enable_tests=yes,
+	      [  --enable-tests            Build tests/*], , 
        	      enable_tests=no)
 
 AC_ARG_ENABLE(hash-map,
-	      [  --enable-hash-map         Use hast_map instead of std::map internally],
-       	      enable_hash_map=yes,
+	      [  --enable-hash-map         Use hast_map instead of std::map internally], , 
 	      enable_hash_map=no)
 
 AC_ARG_ENABLE(config-simple,
-	      [  --disable-config-simple   Do not build Simple Config module],
-       	      enable_config_simple=no,
+	      [  --disable-config-simple   Do not build Simple Config module], , 
        	      enable_config_simple=yes)
 
 AC_ARG_ENABLE(config-socket,
-	      [  --disable-config-socket   Do not build Socket Config module],
-       	      enable_config_socket=no,
+	      [  --disable-config-socket   Do not build Socket Config module], , 
        	      enable_config_socket=yes)
 
 AC_ARG_ENABLE(frontend-x11,
-	      [  --disable-frontend-x11    Do not build X11 FrontEnd module],
-       	      enable_frontend_x11=no,
+	      [  --disable-frontend-x11    Do not build X11 FrontEnd module], , 
        	      enable_frontend_x11=yes)
 
 AC_ARG_ENABLE(frontend-socket,
-	      [  --disable-frontend-socket Do not build Socket FrontEnd module],
-       	      enable_frontend_socket=no,
+	      [  --disable-frontend-socket Do not build Socket FrontEnd module], , 
        	      enable_frontend_socket=yes)
 
 AC_ARG_ENABLE(im-rawcode,
-	      [  --disable-im-rawcode      Do not build RawCode IMEngine module],
-       	      enable_im_rawcode=no,
+	      [  --disable-im-rawcode      Do not build RawCode IMEngine module], , 
        	      enable_im_rawcode=yes)
 
 AC_ARG_ENABLE(im-socket,
-	      [  --disable-im-socket       Do not build Socket IMEngine module],
-       	      enable_im_socket=no,
+	      [  --disable-im-socket       Do not build Socket IMEngine module], ,
        	      enable_im_socket=yes)
 
 AC_ARG_ENABLE(filter-sctc,
-	      [  --disable-filter-sctc     Do not build Simplified/Traditional Chinese conversion Filter module],
-       	      enable_filter_sctc=no,
+	      [  --disable-filter-sctc     Do not build Simplified/Traditional Chinese conversion Filter module], , 
        	      enable_filter_sctc=yes)
 
 AC_ARG_ENABLE(gtk2-immodule,
-	      [  --disable-gtk2-immodule   Do not build GTK2 IMModule],
-       	      enable_gtk2_immodule=no,
+	      [  --disable-gtk2-immodule   Do not build GTK2 IMModule], , 
        	      enable_gtk2_immodule=yes)
 
 AC_ARG_ENABLE(panel-gtk,
-              [  --disable-panel-gtk       Do not build GTK2 Panel],
-              enable_panel_gtk=no,
+              [  --disable-panel-gtk       Do not build GTK2 Panel], , 
               enable_panel_gtk=check)
 
 AC_ARG_ENABLE(setup-ui,
-	      [  --disable-setup-ui        Do not build Setup UI],
-       	      enable_setup_ui=no,
+	      [  --disable-setup-ui        Do not build Setup UI], , 
        	      enable_setup_ui=yes)
 
 if test "$have_x" = "yes"; then

@@ -415,3 +415,22 @@ bool scim_transaction_get_property_list (ScimTransaction *trans, ScimPropertyLis
     
     return false;
 }
+
+void scim_transaction_put_vector_uint32 (ScimTransaction *trans, const uint32 *values, size_t size)
+{
+    const uint32 header = SCIM_TRANS_DATA_VECTOR_UINT32;
+    scim_transaction_put_data (trans, &header, sizeof (uint32));
+    
+    const uint32 size_uint32 = size;
+    scim_transaction_put_data (trans, &size_uint32, sizeof (uint32));
+    
+    int i;
+    for (i = 0; i < size; ++i) {
+        const uint32 value_uint32 = values[i];
+        scim_transaction_put_data (trans, &value_uint32, sizeof (uint32));
+    }
+}
+
+bool scim_transaction_get_vector_uint32 (ScimTransaction *trans, uint32 **values, size_t *value_count)
+{
+}
