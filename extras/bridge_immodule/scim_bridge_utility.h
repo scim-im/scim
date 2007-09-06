@@ -27,6 +27,8 @@
 #ifndef SCIM_BRIDGE_UTILITY_H_
 #define SCIM_BRIDGE_UTILITY_H_
 
+#include "scim_bridge_utility.h"
+
 /**
  * @brief Get the length of a wide string.
  * 
