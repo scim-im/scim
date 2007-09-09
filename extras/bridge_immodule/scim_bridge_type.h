@@ -50,6 +50,16 @@ typedef unsigned int64 uint64_t;
     typedef uint32 ucs4_t;
 #endif
 
+typedef int bool_t;
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
 #endif //SCIM_BRIDGE_TYPES_H
 
 /*
