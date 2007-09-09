@@ -29,6 +29,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <sys/socket.h>
+#include <sys/types.h>
+
 #include "scim_bridge_types.h"
 #include "scim_bridge_utility.h"
 #include "scim_bridge_transaction.h"
@@ -57,38 +60,37 @@ enum ScimTransactionDataType
 
 struct _ScimTransaction
 {
-    size_t buffer_size;
-    size_t write_position;
-    size_t read_position;
-    unsigned char *buffer;
+    size_t sending_buffer_begin;
+    size_t sending_buffer_size;
+    size_t sending_buffer_capacity;
+    unsigned char *sending_buffer;
+    
+    size_t receiving_buffer_begin;
+    size_t receiving_buffer_size;
+    size_t receiving_buffer_capacity;
+    unsigned char *receiving_buffer;
 };
 
 ScimTransaction *scim_alloc_transaction ()
 {
     ScimTransaction *transaction = malloc (sizeof (ScimTransaction));
-    transaction->buffer_size = 256;
-    transaction->buffer = malloc (transaction->buffer_size);
-    transaction->write_position = 0;
-    transaction->read_position = 0;
+    
+    transaction->sending_buffer_capacity = 256;
+    transaction->sending_buffer_size = 0;
+    transaction->sending_buffer_begin = 0;
+    transaction->sending_buffer = malloc (transaction->sending_buffer_capacity);
+    
+    transaction->receiving_buffer_capacity = 256;
+    transaction->receiving_buffer_size = 0;
+    transaction->receiving_buffer_begin = 0;
+    transaction->receiving_buffer = malloc (transaction->receiving_buffer_capacity);
 }
 
 void scim_free_transaction (ScimTransaction *transaction)
 {
-    free (transaction->buffer);
+    free (transaction->sending_buffer);
+    free (transaction->receiving_buffer);
     free (transaction);
-}
-
-/**
- * @brief Check the remaining buffer size of the transaction, and reserve more space if needed.
- * 
- * @param trans The transaction.
- * @param buffer_size The size to reserve.
- */
-static inline void scim_transaction_request_buffer_size (ScimTransaction *trans, size_t buffer_size)
-{
-    const size_t remaining_size = trans->buffer_size - write_position;
-    if (remaining_size < buffer_size)
-        transaction->buffer = realloc (transaction->buffer, transaction->buffer_size + buffer_size * 2);
 }
 
 /**
@@ -98,12 +100,38 @@ static inline void scim_transaction_request_buffer_size (ScimTransaction *trans,
  * @param data The data to write in.
  * @param size The size of the data.
  */
-
 static inline void scim_transaction_put_data (ScimTransaction *trans, void *data, size_t size)
 {
-    scim_transaction_request_buffer_size (trans, size);
-    memcpy (bridge_transaction->buffer + bridge_transaction->write_position, data, size);
-    scim_transaction->write_position += size;    
+    if (trans->sending_buffer_capacity - trans->sending_buffer_size < buffer_size) {
+        const size_t new_buffer_capacity = trans->sending_buffer_capacity + buffer_size * 2;
+        unsigned char new_buffer = malloc (trans->buffer, trans->buffer_capacity);
+        
+        const size_t former_size = trans->sending_buffer_capacity - trans->sending_buffer_begin;
+        const size_t latter_size = trans->sending_buffer_size - former_size;
+        
+        memcpy (new_buffer, trans->sending_buffer + trans->sending_buffer_begin, former_size);
+        memcpy (new_buffer + former_size, trans->sending_buffer, latter_size);
+        
+        trans->sending_buffer_capacity += buffer_size * 2;
+        trans->sending_buffer_begin = 0;
+        
+        free (trans->sending_buffer);
+        trans->sending_buffer = new_buffer;
+    }
+    
+    const size_t seek_index = (trans->sending_buffer_begin + trans->sending_buffer_size) % trans->sending_buffer_capacity;
+    
+    if (seek_index + size > trans->sending_buffer_capacity) {
+        const size_t former_size = trans->sending_buffer_capacity - seek_index;
+        const size_t latter_size = size - former_size;
+        
+        memcpy (trans->sending_buffer + seek_index, data, former_size);
+        memcpy (trans->sending_buffer, data + former_size, latter_size);
+    } else {
+        memcpy (trans->sending_buffer + seek_index, data, size);
+    }
+    
+    scim_transaction->sending_buffer_size += size;
 }
 
 /**
@@ -114,15 +142,30 @@ static inline void scim_transaction_put_data (ScimTransaction *trans, void *data
  * @param size The size of the data.
  * @return true if it succeeded.
  */
-static inline bool scim_transaction_get_data (ScimTransaction *trans, void *data, size_t size)
+static inline bool_t scim_transaction_get_data (ScimTransaction *trans, void *data, size_t size)
 {
-    if (trans->read_position + size > trans->write_position) {
-        return false;
+    const size_t seek_index = (trans->receiving_buffer_begin + trans->receiving_buffer_size) % trans->receiving_buffer_capacity;
+    
+    if (seek_index + size > trans->receiving_buffer_capacity) {
+        const size_t former_size = trans->receiving_buffer_capacity - seek_index;
+        const size_t latter_size = size - former_size;
+        
+        memcpy (data, trans->receiving_buffer + seek_index, former_size);
+        memcpy (data + former_size, trans->receiving_buffer, latter_size);
     } else {
-        memcpy (data, trans->buffer + trans->read_position, size);
-        trans->read_position += size;
-        return true;
+        memcpy (data, trans->receiving_buffer + seek_index, size);
     }
+    
+    scim_transaction->receiving_buffer_begin += size;
+    scim_transaction->receiving_buffer_size -= size;
+}
+
+bool_t scim_transaction_write_to_socket (ScimTransaction *trans, int fd, int timeout)
+{
+}
+
+bool_t scim_transaction_read_from_socket (ScimTransaction *trans, int fd, int timeout)
+{
 }
 
 void scim_transaction_put_command (ScimTransaction *trans, int cmd)
@@ -132,7 +175,7 @@ void scim_transaction_put_command (ScimTransaction *trans, int cmd)
     scim_transaction_put_data (trans, &cmd, sizeof (uint32));
 }
 
-bool scim_transaction_get_command (ScimTransaction *trans, int *cmd)
+bool_t scim_transaction_get_command (ScimTransaction *trans, int *cmd)
 {
     uint32 header;
     return (scim_transaction_get_data (trans, &header, sizeof (uint32)) && header == SCIM_TRANS_COMMAND && 
@@ -146,7 +189,7 @@ void scim_transaction_put_uint32 (ScimTransaction *trans, uint32 value)
     scim_transaction_put_data (trans, &cmd, sizeof (uint32));
 }
 
-bool scim_transaction_get_uint32 (ScimTransaction *trans, uint32 *value)
+bool_t scim_transaction_get_uint32 (ScimTransaction *trans, uint32 *value)
 {
     const uint32 header;
     return (scim_transaction_get_data (trans, &header, sizeof (uint32)) && header == SCIM_TRANS_DATA_UINT32 && 
@@ -164,7 +207,7 @@ void scim_transaction_put_string (ScimTransaction *trans, const char* str)
     scim_transaction_put_data (trans, str, str_length);
 }
 
-bool scim_transaction_get_string (ScimTransaction *trans, char **str)
+bool_t scim_transaction_get_string (ScimTransaction *trans, char **str)
 {
     uint32 header;
     uint32 str_length;
@@ -203,7 +246,7 @@ void scim_transaction_put_wstring (ScimTransaction *trans, const wchar* wstr)
     }
 }
 
-bool scim_transaction_get_wstring (ScimTransaction *trans, ucs4_t **wstr)
+bool_t scim_transaction_get_wstring (ScimTransaction *trans, ucs4_t **wstr)
 {
     uint32 header;
     uint32 str_length;
@@ -239,7 +282,7 @@ void scim_transaction_put_key_event (ScimTransaction *trans, const ScimKeyEvent 
     scim_transaction_put_data (trans, &key_event->layout, sizeof (uint16));
 }
 
-bool scim_transaction_get_key_event (ScimTransaction *trans, ScimKeyEvent *key_event)
+bool_t scim_transaction_get_key_event (ScimTransaction *trans, ScimKeyEvent *key_event)
 {
 	uint32 header;
 	if (scim_transaction_get_data (trans, &header, sizeof (uint32)) && header == SCIM_TRANS_DATA_KEYEVENT) {
@@ -259,7 +302,7 @@ bool scim_transaction_get_key_event (ScimTransaction *trans, ScimKeyEvent *key_e
     return false;
 }
 
-void scim_transaction_put_attributes (ScimTransaction *trans, const ScimAttributeList *attribute_list)
+void scim_transaction_put_attribute_list (ScimTransaction *trans, const ScimAttributeList *attribute_list)
 {
     const uint32 header = SCIM_TRANS_DATA_ATTRIBUTE_LIST;
     scim_transaction_put_data (trans, &header, sizeof (uint32));
@@ -284,7 +327,7 @@ void scim_transaction_put_attributes (ScimTransaction *trans, const ScimAttribut
     }
 }
 
-bool scim_transaction_get_attribute_list (ScimTransaction *trans, ScimAttributeList *attribute_list)
+bool_t scim_transaction_get_attribute_list (ScimTransaction *trans, ScimAttributeList *attribute_list)
 {
     uint32 type;
     if (scim_transaction_get_data (trans, &type, sizeof (uint32)) && type == SCIM_TRANS_DATA_ATTRIBUTE_LIST) {
@@ -337,7 +380,7 @@ void scim_transaction_put_property (ScimTransaction *trans, const ScimProperty *
     scim_transaction_put_data (trans, &active, sizeof (unsigned char));   
 }
 
-bool scim_transaction_get_property (ScimTransaction *trans, ScimProperty *property)
+bool_t scim_transaction_get_property (ScimTransaction *trans, ScimProperty *property)
 {
     uint32 header;
     if (scim_transaction_get_data (trans, &header, sizeof (uint32)) && header == SCIM_TRANS_DATA_PROPERTY) {
@@ -393,7 +436,7 @@ void scim_transaction_put_property_list (ScimTransaction *trans, const ScimPrope
     }
 }
 
-bool scim_transaction_get_property_list (ScimTransaction *trans, ScimPropertyList *property_list)
+bool_t scim_transaction_get_property_list (ScimTransaction *trans, ScimPropertyList *property_list)
 {
     uint32 header;
     uint32 size;
@@ -401,7 +444,7 @@ bool scim_transaction_get_property_list (ScimTransaction *trans, ScimPropertyLis
             scim_transaction_get_data (trans, &size, sizeof (uint32))) {
         
         scim_property_list_set_size (property_list, size);
-        scim_transaction_put_data (trans, &size, sizeof (uint32));
+        scim_transaction_get_data (trans, &size, sizeof (uint32));
         
         size_t i;
         for (i = 0; i < size; ++i) {
@@ -416,13 +459,13 @@ bool scim_transaction_get_property_list (ScimTransaction *trans, ScimPropertyLis
     return false;
 }
 
-void scim_transaction_put_vector_uint32 (ScimTransaction *trans, const uint32 *values, size_t size)
+void scim_transaction_put_vector_uint32 (ScimTransaction *trans, const uint32 *values, size_t value_count)
 {
     const uint32 header = SCIM_TRANS_DATA_VECTOR_UINT32;
     scim_transaction_put_data (trans, &header, sizeof (uint32));
     
-    const uint32 size_uint32 = size;
-    scim_transaction_put_data (trans, &size_uint32, sizeof (uint32));
+    const uint32 size = value_count;
+    scim_transaction_put_data (trans, &size, sizeof (uint32));
     
     int i;
     for (i = 0; i < size; ++i) {
@@ -431,6 +474,48 @@ void scim_transaction_put_vector_uint32 (ScimTransaction *trans, const uint32 *v
     }
 }
 
-bool scim_transaction_get_vector_uint32 (ScimTransaction *trans, uint32 **values, size_t *value_count)
+bool_t scim_transaction_get_vector_uint32 (ScimTransaction *trans, uint32 **values, size_t *value_count)
 {
+    uint32 header;
+    uint32 size;
+    
+    *values = NULL;
+    *value_count = 0;
+    
+    if (scim_transaction_get_data (trans, &header, sizeof (uint32)) && header == SCIM_TRANS_DATA_VECTOR_UINT32 &&
+            scim_transaction_get_data (trans, &size, sizeof (uint32))) {
+
+        *values = malloc (sizeof (uint32) * size);
+        
+        size_t i;
+        for (i = 0; i < size; ++i) {
+            uint32 value;
+            if (!scim_transaction_get_data (trans, &value, sizeof (uit32))) {
+                free (*values);
+                return false;
+            } else {
+                (*values)[i] = value;
+            }
+        }
+        
+        *value_count = size;
+        return true;
+    }
+    
+    return false;
+}
+
+void scim_transaction_put_vector_string (ScimTransaction *trans, const char **values, size_t value_count)
+{
+    const uint32 header = SCIM_TRANS_DATA_VECTOR_STRING;
+    scim_transaction_put_data (trans, &header, sizeof (uint32));
+    
+    const uint32 size = value_count;
+    scim_transaction_put_data (trans, &size, sizeof (uint32));
+    
+    int i;
+    for (i = 0; i < size; ++i) {
+        const char *str = values[i];
+        scim_transaction_put_string (trans, str);
+    }
 }
