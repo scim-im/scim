@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-06-22 11:40-0700\n"
-"PO-Revision-Date: 2005-12-11 11:00+0900\n"
+"PO-Revision-Date: 2007-09-13 17:59+1000\n"
 "Last-Translator: Yukiko Bando <ybando@k6.dion.ne.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -314,7 +314,7 @@ msgstr "ロシア語"
 
 #: ../src/scim_utility.cpp:768
 msgid "Sinhala"
-msgstr ""
+msgstr "シンハラ語"
 
 #: ../src/scim_utility.cpp:769 ../src/scim_keyboard_layout_data.h:4618
 msgid "Slovak"
