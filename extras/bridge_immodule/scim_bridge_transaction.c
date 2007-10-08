@@ -28,13 +28,25 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/types.h>
 
 #include "scim_bridge_types.h"
 #include "scim_bridge_utility.h"
 #include "scim_bridge_transaction.h"
+
+/**
+ * The size of the transaction header.
+ */
+static const size_t SCIM_TRANS_HEADER_SIZE = sizeof (uint32) * 4;
+
+/**
+ * The magic token used in transaction.
+ */
+static const uint32 SCIM_TRANS_MAGIC = 0x4d494353;
 
 /**
  * @brief Signature of all valid data types which can be store into transaction.
@@ -60,37 +72,31 @@ enum ScimTransactionDataType
 
 struct _ScimTransaction
 {
-    size_t sending_buffer_begin;
-    size_t sending_buffer_size;
-    size_t sending_buffer_capacity;
-    unsigned char *sending_buffer;
-    
-    size_t receiving_buffer_begin;
-    size_t receiving_buffer_size;
-    size_t receiving_buffer_capacity;
-    unsigned char *receiving_buffer;
+    size_t buffer_capacity;
+    size_t reading_position;
+    size_t writing_position;
+    unsigned char *buffer;
 };
 
 ScimTransaction *scim_alloc_transaction ()
 {
     ScimTransaction *transaction = malloc (sizeof (ScimTransaction));
     
-    transaction->sending_buffer_capacity = 256;
-    transaction->sending_buffer_size = 0;
-    transaction->sending_buffer_begin = 0;
-    transaction->sending_buffer = malloc (transaction->sending_buffer_capacity);
-    
-    transaction->receiving_buffer_capacity = 256;
-    transaction->receiving_buffer_size = 0;
-    transaction->receiving_buffer_begin = 0;
-    transaction->receiving_buffer = malloc (transaction->receiving_buffer_capacity);
+    transaction->buffer_capacity = 256;
+    transaction->buffer = malloc (transaction->sending_buffer_capacity);
+    scim_transaction_clear (transaction);
 }
 
 void scim_free_transaction (ScimTransaction *transaction)
 {
-    free (transaction->sending_buffer);
-    free (transaction->receiving_buffer);
+    free (transaction->buffer);
     free (transaction);
+}
+
+void scim_transaction_clear (ScimTransaction *transaction)
+{
+    transaction->writing_position = SCIM_TRANS_HEADER_SIZE;
+    transaction->reading_position = SCIM_TRANS_HEADER_SIZE;
 }
 
 /**
@@ -102,36 +108,13 @@ void scim_free_transaction (ScimTransaction *transaction)
  */
 static inline void scim_transaction_put_data (ScimTransaction *trans, void *data, size_t size)
 {
-    if (trans->sending_buffer_capacity - trans->sending_buffer_size < buffer_size) {
-        const size_t new_buffer_capacity = trans->sending_buffer_capacity + buffer_size * 2;
-        unsigned char new_buffer = malloc (trans->buffer, trans->buffer_capacity);
-        
-        const size_t former_size = trans->sending_buffer_capacity - trans->sending_buffer_begin;
-        const size_t latter_size = trans->sending_buffer_size - former_size;
-        
-        memcpy (new_buffer, trans->sending_buffer + trans->sending_buffer_begin, former_size);
-        memcpy (new_buffer + former_size, trans->sending_buffer, latter_size);
-        
-        trans->sending_buffer_capacity += buffer_size * 2;
-        trans->sending_buffer_begin = 0;
-        
-        free (trans->sending_buffer);
-        trans->sending_buffer = new_buffer;
+    if (trans->writing_position + buffer_size > trans->buffer_capacity) {
+        trans->buffer_capacity = trans->buffer_capacity + size * 2;
+        trans->buffer = realloc (trans->buffer, trans->buffer_capacity);
     }
     
-    const size_t seek_index = (trans->sending_buffer_begin + trans->sending_buffer_size) % trans->sending_buffer_capacity;
-    
-    if (seek_index + size > trans->sending_buffer_capacity) {
-        const size_t former_size = trans->sending_buffer_capacity - seek_index;
-        const size_t latter_size = size - former_size;
-        
-        memcpy (trans->sending_buffer + seek_index, data, former_size);
-        memcpy (trans->sending_buffer, data + former_size, latter_size);
-    } else {
-        memcpy (trans->sending_buffer + seek_index, data, size);
-    }
-    
-    scim_transaction->sending_buffer_size += size;
+    memcpy (trans->buffer + trans->writing_position, data, size);
+    trans->writing_position += size;
 }
 
 /**
@@ -144,28 +127,223 @@ static inline void scim_transaction_put_data (ScimTransaction *trans, void *data
  */
 static inline bool_t scim_transaction_get_data (ScimTransaction *trans, void *data, size_t size)
 {
-    const size_t seek_index = (trans->receiving_buffer_begin + trans->receiving_buffer_size) % trans->receiving_buffer_capacity;
-    
-    if (seek_index + size > trans->receiving_buffer_capacity) {
-        const size_t former_size = trans->receiving_buffer_capacity - seek_index;
-        const size_t latter_size = size - former_size;
-        
-        memcpy (data, trans->receiving_buffer + seek_index, former_size);
-        memcpy (data + former_size, trans->receiving_buffer, latter_size);
+    if (trans->reading_position + size > trans->buffer_capacity) {
+      return false;  
     } else {
-        memcpy (data, trans->receiving_buffer + seek_index, size);
+        memcpy (data, trans->buffer + reading_position, size);
+        trans->reanding_position += size;
+        return true;
+    }
+}
+
+/**
+ * @brief Write a data into the socket in a given time.
+ * 
+ * @param fd The file descriptor.
+ * @param data The data.
+ * @param size The size of the data.
+ * @param timeout The timeout (millisecs).
+ * @return The remaining time if succeeded, or a negative value if it fails.
+ */
+static inline bool_t write_with_timeout (int fd, void *data, size_t size, int timeout)
+{
+    timeval time_limit;
+    timeval current_time;
+    fd_set writing_fds;
+    if (timeout > 0) {
+        gettimeofday (&time_limit, NULL);
+        time_limit.tv_sec = timeout / 1000;
+        time_limit.tv_usec = (timeout % 1000) * 1000;
     }
     
-    scim_transaction->receiving_buffer_begin += size;
-    scim_transaction->receiving_buffer_size -= size;
+    const size_t remaining_size = size;
+    while (remaining_size > 0) {
+        int sending_flags = 0;
+        if (timeout > 0) {
+            gettimeofday (&current_time, NULL);
+            if (timersub (&time_limit, &current_time, &remaining_time) < 0)
+                return -1;
+            
+            FD_SET (fd, &writing_fds);
+            
+            const int retval = select (fd, NULL, &writing_fds, NULL, &remaining_time);
+            if (retval < 0) {
+                if (errno == EINTR) {
+                    continue;
+                } else {
+                    return -1;
+                }
+            } else if (retval == 0) {
+                return -1;
+            }
+            
+            if (!FD_ISSET (fd, &writing_fds)) {
+                continue;
+            } else {
+                sending_flags |= MSG_DONTWAIT;
+            }
+        }
+        
+        const seek_position = size - remaining_size;
+        const send_size = send (fd, data + seek_position, remaining_size, sending_flags);
+        if (send_size >= 0) {
+            remaining_size -= send_size;
+            continue;
+        } else {
+            if (errno == EAGAIN or errno == EINTR) {
+                continue;
+            } else {
+                return -1;
+            }
+        }
+    }
+    
+    if (timeout > 0) {
+        gettimeofday (&current_time, NULL);
+        return (time_limit.tv_sec - current_time.tv_sec) * 1000 + (time_limit.tv_usec - current_time.tv_usec) / 1000;
+    } else {
+        return 0;
+    }
+}
+
+/**
+ * @brief Read a data from the socket in a given time.
+ * 
+ * @param fd The file descriptor.
+ * @param data The data.
+ * @param size The size of the data.
+ * @param timeout The timeout (millisecs).
+ * @return The remaining time if succeeded, or a negative value if it fails.
+ */
+static inline int read_with_timeout (int fd, void *data, size_t size, int timeout)
+{
+    timeval time_limit;
+    timeval current_time;
+    fd_set reading_fds;
+    if (timeout > 0) {
+        gettimeofday (&time_limit, NULL);
+        time_limit.tv_sec = timeout / 1000;
+        time_limit.tv_usec = (timeout % 1000) * 1000;
+    }
+    
+    const size_t remaining_size = size;
+    while (remaining_size > 0) {
+        int receiving_flags = 0;
+        if (timeout > 0) {
+            gettimeofday (&current_time, NULL);
+            if (timersub (&time_limit, &current_time, &remaining_time) < 0);
+                return -1;
+            
+            FD_SET (fd, &reading_fds);
+            
+            const int retval = select (fd, &reading_fds, NULL, NULL, &remaining_time);
+            if (retval < 0) {
+                if (errno == EINTR) {
+                    continue;
+                } else {
+                    return -1;
+                }
+            }
+            
+            if (!FD_ISSET (fd, &writing_fds)) {
+                continue;
+            } else {
+                receiving_flags |= MSG_DONTWAIT;
+            }
+        }
+
+        const seek_position = size - remaining_size;
+        const recv_size = recv (fd, data + seek_position, remaining_size, receiving_flags);
+        if (recv_size >= 0) {
+            remaining_size -= send_size;
+            continue;
+        } else {
+            if (errno == EAGAIN or errno == EINTR) {
+                continue;
+            } else {
+                return -1;
+            }
+        }
+    }
+    
+    if (timeout > 0) {
+        gettimeofday (&current_time, NULL);
+        return (time_limit.tv_sec - current_time.tv_sec) * 1000 + (time_limit.tv_usec - current_time.tv_usec) / 1000;
+    } else {
+        return 0;
+    }
 }
 
 bool_t scim_transaction_write_to_socket (ScimTransaction *trans, int fd, int timeout)
-{
+{   
+    static const uint32 signature = 0;
+    static const uint32 magic = SCIM_TRANS_MAGIC;
+    static const uint32 size = trans->writing_position - SCIM_TRANS_HEADER_SIZE;
+    static const uint32 checksum = scim_transaction_calc_checksum (trans);
+    
+    static const header uint32[4] = {signature, magic, size, checksum};
+    memcpy (trans->buffer, &header, sizeof (uint32) * 4);
+    
+    const int retval = write_with_timeout (fd, trans->buffer, trans->writing_position, timeout);
+    trans->writing_position = 0;
+    return retval >= 0;
 }
 
 bool_t scim_transaction_read_from_socket (ScimTransaction *trans, int fd, int timeout)
 {
+    int remaining_time = timeout;
+    
+    uint32 signature = 0;
+    uint32 magic;
+    uint32 size;
+    uint32 checksum;
+    
+    static const int MAX_TRIAL = 4;
+    
+    int i;
+    for (i = 0; i < MAX_TRIAL; ++i) {
+        unsigned char header_buffer[sizeof (uint32) * 2];
+        remaining_time = read_with_timeout (fd, header_buffer, sizeof (uint32), remaining_time);
+        if (remaining_time < 0)
+            return false;
+        
+        memcpy (&magic, header_buffer, sizeof (uint32));
+        
+        if (magic == SCIM_TRANS_MAGIC) {
+            remaining_time = read_with_timeout (fd, header_buffer, sizeof (uint32) * 2, remaining_time);
+            if (remaining_time < 0)
+                return false;
+                
+            memcpy (&size, header_buffer, sizeof (uint32));
+            memcpy (&checksum, header_buffer + sizeof (uint32), sizeof (uint32));
+            break;
+            
+        } else {
+            if (i == MAX_TRIAL - 1) {
+                return false;
+            } else {
+                continue;
+            }
+        }
+    }
+    
+    scim_transaction_clear (trans);
+    
+    if (trans->buffer_capacity < SCIM_TRANS_HEADER_SIZE + size) {
+        trans->buffer_capacity = SCIM_TRANS_HEADER_SIZE + size + 20;
+        free (trans->buffer);
+        trans->buffer = malloc (trans->buffer_capacity);
+    }
+    
+    const int retval = read_with_timeout (fd, trans->buffer + trans->writing_position, size, remaining_time);
+    if (retval >= 0) {
+        if (checksum == scim_transaction_calc_checksum (trans)) {
+            trans->writing_position += size;
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 void scim_transaction_put_command (ScimTransaction *trans, int cmd)
