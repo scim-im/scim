@@ -3500,8 +3500,9 @@ static void
 signalhandler(int sig)
 {
     SCIM_DEBUG_MAIN (1) << "In signal handler...\n";
-
-    _panel_agent->stop ();
+    if (_panel_agent != NULL) {
+        _panel_agent->stop ();
+    }
 }
 
 int main (int argc, char *argv [])
