@@ -43,7 +43,9 @@ ConfigPointer   config;
 
 void signalhandler(int sig)
 {
-    config->flush ();
+    if (config != NULL) {
+        config->flush ();
+    }
 
     std::cerr << "SCIM successfully exited.\n";
 
