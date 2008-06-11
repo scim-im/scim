@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-22 11:40-0700\n"
+"POT-Creation-Date: 2008-03-26 15:59+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -128,275 +128,279 @@ msgstr ""
 msgid "English (American)"
 msgstr ""
 
-#: ../src/scim_utility.cpp:720 ../src/scim_utility.cpp:721
+#: ../src/scim_utility.cpp:720
+msgid "Esperanto"
+msgstr ""
+
+#: ../src/scim_utility.cpp:721 ../src/scim_utility.cpp:722
 #: ../src/scim_keyboard_layout_data.h:4621
 msgid "Spanish"
 msgstr ""
 
-#: ../src/scim_utility.cpp:722
+#: ../src/scim_utility.cpp:723
 msgid "Spanish (Mexico)"
 msgstr ""
 
-#: ../src/scim_utility.cpp:723 ../src/scim_keyboard_layout_data.h:4600
+#: ../src/scim_utility.cpp:724 ../src/scim_keyboard_layout_data.h:4600
 msgid "Estonian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:724
+#: ../src/scim_utility.cpp:725
 msgid "Basque"
 msgstr ""
 
-#: ../src/scim_utility.cpp:725
+#: ../src/scim_utility.cpp:726
 msgid "Persian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:726 ../src/scim_keyboard_layout_data.h:4601
+#: ../src/scim_utility.cpp:727 ../src/scim_keyboard_layout_data.h:4601
 msgid "Finnish"
 msgstr ""
 
-#: ../src/scim_utility.cpp:727 ../src/scim_keyboard_layout_data.h:4602
+#: ../src/scim_utility.cpp:728 ../src/scim_keyboard_layout_data.h:4602
 msgid "French"
 msgstr ""
 
-#: ../src/scim_utility.cpp:728
+#: ../src/scim_utility.cpp:729
 msgid "Irish"
 msgstr ""
 
-#: ../src/scim_utility.cpp:729
+#: ../src/scim_utility.cpp:730
 msgid "Galician"
 msgstr ""
 
-#: ../src/scim_utility.cpp:730
+#: ../src/scim_utility.cpp:731
 msgid "Gujarati"
 msgstr ""
 
-#: ../src/scim_utility.cpp:731 ../src/scim_utility.cpp:740
+#: ../src/scim_utility.cpp:732 ../src/scim_utility.cpp:741
 msgid "Hebrew"
 msgstr ""
 
-#: ../src/scim_utility.cpp:732
+#: ../src/scim_utility.cpp:733
 msgid "Hindi"
 msgstr ""
 
-#: ../src/scim_utility.cpp:733 ../src/scim_keyboard_layout_data.h:4594
+#: ../src/scim_utility.cpp:734 ../src/scim_keyboard_layout_data.h:4594
 msgid "Croatian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:734 ../src/scim_keyboard_layout_data.h:4609
+#: ../src/scim_utility.cpp:735 ../src/scim_keyboard_layout_data.h:4609
 msgid "Hungarian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:735
+#: ../src/scim_utility.cpp:736
 msgid "Armenian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:736
+#: ../src/scim_utility.cpp:737
 msgid "Interlingua"
 msgstr ""
 
-#: ../src/scim_utility.cpp:737
+#: ../src/scim_utility.cpp:738
 msgid "Indonesian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:738 ../src/scim_keyboard_layout_data.h:4627
+#: ../src/scim_utility.cpp:739 ../src/scim_keyboard_layout_data.h:4627
 msgid "Icelandic"
 msgstr ""
 
-#: ../src/scim_utility.cpp:739 ../src/scim_keyboard_layout_data.h:4610
+#: ../src/scim_utility.cpp:740 ../src/scim_keyboard_layout_data.h:4610
 msgid "Italian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:741 ../src/scim_keyboard_layout_data.h:4611
+#: ../src/scim_utility.cpp:742 ../src/scim_keyboard_layout_data.h:4611
 msgid "Japanese"
 msgstr ""
 
-#: ../src/scim_utility.cpp:742
+#: ../src/scim_utility.cpp:743
 msgid "Georgian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:743
+#: ../src/scim_utility.cpp:744
 msgid "Kazakh"
 msgstr ""
 
-#: ../src/scim_utility.cpp:744
+#: ../src/scim_utility.cpp:745
 msgid "Cambodian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:745
+#: ../src/scim_utility.cpp:746
 msgid "Kannada"
 msgstr ""
 
-#: ../src/scim_utility.cpp:746
+#: ../src/scim_utility.cpp:747
 msgid "Korean"
 msgstr ""
 
-#: ../src/scim_utility.cpp:747
+#: ../src/scim_utility.cpp:748
 msgid "Laothian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:748 ../src/scim_keyboard_layout_data.h:4628
+#: ../src/scim_utility.cpp:749 ../src/scim_keyboard_layout_data.h:4628
 msgid "Lithuanian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:749
+#: ../src/scim_utility.cpp:750
 msgid "Latvian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:750
+#: ../src/scim_utility.cpp:751
 msgid "Macedonian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:751
+#: ../src/scim_utility.cpp:752
 msgid "Malayalam"
 msgstr ""
 
-#: ../src/scim_utility.cpp:752
+#: ../src/scim_utility.cpp:753
 msgid "Mongolian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:753
+#: ../src/scim_utility.cpp:754
 msgid "Marathi"
 msgstr ""
 
-#: ../src/scim_utility.cpp:754
+#: ../src/scim_utility.cpp:755
 msgid "Malay"
 msgstr ""
 
-#: ../src/scim_utility.cpp:755
+#: ../src/scim_utility.cpp:756
 msgid "Burmese"
 msgstr ""
 
-#: ../src/scim_utility.cpp:756
+#: ../src/scim_utility.cpp:757
 msgid "Nepali"
 msgstr ""
 
-#: ../src/scim_utility.cpp:757 ../src/scim_keyboard_layout_data.h:4598
+#: ../src/scim_utility.cpp:758 ../src/scim_keyboard_layout_data.h:4598
 msgid "Dutch"
 msgstr ""
 
-#: ../src/scim_utility.cpp:758
+#: ../src/scim_utility.cpp:759
 msgid "Norwegian (nynorsk)"
 msgstr ""
 
-#: ../src/scim_utility.cpp:759
+#: ../src/scim_utility.cpp:760
 msgid "Norwegian (bokmal)"
 msgstr ""
 
-#: ../src/scim_utility.cpp:760
+#: ../src/scim_utility.cpp:761
 msgid "Oriya"
 msgstr ""
 
-#: ../src/scim_utility.cpp:761
+#: ../src/scim_utility.cpp:762
 msgid "Punjabi"
 msgstr ""
 
-#: ../src/scim_utility.cpp:762 ../src/scim_keyboard_layout_data.h:4613
+#: ../src/scim_utility.cpp:763 ../src/scim_keyboard_layout_data.h:4613
 msgid "Polish"
 msgstr ""
 
-#: ../src/scim_utility.cpp:763 ../src/scim_utility.cpp:765
+#: ../src/scim_utility.cpp:764 ../src/scim_utility.cpp:766
 #: ../src/scim_keyboard_layout_data.h:4614
 msgid "Portuguese"
 msgstr ""
 
-#: ../src/scim_utility.cpp:764 ../src/scim_keyboard_layout_data.h:4615
+#: ../src/scim_utility.cpp:765 ../src/scim_keyboard_layout_data.h:4615
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: ../src/scim_utility.cpp:766
+#: ../src/scim_utility.cpp:767
 msgid "Romanian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:767 ../src/scim_keyboard_layout_data.h:4617
+#: ../src/scim_utility.cpp:768 ../src/scim_keyboard_layout_data.h:4617
 msgid "Russian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:768
+#: ../src/scim_utility.cpp:769
 msgid "Sinhala"
 msgstr ""
 
-#: ../src/scim_utility.cpp:769 ../src/scim_keyboard_layout_data.h:4618
+#: ../src/scim_utility.cpp:770 ../src/scim_keyboard_layout_data.h:4618
 msgid "Slovak"
 msgstr ""
 
-#: ../src/scim_utility.cpp:770 ../src/scim_keyboard_layout_data.h:4620
+#: ../src/scim_utility.cpp:771 ../src/scim_keyboard_layout_data.h:4620
 msgid "Slovenian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:771
+#: ../src/scim_utility.cpp:772
 msgid "Albanian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:772 ../src/scim_utility.cpp:773
-#: ../src/scim_utility.cpp:774
+#: ../src/scim_utility.cpp:773 ../src/scim_utility.cpp:774
+#: ../src/scim_utility.cpp:775
 msgid "Serbian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:775 ../src/scim_utility.cpp:777
+#: ../src/scim_utility.cpp:776 ../src/scim_utility.cpp:778
 #: ../src/scim_keyboard_layout_data.h:4624
 msgid "Swedish"
 msgstr ""
 
-#: ../src/scim_utility.cpp:776
+#: ../src/scim_utility.cpp:777
 msgid "Swedish (Finland)"
 msgstr ""
 
-#: ../src/scim_utility.cpp:778
+#: ../src/scim_utility.cpp:779
 msgid "Tamil"
 msgstr ""
 
-#: ../src/scim_utility.cpp:779
+#: ../src/scim_utility.cpp:780
 msgid "Telugu"
 msgstr ""
 
-#: ../src/scim_utility.cpp:780
+#: ../src/scim_utility.cpp:781
 msgid "Thai"
 msgstr ""
 
-#: ../src/scim_utility.cpp:781 ../src/scim_keyboard_layout_data.h:4625
+#: ../src/scim_utility.cpp:782 ../src/scim_keyboard_layout_data.h:4625
 msgid "Turkish"
 msgstr ""
 
-#: ../src/scim_utility.cpp:782
+#: ../src/scim_utility.cpp:783
 msgid "Uighur"
 msgstr ""
 
-#: ../src/scim_utility.cpp:783 ../src/scim_keyboard_layout_data.h:4629
+#: ../src/scim_utility.cpp:784 ../src/scim_keyboard_layout_data.h:4629
 msgid "Ukrainian"
 msgstr ""
 
-#: ../src/scim_utility.cpp:784
+#: ../src/scim_utility.cpp:785
 msgid "Urdu"
 msgstr ""
 
-#: ../src/scim_utility.cpp:785
+#: ../src/scim_utility.cpp:786
 msgid "Uzbek"
 msgstr ""
 
-#: ../src/scim_utility.cpp:786
+#: ../src/scim_utility.cpp:787
 msgid "Vietnamese"
 msgstr ""
 
-#: ../src/scim_utility.cpp:787
+#: ../src/scim_utility.cpp:788
 msgid "Walloon"
 msgstr ""
 
-#: ../src/scim_utility.cpp:788 ../src/scim_utility.cpp:789
+#: ../src/scim_utility.cpp:789 ../src/scim_utility.cpp:790
 msgid "Yiddish"
 msgstr ""
 
-#: ../src/scim_utility.cpp:790
+#: ../src/scim_utility.cpp:791
 msgid "Chinese"
 msgstr ""
 
-#: ../src/scim_utility.cpp:791 ../src/scim_utility.cpp:793
+#: ../src/scim_utility.cpp:792 ../src/scim_utility.cpp:794
 msgid "Chinese (simplified)"
 msgstr ""
 
-#: ../src/scim_utility.cpp:792 ../src/scim_utility.cpp:794
+#: ../src/scim_utility.cpp:793 ../src/scim_utility.cpp:795
 msgid "Chinese (traditional)"
 msgstr ""
 
-#: ../src/scim_utility.cpp:876
+#: ../src/scim_utility.cpp:877
 msgid "Other"
 msgstr ""
 
