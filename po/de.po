@@ -1,23 +1,24 @@
-# translation of de.po to German
+# translation of de.po to
 # This file is distributed under the same license as the scim package.
 # Copyright (C) 2004 THE scim'S COPYRIGHT HOLDER.
 #
 #
 # Jan Hefti <j.hefti@hamburg.de>, 2004.
 # Jan Hefti <j.hefti@chinaboard.de>, 2005.
+# PGP-KeyID: 0x037FD3CF <ttrinks@redhat.com>, 2008.
 msgid ""
 msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-06-22 11:40-0700\n"
-"PO-Revision-Date: 2005-12-16 14:10+0100\n"
-"Last-Translator: Jan Hefti <j.hefti@chinaboard.de>\n"
-"Language-Team: German <scim-devel@lists.sourceforge.net>\n"
+"PO-Revision-Date: 2008-03-26 08:04+1000\n"
+"Last-Translator: PGP-KeyID: 0x037FD3CF <ttrinks@redhat.com>\n"
+"Language-Team:  <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
-"X-Generator: KBabel 1.11\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #: ../src/scim_compose_key.cpp:126
 msgid "English/European"
@@ -101,7 +102,7 @@ msgstr "Deutsch"
 
 #: ../src/scim_utility.cpp:712
 msgid "Divehi"
-msgstr ""
+msgstr "Divehi"
 
 #: ../src/scim_utility.cpp:713 ../src/scim_keyboard_layout_data.h:4608
 msgid "Greek"
@@ -189,9 +190,8 @@ msgid "Hungarian"
 msgstr "Ungarisch"
 
 #: ../src/scim_utility.cpp:735
-#, fuzzy
 msgid "Armenian"
-msgstr "Rumänisch"
+msgstr "Armenisch"
 
 #: ../src/scim_utility.cpp:736
 msgid "Interlingua"
@@ -214,9 +214,8 @@ msgid "Japanese"
 msgstr "Japanisch"
 
 #: ../src/scim_utility.cpp:742
-#, fuzzy
 msgid "Georgian"
-msgstr "Deutsch"
+msgstr "Georgisch"
 
 #: ../src/scim_utility.cpp:743
 msgid "Kazakh"
@@ -268,7 +267,7 @@ msgstr "Malaysisch"
 
 #: ../src/scim_utility.cpp:755
 msgid "Burmese"
-msgstr ""
+msgstr "Burmesisch"
 
 #: ../src/scim_utility.cpp:756
 msgid "Nepali"
@@ -317,7 +316,7 @@ msgstr "Russisch"
 
 #: ../src/scim_utility.cpp:768
 msgid "Sinhala"
-msgstr ""
+msgstr "Sinhala"
 
 #: ../src/scim_utility.cpp:769 ../src/scim_keyboard_layout_data.h:4618
 msgid "Slovak"
@@ -440,7 +439,7 @@ msgstr "Französisch (Schweiz) "
 
 #: ../src/scim_keyboard_layout_data.h:4606
 msgid "German (with deadkeys)"
-msgstr "Deutsch (mit deadkeys)"
+msgstr "Deutsch (mit Deadkeys)"
 
 #: ../src/scim_keyboard_layout_data.h:4607
 msgid "German (Swiss)"
@@ -764,7 +763,7 @@ msgstr ""
 #. Shared input method.
 #: ../modules/SetupUI/scim_frontend_setup.cpp:360
 msgid "_Share the same input method among all applications"
-msgstr "Dieselbe Eingabemethode unter _allen Anwendungen verwenden."
+msgstr "Dieselbe Eingabemethode in _allen Anwendungen verwenden."
 
 #: ../modules/SetupUI/scim_frontend_setup.cpp:365
 msgid ""
@@ -782,8 +781,7 @@ msgid "Hotkeys"
 msgstr "Tastenkombinationen"
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:93
-msgid ""
-"You can enable/disable input methods and set hotkeys for input methods here."
+msgid "You can enable/disable input methods and set hotkeys for input methods here."
 msgstr ""
 "Hier können Sie die installierten Eingabemethoden aktivieren/deaktivieren "
 "und ihnen Tastenkürzel zuordnen."
@@ -810,8 +808,7 @@ msgstr "_Filter auswählen"
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:331
 msgid "Select the Filters which will be attached to this input method."
-msgstr ""
-"Wählen Sie die Filter, die dieser Eingabemethode zugeordnet werden sollen."
+msgstr "Wählen Sie die Filter, die dieser Eingabemethode zugeordnet werden sollen."
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:348
 msgid "_Expand"
@@ -891,8 +888,7 @@ msgstr "GTK"
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:100
 msgid "A panel daemon based on GTK+-2.x library."
-msgstr ""
-"Ein Kontrollleisten-Hilfsprogramm, das auf der GTK+-2.x-Bibliothek beruht."
+msgstr "Ein Kontrollleisten-Hilfsprogramm, das auf der GTK+-2.x-Bibliothek beruht."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:163
 msgid "Always"
@@ -987,8 +983,7 @@ msgstr ""
 "ist. Bei »Nie« wird sie niemals angezeigt."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:426
-msgid ""
-"If this option is checked, the toolbar will be snapped to the screen border."
+msgid "If this option is checked, the toolbar will be snapped to the screen border."
 msgstr ""
 "Wenn diese Option gewählt ist, wird die Symbolleiste am Bildschirmrand "
 "eingerastet."
@@ -1020,8 +1015,7 @@ msgstr ""
 "auf der Symbolleiste angezeigt."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:446
-msgid ""
-"If this option is checked, the stick icon will be showed on the toolbar."
+msgid "If this option is checked, the stick icon will be showed on the toolbar."
 msgstr ""
 "Wenn diese Option gewählt ist, wird das Symbol »Immer im Vordergrund halten« "
 "auf der Symbolleiste angezeigt."
@@ -1055,10 +1049,8 @@ msgstr ""
 "eingebettet."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:467
-msgid ""
-"If this option is checked, the lookup table will be displayed vertically."
-msgstr ""
-"Wenn diese Option gewählt ist, wird die Auswahlliste senkrecht angezeigt."
+msgid "If this option is checked, the lookup table will be displayed vertically."
+msgstr "Wenn diese Option gewählt ist, wird die Auswahlliste senkrecht angezeigt."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:472
 msgid ""
@@ -1158,8 +1150,7 @@ msgstr "Einrichtung von SCIM"
 
 #: ../extras/setup/scim_setup_helper.cpp:51
 msgid "Integrated Setup Utility based on GTK Widget library."
-msgstr ""
-"Integriertes Einrichtungswerkzeug, das auf der GTK Widget-Bibliothek beruht."
+msgstr "Integriertes Einrichtungswerkzeug, das auf der GTK Widget-Bibliothek beruht."
 
 #: ../extras/setup/scim-setup.desktop.in.h:2
 msgid "Setup utility for Smart Common Input Method platform"
@@ -1248,8 +1239,7 @@ msgstr "Mit Rahmen"
 
 #: ../utils/scimstringview.c:227
 msgid "FALSE removes outside bevel from string view."
-msgstr ""
-"»Nein« entfernt den umgebenden Rahmen von der angezeigten Zeichenkette."
+msgstr "»Nein« entfernt den umgebenden Rahmen von der angezeigten Zeichenkette."
 
 #: ../utils/scimstringview.c:234
 msgid "Draw cursor"
@@ -1383,8 +1373,3 @@ msgstr "Ausrichtung"
 msgid "The orientation of the tray."
 msgstr "Die Ausrichtung des Systemabschnitts der Kontrollleiste."
 
-#~ msgid "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
-#~ msgstr "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
-
-#~ msgid "En"
-#~ msgstr "De"
