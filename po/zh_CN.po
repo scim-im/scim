@@ -1,23 +1,24 @@
 # translation of zh_CN.po to Simplified Chinese
-# Copyright (C) 2004 Free Software Foundation, Inc.
-# James Su <suzhe@tsinghua.org.cn>, 2004.
+# Copyright (C) 2004, 2008 Free Software Foundation, Inc.
 #
+# James Su <suzhe@tsinghua.org.cn>, 2004.
+# Leah Liu <lliu@redhat.com>, 2008.
 msgid ""
 msgstr ""
 "Project-Id-Version: zh_CN\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-06-22 11:40-0700\n"
-"PO-Revision-Date: 2004-06-20 14:57+0800\n"
-"Last-Translator: James Su <suzhe@tsinghua.org.cn>\n"
+"PO-Revision-Date: 2008-03-26 10:32+1000\n"
+"Last-Translator: Leah Liu <lliu@redhat.com>\n"
 "Language-Team: Simplified Chinese <zh@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.3.1\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #: ../src/scim_compose_key.cpp:126
 msgid "English/European"
-msgstr "英语/欧洲语"
+msgstr "英语/欧洲语言"
 
 #. Append an entry for forward mode.
 #: ../src/scim_imengine.cpp:638 ../src/scim_utility.cpp:693
@@ -503,7 +504,7 @@ msgstr "将繁体中文转换为简体中文"
 
 #: ../modules/Filter/scim_sctc_filter.cpp:300
 msgid "James Su <suzhe@tsinghua.org.cn>"
-msgstr ""
+msgstr "詹姆斯 · 苏（suzhe@tsinghua.org.cn）"
 
 #: ../modules/Filter/scim_sctc_filter.cpp:425
 #: ../modules/Filter/scim_sctc_filter.cpp:555
@@ -530,6 +531,9 @@ msgid ""
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
 "\n"
 msgstr ""
+"\n"
+"(C) 2002-2005 詹姆斯 · 苏 <suzhe@tsinghua.org.cn>\n"
+"\n"
 
 #: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
 #: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1238
@@ -537,6 +541,8 @@ msgid ""
 ":\n"
 "\n"
 msgstr ""
+":\n"
+"\n"
 
 #: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
 #: ../modules/FrontEnd/scim_x11_frontend.cpp:1857
@@ -546,6 +552,8 @@ msgid ""
 "\n"
 "\n"
 msgstr ""
+"\n"
+"\n"
 
 #: ../modules/IMEngine/scim_rawcode_imengine.cpp:120
 msgid "RAW CODE"
@@ -746,8 +754,7 @@ msgid "Hotkeys"
 msgstr "热键"
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:93
-msgid ""
-"You can enable/disable input methods and set hotkeys for input methods here."
+msgid "You can enable/disable input methods and set hotkeys for input methods here."
 msgstr "你可以在这里激活／禁止输入法, 并为输入法设置热键."
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:296
@@ -846,7 +853,7 @@ msgstr "向下移动(_D)"
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:95
 msgid "GTK"
-msgstr ""
+msgstr "GTK"
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:100
 msgid "A panel daemon based on GTK+-2.x library."
@@ -945,8 +952,7 @@ msgstr ""
 "不会被显示."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:426
-msgid ""
-"If this option is checked, the toolbar will be snapped to the screen border."
+msgid "If this option is checked, the toolbar will be snapped to the screen border."
 msgstr "如果选中这个选项, 工具条将粘附在屏幕边缘上."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:431
@@ -971,8 +977,7 @@ msgid ""
 msgstr "如果选中这个选项, 输入法名称将显示在工具条上."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:446
-msgid ""
-"If this option is checked, the stick icon will be showed on the toolbar."
+msgid "If this option is checked, the stick icon will be showed on the toolbar."
 msgstr "如果选中这个选项, 粘住图标将显示在工具条上."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:450
@@ -996,8 +1001,7 @@ msgid ""
 msgstr "如果选中这个选项, 候选词表将被嵌入到输入窗口中."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:467
-msgid ""
-"If this option is checked, the lookup table will be displayed vertically."
+msgid "If this option is checked, the lookup table will be displayed vertically."
 msgstr "如果选中这个选项, 将垂直显示候选词表."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:472
@@ -1022,7 +1026,7 @@ msgstr "选择界面字体"
 
 #: ../extras/setup/scim_setup_ui.cpp:47
 msgid "SCIM"
-msgstr ""
+msgstr "SCIM"
 
 #: ../extras/setup/scim_setup_ui.cpp:48
 msgid "FrontEnd"
@@ -1081,8 +1085,7 @@ msgstr "你确定要退出 SCIM 设置程序么?"
 msgid ""
 "Not all configuration can be reloaded on the fly. Don't forget to restart "
 "SCIM in order to let all of the new configuration take effect."
-msgstr ""
-"不是所有配置都能够直接重新加载. 别忘了重新启动 SCIM 以使所有新的配置生效."
+msgstr "不是所有配置都能够直接重新加载. 别忘了重新启动 SCIM 以使所有新的配置生效."
 
 #: ../extras/setup/scim_setup_helper.cpp:49
 msgid "SCIM Setup"
@@ -1151,147 +1154,147 @@ msgstr "退出"
 
 #: ../utils/scimstringview.c:196
 msgid "Cursor Position"
-msgstr ""
+msgstr "光标位置"
 
 #: ../utils/scimstringview.c:197
 msgid "The current position of the insertion cursor in chars."
-msgstr ""
+msgstr "字符中嵌入光标的当前位置。"
 
 #: ../utils/scimstringview.c:206
 msgid "Maximum length"
-msgstr ""
+msgstr "最大长度"
 
 #: ../utils/scimstringview.c:207
 msgid "Maximum number of characters for this string view. Zero if no maximum."
-msgstr ""
+msgstr "这个字符串视图的最大字符数。如果没有最大字符数，那就是零。"
 
 #: ../utils/scimstringview.c:216
 msgid "Maximum width"
-msgstr ""
+msgstr "最大宽度"
 
 #: ../utils/scimstringview.c:217
 msgid "Maximum width of this string view."
-msgstr ""
+msgstr "这个字符串视图的最大宽度。"
 
 #: ../utils/scimstringview.c:226
 msgid "Has Frame"
-msgstr ""
+msgstr "有框架"
 
 #: ../utils/scimstringview.c:227
 msgid "FALSE removes outside bevel from string view."
-msgstr ""
+msgstr "错误，删除字符串视图的外斜面"
 
 #: ../utils/scimstringview.c:234
 msgid "Draw cursor"
-msgstr ""
+msgstr "绘制光标"
 
 #: ../utils/scimstringview.c:235
 msgid "TRUE draw blinking cursor."
-msgstr ""
+msgstr "正确，绘制闪烁光标。"
 
 #: ../utils/scimstringview.c:242
 msgid "Auto move cursor"
-msgstr ""
+msgstr "自动移动光标"
 
 #: ../utils/scimstringview.c:243
 msgid "TRUE auto move cursor position when mouse clicking."
-msgstr ""
+msgstr "正确，点击鼠标时自动移动光标位置。"
 
 #: ../utils/scimstringview.c:250
 msgid "Forward button press event"
-msgstr ""
+msgstr "传送按钮事件"
 
 #: ../utils/scimstringview.c:251
 msgid "TRUE forward button press event to user program."
-msgstr ""
+msgstr "正确，将按钮事件传送给用户程序。"
 
 #: ../utils/scimstringview.c:258
 msgid "Auto resize the widget to fit the string"
-msgstr ""
+msgstr "自动调整边框以适应字符串"
 
 #: ../utils/scimstringview.c:259
 msgid "TRUE Auto resize on."
-msgstr ""
+msgstr "正确，打开自动调整。"
 
 #: ../utils/scimstringview.c:266
 msgid "Width in chars"
-msgstr ""
+msgstr "字符宽度"
 
 #: ../utils/scimstringview.c:267
 msgid "Number of characters to leave space for in the string view."
-msgstr ""
+msgstr "为字符串视图中保留的空白的字符数。"
 
 #: ../utils/scimstringview.c:276
 msgid "Scroll offset"
-msgstr ""
+msgstr "滚动偏移"
 
 #: ../utils/scimstringview.c:277
 msgid "Number of pixels of the string view scrolled off the screen to the left"
-msgstr ""
+msgstr "字符串视图距屏幕左边的像素数"
 
 #: ../utils/scimstringview.c:286
 msgid "Text"
-msgstr ""
+msgstr "文本"
 
 #: ../utils/scimstringview.c:287
 msgid "The contents of the string view"
-msgstr ""
+msgstr "字符串视图的内容"
 
 #: ../utils/scimkeyselection.cpp:155
 msgid "Selected _Keys:"
-msgstr "选中的按键(_K):"
+msgstr "选中的按键（_K）："
 
 #: ../utils/scimkeyselection.cpp:200
 msgid "Key Code:"
-msgstr "键码:"
+msgstr "键码："
 
 #: ../utils/scimkeyselection.cpp:218
 msgid "..."
-msgstr ""
+msgstr "..."
 
 #: ../utils/scimkeyselection.cpp:223
 msgid "Modifiers:"
-msgstr "修饰键:"
+msgstr "修正符："
 
 #: ../utils/scimkeyselection.cpp:236
 msgid "_Ctrl"
-msgstr ""
+msgstr "_Ctrl（_C）"
 
 #: ../utils/scimkeyselection.cpp:240
 msgid "A_lt"
-msgstr ""
+msgstr "A_lt（_l）"
 
 #: ../utils/scimkeyselection.cpp:244
 msgid "_Shift"
-msgstr ""
+msgstr "_Shift（_S）"
 
 #: ../utils/scimkeyselection.cpp:248
 msgid "_Release"
-msgstr "释放(_R)"
+msgstr "释放（_R）"
 
 #: ../utils/scimkeyselection.cpp:258
 msgid "_Meta"
-msgstr ""
+msgstr "_Meta（_M）"
 
 #: ../utils/scimkeyselection.cpp:262
 msgid "S_uper"
-msgstr ""
+msgstr "S_uper（_u）"
 
 #: ../utils/scimkeyselection.cpp:266
 msgid "_Hyper"
-msgstr ""
+msgstr "_Hyper（_H）"
 
 #: ../utils/scimkeyselection.cpp:331
 msgid "Please enter a Key Code first."
-msgstr "请先输入一个键码."
+msgstr "请先输入一个键码。"
 
 #: ../utils/scimkeyselection.cpp:385
 msgid ""
 "Press a key (or a key combination).\n"
 "This dialog will be closed when the key is released."
 msgstr ""
-"请按一个键或组合键.\n"
-"本对话窗会在按键释放时关闭."
+"请按一个键或组合键。\n"
+"本对话窗会在按键释放时关闭。"
 
 #: ../utils/scimkeyselection.cpp:388
 msgid "Grabbing a key."
@@ -1303,679 +1306,9 @@ msgstr "按键选择"
 
 #: ../utils/scimtrayicon.c:108
 msgid "Orientation"
-msgstr ""
+msgstr "定位"
 
 #: ../utils/scimtrayicon.c:109
 msgid "The orientation of the tray."
-msgstr ""
+msgstr "托盘定位。"
 
-#~ msgid "En"
-#~ msgstr "英"
-
-#, fuzzy
-#~ msgid "_Switch input method globally"
-#~ msgstr "显示输入法图标(_I)"
-
-#~ msgid "Preedit String mode"
-#~ msgstr "预编辑字符串模式"
-
-#~ msgid "X Window"
-#~ msgstr "X 窗口"
-
-#~ msgid "A FrontEnd module for X11R6 Window System, using XIM Protocol."
-#~ msgstr "一个用于 X11R6 窗口系统的前端模块, 使用 XIM 协议."
-
-#~ msgid "XIM Settings"
-#~ msgstr "XIM 设置"
-
-#~ msgid "_On The Spot"
-#~ msgstr "在光标处预编辑(_O)"
-
-#~ msgid "_Dynamic Event Flow"
-#~ msgstr "动态事件流(_D)"
-
-#~ msgid ""
-#~ "If this option is checked, the OnTheSpot input style will be used when "
-#~ "the client supports it."
-#~ msgstr ""
-#~ "如果选中这个选项, 当客户端支持时, 预编辑字符串将显示在光标位置上, 即 On "
-#~ "The Spot 模式."
-
-#~ msgid ""
-#~ "If this option is checked, then dynamic event flow will be used.This can "
-#~ "speed up the key event response, especially in remote X11 environment.But "
-#~ "SCIM may become unstable."
-#~ msgstr ""
-#~ "如果选中这个选项, 则会使用动态事件流. 这可以加快按键事件的响应速度, 特别是"
-#~ "在远程 X11 环境中. 但 SCIM 可能会变得不稳定."
-
-#~ msgid "Portuguese (Brazilian)"
-#~ msgstr "葡萄牙语(巴西)"
-
-#~ msgid "Slovene"
-#~ msgstr "斯洛文尼亚语"
-
-#, fuzzy
-#~ msgid "Global"
-#~ msgstr "全局设置"
-
-#, fuzzy
-#~ msgid ""
-#~ "\n"
-#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>\n"
-#~ "\n"
-#~ msgstr "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>"
-
-#~ msgid "Hot Keys"
-#~ msgstr "热键"
-
-#~ msgid ""
-#~ "\n"
-#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>\n"
-#~ "\n"
-#~ "Hot keys:\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "\n"
-#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>\n"
-#~ "\n"
-#~ "热键:\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ ":\n"
-#~ "    open/close the input method.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ ":\n"
-#~ "    打开/关闭输入法.\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ ":\n"
-#~ "    switch to the next input method.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ ":\n"
-#~ "    切换到下一个输入法.\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ ":\n"
-#~ "    switch to the previous input method.\n"
-#~ "\n"
-#~ "\n"
-#~ msgstr ""
-#~ ":\n"
-#~ "    切换到前一个输入法.\n"
-#~ "\n"
-#~ "\n"
-
-#~ msgid "Full/Half Letter"
-#~ msgstr "全/半角字符"
-
-#~ msgid "Full/Half Punct"
-#~ msgstr "全/半角标点"
-
-#~ msgid ""
-#~ "The input mode of the letters. Click to toggle between half and full."
-#~ msgstr "字母输入模式. 点击以切换全角/半角模式."
-
-#~ msgid ""
-#~ "The input mode of the puncutations. Click to toggle between half and full."
-#~ msgstr "标点输入模式. 点击以切换全角/半角模式."
-
-#~ msgid ""
-#~ "    Switch between full/half width letter mode.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "    切换全角和半角字符状态.\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ "    Switch between full/half width punctuation mode.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "    切换全角和半角标点符号状态.\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ "    Switch between Forward/Input mode.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "    切换 转发/输入 模式.\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ "    Add a new phrase.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "    添加一个新词.\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ "    Delete the selected phrase.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "    删除选中的词语.\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "  Control+Down:\n"
-#~ "    Move lookup cursor to next shorter phrase\n"
-#~ "    Only available when LongPhraseFirst option is set.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  Control+Down:\n"
-#~ "    将候选词表的光标移动到下一个更短的词\n"
-#~ "    只在打开 LongPhraseFirst 选项的时候才生效.\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "  Control+Up:\n"
-#~ "    Move lookup cursor to previous longer phrase\n"
-#~ "    Only available when LongPhraseFirst option is set.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  Control+Up:\n"
-#~ "    将候选词表的光标移动到前一个更长的词\n"
-#~ "    只在打开 LongPhraseFirst 选项的时候才生效.\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "  Esc:\n"
-#~ "    reset the input method.\n"
-#~ "\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  Esc:\n"
-#~ "    复位输入法.\n"
-#~ "\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "How to add a phrase:\n"
-#~ "    Input the new phrase as normal, then press the\n"
-#~ "  hot key. A hint will be shown to let you input a key\n"
-#~ "  for this phrase.\n"
-#~ "    Input a key then press the space bar.\n"
-#~ "  A hint will be shown to indicate whether\n"
-#~ "  the phrase was added sucessfully.\n"
-#~ msgstr ""
-#~ "怎样添加一个词语:\n"
-#~ "    首先在正常状态下输入新词, 然后按添加词语快捷键.\n"
-#~ "  将会显示一个提示让你为这个词语输入一个键串.\n"
-#~ "    输入键串后按空格键. 会有一个提示说明加词\n"
-#~ "  是否成功.\n"
-
-#~ msgid "Input a key string for phrase: "
-#~ msgstr "为这个词输入一个键串: "
-
-#~ msgid "Success."
-#~ msgstr "成功."
-
-#~ msgid "Failed."
-#~ msgstr "失败."
-
-#~ msgid "Generic Table"
-#~ msgstr "通用码表"
-
-#~ msgid "An IMEngine Module which uses generic table input method file."
-#~ msgstr "一个使用通用码表输入法文件的输入法引擎模块."
-
-#~ msgid "Full width _punctuation:"
-#~ msgstr "全/半角标点切换(_P):"
-
-#~ msgid "Select full width puncutation keys"
-#~ msgstr "选择全/半角标点状态切换键"
-
-#~ msgid ""
-#~ "The key events to switch full/half width punctuation input mode. Click on "
-#~ "the button on the right to edit it."
-#~ msgstr "用以切换全/半角标点输入模式的按键. 点击右边的按钮进行编辑."
-
-#~ msgid "Full width _letter:"
-#~ msgstr "全/半角字母切换(_L):"
-
-#~ msgid "Select full width letter keys"
-#~ msgstr "选择全/半角字母状态切换键"
-
-#~ msgid ""
-#~ "The key events to switch full/half width letter input mode. Click on the "
-#~ "button on the right to edit it."
-#~ msgstr "用以切换全/半角字母输入模式的按键. 点击右边的按钮进行编辑."
-
-#~ msgid "_Mode switch:"
-#~ msgstr "输入模式切换(_M):"
-
-#~ msgid "Select mode switch keys"
-#~ msgstr "选择输入模式切换键"
-
-#~ msgid ""
-#~ "The key events to change current input mode. Click on the button on the "
-#~ "right to edit it."
-#~ msgstr "用以切换当前输入模式的按键. 点击右边的按钮进行编辑."
-
-#~ msgid "_Add phrase:"
-#~ msgstr "添加词语(_A):"
-
-#~ msgid "Select add phrase keys."
-#~ msgstr "选择添加词语键"
-
-#~ msgid ""
-#~ "The key events to add a new user defined phrase. Click on the button on "
-#~ "the right to edit it."
-#~ msgstr "用以添加用户自定义词语的按键. 点击右边的按钮进行编辑."
-
-#~ msgid "_Delete phrase:"
-#~ msgstr "删除词语(_D):"
-
-#~ msgid "Select delete phrase keys."
-#~ msgstr "选择删除词语键"
-
-#~ msgid ""
-#~ "The key events to delete a selected phrase. Click on the button on the "
-#~ "right to edit it."
-#~ msgstr "用以删除选中词语的按键. 点击右边的按钮进行编辑."
-
-#~ msgid "Show _prompt"
-#~ msgstr "显示提示(_P)"
-
-#~ msgid "Show key _hint"
-#~ msgstr "显示逐键提示(_H)"
-
-#~ msgid "Save _user table in binary format"
-#~ msgstr "以二进制格式保存用户码表(_U)"
-
-#~ msgid "Show the u_ser defined phrases first"
-#~ msgstr "优先显示用户自定义的词语(_S)"
-
-#~ msgid "Show the _longer phrases first"
-#~ msgstr "优先显示较长的词语(_L)"
-
-#~ msgid ""
-#~ "If this option is checked, the key prompt of the currently selected "
-#~ "phrase will be shown."
-#~ msgstr "如果选中这个选项, 则显示当前词语按键的提示信息."
-
-#~ msgid ""
-#~ "If this option is checked, the remaining keystrokes of the phraseswill be "
-#~ "shown on the lookup table."
-#~ msgstr "如果选中这个选项, 将在候选词表中显示每个词语剩下需要输入的按键."
-
-#~ msgid ""
-#~ "If this option is checked, the user table will be stored with binary "
-#~ "format, this will increase the loading speed."
-#~ msgstr "如果选中这个选项, 用户码表将以二进制格式存储, 这会提高调入速度."
-
-#~ msgid ""
-#~ "If this option is checked, the user defined phrases will be shown in "
-#~ "front of others. "
-#~ msgstr "如果选中这个选项, 将优先显示用户自定义的词语."
-
-#~ msgid ""
-#~ "If this option is checked, the longer phrase will be shown in front of "
-#~ "others. "
-#~ msgstr "如果选中这个选项, 将优先显示较长的词语."
-
-#~ msgid "The installed tables:"
-#~ msgstr "已安装的码表:"
-
-#~ msgid "_Install"
-#~ msgstr "安装(_I)"
-
-#~ msgid "Install a new table."
-#~ msgstr "安装一个新码表."
-
-#~ msgid "_Delete"
-#~ msgstr "删除(_D)"
-
-#~ msgid "Delete the selected table."
-#~ msgstr "删除选中的码表."
-
-#~ msgid "_Properties"
-#~ msgstr "属性(_P)"
-
-#~ msgid "Edit the properties of the selected table."
-#~ msgstr "编辑选中的码表的属性."
-
-#~ msgid "Generic"
-#~ msgstr "通用"
-
-#~ msgid "Table Management"
-#~ msgstr "码表管理"
-
-#~ msgid "Select an icon file"
-#~ msgstr "选择一个图标文件"
-
-#~ msgid "User"
-#~ msgstr "用户"
-
-#~ msgid "System"
-#~ msgstr "系统"
-
-#~ msgid "Please select the table file to be installed."
-#~ msgstr "请选择要安装的码表文件."
-
-#~ msgid "Failed to install the table! It's already in table file directory."
-#~ msgstr "码表安装失败! 它已经被安装到码表目录中了."
-
-#~ msgid "Failed to load the table file!"
-#~ msgstr "无法调入码表文件!"
-
-#~ msgid ""
-#~ "Failed to install the table! Another version of this table was already "
-#~ "installed."
-#~ msgstr "码表安装失败! 这个码表的另外一个版本已经被安装过了."
-
-#~ msgid ""
-#~ "Another version of this table was already installed. Do you want to "
-#~ "replace it with the new one?"
-#~ msgstr "已经安装了这个码表的另外一个版本. 你想用新码表替换原来那个么?"
-
-#~ msgid ""
-#~ "Failed to install the table! A table with the same file name was already "
-#~ "installed."
-#~ msgstr "码表安装失败! 一个有相同文件名的码表已经被安装."
-
-#~ msgid ""
-#~ "A table with the same file name was already installed. Do you want to "
-#~ "overwrite it?"
-#~ msgstr "一个有相同文件名的码表已经被安装. 你想覆盖它么?"
-
-#~ msgid "Failed to install the table to %s!"
-#~ msgstr "将码表安装到 %s 失败!"
-
-#~ msgid "Can not delete the file %s!"
-#~ msgstr "无法删除文件 %s!"
-
-#~ msgid "Are you sure to delete this table file?"
-#~ msgstr "你确认删除这个码表文件?"
-
-#~ msgid "Failed to delete the table file!"
-#~ msgstr "码表文件删除失败!"
-
-#~ msgid "True"
-#~ msgstr "真"
-
-#~ msgid "False"
-#~ msgstr "假"
-
-#~ msgid "Split Keys:"
-#~ msgstr "分隔键:"
-
-#~ msgid "The key strokes to split inputed string."
-#~ msgstr "用于分隔输入字符串的按键."
-
-#~ msgid "Commit Keys:"
-#~ msgstr "提交键:"
-
-#~ msgid "The key strokes to commit converted result to client."
-#~ msgstr "用于将转换结果提交给客户程序的按键."
-
-#~ msgid "Forward Keys:"
-#~ msgstr "转发键:"
-
-#~ msgid "The key strokes to forward inputed string to client."
-#~ msgstr "用于将已输入的字符串转发给客户程序的按键."
-
-#~ msgid "The key strokes to select candidate phrases in lookup table."
-#~ msgstr "在候选词表中选择候选词的按键."
-
-#~ msgid "Page Up Keys:"
-#~ msgstr "向上翻页键:"
-
-#~ msgid "The lookup table page up keys"
-#~ msgstr "候选词表向上翻页键"
-
-#~ msgid "Page Down Keys:"
-#~ msgstr "向下翻页键:"
-
-#~ msgid "The lookup table page down keys"
-#~ msgstr "候选词表向下翻页键"
-
-#~ msgid "Table Properties"
-#~ msgstr "码表属性"
-
-#~ msgid "Name:"
-#~ msgstr "名称:"
-
-#~ msgid "The name of this table."
-#~ msgstr "这个码表的名称."
-
-#~ msgid "Author:"
-#~ msgstr "作者:"
-
-#~ msgid "The author of this table."
-#~ msgstr "这个码表的作者."
-
-#~ msgid "UUID:"
-#~ msgstr "唯一号:"
-
-#~ msgid "The unique ID of this table."
-#~ msgstr "这个码表的唯一号."
-
-#~ msgid "Serial Number:"
-#~ msgstr "系列号:"
-
-#~ msgid "The serial number of this table."
-#~ msgstr "这个码表的系列号."
-
-#~ msgid "Icon File:"
-#~ msgstr "图标文件:"
-
-#~ msgid "The icon file of this table."
-#~ msgstr "这个码表的图标文件."
-
-#~ msgid "Supported Languages:"
-#~ msgstr "支持的语言:"
-
-#~ msgid "The languages supported by this table."
-#~ msgstr "这个码表支持的语言."
-
-#~ msgid "Status Prompt:"
-#~ msgstr "状态提示:"
-
-#~ msgid "A prompt string to be shown in status area."
-#~ msgstr "要显示在状态区中的提示字符串."
-
-#~ msgid "Valid Input Chars:"
-#~ msgstr "合法的输入字符:"
-
-#~ msgid "The valid input chars of this table."
-#~ msgstr "这个码表的合法的输入字符."
-
-#~ msgid "Multi Wildcard Char:"
-#~ msgstr "多重扩展字符:"
-
-#~ msgid ""
-#~ "The multi wildcard chars of this table. These chars can be used to match "
-#~ "one or more arbitrary chars."
-#~ msgstr "这个码表的多重扩展字符. 这些字符可以用来匹配一个或多个任意字符."
-
-#~ msgid "Single Wildcard Char:"
-#~ msgstr "单一扩展字符:"
-
-#~ msgid ""
-#~ "The single wildcard chars of this table.These chars can be used to match "
-#~ "one arbitrary char."
-#~ msgstr "这个码表的单一扩展字符. 这些字符可以用于匹配一个任意字符."
-
-#~ msgid "Max Key Length:"
-#~ msgstr "最大键长度:"
-
-#~ msgid "The maxmium length of key strings."
-#~ msgstr "键串的最大长度."
-
-#~ msgid "Show Key Prompt:"
-#~ msgstr "显示键提示:"
-
-#~ msgid "If true then the key prompts will be shown instead of the raw keys."
-#~ msgstr "如果选中这个选项, 则显式键的提示而不是原始的键."
-
-#~ msgid "Auto Select:"
-#~ msgstr "自动选择:"
-
-#~ msgid ""
-#~ "If true then the first candidate phrase will be selected automatically "
-#~ "when inputing the next key."
-#~ msgstr "如果为真, 则在输入下一个键的时候, 第一个候选词将被自动选择."
-
-#~ msgid "Auto Wildcard:"
-#~ msgstr "自动扩展:"
-
-#~ msgid ""
-#~ "If true then a multi wildcard char will be append to the end of inputed "
-#~ "key string when searching phrases."
-#~ msgstr ""
-#~ "如果为真, 则会在搜索词语的时候, 在已输入的键串后附加一个多重扩展字符."
-
-#~ msgid "Auto Commit:"
-#~ msgstr "自动提交:"
-
-#~ msgid ""
-#~ "If true then the converted result string will be committed to client "
-#~ "automatically."
-#~ msgstr "如果为真, 则转换结果字符串将被自动提交到客户程序."
-
-#~ msgid "Auto Split:"
-#~ msgstr "自动分隔:"
-
-#~ msgid ""
-#~ "If true then the inputed key string will be splitted automatically when "
-#~ "necessary."
-#~ msgstr "如果为真, 则当有需要的时候, 自动分隔输入的键串."
-
-#~ msgid "Discard Invalid Key:"
-#~ msgstr "丢弃无效键:"
-
-#~ msgid ""
-#~ "If true then the invalid key will be discarded automatically.This option "
-#~ "is only valid when Auto Select and Auto Commit is true."
-#~ msgstr ""
-#~ "如果为真, 则无效键将被自动丢弃. 此选项仅在自动选择和自动提交选项开启时有"
-#~ "效."
-
-#~ msgid "Dynamic Adjust:"
-#~ msgstr "动态调整:"
-
-#~ msgid "If true then the phrases' frequencies will be adjusted dynamically."
-#~ msgstr "如果为真, 则会动态调整词语的频率信息."
-
-#~ msgid "Auto Fill Preedit Area:"
-#~ msgstr "自动填充预编辑区:"
-
-#~ msgid ""
-#~ "If true then the preedit string will be filled up with the current "
-#~ "candiate phrase automatically.This option is only valid when Auto Select "
-#~ "is TRUE."
-#~ msgstr ""
-#~ "如果为真, 则预编辑字符串将自动被当前候选词填充. 此选项仅在自动选择选项开启"
-#~ "时有效."
-
-#~ msgid "Always Show Lookup Table:"
-#~ msgstr "一直显示候选词表:"
-
-#~ msgid ""
-#~ "If true then the lookup table will always be shown when any candidate "
-#~ "phrase is available. Otherwise the lookup table will only be shown when "
-#~ "necessary.\n"
-#~ "If Auto Fill is false, then this option will be no effect, and always be "
-#~ "true."
-#~ msgstr ""
-#~ "如果为真,则当有候选词的时候总是显示候选词表. 否则候选词表将只在需要的时候"
-#~ "才被显示.\n"
-#~ "如果自动填充为假, 则该选项不起作用, 该值将永远为真."
-
-#~ msgid "Default Full Width Punct:"
-#~ msgstr "缺省全角标点:"
-
-#~ msgid "If true then full width punctuations will be inputed by default."
-#~ msgstr "如果为真, 则在缺省状态下输入全角标点."
-
-#~ msgid "Default Full Width Letter:"
-#~ msgstr "缺省全角字母:"
-
-#~ msgid "If true then full width letters will be inputed by default."
-#~ msgstr "如果为真, 则在缺省状态下输入全角字符."
-
-#~ msgid "Invalid icon file."
-#~ msgstr "无效的图标文件."
-
-#~ msgid "Invalid languages."
-#~ msgstr "无效的语言."
-
-#~ msgid "Invalid status prompt."
-#~ msgstr "无效的状态提示."
-
-#~ msgid "Invalid multi wildcard chars."
-#~ msgstr "无效的多重扩展字符."
-
-#~ msgid "Invalid single wildcard chars."
-#~ msgstr "无效的单一扩展字符."
-
-#~ msgid "Invalid commit keys."
-#~ msgstr "无效的提交键."
-
-#~ msgid "Invalid select keys."
-#~ msgstr "无效的选择键."
-
-#~ msgid "Invalid page up keys."
-#~ msgstr "无效的向上翻页键."
-
-#~ msgid "Invalid page down keys."
-#~ msgstr "无效的向下翻页键."
-
-#~ msgid "Invalid max key length."
-#~ msgstr "无效的最大键长度."
-
-#~ msgid "Failed to save table %s!"
-#~ msgstr "保存码表 %s 失败!"
-
-#~ msgid "Failed to load any Config Modules!"
-#~ msgstr "无法调入任何配置模块!"
-
-#~ msgid "_Current Config Module:"
-#~ msgstr "当前配置模块(_C):"
-
-#~ msgid "<Not found>"
-#~ msgstr "<没有找到>"
-
-#~ msgid "Current Config Module has been changed to %s."
-#~ msgstr "当前配置模块已经变成 %s."
-
-#~ msgid "Start the SCIM Setup Utility."
-#~ msgstr "启动 SCIM 设置工具."
-
-#~ msgid "Setup ..."
-#~ msgstr "设置 ..."
-
-#~ msgid "Show status _box"
-#~ msgstr "显示状态栏(_B)"
-
-#~ msgid ""
-#~ "If this option is checked, a float status box will be displayed to show "
-#~ "the status of current input module."
-#~ msgstr "如果选中这个选项, 将显示一个浮动的状态栏用以显示当前输入模块的状态."
-
-#~ msgid ""
-#~ "If this option is checked, a status box will be displayed on the lower "
-#~ "left corner of the client window to show the status of the current input "
-#~ "method.This option needs the support of the client application."
-#~ msgstr ""
-#~ "如果选中这个选项, 将在客户程序窗口的左下角显示一个浮动的状态栏, 用以显示当"
-#~ "前输入法的状态. 这个选项需要客户应用程序的支持."
