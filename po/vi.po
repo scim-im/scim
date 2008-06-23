@@ -1,29 +1,27 @@
 # Vietnamese translation of SCIM.
-# Copyright (C) 2007 GNU/GPL
+# Copyright © 2008 GNU/GPL.
 # This file is distributed under the same license as the SCIM package.
-# Nguyễn Đình Trung <nguyendinhtrung141@gmail.com>, 2007.
-# , fuzzy
-#
+# Nguyễn Đình Trung <nguyendinhtrung141@gmail.com>, 2007-2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: SCIM VERSION\n"
+"Project-Id-Version: SCIM 1.4.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-22 11:40-0700\n"
-"PO-Revision-Date: 2007-11-19 07:42+0700\n"
-"Last-Translator: Nguyễn Đình Trung <nguyendinhtrung141@gmail.com>\n"
-"Language-Team: Vietnamese\n"
+"POT-Creation-Date: 2008-03-26 15:59+1000\n"
+"PO-Revision-Date: 2008-06-20 17:09+0700\n"
+"Last-Translator: Nguyen Dinh Trung <nguyendinhtrung141@gmail.com>\n"
+"Language-Team: Vietnamese <l10n@vi.openoffice.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: ../src/scim_compose_key.cpp:126
 msgid "English/European"
 msgstr "Anh/Âu"
 
 #. Append an entry for forward mode.
-#: ../src/scim_imengine.cpp:638
-#: ../src/scim_utility.cpp:693
+#: ../src/scim_imengine.cpp:638 ../src/scim_utility.cpp:693
 #: ../modules/FrontEnd/scim_x11_frontend.cpp:1897
 #: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1281
 #: ../extras/panel/scim_panel_gtk.cpp:2814
@@ -62,8 +60,7 @@ msgstr "Bê-la-rút"
 msgid "Bulgarian"
 msgstr "Bun-ga-ri"
 
-#: ../src/scim_utility.cpp:702
-#: ../src/scim_utility.cpp:703
+#: ../src/scim_utility.cpp:702 ../src/scim_utility.cpp:703
 msgid "Bengali"
 msgstr "Ben-ga-li"
 
@@ -83,8 +80,7 @@ msgstr "Bôtxnia"
 msgid "Catalan"
 msgstr "Catalăng"
 
-#: ../src/scim_utility.cpp:708
-#: ../src/scim_keyboard_layout_data.h:4595
+#: ../src/scim_utility.cpp:708 ../src/scim_keyboard_layout_data.h:4595
 msgid "Czech"
 msgstr "Séc"
 
@@ -92,13 +88,11 @@ msgstr "Séc"
 msgid "Welsh"
 msgstr "Xứ Wales"
 
-#: ../src/scim_utility.cpp:710
-#: ../src/scim_keyboard_layout_data.h:4597
+#: ../src/scim_utility.cpp:710 ../src/scim_keyboard_layout_data.h:4597
 msgid "Danish"
 msgstr "Đan Mạch"
 
-#: ../src/scim_utility.cpp:711
-#: ../src/scim_keyboard_layout_data.h:4605
+#: ../src/scim_utility.cpp:711 ../src/scim_keyboard_layout_data.h:4605
 msgid "German"
 msgstr "Đức"
 
@@ -106,8 +100,7 @@ msgstr "Đức"
 msgid "Divehi"
 msgstr "Divehi"
 
-#: ../src/scim_utility.cpp:713
-#: ../src/scim_keyboard_layout_data.h:4608
+#: ../src/scim_utility.cpp:713 ../src/scim_keyboard_layout_data.h:4608
 msgid "Greek"
 msgstr "Hi Lạp"
 
@@ -136,299 +129,278 @@ msgid "English (American)"
 msgstr "Anh (Mỹ)"
 
 #: ../src/scim_utility.cpp:720
-#: ../src/scim_utility.cpp:721
+msgid "Esperanto"
+msgstr "Quốc tế ngữ"
+
+#: ../src/scim_utility.cpp:721 ../src/scim_utility.cpp:722
 #: ../src/scim_keyboard_layout_data.h:4621
 msgid "Spanish"
 msgstr "Tây Ban Nha"
 
-#: ../src/scim_utility.cpp:722
+#: ../src/scim_utility.cpp:723
 msgid "Spanish (Mexico)"
 msgstr "Tây Ban Nha (Mê-hi-cô)"
 
-#: ../src/scim_utility.cpp:723
-#: ../src/scim_keyboard_layout_data.h:4600
+#: ../src/scim_utility.cpp:724 ../src/scim_keyboard_layout_data.h:4600
 msgid "Estonian"
 msgstr "Estonia"
 
-#: ../src/scim_utility.cpp:724
+#: ../src/scim_utility.cpp:725
 msgid "Basque"
 msgstr "Basque"
 
-#: ../src/scim_utility.cpp:725
+#: ../src/scim_utility.cpp:726
 msgid "Persian"
 msgstr "Ba Tư"
 
-#: ../src/scim_utility.cpp:726
-#: ../src/scim_keyboard_layout_data.h:4601
+#: ../src/scim_utility.cpp:727 ../src/scim_keyboard_layout_data.h:4601
 msgid "Finnish"
 msgstr "Phần Lan"
 
-#: ../src/scim_utility.cpp:727
-#: ../src/scim_keyboard_layout_data.h:4602
+#: ../src/scim_utility.cpp:728 ../src/scim_keyboard_layout_data.h:4602
 msgid "French"
 msgstr "Pháp"
 
-#: ../src/scim_utility.cpp:728
+#: ../src/scim_utility.cpp:729
 msgid "Irish"
 msgstr "Ai-xơ-len"
 
-#: ../src/scim_utility.cpp:729
+#: ../src/scim_utility.cpp:730
 msgid "Galician"
 msgstr "Galician"
 
-#: ../src/scim_utility.cpp:730
+#: ../src/scim_utility.cpp:731
 msgid "Gujarati"
 msgstr "Gujarati"
 
-#: ../src/scim_utility.cpp:731
-#: ../src/scim_utility.cpp:740
+#: ../src/scim_utility.cpp:732 ../src/scim_utility.cpp:741
 msgid "Hebrew"
 msgstr "Hebrew"
 
-#: ../src/scim_utility.cpp:732
+#: ../src/scim_utility.cpp:733
 msgid "Hindi"
 msgstr "Hin-đu"
 
-#: ../src/scim_utility.cpp:733
-#: ../src/scim_keyboard_layout_data.h:4594
+#: ../src/scim_utility.cpp:734 ../src/scim_keyboard_layout_data.h:4594
 msgid "Croatian"
 msgstr "Cơ-roát-chi-a"
 
-#: ../src/scim_utility.cpp:734
-#: ../src/scim_keyboard_layout_data.h:4609
+#: ../src/scim_utility.cpp:735 ../src/scim_keyboard_layout_data.h:4609
 msgid "Hungarian"
 msgstr "Hung-ga-ri"
 
-#: ../src/scim_utility.cpp:735
+#: ../src/scim_utility.cpp:736
 msgid "Armenian"
 msgstr "Ác-mê-ni-a"
 
-#: ../src/scim_utility.cpp:736
+#: ../src/scim_utility.cpp:737
 msgid "Interlingua"
 msgstr "Quốc tế ngữ"
 
-#: ../src/scim_utility.cpp:737
+#: ../src/scim_utility.cpp:738
 msgid "Indonesian"
 msgstr "In-đô-nê-xi-a"
 
-#: ../src/scim_utility.cpp:738
-#: ../src/scim_keyboard_layout_data.h:4627
+#: ../src/scim_utility.cpp:739 ../src/scim_keyboard_layout_data.h:4627
 msgid "Icelandic"
 msgstr "Icelandic"
 
-#: ../src/scim_utility.cpp:739
-#: ../src/scim_keyboard_layout_data.h:4610
+#: ../src/scim_utility.cpp:740 ../src/scim_keyboard_layout_data.h:4610
 msgid "Italian"
 msgstr "I-ta-li"
 
-#: ../src/scim_utility.cpp:741
-#: ../src/scim_keyboard_layout_data.h:4611
+#: ../src/scim_utility.cpp:742 ../src/scim_keyboard_layout_data.h:4611
 msgid "Japanese"
 msgstr "Nhật Bản"
 
-#: ../src/scim_utility.cpp:742
+#: ../src/scim_utility.cpp:743
 msgid "Georgian"
 msgstr "Georgian"
 
-#: ../src/scim_utility.cpp:743
+#: ../src/scim_utility.cpp:744
 msgid "Kazakh"
 msgstr "Kazakh"
 
-#: ../src/scim_utility.cpp:744
+#: ../src/scim_utility.cpp:745
 msgid "Cambodian"
 msgstr "Campuchia"
 
-#: ../src/scim_utility.cpp:745
+#: ../src/scim_utility.cpp:746
 msgid "Kannada"
 msgstr "Kannada"
 
-#: ../src/scim_utility.cpp:746
+#: ../src/scim_utility.cpp:747
 msgid "Korean"
 msgstr "Hàn Quốc"
 
-#: ../src/scim_utility.cpp:747
+#: ../src/scim_utility.cpp:748
 msgid "Laothian"
 msgstr "Lào"
 
-#: ../src/scim_utility.cpp:748
-#: ../src/scim_keyboard_layout_data.h:4628
+#: ../src/scim_utility.cpp:749 ../src/scim_keyboard_layout_data.h:4628
 msgid "Lithuanian"
 msgstr "Lithuanian"
 
-#: ../src/scim_utility.cpp:749
+#: ../src/scim_utility.cpp:750
 msgid "Latvian"
 msgstr "Lát-via"
 
-#: ../src/scim_utility.cpp:750
+#: ../src/scim_utility.cpp:751
 msgid "Macedonian"
 msgstr "Mác-xê-đô-ni"
 
-#: ../src/scim_utility.cpp:751
+#: ../src/scim_utility.cpp:752
 msgid "Malayalam"
 msgstr "Malayalam"
 
-#: ../src/scim_utility.cpp:752
+#: ../src/scim_utility.cpp:753
 msgid "Mongolian"
 msgstr "Mông Cổ"
 
-#: ../src/scim_utility.cpp:753
+#: ../src/scim_utility.cpp:754
 msgid "Marathi"
 msgstr "Marathi"
 
-#: ../src/scim_utility.cpp:754
+#: ../src/scim_utility.cpp:755
 msgid "Malay"
 msgstr "Malay"
 
-#: ../src/scim_utility.cpp:755
+#: ../src/scim_utility.cpp:756
 msgid "Burmese"
 msgstr "Burmese"
 
-#: ../src/scim_utility.cpp:756
+#: ../src/scim_utility.cpp:757
 msgid "Nepali"
 msgstr "Nê pan"
 
-#: ../src/scim_utility.cpp:757
-#: ../src/scim_keyboard_layout_data.h:4598
+#: ../src/scim_utility.cpp:758 ../src/scim_keyboard_layout_data.h:4598
 msgid "Dutch"
 msgstr "Hà Lan"
 
-#: ../src/scim_utility.cpp:758
+#: ../src/scim_utility.cpp:759
 msgid "Norwegian (nynorsk)"
 msgstr "Na Uy (nynorsk)"
 
-#: ../src/scim_utility.cpp:759
+#: ../src/scim_utility.cpp:760
 msgid "Norwegian (bokmal)"
 msgstr "Na Uy (bokmal)"
 
-#: ../src/scim_utility.cpp:760
+#: ../src/scim_utility.cpp:761
 msgid "Oriya"
 msgstr "Oriya"
 
-#: ../src/scim_utility.cpp:761
+#: ../src/scim_utility.cpp:762
 msgid "Punjabi"
 msgstr "Punjabi"
 
-#: ../src/scim_utility.cpp:762
-#: ../src/scim_keyboard_layout_data.h:4613
+#: ../src/scim_utility.cpp:763 ../src/scim_keyboard_layout_data.h:4613
 msgid "Polish"
 msgstr "Phần Lan"
 
-#: ../src/scim_utility.cpp:763
-#: ../src/scim_utility.cpp:765
+#: ../src/scim_utility.cpp:764 ../src/scim_utility.cpp:766
 #: ../src/scim_keyboard_layout_data.h:4614
 msgid "Portuguese"
 msgstr "Bồ Đào Nha"
 
-#: ../src/scim_utility.cpp:764
-#: ../src/scim_keyboard_layout_data.h:4615
+#: ../src/scim_utility.cpp:765 ../src/scim_keyboard_layout_data.h:4615
 msgid "Portuguese (Brazil)"
 msgstr "Bồ Đào Nha (Bra-xin)"
 
-#: ../src/scim_utility.cpp:766
+#: ../src/scim_utility.cpp:767
 msgid "Romanian"
 msgstr "Ru-ma-ni"
 
-#: ../src/scim_utility.cpp:767
-#: ../src/scim_keyboard_layout_data.h:4617
+#: ../src/scim_utility.cpp:768 ../src/scim_keyboard_layout_data.h:4617
 msgid "Russian"
 msgstr "Nga"
 
-#: ../src/scim_utility.cpp:768
+#: ../src/scim_utility.cpp:769
 msgid "Sinhala"
 msgstr "Sinhala"
 
-#: ../src/scim_utility.cpp:769
-#: ../src/scim_keyboard_layout_data.h:4618
+#: ../src/scim_utility.cpp:770 ../src/scim_keyboard_layout_data.h:4618
 msgid "Slovak"
 msgstr "Slô-va-ki-a"
 
-#: ../src/scim_utility.cpp:770
-#: ../src/scim_keyboard_layout_data.h:4620
+#: ../src/scim_utility.cpp:771 ../src/scim_keyboard_layout_data.h:4620
 msgid "Slovenian"
 msgstr "Slô-vê-ni-a"
 
-#: ../src/scim_utility.cpp:771
+#: ../src/scim_utility.cpp:772
 msgid "Albanian"
 msgstr "An-ba-ni"
 
-#: ../src/scim_utility.cpp:772
-#: ../src/scim_utility.cpp:773
-#: ../src/scim_utility.cpp:774
+#: ../src/scim_utility.cpp:773 ../src/scim_utility.cpp:774
+#: ../src/scim_utility.cpp:775
 msgid "Serbian"
 msgstr "Séc-bi"
 
-#: ../src/scim_utility.cpp:775
-#: ../src/scim_utility.cpp:777
+#: ../src/scim_utility.cpp:776 ../src/scim_utility.cpp:778
 #: ../src/scim_keyboard_layout_data.h:4624
 msgid "Swedish"
 msgstr "Thụy Điển"
 
-#: ../src/scim_utility.cpp:776
+#: ../src/scim_utility.cpp:777
 msgid "Swedish (Finland)"
 msgstr "Thụy Điển (Phần Lan)"
 
-#: ../src/scim_utility.cpp:778
+#: ../src/scim_utility.cpp:779
 msgid "Tamil"
 msgstr "Tamil"
 
-#: ../src/scim_utility.cpp:779
+#: ../src/scim_utility.cpp:780
 msgid "Telugu"
 msgstr "Telugu"
 
-#: ../src/scim_utility.cpp:780
+#: ../src/scim_utility.cpp:781
 msgid "Thai"
 msgstr "Thái Lan"
 
-#: ../src/scim_utility.cpp:781
-#: ../src/scim_keyboard_layout_data.h:4625
+#: ../src/scim_utility.cpp:782 ../src/scim_keyboard_layout_data.h:4625
 msgid "Turkish"
 msgstr "Thổ Nhĩ Kỳ"
 
-#: ../src/scim_utility.cpp:782
+#: ../src/scim_utility.cpp:783
 msgid "Uighur"
 msgstr "Uighur"
 
-#: ../src/scim_utility.cpp:783
-#: ../src/scim_keyboard_layout_data.h:4629
+#: ../src/scim_utility.cpp:784 ../src/scim_keyboard_layout_data.h:4629
 msgid "Ukrainian"
 msgstr "Úc-rai-na"
 
-#: ../src/scim_utility.cpp:784
+#: ../src/scim_utility.cpp:785
 msgid "Urdu"
 msgstr "Urdu"
 
-#: ../src/scim_utility.cpp:785
+#: ../src/scim_utility.cpp:786
 msgid "Uzbek"
 msgstr "U-dơ-be-kix-tan"
 
-#: ../src/scim_utility.cpp:786
+#: ../src/scim_utility.cpp:787
 msgid "Vietnamese"
 msgstr "Việt Nam"
 
-#: ../src/scim_utility.cpp:787
+#: ../src/scim_utility.cpp:788
 msgid "Walloon"
 msgstr "Walloon"
 
-#: ../src/scim_utility.cpp:788
-#: ../src/scim_utility.cpp:789
+#: ../src/scim_utility.cpp:789 ../src/scim_utility.cpp:790
 msgid "Yiddish"
 msgstr "Yiddish"
 
-#: ../src/scim_utility.cpp:790
+#: ../src/scim_utility.cpp:791
 msgid "Chinese"
 msgstr "Trung Quốc"
 
-#: ../src/scim_utility.cpp:791
-#: ../src/scim_utility.cpp:793
+#: ../src/scim_utility.cpp:792 ../src/scim_utility.cpp:794
 msgid "Chinese (simplified)"
 msgstr "Trung Quốc (giản thể)"
 
-#: ../src/scim_utility.cpp:792
-#: ../src/scim_utility.cpp:794
+#: ../src/scim_utility.cpp:793 ../src/scim_utility.cpp:795
 msgid "Chinese (traditional)"
 msgstr "Trung Quốc (phồn thể)"
 
-#: ../src/scim_utility.cpp:876
+#: ../src/scim_utility.cpp:877
 msgid "Other"
 msgstr "Khác"
 
@@ -628,8 +600,12 @@ msgid "Global Setup"
 msgstr "Thiết lập toàn cục"
 
 #: ../modules/SetupUI/scim_frontend_setup.cpp:87
-msgid "Setup the global options used by All FrontEnd modules, including X11 FrontEnd, GTK IMModule, QT IMModule etc."
-msgstr "Thiết lập toàn cục cho tất cả các mô-đun Đầu Trước (FrontEnd), bao gồm Đầu Trước X11, GTK IMModule, QT IMModule.v.v.."
+msgid ""
+"Setup the global options used by All FrontEnd modules, including X11 "
+"FrontEnd, GTK IMModule, QT IMModule etc."
+msgstr ""
+"Thiết lập toàn cục cho tất cả các mô-đun Đầu Trước (FrontEnd), bao gồm Đầu "
+"Trước X11, GTK IMModule, QT IMModule.v.v.."
 
 #. label
 #: ../modules/SetupUI/scim_frontend_setup.cpp:143
@@ -643,8 +619,11 @@ msgstr "Chọn phím bật/tắt"
 
 #. tooltip
 #: ../modules/SetupUI/scim_frontend_setup.cpp:147
-msgid "The key events to turn on/off SCIM input method. Click on the button on the right to edit it."
-msgstr "Tổ hợp phím để bật/tắt bộ gõ SCIM. Bấm vào nút nằm bên phải để hiệu chỉnh."
+msgid ""
+"The key events to turn on/off SCIM input method. Click on the button on the "
+"right to edit it."
+msgstr ""
+"Tổ hợp phím để bật/tắt bộ gõ SCIM. Bấm vào nút nằm bên phải để hiệu chỉnh."
 
 #. label
 #: ../modules/SetupUI/scim_frontend_setup.cpp:160
@@ -658,7 +637,9 @@ msgstr "Chọn tổ hợp phím để bật SCIM:"
 
 #. tooltip
 #: ../modules/SetupUI/scim_frontend_setup.cpp:164
-msgid "The key events to turn on SCIM input method. Click on the button on the right to edit it."
+msgid ""
+"The key events to turn on SCIM input method. Click on the button on the "
+"right to edit it."
 msgstr "Tổ hợp phím để bật bộ gõ SCIM. Bấm vào nút bên phải để hiệu chỉnh"
 
 #. label
@@ -673,7 +654,9 @@ msgstr "Chọn phím để tắt SCIM"
 
 #. tooltip
 #: ../modules/SetupUI/scim_frontend_setup.cpp:181
-msgid "The key events to turn off SCIM input method. Click on the button on the right to edit it."
+msgid ""
+"The key events to turn off SCIM input method. Click on the button on the "
+"right to edit it."
 msgstr "Tổ hợp phím để tắt bộ gõ SCIM. Bấm vào nút bên phải để hiệu chỉnh."
 
 #. label
@@ -688,8 +671,11 @@ msgstr "Chọn tổ hợp phím chuyển bộ gõ kế:"
 
 #. tooltip
 #: ../modules/SetupUI/scim_frontend_setup.cpp:198
-msgid "The key events to switch to the next input method. Click on the button on the right to edit it."
-msgstr "Tổ hợp phím để chuyển tới bộ gõ kế tiếp. Bấm vào nút bên phải để hiệu chỉnh."
+msgid ""
+"The key events to switch to the next input method. Click on the button on "
+"the right to edit it."
+msgstr ""
+"Tổ hợp phím để chuyển tới bộ gõ kế tiếp. Bấm vào nút bên phải để hiệu chỉnh."
 
 #. label
 #: ../modules/SetupUI/scim_frontend_setup.cpp:213
@@ -703,8 +689,11 @@ msgstr "Chọn phím chuyển bộ gõ trước:"
 
 #. tooltip
 #: ../modules/SetupUI/scim_frontend_setup.cpp:217
-msgid "The key events to switch to the previous input method. Click on the button on the right to edit it."
-msgstr "Tổ hợp phím để chuyển tới bộ gõ trước. Bấm vào nút bên phải để hiệu chỉnh."
+msgid ""
+"The key events to switch to the previous input method. Click on the button "
+"on the right to edit it."
+msgstr ""
+"Tổ hợp phím để chuyển tới bộ gõ trước. Bấm vào nút bên phải để hiệu chỉnh."
 
 #. label
 #: ../modules/SetupUI/scim_frontend_setup.cpp:232
@@ -718,8 +707,12 @@ msgstr "Chọn phím hiện trình đơn bộ gõ:"
 
 #. tooltip
 #: ../modules/SetupUI/scim_frontend_setup.cpp:236
-msgid "The key events to show the input method menu. Click on the button on the right to edit it."
-msgstr "Tổ hợp phím để hiển thị trình đơn của bộ gõ. Bấm vào nút bên phải để hiệu chỉnh."
+msgid ""
+"The key events to show the input method menu. Click on the button on the "
+"right to edit it."
+msgstr ""
+"Tổ hợp phím để hiển thị trình đơn của bộ gõ. Bấm vào nút bên phải để hiệu "
+"chỉnh."
 
 #: ../modules/SetupUI/scim_frontend_setup.cpp:306
 msgid "Options"
@@ -730,8 +723,11 @@ msgid "_Keyboard Layout:"
 msgstr "_Bố trí bàn phím:"
 
 #: ../modules/SetupUI/scim_frontend_setup.cpp:342
-msgid "You should choose your currently used keyboard layout here so that input methods, who care about keyboard layout, could work correctly."
-msgstr "Bạn phải chọn đúng kiểu bố trí bàn phím để các bộ gõ làm việc đúng cách."
+msgid ""
+"You should choose your currently used keyboard layout here so that input "
+"methods, who care about keyboard layout, could work correctly."
+msgstr ""
+"Bạn phải chọn đúng kiểu bố trí bàn phím để các bộ gõ làm việc đúng cách."
 
 #. On The Spot.
 #: ../modules/SetupUI/scim_frontend_setup.cpp:346
@@ -739,8 +735,13 @@ msgid "_Embed Preedit String into client window"
 msgstr "_Nhúng chuỗi đang gõ dở vào cửa sổ ứng dụng khách"
 
 #: ../modules/SetupUI/scim_frontend_setup.cpp:351
-msgid "If this option is checked, the preedit string will be displayed directly in the client input window, rather than in a independent float window."
-msgstr "Nếu được chọn, các chuỗi mà bạn đang gõ dở sẽ hiện trực tiếp trên cửa sổ ứng dụng mà bạn đang gõ. Ngược lại, chuỗi đang gõ dở sẽ hiện lên trong một cửa sổ nổi."
+msgid ""
+"If this option is checked, the preedit string will be displayed directly in "
+"the client input window, rather than in a independent float window."
+msgstr ""
+"Nếu được chọn, các chuỗi mà bạn đang gõ dở sẽ hiện trực tiếp trên cửa sổ ứng "
+"dụng mà bạn đang gõ. Ngược lại, chuỗi đang gõ dở sẽ hiện lên trong một cửa "
+"sổ nổi."
 
 #. Shared input method.
 #: ../modules/SetupUI/scim_frontend_setup.cpp:360
@@ -748,8 +749,13 @@ msgid "_Share the same input method among all applications"
 msgstr "_Chỉ dùng một bộ gõ cho tất cả các ứng dụng"
 
 #: ../modules/SetupUI/scim_frontend_setup.cpp:365
-msgid "If this option is checked, then only one input method could be used by all applications at the same time.Otherwise different input method could be used by each application."
-msgstr "Nếu được chọn, mọi ứng dụng sẽ dùng chung một bộ gõ. Nếu bỏ chọn, mỗi ứng dụng sẽ dùng 1 bộ gõ riêng."
+msgid ""
+"If this option is checked, then only one input method could be used by all "
+"applications at the same time.Otherwise different input method could be used "
+"by each application."
+msgstr ""
+"Nếu được chọn, mọi ứng dụng sẽ dùng chung một bộ gõ. Nếu bỏ chọn, mỗi ứng "
+"dụng sẽ dùng 1 bộ gõ riêng."
 
 #: ../modules/SetupUI/scim_frontend_setup.cpp:373
 #: ../modules/SetupUI/scim_imengine_setup.cpp:453
@@ -757,7 +763,8 @@ msgid "Hotkeys"
 msgstr "Phím tắt"
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:93
-msgid "You can enable/disable input methods and set hotkeys for input methods here."
+msgid ""
+"You can enable/disable input methods and set hotkeys for input methods here."
 msgstr "Bạn có thể bật/tắt và đặt phím tắt cho các bộ gõ tại đây."
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:296
@@ -945,56 +952,88 @@ msgid "_Font:"
 msgstr "_Phông chữ:"
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:419
-msgid "If option \"Always\" is selected, the toolbar will always be shown on the screen. If option \"On demand\" is selected, it will only be shown when SCIM is activated. If option \"Never\" is selected, it will never be shown."
-msgstr "Nếu chọn \"Luôn luôn\", thanh công cụ SCIM luôn được hiển thị trên màn hình. Nếu chọn \"Chỉ khi bật\", thanh công cụ sẽ chỉ hiện lên khi SCIM hoạt động. Nếu chọn \"Luôn tắt\", thanh công cụ sẽ không được hiển thị."
+msgid ""
+"If option \"Always\" is selected, the toolbar will always be shown on the "
+"screen. If option \"On demand\" is selected, it will only be shown when SCIM "
+"is activated. If option \"Never\" is selected, it will never be shown."
+msgstr ""
+"Nếu chọn \"Luôn luôn\", thanh công cụ SCIM luôn được hiển thị trên màn hình. "
+"Nếu chọn \"Chỉ khi bật\", thanh công cụ sẽ chỉ hiện lên khi SCIM hoạt động. "
+"Nếu chọn \"Luôn tắt\", thanh công cụ sẽ không được hiển thị."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:426
-msgid "If this option is checked, the toolbar will be snapped to the screen border."
+msgid ""
+"If this option is checked, the toolbar will be snapped to the screen border."
 msgstr "Nếu đánh dấu chọn, thanh công cụ sẽ nằm ở rìa màn hình."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:431
-msgid "The toolbar will be hidden out after this timeout is elapsed. This option is only valid when \"Always show\" is selected. Set to zero to disable this behavior."
-msgstr "Thời gian sau khi bật thanh công cụ được ẩn đi. Tuỳ chọn này chỉ hợp lệ khi \"Luôn luôn\" được chọn. Đặt giá trị này bằng 0 để thanh công cụ luôn nổi."
+msgid ""
+"The toolbar will be hidden out after this timeout is elapsed. This option is "
+"only valid when \"Always show\" is selected. Set to zero to disable this "
+"behavior."
+msgstr ""
+"Thời gian sau khi bật thanh công cụ được ẩn đi. Tuỳ chọn này chỉ hợp lệ khi "
+"\"Luôn luôn\" được chọn. Đặt giá trị này bằng 0 để thanh công cụ luôn nổi."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:438
-msgid "If this option is checked, the input method icon will be showed on the toolbar."
-msgstr "Nếu được chọn, biểu tượng của bộ gõ sẽ được hiển thị trên thanh công cụ."
+msgid ""
+"If this option is checked, the input method icon will be showed on the "
+"toolbar."
+msgstr ""
+"Nếu được chọn, biểu tượng của bộ gõ sẽ được hiển thị trên thanh công cụ."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:442
-msgid "If this option is checked, the input method name will be showed on the toolbar."
+msgid ""
+"If this option is checked, the input method name will be showed on the "
+"toolbar."
 msgstr "Nếu được chọn, tên bộ gõ sẽ được hiển thị trên thanh công cụ."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:446
-msgid "If this option is checked, the stick icon will be showed on the toolbar."
+msgid ""
+"If this option is checked, the stick icon will be showed on the toolbar."
 msgstr "Nếu được chọn, biểu tượng ghim sẽ được hiển thị trên thanh công cụ."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:450
 msgid "If this option is checked, the menu icon will be showed on the toolbar."
-msgstr "Nếu được chọn, biểu tượng trình đơn sẽ được hiển thị trên thanh công cụ."
+msgstr ""
+"Nếu được chọn, biểu tượng trình đơn sẽ được hiển thị trên thanh công cụ."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:454
 msgid "If this option is checked, the help icon will be showed on the toolbar."
-msgstr "Nếu được chọn, biểu tượng trợ giúp sẽ được hiển thị trên thanh công cụ."
+msgstr ""
+"Nếu được chọn, biểu tượng trợ giúp sẽ được hiển thị trên thanh công cụ."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:458
-msgid "If this option is checked, the text label of input method properties will be showed on the toolbar."
-msgstr "Nếu được chọn, nhãn văn bản của bộ gõ sẽ được hiển thị trên thanh công cụ."
+msgid ""
+"If this option is checked, the text label of input method properties will be "
+"showed on the toolbar."
+msgstr ""
+"Nếu được chọn, nhãn văn bản của bộ gõ sẽ được hiển thị trên thanh công cụ."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:462
-msgid "If this option is checked, the lookup table will be embedded into the input window."
+msgid ""
+"If this option is checked, the lookup table will be embedded into the input "
+"window."
 msgstr "Nếu được chọn, bảng tra cứu sẽ được nhúng vào cửa sổ đang gõ."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:467
-msgid "If this option is checked, the lookup table will be displayed vertically."
+msgid ""
+"If this option is checked, the lookup table will be displayed vertically."
 msgstr "Nếu được chọn, bảng tra cứu được hiển thị theo chiều dọc."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:472
-msgid "If this option is checked, the tray icon will be showed on the desktop's taskbar."
-msgstr "Nếu được chọn, biểu tượng SCIM được đặt trên thanh tác vụ của màn hình nền."
+msgid ""
+"If this option is checked, the tray icon will be showed on the desktop's "
+"taskbar."
+msgstr ""
+"Nếu được chọn, biểu tượng SCIM được đặt trên thanh tác vụ của màn hình nền."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:476
-msgid "If this option is checked, the toolbar, input and lookup table windows will be sticked to its original position."
-msgstr "Nếu được chọn, cửa sổ nhập và bảng tra cứu sẽ được ghim vào vị trí mặc định."
+msgid ""
+"If this option is checked, the toolbar, input and lookup table windows will "
+"be sticked to its original position."
+msgstr ""
+"Nếu được chọn, cửa sổ nhập và bảng tra cứu sẽ được ghim vào vị trí mặc định."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:482
 msgid "The font setting will be used in the input and lookup table windows."
@@ -1040,15 +1079,18 @@ msgid ""
 "\n"
 "\n"
 "\n"
-"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org.cn&gt;</span>"
+"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
+"cn&gt;</span>"
 msgstr ""
 " <span size=\"20000\">Bộ gõ dùng chung thông minh</span> \n"
 "\n"
-"<span size=\"16000\" style=\"italic\">Tiện ích thiết lập trên giao diện đồ hoạ người dùng</span>\n"
+"<span size=\"16000\" style=\"italic\">Tiện ích thiết lập trên giao diện đồ "
+"hoạ người dùng</span>\n"
 "\n"
 "\n"
 "\n"
-"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org.cn&gt;</span>"
+"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
+"cn&gt;</span>"
 
 #: ../extras/setup/scim_setup_ui.cpp:394
 #, c-format
@@ -1060,8 +1102,12 @@ msgid "Are you sure you want to quit SCIM Setup?"
 msgstr "Bạn chắc mình muốn thoát khỏi chương trình thiết lập SCIM?"
 
 #: ../extras/setup/scim_setup_ui.cpp:685
-msgid "Not all configuration can be reloaded on the fly. Don't forget to restart SCIM in order to let all of the new configuration take effect."
-msgstr "Một số thiết lập sẽ không có hiệu lực ngay lập tức. Bạn phải khởi động lại SCIM để tất cả các thiết lập đều có hiệu lực."
+msgid ""
+"Not all configuration can be reloaded on the fly. Don't forget to restart "
+"SCIM in order to let all of the new configuration take effect."
+msgstr ""
+"Một số thiết lập sẽ không có hiệu lực ngay lập tức. Bạn phải khởi động lại "
+"SCIM để tất cả các thiết lập đều có hiệu lực."
 
 #: ../extras/setup/scim_setup_helper.cpp:49
 msgid "SCIM Setup"
@@ -1142,7 +1188,8 @@ msgstr "Độ dài tối đa"
 
 #: ../utils/scimstringview.c:207
 msgid "Maximum number of characters for this string view. Zero if no maximum."
-msgstr "Số lượng ký tự lớn nhất hiển thị trong chuỗi. Đặt bằng 0 nếu không giới hạn."
+msgstr ""
+"Số lượng ký tự lớn nhất hiển thị trong chuỗi. Đặt bằng 0 nếu không giới hạn."
 
 #: ../utils/scimstringview.c:216
 msgid "Maximum width"
@@ -1287,4 +1334,3 @@ msgstr "Định hướng"
 #: ../utils/scimtrayicon.c:109
 msgid "The orientation of the tray."
 msgstr "Hướng của khay"
-
