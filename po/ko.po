@@ -1,21 +1,28 @@
+# translation of ko.po to Korean
 # translation of ko.
 # Copyright (C) 2004 THE ko'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the ko package.
 #
+#
 # Kitae <bluetux@gmail.com>, 2005.
 # Choe Hwanjin <choe.hwanjin@gmail.com>, 2005.
-#
+# Eunju Kim <eukim@redhat.com>, 2008.
 msgid ""
 msgstr ""
-"Project-Id-Version: SCIM\n"
+"Project-Id-Version: ko\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-06-22 11:40-0700\n"
-"PO-Revision-Date: 2005-07-08 18:16+0900\n"
-"Last-Translator: Choe Hwanjin <choe.hwanjin@gmail.com>\n"
-"Language-Team: Korean <en@li.org>\n"
+"PO-Revision-Date: 2008-03-26 14:44+1000\n"
+"Last-Translator: Eunju Kim <eukim@redhat.com>\n"
+"Language-Team: Korean <ko@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n!=1);\n\n"
+"\n"
+"\n"
+"\n"
 
 #: ../src/scim_compose_key.cpp:126
 msgid "English/European"
@@ -99,7 +106,7 @@ msgstr "독일어"
 
 #: ../src/scim_utility.cpp:712
 msgid "Divehi"
-msgstr ""
+msgstr "디베히어 "
 
 #: ../src/scim_utility.cpp:713 ../src/scim_keyboard_layout_data.h:4608
 msgid "Greek"
@@ -187,9 +194,8 @@ msgid "Hungarian"
 msgstr "헝가리어"
 
 #: ../src/scim_utility.cpp:735
-#, fuzzy
 msgid "Armenian"
-msgstr "루마니아어"
+msgstr "아르메니아어 "
 
 #: ../src/scim_utility.cpp:736
 msgid "Interlingua"
@@ -212,9 +218,8 @@ msgid "Japanese"
 msgstr "일본어"
 
 #: ../src/scim_utility.cpp:742
-#, fuzzy
 msgid "Georgian"
-msgstr "독일어"
+msgstr "그루지아어 "
 
 #: ../src/scim_utility.cpp:743
 msgid "Kazakh"
@@ -266,7 +271,7 @@ msgstr "말레이어"
 
 #: ../src/scim_utility.cpp:755
 msgid "Burmese"
-msgstr ""
+msgstr "버마어 "
 
 #: ../src/scim_utility.cpp:756
 msgid "Nepali"
@@ -299,11 +304,11 @@ msgstr "폴란드어"
 #: ../src/scim_utility.cpp:763 ../src/scim_utility.cpp:765
 #: ../src/scim_keyboard_layout_data.h:4614
 msgid "Portuguese"
-msgstr "포루투갈어"
+msgstr "포르투갈어"
 
 #: ../src/scim_utility.cpp:764 ../src/scim_keyboard_layout_data.h:4615
 msgid "Portuguese (Brazil)"
-msgstr "포루투갈어 (브라질)"
+msgstr "포르투갈어 (브라질)"
 
 #: ../src/scim_utility.cpp:766
 msgid "Romanian"
@@ -315,7 +320,7 @@ msgstr "러시아어"
 
 #: ../src/scim_utility.cpp:768
 msgid "Sinhala"
-msgstr ""
+msgstr "신할라어 "
 
 #: ../src/scim_utility.cpp:769 ../src/scim_keyboard_layout_data.h:4618
 msgid "Slovak"
@@ -323,7 +328,7 @@ msgstr "슬로바키아어"
 
 #: ../src/scim_utility.cpp:770 ../src/scim_keyboard_layout_data.h:4620
 msgid "Slovenian"
-msgstr "슬로바키아어"
+msgstr "슬로베니아어"
 
 #: ../src/scim_utility.cpp:771
 msgid "Albanian"
@@ -353,7 +358,7 @@ msgstr "텔루구어"
 
 #: ../src/scim_utility.cpp:780
 msgid "Thai"
-msgstr "타이어"
+msgstr "태국어 "
 
 #: ../src/scim_utility.cpp:781 ../src/scim_keyboard_layout_data.h:4625
 msgid "Turkish"
@@ -410,7 +415,7 @@ msgstr "기타"
 #: ../modules/IMEngine/scim_socket_imengine.cpp:531
 #: ../modules/IMEngine/scim_socket_imengine.cpp:561
 msgid "Unknown"
-msgstr "알수없는"
+msgstr "알수없음"
 
 #: ../src/scim_keyboard_layout_data.h:4592
 msgid "English (US)"
@@ -487,23 +492,23 @@ msgstr "중국어 간체-번체 변환"
 
 #: ../modules/Filter/scim_sctc_filter.cpp:76
 msgid "No Conversion"
-msgstr "변환 하지 않음"
+msgstr "변환하지 않음"
 
 #: ../modules/Filter/scim_sctc_filter.cpp:81
 msgid "Simplified to Traditional"
-msgstr "간체에서 번체로"
+msgstr "중국어 간체에서 번체로"
 
 #: ../modules/Filter/scim_sctc_filter.cpp:83
 msgid "Convert Simplified Chinese to Traditional Chinese"
-msgstr "간체에서 번체로 변환"
+msgstr "중국어 간체에서 번체로 변환 "
 
 #: ../modules/Filter/scim_sctc_filter.cpp:86
 msgid "Traditional to Simplified"
-msgstr "번체에서 간체로"
+msgstr "중국어 번체에서 간체로 "
 
 #: ../modules/Filter/scim_sctc_filter.cpp:88
 msgid "Convert Traditional Chinese to Simplified Chinese"
-msgstr "번체에서 간체로 변환"
+msgstr "중국어 번체에서 간체로 변환"
 
 #: ../modules/Filter/scim_sctc_filter.cpp:300
 msgid "James Su <suzhe@tsinghua.org.cn>"
@@ -525,7 +530,7 @@ msgstr "번체->간체"
 #: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1231
 #: ../extras/panel/scim_panel_gtk.cpp:2304
 msgid "Smart Common Input Method platform "
-msgstr "똑똑한 일반 입력 방식 플랫폼 "
+msgstr "스마트 일반 입력 방식 플랫폼 "
 
 #: ../modules/FrontEnd/scim_x11_frontend.cpp:1847
 #: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1233
@@ -602,8 +607,7 @@ msgstr "전체 설정"
 msgid ""
 "Setup the global options used by All FrontEnd modules, including X11 "
 "FrontEnd, GTK IMModule, QT IMModule etc."
-msgstr ""
-"X11, GTK 입력모듈, QT 입력모듈 등 모든 프론트엔드에대한 전체 설정을 합니다."
+msgstr "X11, GTK 입력모듈, QT 입력모듈 등 모든 프론트엔드에대한 전체 설정을 합니다."
 
 #. label
 #: ../modules/SetupUI/scim_frontend_setup.cpp:143
@@ -673,8 +677,7 @@ msgstr "다음 입력 방식으로 바꾸는데 사용할 키 선택"
 msgid ""
 "The key events to switch to the next input method. Click on the button on "
 "the right to edit it."
-msgstr ""
-"다음 입력방식으로 전환을 위한 키설정. 오를쪽 단추를 클릭하고 수정하세요."
+msgstr "다음 입력방식으로 전환을 위한 키설정. 오른쪽 단추를 클릭하고 수정하세요."
 
 #. label
 #: ../modules/SetupUI/scim_frontend_setup.cpp:213
@@ -691,8 +694,7 @@ msgstr "이전 입력방식을 선택"
 msgid ""
 "The key events to switch to the previous input method. Click on the button "
 "on the right to edit it."
-msgstr ""
-"이전 입력방식으로 전환을 위한 키 설정. 우측 단추를 클릭하고 수정하세요."
+msgstr "이전 입력방식으로 전환을 위한 키 설정. 우측 단추를 클릭하고 수정하세요."
 
 #. label
 #: ../modules/SetupUI/scim_frontend_setup.cpp:232
@@ -760,13 +762,12 @@ msgid "Hotkeys"
 msgstr "단축키"
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:93
-msgid ""
-"You can enable/disable input methods and set hotkeys for input methods here."
+msgid "You can enable/disable input methods and set hotkeys for input methods here."
 msgstr "각 입력 방법들과 단축키를 활성화하거나, 비활성화 할수 있습니다."
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:296
 msgid "The installed input method services:"
-msgstr "설치된 입력기 서비스들:"
+msgstr "설치된 입력기 서비스: "
 
 #. Create hotkey and filter button before factory list view, because
 #. factory_list_selection_changed_callback may access these two buttons.
@@ -812,7 +813,7 @@ msgstr "모든 입력 방법을 활성화 "
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:381
 msgid "_Disable All"
-msgstr "모두 비활성(_D)"
+msgstr "모두 비활성화(_D)"
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:390
 msgid "Disable all input methods."
@@ -843,7 +844,7 @@ msgstr "설명"
 #: ../modules/SetupUI/scim_imengine_setup.cpp:1190
 #, c-format
 msgid "Edit Hotkeys for %s"
-msgstr "%s 단축기 수정"
+msgstr "%s 단축키 수정"
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:1417
 #, c-format
@@ -959,8 +960,7 @@ msgstr ""
 "택하면 전혀 보이지 않게 됩니다."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:426
-msgid ""
-"If this option is checked, the toolbar will be snapped to the screen border."
+msgid "If this option is checked, the toolbar will be snapped to the screen border."
 msgstr "이 설정을 선택하면, 도구상자가 화면 가장자리에 맞춰 움직이게 됩니다."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:431
@@ -985,8 +985,7 @@ msgid ""
 msgstr "이 옵션을 선택하면, 입력방법의 이름이 도구상자에 나타납니다."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:446
-msgid ""
-"If this option is checked, the stick icon will be showed on the toolbar."
+msgid "If this option is checked, the stick icon will be showed on the toolbar."
 msgstr "이 옵션을 선택하면, 고정 아이콘이 도구상자에 나타납니다."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:450
@@ -1010,8 +1009,7 @@ msgid ""
 msgstr "이 옵션을 선택하면, 미리보기 테이블이 입력창에 바로 붙을 것입니다."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:467
-msgid ""
-"If this option is checked, the lookup table will be displayed vertically."
+msgid "If this option is checked, the lookup table will be displayed vertically."
 msgstr "이 옵션을 선택하면, 미리보기 테이블이 세로로 나타납니다."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:472
@@ -1024,8 +1022,7 @@ msgstr "이 옵션을 선택하면, 트레이 아이콘이 데스크탑 테스�
 msgid ""
 "If this option is checked, the toolbar, input and lookup table windows will "
 "be sticked to its original position."
-msgstr ""
-"이 옵션을 선택하면, 도구상자, 입력창과 미리보기창들의 위치가 고정됩니다."
+msgstr "이 옵션을 선택하면, 도구상자, 입력창과 미리보기창들의 위치가 고정됩니다."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:482
 msgid "The font setting will be used in the input and lookup table windows."
@@ -1074,7 +1071,7 @@ msgid ""
 "<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
 "cn&gt;</span>"
 msgstr ""
-" <span size=\"20000\">똑똑한 공통 입력 방법</span> \n"
+" <span size=\"20000\">스마트 일반 입력 방식 플랫폼</span> \n"
 "\n"
 "<span size=\"16000\" style=\"italic\">GUI 설정 프로그램</span>\n"
 "\n"
@@ -1097,7 +1094,7 @@ msgid ""
 "Not all configuration can be reloaded on the fly. Don't forget to restart "
 "SCIM in order to let all of the new configuration take effect."
 msgstr ""
-"모든 환경 설정을 새로 불러오진 못 합니다. 새로운 환경설정을 모두 적용 하기 위"
+"모든 환경 설정을 새로 불러오진 못 합니다. 새로운 환경설정을 모두 적용하기 위"
 "해서는 SCIM을 다시 시작해야 합니다."
 
 #: ../extras/setup/scim_setup_helper.cpp:49
@@ -1110,7 +1107,7 @@ msgstr "GTK 라이브러리 기반의 설정 프로그램"
 
 #: ../extras/setup/scim-setup.desktop.in.h:2
 msgid "Setup utility for Smart Common Input Method platform"
-msgstr "똑똑한 공통 입력 방법 (SCIM)을 위한 설정 프로그램"
+msgstr "스마트 일반 입력 방식 (SCIM) 플랫폼을 위한 설정 프로그램"
 
 #: ../extras/panel/scim_panel_gtk.cpp:982
 msgid "SCIM Help"
@@ -1118,19 +1115,19 @@ msgstr "SCIM 도움말"
 
 #: ../extras/panel/scim_panel_gtk.cpp:999
 msgid "Smart Common Input Method"
-msgstr "똑똑한 공통 입력 방법"
+msgstr "스마트 일반 입력 방식"
 
 #: ../extras/panel/scim_panel_gtk.cpp:1058
 msgid "Stick/unstick the input window and the toolbar."
-msgstr "입력창과 도구상자 고정/비고정."
+msgstr "입력창과 도구상자 고정/비고정합니다."
 
 #: ../extras/panel/scim_panel_gtk.cpp:1063
 msgid "Show a brief help about SCIM and the current input method."
-msgstr "SCIM 과 현재 입력 방법에 대한 간단한 도움말을 보여줌."
+msgstr "SCIM 과 현재 입력 방법에 대한 간단한 도움말을 보여줍니다."
 
 #: ../extras/panel/scim_panel_gtk.cpp:1068
 msgid "Show command menu."
-msgstr "명령 메뉴를 보임."
+msgstr "명령 메뉴를 보여줍니다."
 
 #: ../extras/panel/scim_panel_gtk.cpp:2306
 msgid ""
@@ -1211,11 +1208,11 @@ msgstr "자동 커서 이동"
 
 #: ../utils/scimstringview.c:243
 msgid "TRUE auto move cursor position when mouse clicking."
-msgstr "참으로 설정하면 마우스 클릭시 자동 커서가 이동합니다."
+msgstr "참으로 설정하면 마우스 클릭시 자동으로 커서가 이동합니다."
 
 #: ../utils/scimstringview.c:250
 msgid "Forward button press event"
-msgstr "전달 버튼 프레스 이벤트를 전달함"
+msgstr "버튼 프레스 이벤트를 전달함"
 
 #: ../utils/scimstringview.c:251
 msgid "TRUE forward button press event to user program."
@@ -1271,15 +1268,15 @@ msgstr "수정:"
 
 #: ../utils/scimkeyselection.cpp:236
 msgid "_Ctrl"
-msgstr ""
+msgstr "_Ctrl"
 
 #: ../utils/scimkeyselection.cpp:240
 msgid "A_lt"
-msgstr ""
+msgstr "A_lt"
 
 #: ../utils/scimkeyselection.cpp:244
 msgid "_Shift"
-msgstr ""
+msgstr "_Shift"
 
 #: ../utils/scimkeyselection.cpp:248
 msgid "_Release"
@@ -1287,19 +1284,19 @@ msgstr "놓음(_R)"
 
 #: ../utils/scimkeyselection.cpp:258
 msgid "_Meta"
-msgstr ""
+msgstr "_Meta"
 
 #: ../utils/scimkeyselection.cpp:262
 msgid "S_uper"
-msgstr ""
+msgstr "S_uper"
 
 #: ../utils/scimkeyselection.cpp:266
 msgid "_Hyper"
-msgstr ""
+msgstr "_Hyper"
 
 #: ../utils/scimkeyselection.cpp:331
 msgid "Please enter a Key Code first."
-msgstr "키 코드를 입력하십시오"
+msgstr "키 코드를 입력하십시오."
 
 #: ../utils/scimkeyselection.cpp:385
 msgid ""
@@ -1325,8 +1322,3 @@ msgstr "방향"
 msgid "The orientation of the tray."
 msgstr "트레이의 방향."
 
-#~ msgid "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
-#~ msgstr "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
-
-#~ msgid "En"
-#~ msgstr "En"
