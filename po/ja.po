@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-22 11:40-0700\n"
+"POT-Creation-Date: 2007-07-20 09:50+0800\n"
 "PO-Revision-Date: 2008-03-26 09:55+1000\n"
 "Last-Translator: Kiyoto Hashida <khashida@redhat.com>\n"
 "Language-Team: Japanese <jp@li.org>\n"
@@ -1114,11 +1114,10 @@ msgstr ""
 msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
 msgstr "<span size=\"x-large\">%s モジュールの設定</span>"
 
-#: ../extras/setup/scim_setup_ui.cpp:456
-msgid "Are you sure you want to quit SCIM Setup?"
-msgstr "SCIMの設定を終了しますか？"
+#msgid "Are you sure you want to quit SCIM Setup?"
+#msgstr "SCIMの設定を終了しますか？"
 
-#: ../extras/setup/scim_setup_ui.cpp:685
+#: ../extras/setup/scim_setup_ui.cpp:661
 msgid ""
 "Not all configuration can be reloaded on the fly. Don't forget to restart "
 "SCIM in order to let all of the new configuration take effect."
@@ -1351,3 +1350,743 @@ msgstr "方向"
 msgid "The orientation of the tray."
 msgstr "トレイの方向"
 
+#~ msgid "Are you sure you want to quit SCIM Setup?"
+#~ msgstr "SCIMの設定を終了しますか？"
+
+#~ msgid "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
+#~ msgstr "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
+
+#~ msgid "En"
+#~ msgstr "En"
+
+#~ msgid "Preedit String mode"
+#~ msgstr "未確定文字列の表示モード"
+
+#~ msgid "X Window"
+#~ msgstr "Xウィンドウ"
+
+#~ msgid "A FrontEnd module for X11R6 Window System, using XIM Protocol."
+#~ msgstr ""
+#~ "XIMプロトコルによるX11R6ウィンドウシステム用フロントエンドモジュール"
+
+#~ msgid "XIM Settings"
+#~ msgstr "XIMの設定"
+
+#~ msgid "_On The Spot"
+#~ msgstr "_On The Spot"
+
+#~ msgid "_Dynamic Event Flow"
+#~ msgstr "_Dynamic Event Flow"
+
+#~ msgid ""
+#~ "If this option is checked, the OnTheSpot input style will be used when "
+#~ "the client supports it."
+#~ msgstr ""
+#~ "このオプションを有効にするとOn The Spot入力スタイルが適用されます。但し、"
+#~ "クライアント側のサポートが必要です。"
+
+#~ msgid ""
+#~ "If this option is checked, then dynamic event flow will be used.This can "
+#~ "speed up the key event response, especially in remote X11 environment.But "
+#~ "SCIM may become unstable."
+#~ msgstr ""
+#~ "このオプションを有効にすると、特にリモートX11環境においてキーイベントのレ"
+#~ "スポンスを向上させることができます。但し、SCIMが不安定になる場合がありま"
+#~ "す。"
+
+#~ msgid "Portuguese (Brazilian)"
+#~ msgstr "ポルトガル語(ブラジル)"
+
+#, fuzzy
+#~ msgid "Slovene"
+#~ msgstr "スロベニア語"
+
+#, fuzzy
+#~ msgid "Global"
+#~ msgstr "全体設定"
+
+#, fuzzy
+#~ msgid ""
+#~ "\n"
+#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>\n"
+#~ "\n"
+#~ msgstr ""
+#~ "\n"
+#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>"
+
+#~ msgid ""
+#~ "\n"
+#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>"
+#~ msgstr ""
+#~ "\n"
+#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>"
+
+#, fuzzy
+#~ msgid "Hot Keys"
+#~ msgstr ""
+#~ "ショートカットキー:\n"
+#~ "\n"
+#~ "  "
+
+#~ msgid ""
+#~ "\n"
+#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>\n"
+#~ "\n"
+#~ "Hot keys:\n"
+#~ "\n"
+#~ "  "
+#~ msgstr ""
+#~ "\n"
+#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>\n"
+#~ "\n"
+#~ "ショートカットキー:\n"
+#~ "\n"
+#~ "  "
+
+#~ msgid ""
+#~ ":\n"
+#~ "    open/close the input method.\n"
+#~ "\n"
+#~ "  "
+#~ msgstr ""
+#~ ":\n"
+#~ "   入力メソッドを開始/終了する\n"
+#~ "\n"
+#~ "  "
+
+#~ msgid ""
+#~ ":\n"
+#~ "    switch to the next input method.\n"
+#~ "\n"
+#~ "  "
+#~ msgstr ""
+#~ ":\n"
+#~ "    次の入力メソッドに切替える\n"
+#~ "\n"
+#~ "  "
+
+#~ msgid ""
+#~ ":\n"
+#~ "    switch to the previous input method.\n"
+#~ "\n"
+#~ "\n"
+#~ msgstr ""
+#~ ":\n"
+#~ "    前の入力メソッドに切替える\n"
+#~ "\n"
+#~ "\n"
+
+#~ msgid "Full/Half Letter"
+#~ msgstr "全角/半角文字"
+
+#~ msgid "Full/Half Punct"
+#~ msgstr "全角/半角句読点"
+
+#~ msgid ""
+#~ "The input mode of the letters. Click to toggle between half and full."
+#~ msgstr ""
+#~ "文字入力モード。全角/半角文字に切替えるにはここをクリックして下さい。"
+
+#~ msgid ""
+#~ "The input mode of the puncutations. Click to toggle between half and full."
+#~ msgstr "句読点入力モード。全角/半角に切替えるにはここをクリックして下さい。"
+
+#~ msgid ""
+#~ "    Switch between full/half width letter mode.\n"
+#~ "\n"
+#~ "  "
+#~ msgstr ""
+#~ "    全角/半角文字切替\n"
+#~ "\n"
+#~ "  "
+
+#~ msgid ""
+#~ "    Switch between full/half width punctuation mode.\n"
+#~ "\n"
+#~ "  "
+#~ msgstr ""
+#~ "    全角/半角句読点切替\n"
+#~ "\n"
+#~ "  "
+
+#~ msgid ""
+#~ "    Switch between Forward/Input mode.\n"
+#~ "\n"
+#~ "  "
+#~ msgstr "直接入力/変換入力モードに切替"
+
+#~ msgid ""
+#~ "    Add a new phrase.\n"
+#~ "\n"
+#~ "  "
+#~ msgstr ""
+#~ "    新しいフレーズを追加する\n"
+#~ "\n"
+#~ "  "
+
+#~ msgid ""
+#~ "    Delete the selected phrase.\n"
+#~ "\n"
+#~ msgstr ""
+#~ "    選択されたフレーズを削除する\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "  Control+Down:\n"
+#~ "    Move lookup cursor to next shorter phrase\n"
+#~ "    Only available when LongPhraseFirst option is set.\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Control+Down:\n"
+#~ "    カーソルを次のより短いフレーズに移動する\n"
+#~ "    \"長いフレーズを優先的に表示\"が有効な場合のみ使用できます。\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "  Control+Up:\n"
+#~ "    Move lookup cursor to previous longer phrase\n"
+#~ "    Only available when LongPhraseFirst option is set.\n"
+#~ "\n"
+#~ msgstr ""
+#~ "  Control+Up:\n"
+#~ "    カーソルを前のより長いフレーズに移動する\n"
+#~ "    \"長いフレーズを優先的に表示\"が有効な場合のみ使用できます。\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "  Esc:\n"
+#~ "    reset the input method.\n"
+#~ "\n"
+#~ "\n"
+#~ msgstr ""
+#~ "  Esc:\n"
+#~ "   入力メソッドをリセット\n"
+#~ "\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "How to add a phrase:\n"
+#~ "    Input the new phrase as normal, then press the\n"
+#~ "  hot key. A hint will be shown to let you input a key\n"
+#~ "  for this phrase.\n"
+#~ "    Input a key then press the space bar.\n"
+#~ "  A hint will be shown to indicate whether\n"
+#~ "  the phrase was added sucessfully.\n"
+#~ msgstr ""
+#~ "フレーズの追加方法:\n"
+#~ "  新しいフレーズを普通に入力しショートカットキーを押します。\n"
+#~ "  ヒントが表示され、そのフレーズを入力する際に使うキーの入力\n"
+#~ "  を促します。\n"
+#~ "  キーを入力しスペースを押して下さい。\n"
+#~ "  ヒントにフレーズが正しく登録されたかどうか表示されますので\n"
+#~ "  確認して下さい。\n"
+
+#~ msgid "Input a key string for phrase: "
+#~ msgstr "このフレーズに使うキーを入力して下さい: "
+
+#~ msgid "Success."
+#~ msgstr "登録完了"
+
+#~ msgid "Failed."
+#~ msgstr "登録に失敗しました"
+
+#~ msgid "option -no cannot be used with -o\n"
+#~ msgstr "-noオプションは-oオプションと同時には使用できません\n"
+
+#~ msgid "option -o cannot be used with -no\n"
+#~ msgstr "-oオプションは-noオプションと同時には使用できません\n"
+
+#~ msgid "No argument for option "
+#~ msgstr "オプション引数がありません"
+
+#~ msgid "Invalid option: "
+#~ msgstr "オプションが無効です:"
+
+#~ msgid "Loading table file "
+#~ msgstr "テーブルを読込中"
+
+#~ msgid " ...\n"
+#~ msgstr " ...\n"
+
+#~ msgid "table file load failed!"
+#~ msgstr "テーブルの読込に失敗!"
+
+#~ msgid "Saving frequency table file "
+#~ msgstr "頻度テーブルを保存中"
+
+#~ msgid "frequency table file load failed!"
+#~ msgstr "頻度テーブルの読込に失敗!"
+
+#~ msgid "Saving table file "
+#~ msgstr "テーブルを保存中"
+
+#~ msgid "Table file save failed!"
+#~ msgstr "テーブルの保存に失敗!"
+
+#~ msgid "Generic Table"
+#~ msgstr "汎用テーブル"
+
+#~ msgid "An IMEngine Module which uses generic table input method file."
+#~ msgstr "汎用テーブル入力メソッドを使用するIMエンジンモジュール"
+
+#~ msgid "Full width _punctuation:"
+#~ msgstr "全角/半角句読点(_P):"
+
+#~ msgid "Select full width puncutation keys"
+#~ msgstr "全角/半角句読点切替キーの設定"
+
+#~ msgid ""
+#~ "The key events to switch full/half width punctuation input mode. Click on "
+#~ "the button on the right to edit it."
+#~ msgstr ""
+#~ "全角/半角句読点を切替えるキー。変更する\n"
+#~ "場合は右のボタンをクリックして下さい。"
+
+#~ msgid "Full width _letter:"
+#~ msgstr "全角/半角文字(_L):"
+
+#~ msgid "Select full width letter keys"
+#~ msgstr "全角/半角文字切替キーの設定"
+
+#~ msgid ""
+#~ "The key events to switch full/half width letter input mode. Click on the "
+#~ "button on the right to edit it."
+#~ msgstr ""
+#~ "全角/半角文字を切替えるキー。変更する\n"
+#~ "場合は右のボタンをクリックして下さい。"
+
+#~ msgid "_Mode switch:"
+#~ msgstr "入力モード切替(_M):"
+
+#~ msgid "Select mode switch keys"
+#~ msgstr "入力モード切替キーの設定"
+
+#~ msgid ""
+#~ "The key events to change current input mode. Click on the button on the "
+#~ "right to edit it."
+#~ msgstr ""
+#~ "入力モードを切替えるキー。変更する場合は\n"
+#~ "右のボタンをクリックして下さい。"
+
+#~ msgid "_Add phrase:"
+#~ msgstr "フレーズ追加(_A):"
+
+#~ msgid "Select add phrase keys."
+#~ msgstr "フレーズ追加キーの設定"
+
+#~ msgid ""
+#~ "The key events to add a new user defined phrase. Click on the button on "
+#~ "the right to edit it."
+#~ msgstr ""
+#~ "新しいフレーズを追加するキー。変更する\n"
+#~ "場合は右のボタンをクリックして下さい。"
+
+#~ msgid "_Delete phrase:"
+#~ msgstr "フレーズ削除(_D):"
+
+#~ msgid "Select delete phrase keys."
+#~ msgstr "フレーズ削除キーの設定"
+
+#~ msgid ""
+#~ "The key events to delete a selected phrase. Click on the button on the "
+#~ "right to edit it."
+#~ msgstr ""
+#~ "選択されたフレーズを削除するキー。変更する\n"
+#~ "場合は右のボタンをクリックして下さい。"
+
+#~ msgid "Show _prompt"
+#~ msgstr "プロンプトを表示(_P)"
+
+#~ msgid "Show key _hint"
+#~ msgstr "ヒントキーを表示(_H)"
+
+#~ msgid "Save _user table in binary format"
+#~ msgstr "ユーザーテーブルをバイナリー形式で保存(_U)"
+
+#~ msgid "Show the u_ser defined phrases first"
+#~ msgstr "ユーザー定義フレーズを優先的に表示(_S)"
+
+#~ msgid "Show the _longer phrases first"
+#~ msgstr "長いフレーズを優先的に表示(_L)"
+
+#~ msgid ""
+#~ "If this option is checked, the key prompt of the currently selected "
+#~ "phrase will be shown."
+#~ msgstr ""
+#~ "このオプションを有効にすると選択された\n"
+#~ "フレーズのキープロンプトが表示されます。"
+
+#~ msgid ""
+#~ "If this option is checked, the remaining keystrokes of the phraseswill be "
+#~ "shown on the lookup table."
+#~ msgstr ""
+#~ "このオプションを有効にするとフレーズの残りの\n"
+#~ "キーストロークが候補ウィンドウに表示されます。"
+
+#~ msgid ""
+#~ "If this option is checked, the user table will be stored with binary "
+#~ "format, this will increase the loading speed."
+#~ msgstr ""
+#~ "このオプションを有効にするとユーザー定義テーブルがバイナリー\n"
+#~ "形式で保存されます。テーブルの読込が速くなります。"
+
+#~ msgid ""
+#~ "If this option is checked, the user defined phrases will be shown in "
+#~ "front of others. "
+#~ msgstr ""
+#~ "このオプションを有効にするとユーザー定義フレーズ\n"
+#~ "が優先的に表示されます。"
+
+#~ msgid ""
+#~ "If this option is checked, the longer phrase will be shown in front of "
+#~ "others. "
+#~ msgstr ""
+#~ "このオプションを有効にすると長いフレーズが\n"
+#~ "優先的に表示されます。"
+
+#~ msgid "The installed tables:"
+#~ msgstr "インストール済みのテーブル:"
+
+#~ msgid "_Install"
+#~ msgstr "インストール(_I)"
+
+#~ msgid "Install a new table."
+#~ msgstr "新しいテーブルをインストール"
+
+#~ msgid "_Delete"
+#~ msgstr "削除(_D)"
+
+#~ msgid "Delete the selected table."
+#~ msgstr "選択されたテーブルを削除"
+
+#~ msgid "_Properties"
+#~ msgstr "プロパティー(_P)"
+
+#~ msgid "Edit the properties of the selected table."
+#~ msgstr "選択されたテーブルのプロパティーを編集"
+
+#~ msgid "Generic"
+#~ msgstr "全般"
+
+#~ msgid "Table Management"
+#~ msgstr "テーブル管理"
+
+#~ msgid "Select an icon file"
+#~ msgstr "アイコンファイルを選択"
+
+#~ msgid "User"
+#~ msgstr "ユーザー"
+
+#~ msgid "System"
+#~ msgstr "システム"
+
+#~ msgid "Please select the table file to be installed."
+#~ msgstr "インストールするテーブルファイルを選択して下さい。"
+
+#~ msgid "Failed to install the table! It's already in table file directory."
+#~ msgstr "テーブルのインストールに失敗!すでにインストールされています。"
+
+#~ msgid "Failed to load the table file!"
+#~ msgstr "テーブルファイルの読込に失敗!"
+
+#~ msgid ""
+#~ "Failed to install the table! Another version of this table was already "
+#~ "installed."
+#~ msgstr ""
+#~ "テーブルのインストールに失敗!他のバージョンが\n"
+#~ "すでにインストールされています。"
+
+#~ msgid ""
+#~ "Another version of this table was already installed. Do you want to "
+#~ "replace it with the new one?"
+#~ msgstr ""
+#~ "このテーブルの他のバージョンがすでにインストールされています。\n"
+#~ "新しいバージョンに置き換えますか?"
+
+#~ msgid ""
+#~ "Failed to install the table! A table with the same file name was already "
+#~ "installed."
+#~ msgstr ""
+#~ "テーブルのインストールに失敗!同じ名前のテーブルが\n"
+#~ "すでにインストールされています。"
+
+#~ msgid ""
+#~ "A table with the same file name was already installed. Do you want to "
+#~ "overwrite it?"
+#~ msgstr ""
+#~ "同じ名前のテーブルがすでにインストールされています。\n"
+#~ "上書きしますか?"
+
+#~ msgid "Failed to install the table to %s!"
+#~ msgstr "%sにテーブルをインストールできませんでした!"
+
+#~ msgid "Can not delete the file %s!"
+#~ msgstr "ファイル%sを削除できません!"
+
+#~ msgid "Are you sure to delete this table file?"
+#~ msgstr "このテーブルを削除しますか?"
+
+#~ msgid "Failed to delete the table file!"
+#~ msgstr "テーブルの削除に失敗!"
+
+#~ msgid "True"
+#~ msgstr "True"
+
+#~ msgid "False"
+#~ msgstr "False"
+
+#~ msgid "Split Keys:"
+#~ msgstr "スプリットキー:"
+
+#~ msgid "The key strokes to split inputed string."
+#~ msgstr "入力済みの文字列を分割するキー"
+
+#~ msgid "Commit Keys:"
+#~ msgstr "変換確定キー:"
+
+#~ msgid "The key strokes to commit converted result to client."
+#~ msgstr "変換結果をクライアントに送るキー"
+
+#~ msgid "Forward Keys:"
+#~ msgstr "直接入力キー:"
+
+#~ msgid "The key strokes to forward inputed string to client."
+#~ msgstr "入力された文字列を変換せずに直接クライアントに送るキー"
+
+#~ msgid "The key strokes to select candidate phrases in lookup table."
+#~ msgstr "候補ウィンドウからフレーズを選択するキー"
+
+#~ msgid "Page Up Keys:"
+#~ msgstr "前ページキー:"
+
+#~ msgid "The lookup table page up keys"
+#~ msgstr "候補ウィンドウで前のページに戻るキー"
+
+#~ msgid "Page Down Keys:"
+#~ msgstr "次ページキー:"
+
+#~ msgid "The lookup table page down keys"
+#~ msgstr "候補ウィンドウで次のページに進むキー"
+
+#~ msgid "Table Properties"
+#~ msgstr "テーブルのプロパティー"
+
+#~ msgid "Name:"
+#~ msgstr "名称:"
+
+#~ msgid "The name of this table."
+#~ msgstr "このテーブルの名称"
+
+#~ msgid "Author:"
+#~ msgstr "作者:"
+
+#~ msgid "The author of this table."
+#~ msgstr "このテーブルの作者"
+
+#~ msgid "UUID:"
+#~ msgstr "UUID:"
+
+#~ msgid "The unique ID of this table."
+#~ msgstr "このテーブルのID"
+
+#~ msgid "Serial Number:"
+#~ msgstr "バージョン:"
+
+#~ msgid "The serial number of this table."
+#~ msgstr "このテーブルのバージョン"
+
+#~ msgid "Icon File:"
+#~ msgstr "アイコンファイル:"
+
+#~ msgid "The icon file of this table."
+#~ msgstr "このテーブルのアイコンファイル"
+
+#~ msgid "Supported Languages:"
+#~ msgstr "サポート言語:"
+
+#~ msgid "The languages supported by this table."
+#~ msgstr "このテーブルがサポートする言語"
+
+#~ msgid "Status Prompt:"
+#~ msgstr "ステイタスプロンプト:"
+
+#~ msgid "A prompt string to be shown in status area."
+#~ msgstr "ステイタスに表示される文字列"
+
+#~ msgid "Valid Input Chars:"
+#~ msgstr "有効な文字:"
+
+#~ msgid "The valid input chars of this table."
+#~ msgstr "このテーブルで使用できる文字"
+
+#~ msgid "Multi Wildcard Char:"
+#~ msgstr "マルチワイルドカード文字:"
+
+#~ msgid ""
+#~ "The multi wildcard chars of this table. These chars can be used to match "
+#~ "one or more arbitrary chars."
+#~ msgstr ""
+#~ "このテーブルのマルチワイルドカード文字。\n"
+#~ "複数の文字の代わりに使用できます。"
+
+#~ msgid "Single Wildcard Char:"
+#~ msgstr "シングルワイルドカード文字:"
+
+#~ msgid ""
+#~ "The single wildcard chars of this table.These chars can be used to match "
+#~ "one arbitrary char."
+#~ msgstr ""
+#~ "このテーブルのシングルワイルドカード文字。\n"
+#~ "任意の一文字の代わりに使用できます。"
+
+#~ msgid "Max Key Length:"
+#~ msgstr "最大キー数:"
+
+#~ msgid "The maxmium length of key strings."
+#~ msgstr "文字列の最大キー数"
+
+#~ msgid "Show Key Prompt:"
+#~ msgstr "キープロンプトを表示:"
+
+#~ msgid "If true then the key prompts will be shown instead of the raw keys."
+#~ msgstr "Trueの場合は入力された文字の代わりにキープロンプトが表示されます。"
+
+#~ msgid "Auto Select:"
+#~ msgstr "自動選択:"
+
+#~ msgid ""
+#~ "If true then the first candidate phrase will be selected automatically "
+#~ "when inputing the next key."
+#~ msgstr ""
+#~ "Trueの場合は次のフレーズの入力を開始すると同時に入力済みの\n"
+#~ "フレーズに対してその第一変換候補が自動的に選択されます。"
+
+#~ msgid "Auto Wildcard:"
+#~ msgstr "自動ワイルドカード:"
+
+#~ msgid ""
+#~ "If true then a multi wildcard char will be append to the end of inputed "
+#~ "key string when searching phrases."
+#~ msgstr ""
+#~ "Trueの場合は検索時にマルチワイルドカード文字が\n"
+#~ "入力された文字列の最後に自動的に付加されます。"
+
+#~ msgid "Auto Commit:"
+#~ msgstr "自動コミット:"
+
+#~ msgid ""
+#~ "If true then the converted result string will be committed to client "
+#~ "automatically."
+#~ msgstr "Trueの場合は変換結果が自動的にコミットされます。"
+
+#~ msgid "Auto Split:"
+#~ msgstr "自動スプリット:"
+
+#~ msgid ""
+#~ "If true then the inputed key string will be splitted automatically when "
+#~ "necessary."
+#~ msgstr "Trueの場合は、入力された文字列が必要に応じて自動的に分割されます。"
+
+#~ msgid "Discard Invalid Key:"
+#~ msgstr "無効な文字列を排除:"
+
+#~ msgid ""
+#~ "If true then the invalid key will be discarded automatically.This option "
+#~ "is only valid when Auto Select and Auto Commit is true."
+#~ msgstr ""
+#~ "Trueの場合は、入力された無効な文字列を自動的に排除します。このオプションは"
+#~ "自動選択と自動コミットがTrueの場合のみ有効になります。"
+
+#~ msgid "Dynamic Adjust:"
+#~ msgstr "動的アップデート:"
+
+#~ msgid "If true then the phrases' frequencies will be adjusted dynamically."
+#~ msgstr "Trueの場合は、使用頻度情報が動的にアップデートされます。"
+
+#~ msgid "Auto Fill Preedit Area:"
+#~ msgstr "プリエディットの自動補完:"
+
+#~ msgid ""
+#~ "If true then the preedit string will be filled up with the current "
+#~ "candiate phrase automatically.This option is only valid when Auto Select "
+#~ "is TRUE."
+#~ msgstr ""
+#~ "Trueの場合は、自動的にプリエディットが変換候補によって補完されます。\n"
+#~ "このオプションは自動選択がTrueの場合のみ有効になります。"
+
+#~ msgid "Always Show Lookup Table:"
+#~ msgstr "候補リストを常に表示:"
+
+#~ msgid ""
+#~ "If true then the lookup table will always be shown when any candidate "
+#~ "phrase is available. Otherwise the lookup table will only be shown when "
+#~ "necessary.\n"
+#~ "If Auto Fill is false, then this option will be no effect, and always be "
+#~ "true."
+#~ msgstr ""
+#~ "Trueの場合は変換候補があれば常に候補ウィンドウが表示されます。\n"
+#~ "Falseの場合は必要な時のみ表示されます。\n"
+#~ "但し、自動補完が無効の場合は常に表示されます。"
+
+#~ msgid "Default Full Width Punct:"
+#~ msgstr "デフォルト句読点を全角に設定:"
+
+#~ msgid "If true then full width punctuations will be inputed by default."
+#~ msgstr "Trueの場合は、指定のない限り全角句読点が入力されます。"
+
+#~ msgid "Default Full Width Letter:"
+#~ msgstr "デフォルト文字幅を全角に設定:"
+
+#~ msgid "If true then full width letters will be inputed by default."
+#~ msgstr "Trueの場合は、指定のない限り全角文字が入力されます。"
+
+#~ msgid "Invalid icon file."
+#~ msgstr "アイコンファイルが無効です。"
+
+#~ msgid "Invalid languages."
+#~ msgstr "言語が無効です。"
+
+#~ msgid "Invalid status prompt."
+#~ msgstr "ステイタスプロンプトが無効です。"
+
+#~ msgid "Invalid multi wildcard chars."
+#~ msgstr "マルチワイルドカード文字が無効です。"
+
+#~ msgid "Invalid single wildcard chars."
+#~ msgstr "シングルワイルドカード文字が無効です。"
+
+#~ msgid "Invalid commit keys."
+#~ msgstr "コミットキーが無効です。"
+
+#~ msgid "Invalid select keys."
+#~ msgstr "選択キーが無効です。"
+
+#~ msgid "Invalid page up keys."
+#~ msgstr "次ページキーが無効です。"
+
+#~ msgid "Invalid page down keys."
+#~ msgstr "前ページキーが無効です。"
+
+#~ msgid "Invalid max key length."
+#~ msgstr "最大キー数が無効です。"
+
+#~ msgid "Failed to save table %s!"
+#~ msgstr "テーブル%sの保存に失敗!"
+
+#~ msgid "Failed to load any Config Modules!"
+#~ msgstr "設定モジュールの読込に失敗!"
+
+#~ msgid "_Current Config Module:"
+#~ msgstr "現在の設定モジュール(_C):"
+
+#~ msgid "<Not found>"
+#~ msgstr "<見つかりません>"
+
+#~ msgid "Current Config Module has been changed to %s."
+#~ msgstr "現在の設定モジュールを%sに変更しました。"
+
+#~ msgid "Start the SCIM Setup Utility."
+#~ msgstr "SCIMセットアップユーティリティを開く"
+
+#~ msgid "Setup ..."
+#~ msgstr "設定..."

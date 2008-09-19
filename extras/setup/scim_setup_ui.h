@@ -73,8 +73,6 @@ private:
     GtkWidget * create_splash_view ();
     GtkWidget * create_setup_cover (const char *category);
 
-    bool ask_quit () const;
-
     void show_restart_hint () const;
 
     static void module_list_selection_changed_callback (GtkTreeSelection *selection, gpointer user_data);
