@@ -21,10 +21,10 @@ msgid "English/European"
 msgstr "Nederlands/Europees"
 
 #. Append an entry for forward mode.
-#: ../src/scim_imengine.cpp:638 ../src/scim_utility.cpp:692
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1895
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1227
-#: ../extras/panel/scim_panel_gtk.cpp:2590
+#: ../src/scim_imengine.cpp:638 ../src/scim_utility.cpp:693
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1897
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1281
+#: ../extras/panel/scim_panel_gtk.cpp:2814
 msgid "English/Keyboard"
 msgstr "Nederlands/toetsenbord"
 
@@ -519,14 +519,14 @@ msgstr "VC->TC"
 msgid "TC->SC"
 msgstr "TC->VC"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1843
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1177
-#: ../extras/panel/scim_panel_gtk.cpp:2127
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1845
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1231
+#: ../extras/panel/scim_panel_gtk.cpp:2304
 msgid "Smart Common Input Method platform "
 msgstr "Smart Common Invoer-methode Plattform "
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1845
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1179
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1847
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1233
 msgid ""
 "\n"
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
@@ -536,8 +536,8 @@ msgstr ""
 "(c) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
 "\n"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1849
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1184
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1238
 msgid ""
 ":\n"
 "\n"
@@ -545,10 +545,10 @@ msgstr ""
 ":\n"
 "\n"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1852
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1855
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1187
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1190
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1857
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1241
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1244
 msgid ""
 "\n"
 "\n"
@@ -1075,11 +1075,10 @@ msgstr ""
 msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
 msgstr "<span size=\"x-large\">Instellen van de %s-Module.</span>"
 
-#: ../extras/setup/scim_setup_ui.cpp:456
-msgid "Are you sure to quit SCIM Setup?"
-msgstr "Wilt U de setup van SCIM werkelijk verlaten?"
+#msgid "Are you sure you want to quit SCIM Setup?"
+#msgstr "Wilt U de setup van SCIM werkelijk verlaten?"
 
-#: ../extras/setup/scim_setup_ui.cpp:685
+#: ../extras/setup/scim_setup_ui.cpp:661
 msgid ""
 "Not all configuration can be reloaded on the fly. Don't forget to restart "
 "SCIM in order to let all of the new configuration take effect."
@@ -1097,27 +1096,27 @@ msgstr "Geïntegreerde setup dat op de GTK-widget bibiotheek is gebaseerd."
 msgid "Setup utility for Smart Common Input Method platform"
 msgstr "Setup voor de Smart Common Invoer-methode-Plattform"
 
-#: ../extras/panel/scim_panel_gtk.cpp:961
+#: ../extras/panel/scim_panel_gtk.cpp:982
 msgid "SCIM Help"
 msgstr "SCIM handboek"
 
-#: ../extras/panel/scim_panel_gtk.cpp:978
+#: ../extras/panel/scim_panel_gtk.cpp:999
 msgid "Smart Common Input Method"
 msgstr "Smart Common Invoer-methode"
 
-#: ../extras/panel/scim_panel_gtk.cpp:1037
+#: ../extras/panel/scim_panel_gtk.cpp:1058
 msgid "Stick/unstick the input window and the toolbar."
 msgstr "Invoer-venster en de werkbalk  vastzetten/verschuifbaar maken."
 
-#: ../extras/panel/scim_panel_gtk.cpp:1042
+#: ../extras/panel/scim_panel_gtk.cpp:1063
 msgid "Show a brief help about SCIM and the current input method."
 msgstr "Toepasselijke help voor SCIM en de huidige invoer-methode tonen."
 
-#: ../extras/panel/scim_panel_gtk.cpp:1047
+#: ../extras/panel/scim_panel_gtk.cpp:1068
 msgid "Show command menu."
 msgstr "Commandoregel tonen."
 
-#: ../extras/panel/scim_panel_gtk.cpp:2129
+#: ../extras/panel/scim_panel_gtk.cpp:2306
 msgid ""
 "\n"
 "(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
@@ -1126,27 +1125,27 @@ msgstr ""
 "(c) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
 
 #. Reload Configuration.
-#: ../extras/panel/scim_panel_gtk.cpp:2208
+#: ../extras/panel/scim_panel_gtk.cpp:2385
 msgid "Reload Configuration"
 msgstr "Instellingen opnieuw laden"
 
 #. Stick
-#: ../extras/panel/scim_panel_gtk.cpp:2218
+#: ../extras/panel/scim_panel_gtk.cpp:2395
 msgid "Stick Windows"
 msgstr "Venster vastzetten"
 
 #. Toolbar
-#: ../extras/panel/scim_panel_gtk.cpp:2227
+#: ../extras/panel/scim_panel_gtk.cpp:2404
 msgid "Hide Toolbar"
 msgstr "Werkbalk ontzichtbaar maken"
 
 #. Help
-#: ../extras/panel/scim_panel_gtk.cpp:2236
+#: ../extras/panel/scim_panel_gtk.cpp:2413
 msgid "Help ..."
 msgstr "Help ..."
 
 #. Clients exit.
-#: ../extras/panel/scim_panel_gtk.cpp:2255
+#: ../extras/panel/scim_panel_gtk.cpp:2431
 msgid "Exit"
 msgstr "Afsluiten"
 
@@ -1307,3 +1306,6 @@ msgstr "Oriëntatie"
 #: ../utils/scimtrayicon.c:109
 msgid "The orientation of the tray."
 msgstr "De richting van de werkbalk."
+
+#~ msgid "Are you sure you want to quit SCIM Setup?"
+#~ msgstr "Wilt U de setup van SCIM werkelijk verlaten?"

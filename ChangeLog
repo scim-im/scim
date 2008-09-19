@@ -1,3 +1,7 @@
+2008-09-19 11:34  Yuri Victorovich <yuri@tsoft.com>
+	Merged all changes from scim-1.4 branch into the trunk and bumped the version 1.4.7->1.4.8.
+	I don't believe that branches are useful with such a low activity project as scim is now.
+
 2008-09-14 03:04  Yuri Victorovich <yuri@tsoft.com>
 
 	* Renamed po/pt-BR.po->po/pt_BR.po: renamed po/pt-BR.po to po/pt_BR.po to make it look like other language files.

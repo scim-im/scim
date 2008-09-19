@@ -298,12 +298,12 @@
     #include <scim_global_config.h>
 #endif
 
-#ifdef Uses_SCIM_OBJECT
-    #include <scim_object.h>
-#endif
-
 #ifdef Uses_SCIM_POINTER
     #include <scim_pointer.h>
+#endif
+
+#ifdef Uses_SCIM_OBJECT
+    #include <scim_object.h>
 #endif
 
 #ifdef Uses_SCIM_SLOT

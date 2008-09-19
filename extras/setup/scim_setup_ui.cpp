@@ -19,7 +19,7 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA  02111-1307  USA
  *
- * $Id: scim_setup_ui.cpp,v 1.52.2.1 2007/05/04 02:17:36 juhp Exp $
+ * $Id: scim_setup_ui.cpp,v 1.52 2005/06/23 05:12:58 suzhe Exp $
  *
  */
 
@@ -443,25 +443,6 @@ SetupUI::create_module_list_model ()
                              GTK_TREE_MODEL (m_module_list_model));
 }
 
-bool
-SetupUI::ask_quit () const
-{
-    GtkWidget *dialog;
-    gint result;
-
-    dialog = gtk_message_dialog_new (GTK_WINDOW (m_main_window),
-                                     GTK_DIALOG_MODAL,
-                                     GTK_MESSAGE_WARNING,
-                                     GTK_BUTTONS_OK_CANCEL,
-                                     _("Are you sure you want to quit SCIM Setup?"));
-
-    result = gtk_dialog_run (GTK_DIALOG (dialog));
-
-    gtk_widget_destroy (dialog);
-
-    return result == GTK_RESPONSE_OK;
-}
-
 gboolean
 SetupUI::module_list_hide_widget_iter_func  (GtkTreeModel *model,
                                              GtkTreePath *path,
@@ -627,11 +608,9 @@ SetupUI::exit_button_clicked_callback (GtkButton *button, gpointer user_data)
 {
     SetupUI *ui = (SetupUI*) user_data;
 
-    if (ui->ask_quit ()) {
-        if (ui->m_changes_applied)
-            ui->show_restart_hint ();
-        gtk_main_quit ();
-    }
+    if (ui->m_changes_applied)
+        ui->show_restart_hint ();
+    gtk_main_quit ();
 }
 
 gboolean
@@ -639,13 +618,10 @@ SetupUI::main_window_delete_callback (GtkWidget *widget, GdkEvent *event, gpoint
 {
     SetupUI *ui = (SetupUI*) user_data;
 
-    if (ui->ask_quit ()) {
+    if (ui->m_changes_applied)
+        ui->show_restart_hint ();
 
-        if (ui->m_changes_applied)
-            ui->show_restart_hint ();
-
-        gtk_main_quit ();
-    }
+    gtk_main_quit ();
 
     return TRUE;
 }
