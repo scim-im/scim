@@ -27,6 +27,7 @@
  *
  */
 #define Uses_C_STRING
+#define Uses_C_STRING
 #include "scim_private.h"
 #include "scim.h"
 

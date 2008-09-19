@@ -1206,10 +1206,13 @@ String scim_get_default_panel_socket_address (const String &display)
             disp_name = display.substr (0, dot_pos);
         }
         // FIXME: ignore remote X Server name.
-        disp_num = atoi (display.substr (colon_pos + 1, dot_pos - colon_pos - 1).c_str ());
+        disp_num = atoi (display.substr (colon_pos + 1, String::npos).c_str());
     }
 
     if (sockaddr.get_family () == SCIM_SOCKET_LOCAL) {
+        for (size_t i = 0; i < disp_name.length(); ++i) {
+            if (disp_name[i] == '/') disp_name[i] = '_';
+        }
         address = address + disp_name;
     } else if (sockaddr.get_family () == SCIM_SOCKET_INET) {
         std::vector <String> varlist;
@@ -1359,4 +1362,3 @@ scim_socket_accept_connection (uint32       &key,
 /*
 vi:ts=4:nowrap:ai:expandtab
 */
-
