@@ -1058,6 +1058,7 @@ lt_estrdup (const char *str)
 static lt_module
 sys_dl_open (lt_user_data loader_data, const char *filename)
 {
+  // XXX Need to investigate why .a files are asked to be open by this routine ???
   lt_module   module   = dlopen (filename, LT_GLOBAL | LT_LAZY_OR_NOW);
 
   if (!module)

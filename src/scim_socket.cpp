@@ -43,7 +43,6 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-#include <errno.h>
 #include <signal.h>
 #include <sys/time.h>
 
@@ -471,8 +470,28 @@ public:
  
                         // If it's a socket file, then 
                         // delete it.
-                        if (::stat (data_un->sun_path, &statbuf) == 0 && S_ISSOCK (statbuf.st_mode))
-                            ::unlink (data_un->sun_path);
+                        if (::stat (data_un->sun_path, &statbuf) == 0 && S_ISSOCK (statbuf.st_mode)) { // TODO need to separate stat and S_ISSOCK here
+                            if (::unlink (data_un->sun_path) == -1) {
+                                std::cerr << _("Creating socket") << " " << data_un->sun_path << ": "
+                                          << _("file exists and we were unable to delete it") << ": " << _("syscall") << " unlink " << _("failed")
+                                          << ": " << strerror(errno)
+                                          << ": " << _("exiting") << ""
+                                          << std::endl;
+                                exit(-1);
+                            }
+                        } else {
+                            std::cerr << _("Creating socket") << " " << data_un->sun_path << ": "
+                                      << _("file exists and is not a socket") << ", " <<  _("exiting") << " ..." << std::endl;
+                            exit(-1);
+                        }
+                    } else {
+                        // NOTE another instance of the server is running: we can't just keep running like this
+                        //      if we attempt to bind anyway there may be more than one servers listening on this socket.
+                        //      In addition on FreeBSD bind will get EADDRINUSE, not clear why Linux doesn;t produce this same error.
+                        std::cerr << _("Creating socket") << " " << data_un->sun_path << ": "
+                                  << _("another instance of the server is already listening on this socket") << ", "  << _("exiting") << " ..."
+                                  << std::endl;
+                        exit(-1);
                     }
  
                     tmp_socket.close ();
@@ -486,12 +505,18 @@ public:
 
                 // Set correct permission for the socket file
                 if (m_family == SCIM_SOCKET_LOCAL) {
-                    ::chmod (data_un->sun_path, S_IRUSR | S_IWUSR);
+                    if (::chmod (data_un->sun_path, S_IRUSR | S_IWUSR) == -1) {
+                        std::cerr << _("Creating socket") << " " << data_un->sun_path << ": "
+                                  << _("unable to change the mode of this file") << ": "  << _("syscall") << " chmod " << _("failed")
+                                  << ", " << _("continuing") << " ..."
+                                  << std::endl;
+                    }
                 }
 
                 return true;
             }
 
+            std::cerr << _("Error creating socket") << ": bind " << _("syscall failed") << ": " << strerror(errno) << std::endl;
             m_err = errno;
         }
         return false;
@@ -506,10 +531,13 @@ public:
         m_err = 0;
 
         int ret = ::listen (m_id, queue_length);
+        if (ret == -1) {
+            std::cerr << _("Error creating socket") << ": listen " << _("syscall failed") << ": " << strerror(errno) << std::endl;
+            m_err = errno;
+            return false;
+        }
  
-        if (ret < 0) m_err = errno;
- 
-        return ret >= 0;
+        return true;
     }
 
     int accept () {
@@ -558,6 +586,7 @@ public:
             m_family = family;
             m_id = ret;
         } else {
+            std::cerr << _("Error creating socket") << ": socket " << _("syscall failed") << ": " << strerror(errno) << std::endl;
             m_err = errno;
         }
  
