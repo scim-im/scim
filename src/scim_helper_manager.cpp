@@ -36,6 +36,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <stdio.h> // for strerror
+#include <errno.h>
+#include <assert.h>
 
 #include "scim_private.h"
 #include "scim.h"
@@ -125,6 +128,10 @@ private:
                             break;
                         scim_usleep (100000);
                     }
+                } else {
+                    // bail out: can't continue without the helper
+                    std::cerr << _("Failed to launch HelperManager: exiting...") << std::endl;
+                    exit(-1);
                 }
             }
         }
@@ -144,14 +151,16 @@ private:
 
     int launch_helper_manager () const
     {
-        char *argv [] = { SCIM_HELPER_MANAGER_PROGRAM, 0 };
+        char *argv [] = { (char*)SCIM_HELPER_MANAGER_PROGRAM, 0 };
 
         pid_t child_pid;
  
         child_pid = fork ();
- 
         // Error fork.
-        if (child_pid < 0) return -1;
+        if (child_pid == -1) {
+            std::cerr << _("Error launching HelperManager") << " (" << SCIM_HELPER_MANAGER_PROGRAM << "): fork " << _("failed") << ": " << strerror(errno) << std::endl;
+            return -1;
+        }
  
         // In child process, start scim-helper-manager.
         if (child_pid == 0) {
@@ -164,9 +173,24 @@ private:
         pid_t ret_pid;
  
         ret_pid = waitpid (child_pid, &status, 0);
+        if (ret_pid == -1) {
+            std::cerr << _("Error launching HelperManager") << " (" << SCIM_HELPER_MANAGER_PROGRAM << "): waitpid " << _("failed") << ": " << strerror(errno) << std::endl;
+        }
+        assert(ret_pid==child_pid);
  
-        if (ret_pid == child_pid && WIFEXITED(status))
+        if (WIFEXITED(status)) {
+            if (WEXITSTATUS(status) != 0) {
+                std::cerr << _("Error launching HelperManager") << " (" << SCIM_HELPER_MANAGER_PROGRAM << "): " << _("abnormal process termination") << std::endl;
+            }
             return WEXITSTATUS(status);
+        }
+        if (WIFSIGNALED(status)) {
+            std::cerr << _("Error launching HelperManager") << " (" << SCIM_HELPER_MANAGER_PROGRAM << "): "
+                      << _("it exited with signal") << " " << WTERMSIG(status) << std::endl;
+            return -1;
+        }
+
+        std::cerr << _("Error launching HelperManager") << " (" << SCIM_HELPER_MANAGER_PROGRAM << "): " << _("unknown process launch error") << std::endl;
  
         return -1;
     }
