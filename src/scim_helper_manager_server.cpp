@@ -90,28 +90,35 @@ void load_helper_modules (void)
 
     scim_get_helper_module_list (mod_list);
 
+    // NOTE on FreeBSD if some module is loaded and unloaded right away here the following module crashes for some unknown reason
+    //      seems like some damage is being done by module.unload();
+    //      so I added a workaround: have an array of modules and unload them all together in the end only.
+    //      TODO Need to figure out what's going on with this issue.
+
+    HelperModule module[mod_list.size ()];
+
     if (mod_list.size ()) {
-        HelperModule module;
 
         for (size_t i = 0; i < mod_list.size (); ++i) {
 
             SCIM_DEBUG_MAIN (2) << " Load module: " << mod_list [i] << "\n";
 
-            if (module.load (mod_list [i]) && module.valid ()) {
+            if (module[i].load (mod_list [i]) && module[i].valid ()) {
                 HelperInfo info;
-                size_t num = module.number_of_helpers ();
+                size_t num = module[i].number_of_helpers ();
 
                 SCIM_DEBUG_MAIN (2) << " Find " << num << " Helpers:\n";
 
                 for (size_t j = 0; j < num; ++j) {
-                    if (module.get_helper_info (j, info)) {
+                    if (module[i].get_helper_info (j, info)) {
                         SCIM_DEBUG_MAIN (3) << "  " << info.uuid << ": " << info.name << "\n";
                         __helpers.push_back ( std::make_pair (info, mod_list [i]) );
                     }
                 }
             }
-
-            module.unload ();
+        }
+        for (size_t i = 0; i < mod_list.size (); ++i) {
+            module[i].unload ();
         }
     }
 }

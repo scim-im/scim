@@ -1,3 +1,13 @@
+2008-09-21 17:14  Yuri Victorovich <yuri@tsoft.com>
+	* src/scim_socket.cpp
+	* src/scim_helper_manager_server.cpp
+	* src/scim_helper_manager.cpp
+	* src/ltdl.cpp
+	Fixed the problem when on FreeBSD scim-helper-module silently failed to launch.
+	Added a workaround to module loading/unloading for some unknown problem of SEGV occuring after some module was unloaded in scim-helper-module.
+	Improved error handling in scim-helper-module launching and in socket operations.
+
+
 2008-09-19 11:34  Yuri Victorovich <yuri@tsoft.com>
 	Merged all changes from scim-1.4 branch into the trunk and bumped the version 1.4.7->1.4.8.
 	I don't believe that branches are useful with such a low activity project as scim is now.
