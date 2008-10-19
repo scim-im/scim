@@ -557,7 +557,7 @@ public:
 private:
     void launch_panel (const String &config, const String &display) const
     {
-        char * my_argv [2] = {"--no-stay", 0};
+        char * my_argv [2] = {const_cast<char*> ("--no-stay"), 0};
         scim_launch_panel (true, config, display, my_argv);
     }
 };

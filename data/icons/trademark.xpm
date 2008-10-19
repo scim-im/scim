@@ -1,5 +1,5 @@
 /* XPM */
-static char * trademark_xpm[] = {
+static const char * trademark_xpm[] = {
 "24 24 5 1",
 " 	c None",
 ".	c #3D55FD",

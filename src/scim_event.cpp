@@ -48,7 +48,7 @@ struct __KeyCodeMap
 struct __KeyName
 {
     uint16  value;
-    char   *name;
+    const char   *name;
 };
 
 class __Uint16PairLessByFirst

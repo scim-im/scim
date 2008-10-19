@@ -682,11 +682,11 @@ scim_make_dir (const String &dir)
 }
 
 struct __Language {
-    char *code;
-    char *normalized;
-    char *name;
-    char *untranslated;
-    char *locale_suffix;
+    const char *code;
+    const char *normalized;
+    const char *name;
+    const char *untranslated;
+    const char *locale_suffix;
 };
 
 static __Language __languages [] = {

@@ -160,10 +160,10 @@ void run_helper (const String &uuid, const String &config, const String &display
             if (pid < 0) return;
 
             if (pid == 0) {
-                char * argv [] = { SCIM_HELPER_LAUNCHER_PROGRAM,
-                                   "--daemon",
-                                   "--config", const_cast<char*> (config.c_str ()),
-                                   "--display", const_cast<char*> (display.c_str ()),
+                char * argv [] = { const_cast<char*> (SCIM_HELPER_LAUNCHER_PROGRAM),
+                                   const_cast<char*> ("--daemon"),
+                                   const_cast<char*> ("--config"), const_cast<char*> (config.c_str ()),
+                                   const_cast<char*> ("--display"), const_cast<char*> (display.c_str ()),
                                    const_cast<char*> (__helpers [i].second.c_str ()),
                                    const_cast<char*> (__helpers [i].first.uuid.c_str ()),
                                    0};

@@ -267,7 +267,7 @@ int main (int argc, char *argv [])
         // And set manual to false.
         if (!check_socket_frontend ()) {
             cerr << "Launching a SCIM daemon with Socket FrontEnd...\n";
-            char *no_stay_argv [] = { "--no-stay", 0 };
+            char *no_stay_argv [] = { const_cast<char*> ("--no-stay"), 0 };
             scim_launch (true,
                          def_config,
                          (load_engine_list.size () ? scim_combine_string_list (load_engine_list, ',') : "all"),

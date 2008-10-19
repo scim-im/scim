@@ -1,5 +1,5 @@
 /* XPM */
-static char *half_letter_xpm[]={
+static const char *half_letter_xpm[]={
 "16 16 2 1",
 ". c None",
 "# c #0000ff",

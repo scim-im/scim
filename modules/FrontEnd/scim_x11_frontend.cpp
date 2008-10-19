@@ -555,7 +555,7 @@ X11FrontEnd::init_ims (void)
     };
 
     XIMEncoding ims_encodings[] = {
-        "COMPOUND_TEXT",
+        const_cast<char*> ("COMPOUND_TEXT"),
         0
     };
 
@@ -1350,7 +1350,7 @@ X11FrontEnd::ims_preedit_callback_draw (X11IC *ic, const WideString& str, const 
     } else {
         text.encoding_is_wchar = false;
         text.length = 0;
-        text.string.multi_byte = "";
+        text.string.multi_byte = const_cast<char*> ("");
         IMCallCallback (m_xims, (XPointer) & pcb);
         len = 0;
     }

@@ -3641,7 +3641,7 @@ int main (int argc, char *argv [])
 
     // Make up DISPLAY env.
     if (display_name.length ()) {
-        new_argv [new_argc ++] = "--display";
+        new_argv [new_argc ++] = const_cast <char*> ("--display");
         new_argv [new_argc ++] = const_cast <char*> (display_name.c_str ());
 
         setenv ("DISPLAY", display_name.c_str (), 1);
