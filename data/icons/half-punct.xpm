@@ -1,5 +1,5 @@
 /* XPM */
-static char * half_punct_xpm[] = {
+static const char * half_punct_xpm[] = {
 "16 16 2 1",
 " 	c None",
 ".	c #1520EF",

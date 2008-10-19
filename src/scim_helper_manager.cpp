@@ -39,6 +39,7 @@
 #include <stdio.h> // for strerror
 #include <errno.h>
 #include <assert.h>
+#include <string.h>
 
 #include "scim_private.h"
 #include "scim.h"

@@ -92,6 +92,8 @@ static const ComposeSequence __scim_compose_seqs[] = {
 #define SCIM_NUM_COMPOSE_SEQS (sizeof (__scim_compose_seqs) / sizeof (__scim_compose_seqs [0]))
 
 static uint16 __scim_compose_ignores [] = {
+    SCIM_KEY_ISO_Level3_Shift,
+    SCIM_KEY_ISO_Group_Shift,
     SCIM_KEY_Mode_switch,
     SCIM_KEY_Shift_L,
     SCIM_KEY_Shift_R,

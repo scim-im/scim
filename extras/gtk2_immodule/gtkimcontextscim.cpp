@@ -1710,7 +1710,7 @@ initialize (void)
         // And set manual to false.
         if (!check_socket_frontend ()) {
             std::cerr << "Launching a SCIM daemon with Socket FrontEnd...\n";
-            char *new_argv [] = { "--no-stay", 0 };
+            char *new_argv [] = { static_cast<char*> ("--no-stay"), 0 };
             scim_launch (true,
                          config_module_name,
                          (load_engine_list.size () ? scim_combine_string_list (load_engine_list, ',') : "all"),

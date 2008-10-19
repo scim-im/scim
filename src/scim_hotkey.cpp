@@ -314,7 +314,7 @@ IMEngineHotkeyMatcher::get_match_result (void) const
 }
 
 //============================ FrontEndHotkeyMatcher ==========================
-static char *__scim_frontend_hotkey_config_paths [] =
+static const char *__scim_frontend_hotkey_config_paths [] =
 {
     0,
     SCIM_CONFIG_HOTKEYS_FRONTEND_TRIGGER,
@@ -326,7 +326,7 @@ static char *__scim_frontend_hotkey_config_paths [] =
     0
 };
 
-static char *__scim_frontend_hotkey_defaults [] =
+static const char *__scim_frontend_hotkey_defaults [] =
 {
     0,
     "Control+space",

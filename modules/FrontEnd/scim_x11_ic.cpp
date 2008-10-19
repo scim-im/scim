@@ -40,7 +40,7 @@
 using namespace scim;
 
 static int
-_is_attr (char *attr, XICAttribute * attr_list)
+_is_attr (const char *attr, XICAttribute * attr_list)
 {
   return !strcmp (attr, attr_list->name);
 }
