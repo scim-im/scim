@@ -161,7 +161,7 @@ int main (int argc, char *argv [])
     } //End of command line parsing.
 
     // Construct new argv array for FrontEnd.
-    new_argv [new_argc ++] = "-c";
+    new_argv [new_argc ++] = const_cast <char *> ("-c");
     new_argv [new_argc ++] = const_cast <char *> (config_name.c_str ());
 
     // Store the rest argvs into new_argv.

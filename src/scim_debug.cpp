@@ -33,7 +33,7 @@ namespace scim {
 struct _DebugMaskName
 {
     uint32 mask;
-    char  *name;
+    const char  *name;
 };
 
 static _DebugMaskName _debug_mask_names [] =

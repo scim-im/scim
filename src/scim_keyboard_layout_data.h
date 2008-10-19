@@ -4586,7 +4586,7 @@ static __KeyName __scim_keyboard_layout_ids_by_name [] =
 
 
 // Keyboard Layout display names.
-static char *__scim_keyboard_layout_names [] = 
+static const char *__scim_keyboard_layout_names [] = 
 {
     N_("Unknown"),
     N_("English (US)"),

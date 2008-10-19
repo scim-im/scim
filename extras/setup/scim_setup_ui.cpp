@@ -79,11 +79,11 @@ SetupUI::SetupUI (const ConfigPointer &config, const String &display, const Help
     char **argv = new char * [4];
     int    argc = 1;
 
-    argv [0] = "scim-setup";
+    argv [0] = const_cast<char*>("scim-setup");
     argv [1] = 0;
 
     if (display.length ()) {
-        argv [argc ++] = "--display";
+        argv [argc ++] = const_cast <char*> ("--display");
         argv [argc ++] = const_cast <char *> (display.c_str ());
         argv [argc] = 0;
         setenv ("DISPLAY", display.c_str (), 1);

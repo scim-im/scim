@@ -159,7 +159,7 @@ enum ToolbarShowFlavourType {
     SCIM_TOOLBAR_SHOW_NEVER
 };
 
-static char * __toolbar_show_behaviour_text[] = {
+static const char * __toolbar_show_behaviour_text[] = {
     N_("Always"),
     N_("On demand"),
     N_("Never")
