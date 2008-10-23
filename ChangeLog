@@ -17,5 +17,5 @@
 	* Renamed po/pt-BR.po->po/pt_BR.po: renamed po/pt-BR.po to po/pt_BR.po to make it look like other language files.
 	* configure.ac: removed 'ta' from languages due to missing po/ta.po
 
-2008-09-14 03:04  Yuri Victorovich <yuri@tsoft.com>
+2008-10-23 13:38  Yuri Victorovich <yuri@tsoft.com>
 	* configure.ac,po/ca.po: added Catalan translation
