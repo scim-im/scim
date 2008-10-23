@@ -65,7 +65,7 @@ AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER([config.h])
 
 # Init gettext
-ALL_LINGUAS="as bn_IN cs de es fi fr gu hi it ja kn ko ml mr nl pa pt_BR ru sk sv te vi zh_CN zh_TW"
+ALL_LINGUAS="as bn_IN ca cs de es fi fr gu hi it ja kn ko ml mr nl pa pt_BR ru sk sv te vi zh_CN zh_TW"
 AM_GNU_GETTEXT
 
 # Init libtool
