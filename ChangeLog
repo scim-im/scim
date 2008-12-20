@@ -1,21 +1,302 @@
-2008-09-21 17:14  Yuri Victorovich <yuri@tsoft.com>
-	* src/scim_socket.cpp
-	* src/scim_helper_manager_server.cpp
-	* src/scim_helper_manager.cpp
-	* src/ltdl.cpp
-	Fixed the problem when on FreeBSD scim-helper-module silently failed to launch.
-	Added a workaround to module loading/unloading for some unknown problem of SEGV occuring after some module was unloaded in scim-helper-module.
-	Improved error handling in scim-helper-module launching and in socket operations.
+2008-12-20 00:51  ryo-dairiki
 
+	* po/nl.po: - Update Dutch translation.
 
-2008-09-19 11:34  Yuri Victorovich <yuri@tsoft.com>
-	Merged all changes from scim-1.4 branch into the trunk and bumped the version 1.4.7->1.4.8.
-	I don't believe that branches are useful with such a low activity project as scim is now.
+2008-10-23 20:38  yurivict
 
-2008-09-14 03:04  Yuri Victorovich <yuri@tsoft.com>
+	* ChangeLog: fixed ChangeLog date
 
-	* Renamed po/pt-BR.po->po/pt_BR.po: renamed po/pt-BR.po to po/pt_BR.po to make it look like other language files.
-	* configure.ac: removed 'ta' from languages due to missing po/ta.po
+2008-10-23 20:38  yurivict
 
-2008-10-23 13:38  Yuri Victorovich <yuri@tsoft.com>
-	* configure.ac,po/ca.po: added Catalan translation
+	* ChangeLog, configure.ac, po/ca.po: added Catalan translation from
+	  scim-delel mailing list submission
+
+2008-10-19 04:48  ryo-dairiki
+
+	* data/icons/down.xpm, data/icons/full-letter.xpm,
+	  data/icons/full-punct.xpm, data/icons/half-letter.xpm,
+	  data/icons/half-punct.xpm, data/icons/help.xpm,
+	  data/icons/left.xpm, data/icons/menu.xpm,
+	  data/icons/pin-down.xpm, data/icons/pin-up.xpm,
+	  data/icons/right.xpm, data/icons/setup.xpm,
+	  data/icons/trademark.xpm, data/icons/up.xpm,
+	  extras/bridge_immodule,
+	  extras/gtk2_immodule/gtkimcontextscim.cpp,
+	  extras/panel/scim_panel_gtk.cpp, extras/setup/scim_setup_ui.cpp,
+	  modules/FrontEnd/IMdkit/i18nAttr.c,
+	  modules/FrontEnd/scim_x11_frontend.cpp,
+	  modules/FrontEnd/scim_x11_ic.cpp,
+	  modules/SetupUI/scim_panel_gtk_setup.cpp, src/scim.cpp,
+	  src/scim_compose_key.cpp, src/scim_debug.cpp, src/scim_event.cpp,
+	  src/scim_helper_manager.cpp, src/scim_helper_manager_server.cpp,
+	  src/scim_hotkey.cpp, src/scim_keyboard_layout_data.h,
+	  src/scim_launcher.cpp, src/scim_panel_client.cpp,
+	  src/scim_utility.cpp: - Eliminate warnings about implicit casting
+	  from 'const char*' to 'char *'.
+	  - Import ISO3-shift patch.
+
+2008-09-22 00:18  yurivict
+
+	* ChangeLog, src/ltdl.cpp, src/scim_helper_manager.cpp,
+	  src/scim_helper_manager_server.cpp, src/scim_socket.cpp: Fixed
+	  the problem when on FreeBSD scim-helper-module silently failed to
+	  launch.
+	  Added a workaround to module loading/unloading for some unknown
+	  problem of SEGV occuring after some module was unloaded in
+	  scim-helper-module.
+	  Improved error handling in scim-helper-module launching and in
+	  socket operations.
+
+2008-09-19 18:45  yurivict
+
+	* ., ChangeLog, configure.ac, extras/setup/scim_setup_ui.cpp,
+	  extras/setup/scim_setup_ui.h, po/cs.po, po/de.po, po/fi.po,
+	  po/fr.po, po/it.po, po/ja.po, po/ko.po, po/nl.po, po/pa.po,
+	  po/pt_BR.po, po/scim.pot, po/sv.po, po/zh_CN.po, po/zh_TW.po,
+	  src/scim.h, src/scim_private.cpp, src/scim_socket.cpp: Merged all
+	  changes from scim/branches/scim-1.4 branch into scim/trunk and
+	  bumped the version of the trunk 1.4.6->1.4.8.
+
+2008-09-15 19:03  yurivict
+
+	* ChangeLog, configure.ac, po/pt-BR.po, po/pt_BR.po: Minor language
+	  files changes.
+
+2008-09-14 20:53  yurivict
+
+	* ChangeLog: Added missing ChangeLog files needed for auto*-tools
+
+2008-08-26 07:18  juhp
+
+	* po/ko.po: updated translations by Eunju Kim (Red Hat) with
+	  additional fixes by Choe Hwanjin
+
+2008-06-23 05:21  juhp
+
+	* po/vi.po: update from Nguyen Dinh Trung
+
+2008-06-18 07:03  juhp
+
+	* po/zh_CN.po: update from Leah Liu <lliu@redhat.com>
+
+2008-06-18 05:56  juhp
+
+	* po/nl.po: update from Ronald Stroethoff
+
+2008-06-13 08:48  juhp
+
+	* configure.ac: update LINGUAS for new translations added
+
+2008-06-13 08:29  juhp
+
+	* po/sk.po: add Slovakian translation from 1.4 branch
+
+2008-06-11 08:16  juhp
+
+	* po/pa.po: update to Punjabi translation from Jaswinder Singh
+	  <jsingh@redhat.com>
+
+2008-06-11 08:15  juhp
+
+	* po/ja.po: update to Japanese translation from Kiyoto Hashida
+	  <khashida@redhat.com>
+
+2008-06-11 08:13  juhp
+
+	* po/de.po: updated German translation from Timo Trinks
+	  <ttrinks@redhat.com>
+
+2008-06-11 08:10  juhp
+
+	* po/it.po: update of Italian translation from Francesco Valente
+	  <fvalen@redhat.com>
+
+2008-06-11 06:47  juhp
+
+	* po/scim.pot: updated to recent strings
+
+2008-06-11 06:43  juhp
+
+	* po/ml.po: add translator
+
+2008-06-11 06:42  juhp
+
+	* po/te.po: add Telugu translation from Krishna Babu K
+	  <kkrothap@redhat.com>
+
+2008-06-11 06:42  juhp
+
+	* po/ru.po: add Russian translations from Yulia Poyarkova
+	  <yulia.poyarkova@redhat.com>
+
+2008-06-11 06:41  juhp
+
+	* po/pt-BR.po: add Brazilian Portuguese translation from Glaucia
+	  Cintra <gcintra@redhat.com>
+
+2008-06-11 06:40  juhp
+
+	* po/gu.po: add Gujarati translations from Ankit Patel
+	  <ankit@redhat.com>
+
+2008-06-11 06:39  juhp
+
+	* po/ml.po: add Malayalam translations from Ani Peter
+	  <apeter@redhat.com>
+
+2008-06-11 06:34  juhp
+
+	* po/mr.po: add Marathi translations from Sandeep Shedmake
+	  <sandeep.shedmake@gmail.com>
+
+2008-06-11 06:23  juhp
+
+	* po/kn.po: add Kannada translations from Shankar Prasad
+	  <svenkate@redhat.com>
+
+2008-06-11 06:22  juhp
+
+	* po/hi.po: add Hindi translations by Rajesh Ranjan
+	  <rranjan@redhat.com>
+
+2008-06-11 06:21  juhp
+
+	* po/es.po: add Spanish translation by Angela Garcia
+	  <agarcia@redhat.com>
+
+2008-06-11 06:16  juhp
+
+	* po/bn_IN.po: add Bengali INDIA translation by Runa Bhattacharjee
+	  <runab@fedoraproject.org>
+
+2008-06-11 06:15  juhp
+
+	* po/as.po: add Assamese translation by Amitakhya Phukan
+	  <aphukan@fedoraproject.org>
+
+2008-03-26 07:58  juhp
+
+	* po/vi.po: add Vietnamese translation from Nguyễn Đình Trung
+
+2008-03-12 06:13  huangpeng
+
+	* extras/panel/scim_panel_gtk.cpp, src/scim_launcher.cpp: Avoid
+	  scim segfault during exiting.
+
+2007-10-08 08:56  ryo-dairiki
+
+	* extras/bridge_immodule/scim_bridge_transaction.c:
+
+2007-09-13 08:02  juhp
+
+	* po/ja.po: add Sinhala
+
+2007-09-09 12:18  ryo-dairiki
+
+	* extras/bridge_immodule/scim_bridge_transaction.c,
+	  extras/bridge_immodule/scim_bridge_type.h:
+
+2007-09-06 17:10  ryo-dairiki
+
+	* AUTHORS, configure.ac,
+	  extras/bridge_immodule/scim_bridge_attribute.c,
+	  extras/bridge_immodule/scim_bridge_attribute.h,
+	  extras/bridge_immodule/scim_bridge_lookup_table.c,
+	  extras/bridge_immodule/scim_bridge_transaction.c,
+	  extras/bridge_immodule/scim_bridge_utility.h:
+
+2007-08-28 16:09  ryo-dairiki
+
+	* extras/bridge_immodule/scim_bridge_lookup.h,
+	  extras/bridge_immodule/scim_bridge_lookup_table.c,
+	  extras/bridge_immodule/scim_bridge_lookup_table.h:
+
+2007-08-26 08:44  ryo-dairiki
+
+	* .cdtproject, .project, .settings,
+	  .settings/org.eclipse.cdt.core.prefs, extras/bridge_immodule,
+	  extras/bridge_immodule/scim_bridge_attribute.c,
+	  extras/bridge_immodule/scim_bridge_attribute.h,
+	  extras/bridge_immodule/scim_bridge_key_event.h,
+	  extras/bridge_immodule/scim_bridge_lookup.h,
+	  extras/bridge_immodule/scim_bridge_lookup_table.c,
+	  extras/bridge_immodule/scim_bridge_property.c,
+	  extras/bridge_immodule/scim_bridge_property.h,
+	  extras/bridge_immodule/scim_bridge_transaction.c,
+	  extras/bridge_immodule/scim_bridge_transaction.h,
+	  extras/bridge_immodule/scim_bridge_type.h,
+	  extras/bridge_immodule/scim_bridge_utility.c,
+	  extras/bridge_immodule/scim_bridge_utility.h: - Begin to import
+	  scim-bridge as an extra immodule.
+
+2007-08-03 11:38  suzhe
+
+	* src/scim_frontend_module.cpp: Don't unload FrontEnd module to
+	  avoid possible crash.
+
+2007-07-22 02:44  suzhe
+
+	* src/scim_utility.cpp: Add "Esperanto" language.
+
+2007-07-09 11:52  suzhe
+
+	* src/scim_private.cpp: Include necessary header file.
+
+2007-07-09 11:49  suzhe
+
+	* src/scim_private.cpp: Set locale correctly.
+
+2007-07-09 11:41  suzhe
+
+	* src/scim_utility.cpp: Use LC_MESSAGES instead of LC_CTYPE for
+	  current locale.
+
+2007-06-26 02:37  suzhe
+
+	* extras/gtk2_immodule/gtkimcontextscim.cpp: Fix include file
+	  issue.
+
+2007-06-22 18:43  suzhe
+
+	* po/cs.po, po/de.po, po/fi.po, po/fr.po, po/it.po, po/ja.po,
+	  po/ko.po, po/nl.po, po/pa.po, po/scim.pot, po/sv.po, po/zh_CN.po,
+	  po/zh_TW.po: Update po files.
+
+2007-06-22 17:09  suzhe
+
+	* modules/FrontEnd/scim_x11_frontend.cpp: Fix high power
+	  consumption issue.
+
+2007-06-22 02:36  suzhe
+
+	* extras/gtk2_immodule/gtkimcontextscim.cpp, src/scim_event.cpp,
+	  src/scim_transaction.cpp: Add missing headers.
+
+2007-06-22 00:08  suzhe
+
+	* ChangeLog, ChangeLog.old, Makefile.am, developers, svn2cl.sh,
+	  svn2cl.xsl: Use svn2cl to generate ChangeLog.
+
+2007-06-21 23:37  suzhe
+
+	* src/scim_socket.cpp: Fix a bug in Socket::wait_for_data() and
+	  Socket::read(), Socket::write().
+
+2007-06-19 06:32  suzhe
+
+	* extras/gtk2_immodule/gtkimcontextscim.cpp,
+	  modules/IMEngine/scim_socket_imengine.cpp: Add more debug
+	  message. Avoid focus an already focused IC.
+
+2007-06-17 07:15  suzhe
+
+	* .: Move scim-trunk (the head) to scim/trunk.
+
+2007-06-17 07:13  suzhe
+
+	* : Rename scim to trunk.
+
+2007-06-17 07:09  suzhe
+
+	* : Initial import scim 1.4 branch into svn as trunk.
+
