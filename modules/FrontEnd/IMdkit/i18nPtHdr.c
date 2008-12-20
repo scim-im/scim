@@ -53,6 +53,38 @@ static void	DebugLog(char * msg)
 
 extern Xi18nClient *_Xi18nFindClient (Xi18n, CARD16);
 
+static void DiscardQueue (XIMS ims, CARD16 connect_id)
+{
+    Xi18n i18n_core = ims->protocol;
+    Xi18nClient *client = (Xi18nClient *) _Xi18nFindClient (i18n_core,
+                                                            connect_id);
+
+    if (client != NULL) {
+	client->sync = False;
+	while (client->pending != NULL) {
+	    XIMPending* pending = client->pending;
+
+	    client->pending = pending->next;
+
+	    XFree(pending->p);
+	    XFree(pending);
+	}
+    }
+}
+
+static void DiscardAllQueue(XIMS ims)
+{
+    Xi18n i18n_core = ims->protocol;
+    Xi18nClient* client = i18n_core->address.clients;
+
+    while (client != NULL) {
+	if (client->sync) {
+	    DiscardQueue(ims, client->connect_id);
+	}
+	client = client->next;
+    }
+}
+
 static void GetProtocolVersion (CARD16 client_major,
                                 CARD16 client_minor,
                                 CARD16 *server_major,
@@ -866,6 +898,21 @@ static void SetICFocusMessageProc (XIMS ims,
     CARD16 connect_id = call_data->any.connect_id;
     CARD16 input_method_ID;
 
+    /* some buggy xim clients do not send XIM_SYNC_REPLY for synchronous
+     * events. In such case, xim server is waiting for XIM_SYNC_REPLY 
+     * forever. So the xim server is blocked to waiting sync reply. 
+     * It prevents further input.
+     * Usually it happens when a client calls XSetICFocus() with another ic 
+     * before passing an event to XFilterEvent(), where the event is needed
+     * by the old focused ic to sync its state.
+     * To avoid such problem, remove the whole clients queue and set them 
+     * as asynchronous.
+     *
+     * See:
+     * http://bugs.freedesktop.org/show_bug.cgi?id=7869
+     */
+    DiscardAllQueue(ims);
+
     setfocus = (IMChangeFocusStruct *) &call_data->changefocus;
 
     fm = FrameMgrInit (set_ic_focus_fr,
@@ -897,6 +944,17 @@ static void UnsetICFocusMessageProc (XIMS ims,
     IMChangeFocusStruct *unsetfocus;
     CARD16 connect_id = call_data->any.connect_id;
     CARD16 input_method_ID;
+    Xi18nClient *client = _Xi18nFindClient (i18n_core, connect_id);
+
+    /* some buggy clients unset focus ic before the ic answer the sync reply,
+     * so the xim server may be blocked to waiting sync reply. To avoid 
+     * this problem, remove the client queue and set it asynchronous
+     * 
+     * See: SetICFocusMessageProc
+     */
+    if (client != NULL && client->sync) {
+	DiscardQueue(ims, client->connect_id);
+    }
 
     unsetfocus = (IMChangeFocusStruct *) &call_data->changefocus;
 
