@@ -25,20 +25,19 @@ SUBDIRS			= manual
 
 .PHONY: html
 
-
-if HAVE_DOXYGEN
-html: 
-	(cd $(top_builddir)/docs; rm -fr html/*; $(DOXYGEN) scim.cfg)
-
-dist-hook: html
-	cp -Rp $(top_builddir)/docs/html $(distdir)
-else
 html:
+if HAVE_DOXYGEN
+	(cd $(top_builddir)/docs; rm -fr html/*; $(DOXYGEN) scim.cfg)
+else
 	echo "***"
 	echo "*** Warning: Documentation not built"
 	echo "***"
-
-dist-hook:
+endif
+	
+dist-hook: html
+if HAVE_DOXYGEN
+	cp -Rp $(top_builddir)/docs/html $(distdir)
+else
 	echo "***"
 	echo "*** Warning: Documentation not built"
 	echo "*** DISTRIBUTION IS INCOMPLETE"
