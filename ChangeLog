@@ -1,3 +1,16 @@
+2008-12-21 02:07  ryo-dairiki
+
+	* configs/config: - Remove "CapsLock" from valid key masks.
+
+2008-12-20 12:01  ryo-dairiki
+
+	* modules/FrontEnd/IMdkit/i18nPtHdr.c: - Import
+	  "scim-xim-block.patch".
+
+2008-12-20 00:56  ryo-dairiki
+
+	* ChangeLog: - Update Changelog.
+
 2008-12-20 00:51  ryo-dairiki
 
 	* po/nl.po: - Update Dutch translation.
