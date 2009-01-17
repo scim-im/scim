@@ -21,23 +21,25 @@ CLEANFILES		= *.bak
 
 SUBDIRS			= figures
 
+if BUILD_MANUAL
+
 HTML_FILES		= user-manual.html
 XML_FILES		= user-manual.xml
 
-EXTRA_DIST		= $(XML_FILES)
-
-.PHONY:	html
-
-if BUILD_MANUAL
 .xml.html:
 	$(XSLTPROC) -o $@ $(DOCBOOK_XSL) $<
 
-html:	$(HTML_FILES)
+html_zh_CN:	$(HTML_FILES)
 
-dist-hook: html
+dist-hook: html_zh_CN
 	cp -Rp $(srcdir)/$(HTML_FILES) $(distdir)
+
 else
-html:
+
+HTML_FILES		=
+XML_FILES		=
+
+html_zh_CN:
 	echo "***"
 	echo "*** Warning: Manual not built"
 	echo "***"
@@ -48,3 +50,7 @@ dist-hook:
 	echo "*** DISTRIBUTION IS INCOMPLETE"
 	echo "***"
 endif
+
+EXTRA_DIST		= $(XML_FILES)
+
+.PHONY:	html_zh_CN
