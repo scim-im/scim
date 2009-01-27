@@ -1,0 +1,1308 @@
+# translation of ta.po to Tamil
+# Tamil translations for PACKAGE package.
+# Copyright (C) 2008 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Automatically generated, 2008.
+# I. Felix <ifelix@redhat.com>, 2008.
+msgid ""
+msgstr ""
+"Project-Id-Version: ta\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-06-22 11:40-0700\n"
+"PO-Revision-Date: 2008-04-02 13:45+0530\n"
+"Last-Translator: I. Felix <ifelix@redhat.com>\n"
+"Language-Team: Tamil <fedora-trans-ta@redhat.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n\n\n"
+"\n"
+"\n"
+"\n"
+"\n"
+
+#: ../src/scim_compose_key.cpp:126
+msgid "English/European"
+msgstr "ஆங்கிலம்/ஐரோப்பா"
+
+#. Append an entry for forward mode.
+#: ../src/scim_imengine.cpp:638 ../src/scim_utility.cpp:693
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1897
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1281
+#: ../extras/panel/scim_panel_gtk.cpp:2814
+msgid "English/Keyboard"
+msgstr "ஆங்கிலம்/விசைப்பலகை"
+
+#: ../src/scim_utility.cpp:694
+msgid "Amharic"
+msgstr "அம்ஹரிக்"
+
+#: ../src/scim_utility.cpp:695
+msgid "Arabic"
+msgstr "அரேபியம்"
+
+#: ../src/scim_utility.cpp:696
+msgid "Arabic (Egypt)"
+msgstr "அரேபிக் (எகிப்து)"
+
+#: ../src/scim_utility.cpp:697
+msgid "Arabic (Lebanon)"
+msgstr "அரேபிக் (லிபனான்)"
+
+#: ../src/scim_utility.cpp:698
+msgid "Assamese"
+msgstr "அசாமி"
+
+#: ../src/scim_utility.cpp:699
+msgid "Azerbaijani"
+msgstr "அசர்பைஜானி"
+
+#: ../src/scim_utility.cpp:700
+msgid "Belarusian"
+msgstr "பெலாருஷியன்"
+
+#: ../src/scim_utility.cpp:701
+msgid "Bulgarian"
+msgstr "பல்கேரியன்"
+
+#: ../src/scim_utility.cpp:702 ../src/scim_utility.cpp:703
+msgid "Bengali"
+msgstr "பெங்காலி"
+
+#: ../src/scim_utility.cpp:704
+msgid "Bengali (India)"
+msgstr "பெங்காலி (இந்தியா)"
+
+#: ../src/scim_utility.cpp:705
+msgid "Tibetan"
+msgstr "திபேத்தியன்"
+
+#: ../src/scim_utility.cpp:706
+msgid "Bosnian"
+msgstr "போஸ்னியன்"
+
+#: ../src/scim_utility.cpp:707
+msgid "Catalan"
+msgstr "காட்டலான்"
+
+#: ../src/scim_utility.cpp:708 ../src/scim_keyboard_layout_data.h:4595
+msgid "Czech"
+msgstr "செக்"
+
+#: ../src/scim_utility.cpp:709
+msgid "Welsh"
+msgstr "வெல்ஸ்"
+
+#: ../src/scim_utility.cpp:710 ../src/scim_keyboard_layout_data.h:4597
+msgid "Danish"
+msgstr "டேனிஷ்"
+
+#: ../src/scim_utility.cpp:711 ../src/scim_keyboard_layout_data.h:4605
+msgid "German"
+msgstr "ஜெர்மன்"
+
+#: ../src/scim_utility.cpp:712
+msgid "Divehi"
+msgstr "திவிஹி"
+
+#: ../src/scim_utility.cpp:713 ../src/scim_keyboard_layout_data.h:4608
+msgid "Greek"
+msgstr "கிரேக்கம்"
+
+#: ../src/scim_utility.cpp:714
+msgid "English"
+msgstr "ஆங்கிலம்"
+
+#: ../src/scim_utility.cpp:715
+msgid "English (Australian)"
+msgstr "ஆங்கிலம் (ஆஸ்திரேலியன்)"
+
+#: ../src/scim_utility.cpp:716
+msgid "English (Canadian)"
+msgstr "ஆங்கிலம் (கனடியன்)"
+
+#: ../src/scim_utility.cpp:717
+msgid "English (British)"
+msgstr "ஆங்கிலம் (பிரிட்டிஷ்)"
+
+#: ../src/scim_utility.cpp:718
+msgid "English (Ireland)"
+msgstr "ஆங்கிலம் (அயர்லாந்து)"
+
+#: ../src/scim_utility.cpp:719
+msgid "English (American)"
+msgstr "ஆங்கிலம் (அமெரிக்கன்)"
+
+#: ../src/scim_utility.cpp:720 ../src/scim_utility.cpp:721
+#: ../src/scim_keyboard_layout_data.h:4621
+msgid "Spanish"
+msgstr "ஸ்பானிஷ்"
+
+#: ../src/scim_utility.cpp:722
+msgid "Spanish (Mexico)"
+msgstr "ஸ்பேனிஷ் (மெக்ஸிகோ)"
+
+#: ../src/scim_utility.cpp:723 ../src/scim_keyboard_layout_data.h:4600
+msgid "Estonian"
+msgstr "எஸ்தோனியன்"
+
+#: ../src/scim_utility.cpp:724
+msgid "Basque"
+msgstr "பாஸ்க்யு"
+
+#: ../src/scim_utility.cpp:725
+msgid "Persian"
+msgstr "பெர்ஷியன்"
+
+#: ../src/scim_utility.cpp:726 ../src/scim_keyboard_layout_data.h:4601
+msgid "Finnish"
+msgstr "ஃபினிஷ்"
+
+#: ../src/scim_utility.cpp:727 ../src/scim_keyboard_layout_data.h:4602
+msgid "French"
+msgstr "பிரென்சு"
+
+#: ../src/scim_utility.cpp:728
+msgid "Irish"
+msgstr "ஐரிஷ்"
+
+#: ../src/scim_utility.cpp:729
+msgid "Galician"
+msgstr "காலிசியன்"
+
+#: ../src/scim_utility.cpp:730
+msgid "Gujarati"
+msgstr "குஜராத்தி"
+
+#: ../src/scim_utility.cpp:731 ../src/scim_utility.cpp:740
+msgid "Hebrew"
+msgstr "எபிரேயம்"
+
+#: ../src/scim_utility.cpp:732
+msgid "Hindi"
+msgstr "இந்தி"
+
+#: ../src/scim_utility.cpp:733 ../src/scim_keyboard_layout_data.h:4594
+msgid "Croatian"
+msgstr "கிரோசியன்"
+
+#: ../src/scim_utility.cpp:734 ../src/scim_keyboard_layout_data.h:4609
+msgid "Hungarian"
+msgstr "ஹங்கேரியன்"
+
+#: ../src/scim_utility.cpp:735
+msgid "Armenian"
+msgstr "அர்மேனியன்"
+
+#: ../src/scim_utility.cpp:736
+msgid "Interlingua"
+msgstr "இன்டர்லிங்கா"
+
+#: ../src/scim_utility.cpp:737
+msgid "Indonesian"
+msgstr "இந்தோனேஷியன்"
+
+#: ../src/scim_utility.cpp:738 ../src/scim_keyboard_layout_data.h:4627
+msgid "Icelandic"
+msgstr "ஐஸ்லாந்து"
+
+#: ../src/scim_utility.cpp:739 ../src/scim_keyboard_layout_data.h:4610
+msgid "Italian"
+msgstr "இத்தாலியன்"
+
+#: ../src/scim_utility.cpp:741 ../src/scim_keyboard_layout_data.h:4611
+msgid "Japanese"
+msgstr "ஜப்பானிய"
+
+#: ../src/scim_utility.cpp:742
+msgid "Georgian"
+msgstr "ஜார்ஜியன்"
+
+#: ../src/scim_utility.cpp:743
+msgid "Kazakh"
+msgstr "கசக்"
+
+#: ../src/scim_utility.cpp:744
+msgid "Cambodian"
+msgstr "கம்போடியன்"
+
+#: ../src/scim_utility.cpp:745
+msgid "Kannada"
+msgstr "கன்னடம்"
+
+#: ../src/scim_utility.cpp:746
+msgid "Korean"
+msgstr "கொரியன்"
+
+#: ../src/scim_utility.cpp:747
+msgid "Laothian"
+msgstr "லோதியன்"
+
+#: ../src/scim_utility.cpp:748 ../src/scim_keyboard_layout_data.h:4628
+msgid "Lithuanian"
+msgstr "லித்துனியன்"
+
+#: ../src/scim_utility.cpp:749
+msgid "Latvian"
+msgstr "லுத்வேனியன்"
+
+#: ../src/scim_utility.cpp:750
+msgid "Macedonian"
+msgstr "மாசிடோனியன்"
+
+#: ../src/scim_utility.cpp:751
+msgid "Malayalam"
+msgstr "மலையாளம்"
+
+#: ../src/scim_utility.cpp:752
+msgid "Mongolian"
+msgstr "மங்கோலியன்"
+
+#: ../src/scim_utility.cpp:753
+msgid "Marathi"
+msgstr "மராத்தி"
+
+#: ../src/scim_utility.cpp:754
+msgid "Malay"
+msgstr "மலாய்"
+
+#: ../src/scim_utility.cpp:755
+msgid "Burmese"
+msgstr "பர்மிஸ்"
+
+#: ../src/scim_utility.cpp:756
+msgid "Nepali"
+msgstr "நேபாளி"
+
+#: ../src/scim_utility.cpp:757 ../src/scim_keyboard_layout_data.h:4598
+msgid "Dutch"
+msgstr "டச்சு"
+
+#: ../src/scim_utility.cpp:758
+msgid "Norwegian (nynorsk)"
+msgstr "நார்வேனியன் (nynorsk)"
+
+#: ../src/scim_utility.cpp:759
+msgid "Norwegian (bokmal)"
+msgstr "நார்வேனியன் (bokmal)"
+
+#: ../src/scim_utility.cpp:760
+msgid "Oriya"
+msgstr "ஒரியா"
+
+#: ../src/scim_utility.cpp:761
+msgid "Punjabi"
+msgstr "பஞ்சாபி"
+
+#: ../src/scim_utility.cpp:762 ../src/scim_keyboard_layout_data.h:4613
+msgid "Polish"
+msgstr "போலிஷ்"
+
+#: ../src/scim_utility.cpp:763 ../src/scim_utility.cpp:765
+#: ../src/scim_keyboard_layout_data.h:4614
+msgid "Portuguese"
+msgstr "போர்ச்சுகீசியம்"
+
+#: ../src/scim_utility.cpp:764 ../src/scim_keyboard_layout_data.h:4615
+msgid "Portuguese (Brazil)"
+msgstr "போர்த்துகீஸ் (பிரேசில்)"
+
+#: ../src/scim_utility.cpp:766
+msgid "Romanian"
+msgstr "ரோமானியன்"
+
+#: ../src/scim_utility.cpp:767 ../src/scim_keyboard_layout_data.h:4617
+msgid "Russian"
+msgstr "ரஷ்யன்"
+
+#: ../src/scim_utility.cpp:768
+msgid "Sinhala"
+msgstr "சிங்களம்"
+
+#: ../src/scim_utility.cpp:769 ../src/scim_keyboard_layout_data.h:4618
+msgid "Slovak"
+msgstr "ஸ்லோவேக்"
+
+#: ../src/scim_utility.cpp:770 ../src/scim_keyboard_layout_data.h:4620
+msgid "Slovenian"
+msgstr "ஸ்லோவேனியன்"
+
+#: ../src/scim_utility.cpp:771
+msgid "Albanian"
+msgstr "அல்பனியன்"
+
+#: ../src/scim_utility.cpp:772 ../src/scim_utility.cpp:773
+#: ../src/scim_utility.cpp:774
+msgid "Serbian"
+msgstr "செர்பியன்"
+
+#: ../src/scim_utility.cpp:775 ../src/scim_utility.cpp:777
+#: ../src/scim_keyboard_layout_data.h:4624
+msgid "Swedish"
+msgstr "ஸ்வீடிஷ்"
+
+#: ../src/scim_utility.cpp:776
+msgid "Swedish (Finland)"
+msgstr "சுவீடிஸ் (பின்லாந்து)"
+
+#: ../src/scim_utility.cpp:778
+msgid "Tamil"
+msgstr "தமிழ்"
+
+#: ../src/scim_utility.cpp:779
+msgid "Telugu"
+msgstr "தெலுங்கு"
+
+#: ../src/scim_utility.cpp:780
+msgid "Thai"
+msgstr "தாய்"
+
+#: ../src/scim_utility.cpp:781 ../src/scim_keyboard_layout_data.h:4625
+msgid "Turkish"
+msgstr "துருக்கி"
+
+#: ../src/scim_utility.cpp:782
+msgid "Uighur"
+msgstr "உய்கர்"
+
+#: ../src/scim_utility.cpp:783 ../src/scim_keyboard_layout_data.h:4629
+msgid "Ukrainian"
+msgstr "உக்ரேனியன்"
+
+#: ../src/scim_utility.cpp:784
+msgid "Urdu"
+msgstr "உருது"
+
+#: ../src/scim_utility.cpp:785
+msgid "Uzbek"
+msgstr "உஸ்பெக்"
+
+#: ../src/scim_utility.cpp:786
+msgid "Vietnamese"
+msgstr "வியட்னாமியன்"
+
+#: ../src/scim_utility.cpp:787
+msgid "Walloon"
+msgstr "வலூன்"
+
+#: ../src/scim_utility.cpp:788 ../src/scim_utility.cpp:789
+msgid "Yiddish"
+msgstr "ஈடிஷ்"
+
+#: ../src/scim_utility.cpp:790
+msgid "Chinese"
+msgstr "சீனம்"
+
+#: ../src/scim_utility.cpp:791 ../src/scim_utility.cpp:793
+msgid "Chinese (simplified)"
+msgstr "சீனம் (எளியது)"
+
+#: ../src/scim_utility.cpp:792 ../src/scim_utility.cpp:794
+msgid "Chinese (traditional)"
+msgstr "சீனம் (மரபார்ந்து)"
+
+#: ../src/scim_utility.cpp:876
+msgid "Other"
+msgstr "வேறு"
+
+#: ../src/scim_keyboard_layout_data.h:4591
+#: ../modules/IMEngine/scim_socket_imengine.cpp:386
+#: ../modules/IMEngine/scim_socket_imengine.cpp:416
+#: ../modules/IMEngine/scim_socket_imengine.cpp:501
+#: ../modules/IMEngine/scim_socket_imengine.cpp:531
+#: ../modules/IMEngine/scim_socket_imengine.cpp:561
+msgid "Unknown"
+msgstr "தெரியாத"
+
+#: ../src/scim_keyboard_layout_data.h:4592
+msgid "English (US)"
+msgstr "ஆங்கிலம் (அமெரிக்கா)"
+
+#: ../src/scim_keyboard_layout_data.h:4593
+msgid "Belgian"
+msgstr "பெல்ஜியன்"
+
+#: ../src/scim_keyboard_layout_data.h:4596
+msgid "Czech (qwerty)"
+msgstr "செக் (qwerty)"
+
+#: ../src/scim_keyboard_layout_data.h:4599
+msgid "Dvorak"
+msgstr "டோவ்ராக்"
+
+#: ../src/scim_keyboard_layout_data.h:4603
+msgid "French (Canadian)"
+msgstr "பிரஞ்சு (கனடியன்)"
+
+#: ../src/scim_keyboard_layout_data.h:4604
+msgid "French (Switzerland)"
+msgstr "பிரஞ்சு (சுவிஸ்சர்லாந்து)"
+
+#: ../src/scim_keyboard_layout_data.h:4606
+msgid "German (with deadkeys)"
+msgstr "ஜெர்மன் (டெட்விசைகளுடன்)"
+
+#: ../src/scim_keyboard_layout_data.h:4607
+msgid "German (Swiss)"
+msgstr "ஜெர்மன் (சுவிஸ்)"
+
+#: ../src/scim_keyboard_layout_data.h:4612
+msgid "Norwegian"
+msgstr "நார்வேஜியன்"
+
+#: ../src/scim_keyboard_layout_data.h:4616
+msgid "Portuguese (Brazil US accents)"
+msgstr "போர்த்துகீஸ் (பிரேசில் யுஎஸ் முறை)"
+
+#: ../src/scim_keyboard_layout_data.h:4619
+msgid "Slovak (qwerty)"
+msgstr "ஸ்லோவாக் (qwerty)"
+
+#: ../src/scim_keyboard_layout_data.h:4622
+msgid "Spanish (CP 850)"
+msgstr "ஸ்பேனிஷ் (CP 850)"
+
+#: ../src/scim_keyboard_layout_data.h:4623
+msgid "Spanish (Latin America)"
+msgstr "ஸ்பேனிஷ் (லத்தீன் அமெரிக்கா)"
+
+#: ../src/scim_keyboard_layout_data.h:4626
+msgid "English (UK)"
+msgstr "ஆங்கிலம் (பிரிட்டன்)"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:57
+msgid "Simplified-Traditional Chinese Conversion"
+msgstr "எளிய-மரபு சீன உரையாடல்"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:60
+msgid "Convert between Simplified Chinese and Traditional Chinese"
+msgstr "எளிய மற்றும் மரபு சீனத்திற்கிடையே மாற்றம்"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:71
+msgid "SC-TC"
+msgstr "SC-TC"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:73
+#: ../modules/Filter/scim_sctc_filter.cpp:78
+msgid "Simplified-Traditional Chinese conversion"
+msgstr "எளிய-மரபு சீன உரையாடல்"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:76
+msgid "No Conversion"
+msgstr "மாற்றம் இல்லை"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:81
+msgid "Simplified to Traditional"
+msgstr "எளிமையிலிருந்து மரபுக்கு"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:83
+msgid "Convert Simplified Chinese to Traditional Chinese"
+msgstr "எளிய சீனத்திலிருந்து மரபு சீனத்திற்கு மாற்றுதல்"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:86
+msgid "Traditional to Simplified"
+msgstr "மரபிலிருந்து எளிமைக்கு"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:88
+msgid "Convert Traditional Chinese to Simplified Chinese"
+msgstr "மரபு சீனத்திலிருந்து எளிய சீனத்திற்கு மாற்றுதல்"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:300
+msgid "James Su <suzhe@tsinghua.org.cn>"
+msgstr "James Su <suzhe@tsinghua.org.cn>"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:425
+#: ../modules/Filter/scim_sctc_filter.cpp:555
+#: ../modules/Filter/scim_sctc_filter.cpp:571
+msgid "SC->TC"
+msgstr "SC->TC"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:431
+#: ../modules/Filter/scim_sctc_filter.cpp:559
+#: ../modules/Filter/scim_sctc_filter.cpp:575
+msgid "TC->SC"
+msgstr "TC->SC"
+
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1845
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1231
+#: ../extras/panel/scim_panel_gtk.cpp:2304
+msgid "Smart Common Input Method platform "
+msgstr "Smart Common Input Method தளம்"
+
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1847
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1233
+msgid ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
+"\n"
+msgstr ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
+"\n"
+
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1238
+msgid ""
+":\n"
+"\n"
+msgstr ""
+":\n"
+"\n"
+
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1857
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1241
+#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1244
+msgid ""
+"\n"
+"\n"
+msgstr ""
+"\n"
+"\n"
+
+#: ../modules/IMEngine/scim_rawcode_imengine.cpp:120
+msgid "RAW CODE"
+msgstr "RAW CODE"
+
+#: ../modules/IMEngine/scim_rawcode_imengine.cpp:127
+msgid "(C) 2002-2006 James Su <suzhe@tsinghua.org.cn>"
+msgstr "(C) 2002-2006 James Su <suzhe@tsinghua.org.cn>"
+
+#: ../modules/IMEngine/scim_rawcode_imengine.cpp:140
+msgid ""
+"Hot Keys:\n"
+"\n"
+"  Control+u:\n"
+"    switch between Multibyte encoding and Unicode.\n"
+"\n"
+"  Esc:\n"
+"    reset the input method.\n"
+msgstr ""
+"குறுக்குவிசைகள்:\n"
+"\n"
+"  Control+u:\n"
+"    பல பைட் குறிமுறையிலிருந்து ஒருங்குறிக்கு மாற்றுதல்.\n"
+"\n"
+"  Esc:\n"
+"    உள்ளீடு முறைக்கு மறு அமைவு செய்தல்.\n"
+
+#: ../modules/IMEngine/scim_rawcode_imengine.cpp:407
+#: ../modules/IMEngine/scim_rawcode_imengine.cpp:423
+msgid "The status of the current input method. Click to change it."
+msgstr "நடப்பு உள்ளீடு முறையின் நிலை. மாற்ற சொடுக்கவும்."
+
+#: ../modules/IMEngine/scim_rawcode_imengine.cpp:409
+msgid "Unicode"
+msgstr "யுனிக்கோடு"
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:82
+#: ../modules/SetupUI/scim_imengine_setup.cpp:88
+msgid "Global Setup"
+msgstr "முழுமையான அமைவு"
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:87
+msgid ""
+"Setup the global options used by All FrontEnd modules, including X11 "
+"FrontEnd, GTK IMModule, QT IMModule etc."
+msgstr "X11 FrontEnd, GTK IMModule, QT IMModule போன்றவற்றையும் சேர்த்து, அனைத்து FrontEnd தொகுதிகளால் பயன்படுத்தப்பட்ட முழுமையான விருப்பங்களை அமைக்கவும்."
+
+#. label
+#: ../modules/SetupUI/scim_frontend_setup.cpp:143
+msgid "_Trigger:"
+msgstr "சொடுக்கி (_T):"
+
+#. title
+#: ../modules/SetupUI/scim_frontend_setup.cpp:145
+msgid "Select the trigger keys"
+msgstr "சொடுக்கி விசைகளை தேர்ந்தெடுக்கவும்"
+
+#. tooltip
+#: ../modules/SetupUI/scim_frontend_setup.cpp:147
+msgid ""
+"The key events to turn on/off SCIM input method. Click on the button on the "
+"right to edit it."
+msgstr "SCIM உள்ளீடு முறையை இயக்கும்/நிறுத்தும் விசை நிகழ்வுகள். வலது பக்கம் இருக்கும் பொத்தானை சொடுக்கி இதனை திருத்தவும்."
+
+#. label
+#: ../modules/SetupUI/scim_frontend_setup.cpp:160
+msgid "Turn _On:"
+msgstr "இயக்குதல் (_O):"
+
+#. title
+#: ../modules/SetupUI/scim_frontend_setup.cpp:162
+msgid "Select the Turn On keys"
+msgstr "இயக்கும் விசைகளை தேர்ந்தெடுத்தல்"
+
+#. tooltip
+#: ../modules/SetupUI/scim_frontend_setup.cpp:164
+msgid ""
+"The key events to turn on SCIM input method. Click on the button on the "
+"right to edit it."
+msgstr "SCIM உள்ளீடு முறையை இயக்கும் விசை நிகழ்வுகள். வலது பக்கம் இருக்கும் பொத்தானை சொடுக்கி இதனை திருத்தவும்."
+
+#. label
+#: ../modules/SetupUI/scim_frontend_setup.cpp:177
+msgid "Turn O_ff:"
+msgstr "நிறுத்துதல் (_f):"
+
+#. title
+#: ../modules/SetupUI/scim_frontend_setup.cpp:179
+msgid "Select the Turn Off keys"
+msgstr "நிறுத்தும் விசைகளை தேர்ந்தெடுத்தல்"
+
+#. tooltip
+#: ../modules/SetupUI/scim_frontend_setup.cpp:181
+msgid ""
+"The key events to turn off SCIM input method. Click on the button on the "
+"right to edit it."
+msgstr "SCIM உள்ளீடு முறையை நிறுத்தும் விசை நிகழ்வுகள். வலது பக்கம் இருக்கும் பொத்தானை சொடுக்கி இதனை திருத்தவும்."
+
+#. label
+#: ../modules/SetupUI/scim_frontend_setup.cpp:194
+msgid "_Next input method:"
+msgstr "அடுத்த உள்ளீடு முறை (_N):"
+
+#. title
+#: ../modules/SetupUI/scim_frontend_setup.cpp:196
+msgid "Select the next input method keys"
+msgstr "அடுத்த உள்ளீடு முறை விசைகளை தேர்ந்தெடுக்கவும்"
+
+#. tooltip
+#: ../modules/SetupUI/scim_frontend_setup.cpp:198
+msgid ""
+"The key events to switch to the next input method. Click on the button on "
+"the right to edit it."
+msgstr "அடுத்த உள்ளீடு முறைக்கு மாற்றும் விசை நிகழ்வுகள். வலது பக்கம் இருக்கும் பொத்தானை சொடுக்கி இதனை திருத்தவும்."
+
+#. label
+#: ../modules/SetupUI/scim_frontend_setup.cpp:213
+msgid "_Previous input method:"
+msgstr "முந்தைய உள்ளீடு முறை (_P):"
+
+#. title
+#: ../modules/SetupUI/scim_frontend_setup.cpp:215
+msgid "Select the previous input method keys"
+msgstr "முந்தைய உள்ளீடு முறை விசைகளை தேர்ந்தெடுக்கவும்"
+
+#. tooltip
+#: ../modules/SetupUI/scim_frontend_setup.cpp:217
+msgid ""
+"The key events to switch to the previous input method. Click on the button "
+"on the right to edit it."
+msgstr "முந்தைய உள்ளீடு முறைக்கு மாற்றும் விசை நிகழ்வுகள். வலது பக்கம் இருக்கும் பொத்தானை சொடுக்கி இதனை திருத்தவும்."
+
+#. label
+#: ../modules/SetupUI/scim_frontend_setup.cpp:232
+msgid "Show input method _menu:"
+msgstr "உள்ளீடு முறை பட்டியை காட்டுதல் (_m):"
+
+#. title
+#: ../modules/SetupUI/scim_frontend_setup.cpp:234
+msgid "Select the show input method menu keys"
+msgstr "உள்ளீடு முறை பட்டி விசைகளை காட்டுதலை தேர்ந்தெடுக்கவும்"
+
+#. tooltip
+#: ../modules/SetupUI/scim_frontend_setup.cpp:236
+msgid ""
+"The key events to show the input method menu. Click on the button on the "
+"right to edit it."
+msgstr "உள்ளீடு முறை பட்டியை காட்டும் விசை நிகழ்வுகள். வலது பக்கம் இருக்கும் பொத்தானை சொடுக்கி இதனை திருத்தவும்."
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:306
+msgid "Options"
+msgstr "விருப்பங்கள்"
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:321
+msgid "_Keyboard Layout:"
+msgstr "விசைப்பலகை அமைப்பு (_K):"
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:342
+msgid ""
+"You should choose your currently used keyboard layout here so that input "
+"methods, who care about keyboard layout, could work correctly."
+msgstr "நீங்கள் தற்போது பயன்படுத்திய விசைப்பலகை அமைப்பை இங்கு தேர்ந்தெடுக்க வேண்டும். எனவே விசைப்பலகை அமைப்புக்கு துணைபுரியும் உள்ளீடு முறைகள் சரியாக வேலை செய்யும்."
+
+#. On The Spot.
+#: ../modules/SetupUI/scim_frontend_setup.cpp:346
+msgid "_Embed Preedit String into client window"
+msgstr "கிளையன் சாளரத்தில் உட்பொதியப்பட்ட  முன்திருத்தப்பட்ட சரம் (_E)"
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:351
+msgid ""
+"If this option is checked, the preedit string will be displayed directly in "
+"the client input window, rather than in a independent float window."
+msgstr "இந்த விருப்பம் தேர்ந்தெடுக்கப்பட்டால், முன் திருத்தப்பட்ட சரம் கிளையன் உள்ளீடு சாளரத்தில் நேரடியாக காட்டப்படும்."
+
+#. Shared input method.
+#: ../modules/SetupUI/scim_frontend_setup.cpp:360
+msgid "_Share the same input method among all applications"
+msgstr "அனைத்து பயன்பாடுகளிலும் ஒரே உள்ளீடு முறையை பகிரவும் (_S)"
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:365
+msgid ""
+"If this option is checked, then only one input method could be used by all "
+"applications at the same time.Otherwise different input method could be used "
+"by each application."
+msgstr "இந்த விருப்பம் தேர்ந்தெடுக்கப்பட்டால், தான் ஒரே ஒரு உள்ளீடு முறை அனைத்து பயன்பாடுகளால் ஒரே நேரத்தில் பயன்படுத்த முடியும். இல்லையெனில் வேறு உள்ளீடு முறை ஒவ்வொரு பயன்பாட்டிலும் பயன்படுத்தப்படும்."
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:373
+#: ../modules/SetupUI/scim_imengine_setup.cpp:453
+msgid "Hotkeys"
+msgstr "குறுக்குவிசைகள்"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:93
+msgid "You can enable/disable input methods and set hotkeys for input methods here."
+msgstr "நீங்கள் உள்ளீடு முறைகளை செயல்படுத்தலாம்/நீக்கலாம் மற்றும் உள்ளீடு முறைகளுக்கு இங்கு குறுக்குவிசைகளை அமைக்கலாம்."
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:296
+msgid "The installed input method services:"
+msgstr "நிறுவப்பட்ட உள்ளீடு முறை சேவைகள்:"
+
+#. Create hotkey and filter button before factory list view, because
+#. factory_list_selection_changed_callback may access these two buttons.
+#: ../modules/SetupUI/scim_imengine_setup.cpp:311
+msgid "Edit _Hotkeys"
+msgstr "குறுக்குவிசைகளை திருத்துதல் (_H)"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:320
+msgid "Edit Hotkeys associated with the selected input method."
+msgstr "தேர்ந்தெடுக்கப்பட்ட உள்ளீடு முறையுடன் குறுக்குவிசைகளை திருத்தவும்."
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:322
+msgid "Select _Filters"
+msgstr "வடிப்பிகளை தேர்ந்தெடுத்தல் (_F)"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:331
+msgid "Select the Filters which will be attached to this input method."
+msgstr "இந்த உள்ளீடு முறையில் இணைக்கப்பட்ட வடிப்பிகளை தேர்ந்தெடுக்கவும்."
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:348
+msgid "_Expand"
+msgstr "விரிவாக்குதல் (_E)"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:357
+msgid "Expand all language categories."
+msgstr "அனைத்து மொழி வகைகளையும் விரிவாக்குதல்"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:359
+msgid "_Collapse"
+msgstr "குறுக்குதல் (_C)"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:368
+msgid "Collapse all language categories."
+msgstr "அனைத்து மொழி வகைகளுக்கும் குறுக்குதல்"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:370
+msgid "E_nable All"
+msgstr "அனைத்தையும் செயல்படுத்தல் (_n)"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:379
+msgid "Enable all input methods."
+msgstr "அனைத்து உள்ளீடு முறைகளையும் செயல்படுத்தல்."
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:381
+msgid "_Disable All"
+msgstr "அனைத்தையும் செயல்நீக்கவும் (_D)"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:390
+msgid "Disable all input methods."
+msgstr "அனைத்து உள்ளீடு முறைகளையும் செயல்நீக்கவும்"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:414
+#: ../modules/SetupUI/scim_imengine_setup.cpp:541
+msgid "Name"
+msgstr "பெயர்"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:432
+#: ../modules/SetupUI/scim_imengine_setup.cpp:522
+msgid "Enable"
+msgstr "செயல்படுத்தல்"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:467
+msgid "Filters"
+msgstr "வடிப்பிகள்"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:560
+msgid "Languages"
+msgstr "மொழிகள்"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:574
+msgid "Description"
+msgstr "விளக்கம்"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1190
+#, c-format
+msgid "Edit Hotkeys for %s"
+msgstr "%sக்கு குறுக்கு விசைகளை திருத்துதல்"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1417
+#, c-format
+msgid "Select Filters for %s"
+msgstr "%sக்கு வடிப்பிகளை தேர்ந்தெடுத்தல்"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1450
+msgid "Move _Up"
+msgstr "மேலே நகர்த்தல் (_U)"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1457
+msgid "Move _Down"
+msgstr "கீழே நகர்த்தல் (_D)"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:95
+msgid "GTK"
+msgstr "GTK"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:100
+msgid "A panel daemon based on GTK+-2.x library."
+msgstr "GTK+-2.x நூலகத்தை அடிப்படையாக கொண்ட ஒரு பலக டீமான்."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:163
+msgid "Always"
+msgstr "எப்போதும்"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:164
+msgid "On demand"
+msgstr "தேவையின்படி"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:165
+msgid "Never"
+msgstr "ஒருபோதும்"
+
+#. Create the ToolBar setup block.
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:211
+msgid "ToolBar"
+msgstr "கருவிப்பட்டை"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:229
+msgid "_Show:"
+msgstr "காட்டுதல் (_S):"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:245
+msgid "Auto s_nap"
+msgstr "தானாக ஒட்டுதல் (_n)"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:251
+msgid "Show _input method icon"
+msgstr "உள்ளீடு முறை சின்னத்தைக் காட்டுதல் (_i)"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:257
+msgid "Show inp_ut method name"
+msgstr "உள்ளீடு முறை பெயரை காட்டுதல் (_u)"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:269
+msgid "Hide time_out:"
+msgstr "நேரம் முடிதலை மறைத்தல் (_o):"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:282
+msgid "Show s_tick icon"
+msgstr "ஒட்டு சின்னத்தைக் காட்டுதல் (_t)"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:288
+msgid "Show m_enu icon"
+msgstr "பட்டி சின்னத்தைக் காட்டுதல் (_e)"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:294
+msgid "Show _help icon"
+msgstr "உதவி சின்னத்தைக் காட்டுதல் (_h)"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:300
+msgid "Show _property label"
+msgstr "பண்பு லேபிளை காட்டுதல் (_p)"
+
+#. Create the Input Window setup block
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:311
+msgid "Input window"
+msgstr "உள்ளீடு சாளரம்"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:320
+msgid "E_mbedded lookup table"
+msgstr "உட்பொதியப்பட்ட பார்வை அட்டவணை (_m)"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:324
+msgid "_Vertical lookup table"
+msgstr "செங்குத்து பார்வை அட்டவணை (_V)"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:328
+msgid "Misc"
+msgstr "மற்றவை"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:337
+msgid "Show tra_y icon"
+msgstr "தட்டு சின்னத்தை காட்டுதல் (_y)"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:341
+msgid "Stick _windows"
+msgstr "ஒட்டும் சாளரங்கள் (_w)"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:349
+msgid "_Font:"
+msgstr "எழுத்துரு (_F):"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:419
+msgid ""
+"If option \"Always\" is selected, the toolbar will always be shown on the "
+"screen. If option \"On demand\" is selected, it will only be shown when SCIM "
+"is activated. If option \"Never\" is selected, it will never be shown."
+msgstr "\"எப்போதும்\" என்ற விருப்பம் தேர்ந்தெடுக்கப்பட்டால், கருவிப்பட்டை எப்போதும் திரையில் தோன்றும். \"தேவையின் படி\" என்ற விருப்பம் தேர்ந்தெடுக்கப்பட்டால் SCIM செயல்படுத்தப்பட்டால் மட்டுமே காட்டப்படும். \"ஒருபோதும் இல்லை\" என்ற விருப்பம் தேர்ந்தெடுக்கப்பட்டால், அது ஒருபோதும் காட்டாது."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:426
+msgid "If this option is checked, the toolbar will be snapped to the screen border."
+msgstr "இந்த விருப்பம் சோதிக்கப்பட்டால், கருவிப்பட்டை திரை எல்லையில் ஒட்டப்படும்."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:431
+msgid ""
+"The toolbar will be hidden out after this timeout is elapsed. This option is "
+"only valid when \"Always show\" is selected. Set to zero to disable this "
+"behavior."
+msgstr "கருவிப்படை இந்த நேரம் முடிந்ததும் மறைக்கப்படும். இந்த விருப்பம் \"எப்போதும் காட்டவும்\" என்பது தேர்ந்தெடுக்கப்பட்டால் மட்டும் பயன்படும். இந்த செயல்நீக்க பூஜ்ஜியம் என அமைக்கவும்."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:438
+msgid ""
+"If this option is checked, the input method icon will be showed on the "
+"toolbar."
+msgstr "இந்த விருப்பம் சோதிக்கப்பட்டால், உள்ளீடு முறை சின்னம் கருவிப்பட்டையில் காட்டப்படும்."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:442
+msgid ""
+"If this option is checked, the input method name will be showed on the "
+"toolbar."
+msgstr "இந்த விருப்பம் சோதிக்கப்பட்டால், உள்ளீடு முறை பெயர் கருவிப்பட்டையில் காட்டப்படும்."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:446
+msgid "If this option is checked, the stick icon will be showed on the toolbar."
+msgstr "இந்த விருப்பம் சோதிக்கப்பட்டால், ஒட்டு சின்னம் கருவிப்பட்டையில் காட்டப்படும்."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:450
+msgid "If this option is checked, the menu icon will be showed on the toolbar."
+msgstr "இந்த விருப்பம் சோதிக்கப்பட்டால், பட்டி சின்னம் கருவிப்பட்டையில் காட்டப்படும்."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:454
+msgid "If this option is checked, the help icon will be showed on the toolbar."
+msgstr "இந்த விருப்பம் சோதிக்கப்பட்டால், உதவி சின்னம் கருவிப்பட்டையில் காட்டப்படும்."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:458
+msgid ""
+"If this option is checked, the text label of input method properties will be "
+"showed on the toolbar."
+msgstr "இந்த விருப்பம் சோதிக்கப்பட்டால், உள்ளீடு முறை பண்புகளின் உரை லேபிள் கருவிப்பட்டையில் காட்டப்படும்."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:462
+msgid ""
+"If this option is checked, the lookup table will be embedded into the input "
+"window."
+msgstr "இந்த விருப்பம் சோதிக்கப்பட்டால், அட்டவணை உள்ளீடு சாளரத்தில் உட்பொதியப்படும்."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:467
+msgid "If this option is checked, the lookup table will be displayed vertically."
+msgstr "இந்த விருப்பம் சோதிக்கப்பட்டால், அட்டவணை செங்குத்தாக தோன்றும்."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:472
+msgid ""
+"If this option is checked, the tray icon will be showed on the desktop's "
+"taskbar."
+msgstr "இந்த விருப்பம் சோதிக்கப்பட்டால், தட்டு சின்னம் பணிமேடை பணிபட்டையில் காட்டப்படும்."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:476
+msgid ""
+"If this option is checked, the toolbar, input and lookup table windows will "
+"be sticked to its original position."
+msgstr "இந்த விருப்பம் சோதிக்கப்பட்டால், கருவிப்பட்டை, உள்ளீடு மற்றும் அட்டவணை சாளரங்கள் அதன் இடங்களில் ஒட்டப்படும்."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:482
+msgid "The font setting will be used in the input and lookup table windows."
+msgstr "எழுத்துரு அமைவு உள்ளீட்டில் பயன்படுத்தப்பட்டு அட்டவணை சாளரங்களில் தேடுகிறது."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:801
+msgid "Select Interface Font"
+msgstr "முகப்ப் எழுத்துருவை தேர்ந்தெடுத்தல்"
+
+#: ../extras/setup/scim_setup_ui.cpp:47
+msgid "SCIM"
+msgstr "SCIM"
+
+#: ../extras/setup/scim_setup_ui.cpp:48
+msgid "FrontEnd"
+msgstr "முன்புலம்"
+
+#: ../extras/setup/scim_setup_ui.cpp:49
+msgid "IMEngine"
+msgstr "IMEngine"
+
+#: ../extras/setup/scim_setup_ui.cpp:50
+msgid "Panel"
+msgstr "பலகம்"
+
+#: ../extras/setup/scim_setup_ui.cpp:51
+msgid "Extra"
+msgstr "மற்றவை"
+
+#.
+#. vi:ts=4:nowrap:ai:expandtab
+#.
+#: ../extras/setup/scim_setup_ui.cpp:230
+#: ../extras/setup/scim-setup.desktop.in.h:1
+msgid "SCIM Input Method Setup"
+msgstr "SCIM உள்ளீடு முறை அமைவு"
+
+#: ../extras/setup/scim_setup_ui.cpp:369
+msgid ""
+" <span size=\"20000\">Smart Common Input Method platform</span> \n"
+"\n"
+"<span size=\"16000\" style=\"italic\">GUI Setup Utility</span>\n"
+"\n"
+"\n"
+"\n"
+"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
+"cn&gt;</span>"
+msgstr ""
+" <span size=\"20000\">Smart Common Input Method platform</span> \n"
+"\n"
+"<span size=\"16000\" style=\"italic\">வரைகலை அமைவு வசதி</span>\n"
+"\n"
+"\n"
+"\n"
+"<span size=\"12000\">பதிப்புரிமை 2002-2004, James Su &lt;suzhe@tsinghua.org."
+"cn&gt;</span>"
+
+#: ../extras/setup/scim_setup_ui.cpp:394
+#, c-format
+msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
+msgstr "<span size=\"x-large\">%s தொகுதிகளுக்கான அமைவு.</span>"
+
+#: ../extras/setup/scim_setup_ui.cpp:456
+msgid "Are you sure you want to quit SCIM Setup?"
+msgstr "நீங்கள் SCIM அமைவை விட்டு வெளியேற வேண்டுமா?"
+
+#: ../extras/setup/scim_setup_ui.cpp:685
+msgid ""
+"Not all configuration can be reloaded on the fly. Don't forget to restart "
+"SCIM in order to let all of the new configuration take effect."
+msgstr "அனைத்து கட்டமைப்பு மீண்டும் ஏற்றப்படும். அனைத்து புதிய அமைவுகளும் செயல்பட SCIM ஐ மீண்டும் துவக்கவும்."
+
+#: ../extras/setup/scim_setup_helper.cpp:49
+msgid "SCIM Setup"
+msgstr "SCIM அமைவு"
+
+#: ../extras/setup/scim_setup_helper.cpp:51
+msgid "Integrated Setup Utility based on GTK Widget library."
+msgstr "GTK சாளர நூலகத்தை அடிப்படையாக கொண்ட ஒருங்கிணைக்கப்பட்ட அமைவு வசதி."
+
+#: ../extras/setup/scim-setup.desktop.in.h:2
+msgid "Setup utility for Smart Common Input Method platform"
+msgstr "Smart Common Input Method தளத்திற்கு அமைவு வசதி"
+
+#: ../extras/panel/scim_panel_gtk.cpp:982
+msgid "SCIM Help"
+msgstr "SCIM உதவி"
+
+#: ../extras/panel/scim_panel_gtk.cpp:999
+msgid "Smart Common Input Method"
+msgstr "Smart Common Input Method"
+
+#: ../extras/panel/scim_panel_gtk.cpp:1058
+msgid "Stick/unstick the input window and the toolbar."
+msgstr "ஒட்டும்/ஒட்டாத உள்ளீடு சாளரம் மற்றும் கருவிப்பட்டை."
+
+#: ../extras/panel/scim_panel_gtk.cpp:1063
+msgid "Show a brief help about SCIM and the current input method."
+msgstr "SCIM மற்றும் நடப்பு உள்ளீடு முறை பற்றி சுருக்கமான உதவியை காட்டவும்."
+
+#: ../extras/panel/scim_panel_gtk.cpp:1068
+msgid "Show command menu."
+msgstr "கட்டளை பட்டியை காட்டவும்."
+
+#: ../extras/panel/scim_panel_gtk.cpp:2306
+msgid ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
+msgstr ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
+
+#. Reload Configuration.
+#: ../extras/panel/scim_panel_gtk.cpp:2385
+msgid "Reload Configuration"
+msgstr "கட்டமைப்பை மீண்டும் ஏற்றுதல்"
+
+#. Stick
+#: ../extras/panel/scim_panel_gtk.cpp:2395
+msgid "Stick Windows"
+msgstr "ஒட்டும் சாளரங்கள்"
+
+#. Toolbar
+#: ../extras/panel/scim_panel_gtk.cpp:2404
+msgid "Hide Toolbar"
+msgstr "கருவிப்பட்டையை மறைத்தல்"
+
+#. Help
+#: ../extras/panel/scim_panel_gtk.cpp:2413
+msgid "Help ..."
+msgstr "உதவி ..."
+
+#. Clients exit.
+#: ../extras/panel/scim_panel_gtk.cpp:2431
+msgid "Exit"
+msgstr "வெளியேறவும்"
+
+#: ../utils/scimstringview.c:196
+msgid "Cursor Position"
+msgstr "நிலைகாட்டி இடம்"
+
+#: ../utils/scimstringview.c:197
+msgid "The current position of the insertion cursor in chars."
+msgstr "எழுத்துக்களில் உள்ளீடும் நிலைக்காட்டியின் நடப்பு நிலை."
+
+#: ../utils/scimstringview.c:206
+msgid "Maximum length"
+msgstr "அதிகபட்ச எண்ணிக்கை"
+
+#: ../utils/scimstringview.c:207
+msgid "Maximum number of characters for this string view. Zero if no maximum."
+msgstr "இந்த சர பார்வையின் அதிகபட்ச எழுத்துக்களின் எண்ணிக்கை. அதிகபட்சம் இல்லையெனில் பூஜ்ஜியம்."
+
+#: ../utils/scimstringview.c:216
+msgid "Maximum width"
+msgstr "அதிகபட்ச அகலம்"
+
+#: ../utils/scimstringview.c:217
+msgid "Maximum width of this string view."
+msgstr "இந்த சர பார்வையின் அதிகபட்ச அகலம்."
+
+#: ../utils/scimstringview.c:226
+msgid "Has Frame"
+msgstr "சட்டம் உள்ளது"
+
+#: ../utils/scimstringview.c:227
+msgid "FALSE removes outside bevel from string view."
+msgstr "இல்லை சர பார்வையிலிருந்து வெளிப்புற பிவலை நீக்குகிறது."
+
+#: ../utils/scimstringview.c:234
+msgid "Draw cursor"
+msgstr "நிலைக்காட்டியை இழுத்தல்"
+
+#: ../utils/scimstringview.c:235
+msgid "TRUE draw blinking cursor."
+msgstr "ஆம் சிமிட்டும் நிலைக்காட்டியை இழுத்தல்"
+
+#: ../utils/scimstringview.c:242
+msgid "Auto move cursor"
+msgstr "தானியக்க நிலைகாட்டு நகர்த்தல்"
+
+#: ../utils/scimstringview.c:243
+msgid "TRUE auto move cursor position when mouse clicking."
+msgstr "ஆம் சுட்டியை சொடுக்கும் போது தானாக நகரும் நிலைகாட்டி இடம்."
+
+#: ../utils/scimstringview.c:250
+msgid "Forward button press event"
+msgstr "முன்னோக்கு பொத்தான் அழுத்தும் நிகழ்வு"
+
+#: ../utils/scimstringview.c:251
+msgid "TRUE forward button press event to user program."
+msgstr "ஆம் பயனர் நிரலில் முன்னோக்கு பொத்தானை அழுத்தும் நிகழ்வு."
+
+#: ../utils/scimstringview.c:258
+msgid "Auto resize the widget to fit the string"
+msgstr "தானாக சரம் சாளரத்தில் மறுஅளவு செய்யப்பட்டது"
+
+#: ../utils/scimstringview.c:259
+msgid "TRUE Auto resize on."
+msgstr "ஆம் தானியக்க மறு அமைவு உள்ளது."
+
+#: ../utils/scimstringview.c:266
+msgid "Width in chars"
+msgstr "அகலம் எழுத்துக்களில்"
+
+#: ../utils/scimstringview.c:267
+msgid "Number of characters to leave space for in the string view."
+msgstr "சர பார்வையில் இடவெளி விட வேண்டிய எழுத்துக்களின் எண்ணிக்கை."
+
+#: ../utils/scimstringview.c:276
+msgid "Scroll offset"
+msgstr "உருளும் ஆப்செட்"
+
+#: ../utils/scimstringview.c:277
+msgid "Number of pixels of the string view scrolled off the screen to the left"
+msgstr "சர பார்வையில் திரையில் உருளும் பிக்ஸலின் எண்ணிக்கை"
+
+#: ../utils/scimstringview.c:286
+msgid "Text"
+msgstr "உரை"
+
+#: ../utils/scimstringview.c:287
+msgid "The contents of the string view"
+msgstr "சரப்பார்வையின் உள்ளடக்கங்கள்"
+
+#: ../utils/scimkeyselection.cpp:155
+msgid "Selected _Keys:"
+msgstr "தேர்ந்தெடுக்கப்பட்ட விசைகள் (_K):"
+
+#: ../utils/scimkeyselection.cpp:200
+msgid "Key Code:"
+msgstr "விசைக்குறியீடு:"
+
+#: ../utils/scimkeyselection.cpp:218
+msgid "..."
+msgstr "..."
+
+#: ../utils/scimkeyselection.cpp:223
+msgid "Modifiers:"
+msgstr "மாற்றிகள்:"
+
+#: ../utils/scimkeyselection.cpp:236
+msgid "_Ctrl"
+msgstr "_Ctrl"
+
+#: ../utils/scimkeyselection.cpp:240
+msgid "A_lt"
+msgstr "A_lt"
+
+#: ../utils/scimkeyselection.cpp:244
+msgid "_Shift"
+msgstr "_Shift"
+
+#: ../utils/scimkeyselection.cpp:248
+msgid "_Release"
+msgstr "_Release"
+
+#: ../utils/scimkeyselection.cpp:258
+msgid "_Meta"
+msgstr "_Meta"
+
+#: ../utils/scimkeyselection.cpp:262
+msgid "S_uper"
+msgstr "S_uper"
+
+#: ../utils/scimkeyselection.cpp:266
+msgid "_Hyper"
+msgstr "_Hyper"
+
+#: ../utils/scimkeyselection.cpp:331
+msgid "Please enter a Key Code first."
+msgstr "முதலில் ஒரு விசைக்குறியீட்டை உள்ளிடவும்."
+
+#: ../utils/scimkeyselection.cpp:385
+msgid ""
+"Press a key (or a key combination).\n"
+"This dialog will be closed when the key is released."
+msgstr ""
+"ஒரு விசையை (அல்லது ஒரு விசை கூட்டமைப்பை) அழுத்தவும். \n"
+"இந்த உரையாடல் விசையை விடும் போது மூடும்."
+
+#: ../utils/scimkeyselection.cpp:388
+msgid "Grabbing a key."
+msgstr "ஒரு விசையை எடுத்தல்"
+
+#: ../utils/scimkeyselection.cpp:678
+msgid "Key Selection"
+msgstr "விசை தேர்ந்தெடுத்தல்"
+
+#: ../utils/scimtrayicon.c:108
+msgid "Orientation"
+msgstr "திசையமைப்பு"
+
+#: ../utils/scimtrayicon.c:109
+msgid "The orientation of the tray."
+msgstr "தட்டின் திசையமைப்பு."
+
