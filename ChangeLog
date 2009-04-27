@@ -1,3 +1,5 @@
+2009-04-27 10:09  yurivict
+	* extras/gtk2_immodule/gtkimcontextscim.cpp: fixed the issues of dual uninitialization causing segv.
 2008-12-21 02:07  ryo-dairiki
 
 	* configs/config: - Remove "CapsLock" from valid key masks.
