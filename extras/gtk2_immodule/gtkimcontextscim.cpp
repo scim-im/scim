@@ -318,8 +318,10 @@ public:
         SCIM_DEBUG_FRONTEND(1) << "FinalizeHandler::FinalizeHandler ()\n";
     }
     ~FinalizeHandler () {
-        SCIM_DEBUG_FRONTEND(1) << "FinalizeHandler::~FinalizeHandler ()\n";
-        gtk_im_context_scim_shutdown ();
+        if (_scim_initialized) {
+            SCIM_DEBUG_FRONTEND(1) << "FinalizeHandler::~FinalizeHandler ()\n";
+            gtk_im_context_scim_shutdown ();
+        }
     }
 };
 
@@ -453,8 +455,6 @@ gtk_im_context_scim_register_type (GTypeModule *type_module)
 void
 gtk_im_context_scim_shutdown (void)
 {
-    SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_shutdown...\n";
-
     if (_scim_initialized) {
         SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_shutdown: call finalize ()...\n";
         finalize ();
