@@ -1,20 +1,21 @@
-# translation of fr.po to French
+# translation of fr.po to Nederlands
 # This file is distributed under the same license as the scim package.
 # Copyright (C) 2004 James Su <suzhe@tsinghua.org.cn>.
 #
 # Damien Menanteau <MengDaming@nerdshack.com>, 2005.
+# Ronald Stroethoff <stroet43@zonnet.nl>, 2009.
 msgid ""
 msgstr ""
 "Project-Id-Version: fr\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-07-20 09:50+0800\n"
-"PO-Revision-Date: 2005-12-11 13:54+0800\n"
-"Last-Translator: Damien Menanteau <MengDaming@nerdshack.com>\n"
-"Language-Team: French\n"
+"PO-Revision-Date: 2009-06-21 21:54+0200\n"
+"Last-Translator: Ronald Stroethoff <stroet43@zonnet.nl>\n"
+"Language-Team: Nederlands\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11\n"
+"X-Generator: KBabel 1.11.4\n"
 "Plural-Forms:  nplurals=2; plural=(n > 1);\n"
 
 #: ../src/scim_compose_key.cpp:126
@@ -176,7 +177,7 @@ msgstr "Hébreu"
 
 #: ../src/scim_utility.cpp:732
 msgid "Hindi"
-msgstr "Hindou"
+msgstr "Hindi"
 
 #: ../src/scim_utility.cpp:733 ../src/scim_keyboard_layout_data.h:4594
 msgid "Croatian"
@@ -638,8 +639,7 @@ msgstr "Sélectionner les touches d'activation"
 msgid ""
 "The key events to turn on SCIM input method. Click on the button on the "
 "right to edit it."
-msgstr ""
-"Touches pour activer SCIM. Cliquer sur le bouton de droite pour les modifier."
+msgstr "Touches pour activer SCIM. Cliquer sur le bouton de droite pour les modifier."
 
 #. label
 #: ../modules/SetupUI/scim_frontend_setup.cpp:177
@@ -768,8 +768,7 @@ msgid "Hotkeys"
 msgstr "Raccourcis"
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:93
-msgid ""
-"You can enable/disable input methods and set hotkeys for input methods here."
+msgid "You can enable/disable input methods and set hotkeys for input methods here."
 msgstr ""
 "Ici, vous pouvez activer/désactiver les méthodes de saisie et les jeux de "
 "raccourcis pour les méthodes de saisie."
@@ -970,8 +969,7 @@ msgstr ""
 "l'option \"Jamais\" estsélectionnée, la barre d'outils n'est jamais affichée."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:426
-msgid ""
-"If this option is checked, the toolbar will be snapped to the screen border."
+msgid "If this option is checked, the toolbar will be snapped to the screen border."
 msgstr ""
 "Quand cette option est sélectionnée, la barre d'outil s'aligne "
 "automatiquement sur le bord de l'écran."
@@ -1003,8 +1001,7 @@ msgstr ""
 "inséré dans la barre d'outils."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:446
-msgid ""
-"If this option is checked, the stick icon will be showed on the toolbar."
+msgid "If this option is checked, the stick icon will be showed on the toolbar."
 msgstr ""
 "Quand cette option est sélectionnée, l'icône d'épinglage de fenêtre est "
 "inséré dans la barre d'outils."
@@ -1038,8 +1035,7 @@ msgstr ""
 "dans la fenêtre de saisie."
 
 #: ../modules/SetupUI/scim_panel_gtk_setup.cpp:467
-msgid ""
-"If this option is checked, the lookup table will be displayed vertically."
+msgid "If this option is checked, the lookup table will be displayed vertically."
 msgstr ""
 "Quand cette option est sélectionnée, la table de recherche est affichée "
 "verticalement."
@@ -1125,7 +1121,6 @@ msgstr "<span size=\"x-large\">Configuration des modules %s.</span>"
 
 #msgid "Are you sure you want to quit SCIM Setup?"
 #msgstr "Etes vous sûr de vouloir quitter SCIM Config. ?"
-
 #: ../extras/setup/scim_setup_ui.cpp:661
 msgid ""
 "Not all configuration can be reloaded on the fly. Don't forget to restart "
@@ -1145,8 +1140,7 @@ msgstr "Utilitaire de configuration intégré basé sur la librairie GTK Widget.
 
 #: ../extras/setup/scim-setup.desktop.in.h:2
 msgid "Setup utility for Smart Common Input Method platform"
-msgstr ""
-"Utilitaire de configuration de la plateforme \"Smart Common Input Method\""
+msgstr "Utilitaire de configuration de la plateforme \"Smart Common Input Method\""
 
 #: ../extras/panel/scim_panel_gtk.cpp:982
 msgid "SCIM Help"
@@ -1249,8 +1243,7 @@ msgstr "Déplacement automatique du curseur"
 
 #: ../utils/scimstringview.c:243
 msgid "TRUE auto move cursor position when mouse clicking."
-msgstr ""
-"VRAI Déplacement automatique de la position du curseur sur clic de souris."
+msgstr "VRAI Déplacement automatique de la position du curseur sur clic de souris."
 
 #: ../utils/scimstringview.c:250
 msgid "Forward button press event"
@@ -1258,8 +1251,7 @@ msgstr "Transmission événement d'appui de bouton"
 
 #: ../utils/scimstringview.c:251
 msgid "TRUE forward button press event to user program."
-msgstr ""
-"VRAI Fait suivre les événements d'appui de bouton vers le programme client."
+msgstr "VRAI Fait suivre les événements d'appui de bouton vers le programme client."
 
 #: ../utils/scimstringview.c:258
 msgid "Auto resize the widget to fit the string"
@@ -1275,8 +1267,7 @@ msgstr "Largeur en caractères"
 
 #: ../utils/scimstringview.c:267
 msgid "Number of characters to leave space for in the string view."
-msgstr ""
-"Nombre de caractères à laisser vides dans la vue de chaîne de caractères."
+msgstr "Nombre de caractères à laisser vides dans la vue de chaîne de caractères."
 
 #: ../utils/scimstringview.c:276
 msgid "Scroll offset"
@@ -1368,11 +1359,3 @@ msgstr "Orientation"
 msgid "The orientation of the tray."
 msgstr "Orientation du tiroir."
 
-#~ msgid "Are you sure you want to quit SCIM Setup?"
-#~ msgstr "Etes vous sûr de vouloir quitter SCIM Config. ?"
-
-#~ msgid "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
-#~ msgstr "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
-
-#~ msgid "En"
-#~ msgstr "Fr"
