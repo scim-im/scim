@@ -978,6 +978,7 @@ X11FrontEnd::ims_set_ic_focus_handler (XIMS ims, IMChangeFocusStruct *call_data)
     if (ic->xims_on) {
         start_ic (ic);
     } else {
+    	panel_req_update_factory_info (ic);
         m_panel_client.turn_off (ic->icid);
     }
 
@@ -1800,7 +1801,10 @@ X11FrontEnd::panel_slot_change_factory (int context, const String &uuid)
         if (uuid.length () == 0 && ic->xims_on) {
             SCIM_DEBUG_FRONTEND (2) << "panel_slot_change_factory : turn off.\n";
             ims_turn_off_ic (ic);
-        } else if (uuid.length ()) {
+        }else if(uuid.length () == 0 && (ic->xims_on == false)){
+    		panel_req_update_factory_info (ic);
+        	m_panel_client.turn_off (ic->icid);        	
+        }else if (uuid.length ()) {
             String encoding = scim_get_locale_encoding (ic->locale);
             String language = scim_get_locale_language (ic->locale);
             if (validate_factory (uuid, encoding)) {
