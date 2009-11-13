@@ -1087,7 +1087,7 @@ X11FrontEnd::ims_forward_event_handler (XIMS ims, IMForwardEventStruct *call_dat
     // If the ic is not focused, then return.
     if (!is_focused_ic (ic)) {
         SCIM_DEBUG_FRONTEND(1) << "IC " << call_data->icid << " is not focused, focus it first.\n";
-        ims_set_ic_focus_handler (ims, (IMChangeFocusStruct *) call_data);
+        return 1;
     }
 
     XKeyEvent *event = (XKeyEvent*) &(call_data->event);
