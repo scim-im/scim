@@ -34,6 +34,8 @@
 #define Uses_SCIM_SOCKET
 #define Uses_SCIM_EVENT
 
+#define SCIM_KEYBOARD_ICON_FILE            (SCIM_ICONDIR "/keyboard.png")
+
 #include "scim_private.h"
 #include "scim.h"
 #include "scim_stl_map.h"
@@ -82,12 +84,15 @@ typedef Signal2<void, const String &, const AttributeList &>
 enum ClientType {
     UNKNOWN_CLIENT,
     FRONTEND_CLIENT,
-    HELPER_CLIENT
+    HELPER_CLIENT,
+    PANELCONTROL_CLIENT
 };
+
 
 struct ClientInfo {
     uint32       key;
     ClientType   type;
+    int          awaitedTransCommand;
 };
 
 struct HelperClientStub {
@@ -164,6 +169,9 @@ class PanelAgent::PanelAgentImpl
     StartHelperICIndex                  m_start_helper_ic_index;
 
     ClientContextUUIDRepository         m_client_context_uuids;
+    
+    PanelFactoryInfo 					m_currentFactoryInfo;
+    PanelFactoryInfo 					m_defaultFactoryInfo;
 
     HelperManager                       m_helper_manager;
 
@@ -205,7 +213,9 @@ public:
           m_current_screen (0),
           m_socket_timeout (scim_get_default_socket_timeout ()),
           m_current_socket_client (-1), m_current_client_context (0),
-          m_last_socket_client (-1), m_last_client_context (0)
+          m_last_socket_client (-1), m_last_client_context (0),
+          m_defaultFactoryInfo (PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE))),
+          m_currentFactoryInfo (PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE)))
     {
         m_socket_server.signal_connect_accept (slot (this, &PanelAgentImpl::socket_accept_callback));
         m_socket_server.signal_connect_receive (slot (this, &PanelAgentImpl::socket_receive_callback));
@@ -891,6 +901,9 @@ private:
                         socket_stop_helper (client_id, context, uuid);
                         continue;
                     }
+					
+                   if (cmd == SCIM_TRANS_CMD_PANEL_SHOW_FACTORY_MENU)
+                        socket_show_factory_menu ();
  
                     // If it's not focused, just continue.
                     if ((!current && !last) || (last && m_current_socket_client >= 0)) {
@@ -937,8 +950,6 @@ private:
                         socket_update_property ();
                     else if (cmd == SCIM_TRANS_CMD_PANEL_SHOW_HELP)
                         socket_show_help ();
-                    else if (cmd == SCIM_TRANS_CMD_PANEL_SHOW_FACTORY_MENU)
-                        socket_show_factory_menu ();
                     else if (cmd == SCIM_TRANS_CMD_FOCUS_OUT) {
                         SCIM_DEBUG_MAIN (2) << "PanelAgent::focus_out (" << client_id << "," << "," << context << ")\n";
                         lock ();
@@ -980,9 +991,77 @@ private:
                 }
             }
             socket_transaction_end();
+        } else if (client_info.type == PANELCONTROL_CLIENT) {
+            SCIM_DEBUG_MAIN (1) << "PanelAgent::PanelController Client\n";
+            socket_transaction_start();
+            while (m_recv_trans.get_command (cmd)) {
+				SCIM_DEBUG_MAIN (3) << "PanelAgent::cmd = " << cmd << "\n";
+				
+				if(previous_command_is_outstanding_for_client(client_id))
+                		return; //if the response to a previous command is outstanding we ignore the current command 
+					
+                if (cmd == SCIM_TRANS_CMD_CONTROLLER_REQUEST_FACTORY_MENU) {
+                	register_awaited_command_for_client(client_id, SCIM_TRANS_CMD_PANEL_SHOW_FACTORY_MENU);
+                    socket_panelcontroller_request_factory_menu ();
+                }
+                if (cmd == SCIM_TRANS_CMD_CONTROLLER_CHANGE_FACTORY) {
+                	register_awaited_command_for_client(client_id, SCIM_TRANS_CMD_PANEL_UPDATE_FACTORY_INFO);
+                    socket_panelcontroller_change_factory ();
+                }
+                if (cmd == SCIM_TRANS_CMD_CONTROLLER_GET_CURRENT_FACTORY) {
+                	register_awaited_command_for_client(client_id, SCIM_TRANS_CMD_PANEL_RETURN_CURRENT_FACTORY_INFO);
+                    socket_panelcontroller_get_current_factory (client_id);
+                }
+                if (cmd == SCIM_TRANS_CMD_CONTROLLER_GET_CURRENT_CONTEXT) {
+					register_awaited_command_for_client(client_id, SCIM_TRANS_CMD_PANEL_RETURN_CURRENT_CONTEXT);
+                    socket_panelcontroller_get_current_frontend_client_and_context (client_id);
+                }
+            }
+            socket_transaction_end();
         }
     }
-
+    
+    bool previous_command_is_outstanding_for_client(int client_id){
+    	ClientRepository::iterator it = m_client_repository.find (client_id);
+		return (it->second.awaitedTransCommand != 0);
+    }
+    
+    void register_awaited_command_for_client(int client_id, int cmd){
+    	ClientRepository::iterator it = m_client_repository.find (client_id);
+		it->second.awaitedTransCommand = cmd;
+    }
+    
+    int expected_command_for_client(int client_id){
+    	ClientRepository::iterator it = m_client_repository.find (client_id);
+		return it->second.awaitedTransCommand;
+    }
+    
+    void socket_panelcontroller_get_current_frontend_client_and_context(int client_id)
+    {
+    	SCIM_DEBUG_MAIN (2) << "PanelAgent::socket_panelcontroller_get_current_frontend_client_and_context ()\n";
+        inform_waiting_client_of_current_context(client_id);
+    }
+	
+	void socket_panelcontroller_request_factory_menu()
+	{
+		SCIM_DEBUG_MAIN (2) << "PanelAgent::socket_panelcontroller_request_factory_menu ()\n";
+        request_factory_menu();
+	}
+	
+	void socket_panelcontroller_change_factory ()
+	{
+		String requested_uuid;
+		m_recv_trans.get_data(requested_uuid);
+		SCIM_DEBUG_MAIN (2) << "PanelAgent::socket_panelcontroller_change_factory ()" << requested_uuid << "\n";
+		change_factory(requested_uuid);
+	}
+	
+	void socket_panelcontroller_get_current_factory	(int client_id)
+	{
+		SCIM_DEBUG_MAIN (2) << "PanelAgent::socket_panelcontroller_get_current_factory ()\n";
+		inform_waiting_client_of_current_factory(client_id);
+	}
+	
     void socket_exception_callback              (SocketServer   *server,
                                                  const Socket   &client)
     {
@@ -998,16 +1077,18 @@ private:
 
         uint32 key;
         String type = scim_socket_accept_connection (key,
-                                                     String ("Panel"), 
-                                                     String ("FrontEnd,Helper"),
+                                                     String ("Panel"),
+                                                     String ("FrontEnd,Helper,PanelController"),
                                                      client,
                                                      m_socket_timeout);
 
         if (type.length ()) {
             ClientInfo info;
             info.key = key;
-            info.type = ((type == "FrontEnd") ? FRONTEND_CLIENT : HELPER_CLIENT);
-
+            info.awaitedTransCommand = 0;
+			if		(type=="FrontEnd") 	{info.type = FRONTEND_CLIENT;}
+			else if	(type=="Helper") 	{info.type = HELPER_CLIENT;}
+			else 						{info.type = PANELCONTROL_CLIENT;}
             SCIM_DEBUG_MAIN (4) << "Add client to repository. Type=" << type << " key=" << key << "\n";
             lock ();
             m_client_repository [client.get_id ()] = info;
@@ -1134,7 +1215,8 @@ private:
     void socket_turn_off                        (void)
     {
         SCIM_DEBUG_MAIN(4) << "PanelAgent::socket_turn_off ()\n";
-
+		//inform_waiting_clients_of_factory_update(m_defaultFactoryInfo);	
+		
         m_signal_turn_off ();
     }
 
@@ -1164,7 +1246,7 @@ private:
     }
 
     void socket_update_factory_info             (void)
-    {
+    {	
         SCIM_DEBUG_MAIN(4) << "PanelAgent::socket_update_factory_info ()\n";
 
         PanelFactoryInfo info;
@@ -1172,8 +1254,72 @@ private:
             m_recv_trans.get_data (info.lang) && m_recv_trans.get_data (info.icon)) {
             SCIM_DEBUG_MAIN(4) << "New Factory info uuid=" << info.uuid << " name=" << info.name << "\n";
             info.lang = scim_get_normalized_language (info.lang);
+            m_currentFactoryInfo = info;            
             m_signal_update_factory_info (info);
+            inform_waiting_clients_of_factory_update(info);
         }
+    }
+    
+    bool inform_waiting_clients_of_factory_update(PanelFactoryInfo info){
+    	bool message_was_forwarded = false;
+		SCIM_DEBUG_MAIN (1) << "PanelAgent::Checking if message needs forwarding\n";
+    	for(ClientRepository::iterator it = m_client_repository.begin ();
+	    	it != m_client_repository.end (); ++it){
+	   		if(it->second.awaitedTransCommand == SCIM_TRANS_CMD_PANEL_UPDATE_FACTORY_INFO){
+	        	uint32 context = m_current_client_context;
+	        	Socket client_socket (it->first);
+					            
+				m_send_trans.clear ();
+				m_send_trans.put_command (SCIM_TRANS_CMD_REPLY);
+				m_send_trans.put_data ((uint32) context);	//this is the REAL context. i.e. it is 0 when the desktop is focused
+		    	m_send_trans.put_command (SCIM_TRANS_CMD_PANEL_UPDATE_FACTORY_INFO);
+		        m_send_trans.put_data (info.uuid);
+		        m_send_trans.put_data (info.name);
+		        m_send_trans.put_data (info.lang);
+		        m_send_trans.put_data (info.icon);
+		        m_send_trans.write_to_socket (client_socket);
+			
+				SCIM_DEBUG_MAIN (2) << "Forwarded message " << "SCIM_TRANS_CMD_PANEL_UPDATE_FACTORY_INFO" << "to " << it->first << "\n";
+				it->second.awaitedTransCommand = 0;
+				message_was_forwarded = true;
+				break;	//client iteration
+	        }
+	    }
+	    return message_was_forwarded;
+    }
+    
+    void inform_waiting_client_of_current_context(int client_id){
+    	SCIM_DEBUG_MAIN (1) << "PanelAgent::Checking if message needs forwarding\n";
+    	uint32 context = m_current_client_context;
+    	Socket client_socket (client_id);
+    	
+    	m_send_trans.clear ();
+		m_send_trans.put_command (SCIM_TRANS_CMD_REPLY);
+		m_send_trans.put_data ((uint32) context);	//this is the REAL context. i.e. it is 0 when the desktop is focused
+    	m_send_trans.put_command (SCIM_TRANS_CMD_PANEL_RETURN_CURRENT_CONTEXT);
+		m_send_trans.put_data ((uint32) m_current_socket_client);  //this is the REAL client. i.e. it is -1 when the desktop is focused
+		m_send_trans.put_data ((uint32) m_current_client_context); //this is the REAL context. i.e. it is 0 when the desktop is focused
+        m_send_trans.write_to_socket (client_socket);
+        m_client_repository[client_id].awaitedTransCommand = 0;
+        SCIM_DEBUG_MAIN (2) << "Forwarded message " << "SCIM_TRANS_CMD_PANEL_RETURN_CURRENT_CONTEXT\n";
+    }
+    
+    void inform_waiting_client_of_current_factory(int client_id){
+    	SCIM_DEBUG_MAIN (1) << "PanelAgent::Checking if message needs forwarding\n";
+    	uint32 context = m_current_client_context;
+    	Socket client_socket (client_id);
+    	
+    	m_send_trans.clear ();
+		m_send_trans.put_command (SCIM_TRANS_CMD_REPLY);
+		m_send_trans.put_data ((uint32) context);	//this is the REAL context. i.e. it is 0 when the desktop is focused
+    	m_send_trans.put_command (SCIM_TRANS_CMD_PANEL_RETURN_CURRENT_FACTORY_INFO);
+        m_send_trans.put_data (m_currentFactoryInfo.uuid);
+        m_send_trans.put_data (m_currentFactoryInfo.name);
+        m_send_trans.put_data (m_currentFactoryInfo.lang);
+        m_send_trans.put_data (m_currentFactoryInfo.icon);
+        m_send_trans.write_to_socket (client_socket);
+        m_client_repository[client_id].awaitedTransCommand = 0;
+        SCIM_DEBUG_MAIN (2) << "Forwarded message " << "SCIM_TRANS_CMD_PANEL_RETURN_CURRENT_FACTORY_INFO\n";
     }
 
     void socket_show_help                       (void)
@@ -1189,17 +1335,50 @@ private:
     {
         SCIM_DEBUG_MAIN(4) << "PanelAgent::socket_show_factory_menu ()\n";
 
-        PanelFactoryInfo info;
+		PanelFactoryInfo info;
         std::vector <PanelFactoryInfo> vec;
-
+		
         while (m_recv_trans.get_data (info.uuid) && m_recv_trans.get_data (info.name) &&
                m_recv_trans.get_data (info.lang) && m_recv_trans.get_data (info.icon)) {
             info.lang = scim_get_normalized_language (info.lang);
             vec.push_back (info);
         }
-
-        if (vec.size ())
-            m_signal_show_factory_menu (vec);
+        if (vec.size ()){
+        	if(!inform_waiting_clients_of_factory_menu(vec))        	
+        		m_signal_show_factory_menu (vec);
+        }
+    }
+    
+    bool inform_waiting_clients_of_factory_menu(std::vector <PanelFactoryInfo> menu){
+    	bool message_was_forwarded = false;
+		SCIM_DEBUG_MAIN (1) << "PanelAgent::Checking if message needs forwarding\n";
+    	
+		menu.push_back(m_defaultFactoryInfo);
+    	for(ClientRepository::iterator it = m_client_repository.begin ();
+	    	it != m_client_repository.end (); ++it){
+	   		if(it->second.awaitedTransCommand == SCIM_TRANS_CMD_PANEL_SHOW_FACTORY_MENU){
+	        	uint32 context = m_current_client_context;
+	        	Socket client_socket (it->first);
+					            
+				m_send_trans.clear ();
+				m_send_trans.put_command (SCIM_TRANS_CMD_REPLY);
+				m_send_trans.put_data ((uint32) context);	//this is the REAL context. i.e. it is 0 when the desktop is focused
+		        m_send_trans.put_command (SCIM_TRANS_CMD_PANEL_SHOW_FACTORY_MENU);
+	            for (size_t i = 0; i < menu.size (); ++ i) {
+	                m_send_trans.put_data (menu [i].uuid);
+	                m_send_trans.put_data (menu [i].name);
+	                m_send_trans.put_data (menu [i].lang);
+	                m_send_trans.put_data (menu [i].icon);
+	            }
+		        m_send_trans.write_to_socket (client_socket);
+			
+				SCIM_DEBUG_MAIN (2) << "Forwarded message " << "SCIM_TRANS_CMD_PANEL_SHOW_FACTORY_MENU" << "to " << it->first << "\n";
+				it->second.awaitedTransCommand = 0;
+				message_was_forwarded = true;
+				break;	//client iteration
+	        }
+	    }
+	    return message_was_forwarded;
     }
 
     void socket_show_preedit_string             (void)

@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script
-AC_INIT(scim, 1.4.9, suzhe@tsinghua.org.cn)
+AC_INIT(scim, 1.4.10, suzhe@tsinghua.org.cn)
 AC_CONFIG_SRCDIR([src/scim.h])
 
 ###########################################################
@@ -8,7 +8,7 @@ AC_CONFIG_SRCDIR([src/scim.h])
 
 SCIM_MAJOR_VERSION=1
 SCIM_MINOR_VERSION=4
-SCIM_MICRO_VERSION=9
+SCIM_MICRO_VERSION=10
 
 SCIM_VERSION=$SCIM_MAJOR_VERSION.$SCIM_MINOR_VERSION.$SCIM_MICRO_VERSION
 
@@ -23,7 +23,7 @@ AC_SUBST(SCIM_VERSION)
 SCIM_CURRENT=10
 
 # increment any time the source changes; set to 0 if you increment CURRENT
-SCIM_REVISION=4
+SCIM_REVISION=5
 
 # increment if any interfaces have been added; set to 0
 # if any interfaces have been removed. removal has 
