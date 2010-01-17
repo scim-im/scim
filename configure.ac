@@ -71,7 +71,6 @@ AM_GNU_GETTEXT
 # Init libtool
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
-AC_LIB_LTDL
 AC_SUBST(LIBTOOL_DEPS)
 
 # libtool option to control which symbols are exported
