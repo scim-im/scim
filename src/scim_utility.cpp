@@ -547,6 +547,11 @@ scim_get_home_dir ()
 
     struct passwd *pw;
 
+    home_dir = getenv ("SCIM_HOME");
+    if (home_dir && *home_dir) {
+        return String (home_dir);
+    }
+
     setpwent ();
     pw = getpwuid (getuid ());
     endpwent ();
@@ -567,6 +572,11 @@ scim_get_user_name ()
 {
     struct passwd *pw;
     const char *user_name;
+
+    user_name = getenv ("SCIM_USER");
+    if (user_name && *user_name) {
+        return String (user_name);
+    }
 
     setpwent ();
     pw = getpwuid (getuid ());
