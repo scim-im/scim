@@ -27,7 +27,9 @@
 #define Uses_STL_ALGORITHM
 #include "scim_private.h"
 #include "scim.h"
-#include "ltdl.h"
+extern "C" {
+  #include <ltdl.h>
+}
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
