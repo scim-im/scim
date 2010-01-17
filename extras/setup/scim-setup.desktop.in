@@ -1,5 +1,4 @@
 [Desktop Entry]
-Encoding=UTF-8
 _Name=SCIM Input Method
 _Comment=Configure the Smart Common Input Method platform
 Exec=scim-setup
@@ -7,4 +6,7 @@ Icon=scim-setup
 Terminal=false
 Type=Application
 StartupNotify=true
-Categories=Applications;Settings;
+Categories=Settings;
+NotShowIn=KDE;
+X-Ubuntu-Gettext-Domain=scim
+
