@@ -36,6 +36,7 @@ struct _ScimKeySelection
     GtkWidget *toggle_meta;
     GtkWidget *toggle_super;
     GtkWidget *toggle_hyper;
+    GtkWidget *toggle_capslock;
     GtkWidget *toggle_release;
     GtkWidget *key_code;
 
