@@ -10,7 +10,7 @@
 /Hotkeys/FrontEnd/NextFactory = Control+Alt+Down,Shift+Control+KeyRelease+Shift_L,Shift+Control+KeyRelease+Shift_R
 /Hotkeys/FrontEnd/PreviousFactory = Control+Alt+Up,Shift+Control+KeyRelease+Control_L,Shift+Control+KeyRelease+Control_R
 /Hotkeys/FrontEnd/ShowFactoryMenu = Control+Alt+Right
-/Hotkeys/FrontEnd/Trigger = Control+space
+/Hotkeys/FrontEnd/Trigger = Control+space,Zenkaku_Hankaku,Hangul
 /Hotkeys/FrontEnd/ValidKeyMask = Shift+Control+Alt+Meta+QuirkKanaRo
 /Panel/Gtk/Color/ActiveBackground = light sky blue
 /Panel/Gtk/Color/ActiveText = black
