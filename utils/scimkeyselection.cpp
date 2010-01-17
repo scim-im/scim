@@ -267,6 +267,11 @@ scim_key_selection_init (ScimKeySelection *keyselection)
     gtk_widget_show (keyselection->toggle_hyper);
     gtk_box_pack_start (GTK_BOX (hbox), keyselection->toggle_hyper, TRUE, TRUE, 2);
 
+
+    keyselection->toggle_capslock = gtk_check_button_new_with_mnemonic (_("Ca_psLock")); 
+    gtk_widget_show (keyselection->toggle_capslock);
+    gtk_box_pack_start (GTK_BOX (hbox), keyselection->toggle_capslock, TRUE, TRUE, 2);
+    
     hbox = gtk_hbox_new (TRUE, 0);
     gtk_widget_show (hbox);
     gtk_box_pack_start (GTK_BOX (keyselection), hbox, FALSE, FALSE, 4);
@@ -319,6 +324,8 @@ scim_key_selection_add_key_button_callback (GtkButton        *button,
         key += String ("Super+");
     if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (keyselection->toggle_hyper)))
         key += String ("Hyper+");
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (keyselection->toggle_capslock)))
+        key += String ("CapsLock+");
 
     key_code = String (gtk_entry_get_text (GTK_ENTRY (keyselection->key_code)));
     if (!key_code.length ()){
@@ -571,6 +578,9 @@ scim_key_selection_set_key_event (ScimKeySelection *keyselection,
     gtk_toggle_button_set_active (
         GTK_TOGGLE_BUTTON (keyselection->toggle_hyper),
         event.is_hyper_down ());
+    gtk_toggle_button_set_active (
+        GTK_TOGGLE_BUTTON (keyselection->toggle_capslock),
+        event.is_caps_lock_down ());
     gtk_toggle_button_set_active (
         GTK_TOGGLE_BUTTON (keyselection->toggle_release),
         event.is_key_release ());
