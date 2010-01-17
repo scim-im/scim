@@ -33,7 +33,7 @@ INCLUDES		= -I$(top_builddir) \
 			  -DSCIM_MODULE_PATH=\"@SCIM_MODULE_PATH@\"
 
 
-noinst_HEADERS		= ltdl.h \
+noinst_HEADERS		= \
 			  scim_private.h \
 			  scim_compose_key_data.h \
 			  scim_keyboard_layout_data.h \
@@ -84,11 +84,6 @@ libsciminclude_HEADERS 	= scim.h \
 			  scim_utility.h
 
 
-noinst_LTLIBRARIES	= libltdlc.la
-
-libltdlc_la_SOURCES	= ltdl.cpp
-libltdlc_la_LIBADD	= $(LIBADD_DL)
-
 if SCIM_LD_VERSION_SCRIPT
 LD_VERSION_SCRIPT_OPTION="-Wl,--version-script=$(srcdir)/libscim.version-script"
 endif
@@ -137,7 +132,7 @@ libscim@SCIM_EPOCH@_la_LDFLAGS= -version-info $(SCIM_CURRENT):$(SCIM_REVISION):$
 			  @LTLIBINTL@ \
 			  -lstdc++
 
-libscim@SCIM_EPOCH@_la_LIBADD	= libltdlc.la
+libscim@SCIM_EPOCH@_la_LIBADD	= -lltdl
 
 
 bin_PROGRAMS		= scim scim-config-agent
