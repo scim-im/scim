@@ -409,6 +409,8 @@ static PangoFontDescription *_default_font_desc        = 0;
 static GtkStatusIcon     *_tray_icon                   = 0;
 // static GtkWidget         *_tray_icon_factory_button    = 0;
 // static gulong             _tray_icon_destroy_signal_id = 0;
+static bool              _tray_icon_clicked            = false;
+static guint             _tray_icon_clicked_time       = 0;
 #endif
 
 static gboolean           _input_window_draging        = FALSE;
@@ -1066,13 +1068,11 @@ ui_initialize (void)
 #ifdef GDK_WINDOWING_X11
     // Add an event filter function to observe X root window's properties.
     GdkWindow *root_window = gdk_get_default_root_window ();
-    GdkEventMask event_mask;
 #if GDK_MULTIHEAD_SAFE
     if (_current_screen)
         root_window = gdk_screen_get_root_window (_current_screen);
 #endif
-    event_mask = (GdkEventMask) (gdk_window_get_events (root_window) | GDK_PROPERTY_NOTIFY);
-    gdk_window_set_events (root_window, event_mask); 
+    gdk_window_set_events (root_window, (GdkEventMask)GDK_PROPERTY_NOTIFY);
     gdk_window_add_filter (root_window, ui_event_filter, NULL);
 #endif
 
@@ -1319,11 +1319,9 @@ ui_switch_screen (GdkScreen *screen)
 
 #ifdef GDK_WINDOWING_X11
         GdkWindow *root_window = gdk_get_default_root_window ();
-        GdkEventMask event_mask;
         if (_current_screen)
             root_window = gdk_screen_get_root_window (_current_screen);
-        event_mask = (GdkEventMask) (gdk_window_get_events (root_window) | GDK_PROPERTY_NOTIFY);
-        gdk_window_set_events (root_window, event_mask); 
+        gdk_window_set_events (root_window, (GdkEventMask)GDK_PROPERTY_NOTIFY);
         gdk_window_add_filter (root_window, ui_event_filter, NULL);
 #endif
 
@@ -1697,12 +1695,16 @@ static void
 ui_tray_icon_popup_menu_cb (GtkStatusIcon *status_icon, guint button, 
     guint activate_time, gpointer user_data)
 {
+    _tray_icon_clicked = true;
+    _tray_icon_clicked_time = activate_time;
     action_show_command_menu ();
 }
 
 static void
 ui_tray_icon_activate_cb (GtkStatusIcon *status_icon, gpointer user_data)
 {
+    _tray_icon_clicked = true;
+    _tray_icon_clicked_time = gtk_get_current_event_time ();
     _panel_agent->request_factory_menu ();
 }
 
@@ -2457,8 +2459,12 @@ action_show_command_menu (void)
                       G_CALLBACK (ui_command_menu_exit_activate_cb),
                       0);
     gtk_widget_show_all (menu_item);
-
-    gtk_menu_popup (GTK_MENU (_command_menu), 0, 0, 0, 0, 2, activate_time);
+    if (_tray_icon_clicked && _tray_icon) {
+        gtk_menu_popup (GTK_MENU (_command_menu), 0, 0, gtk_status_icon_position_menu, _tray_icon, 2, _tray_icon_clicked_time);
+    }
+    else
+        gtk_menu_popup (GTK_MENU (_command_menu), 0, 0, 0, 0, 2, activate_time);
+    _tray_icon_clicked = false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2747,7 +2753,6 @@ slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
         MapStringVectorSizeT groups;
         std::map<String,size_t> langs, recents;
 
-        guint32 activate_time = gtk_get_current_event_time ();
 
         _factory_menu_uuids.clear ();
         _factory_menu_activated = true;
@@ -2842,7 +2847,17 @@ slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
         g_signal_connect (G_OBJECT (_factory_menu), "deactivate",
                           G_CALLBACK (ui_factory_menu_deactivate_cb),
                           NULL);
-        gtk_menu_popup (GTK_MENU (_factory_menu), 0, 0, 0, 0, 1, activate_time);
+        
+        if (_tray_icon_clicked && _tray_icon) {
+            while (gtk_main_iteration_do (FALSE));
+            gtk_menu_popup (GTK_MENU (_factory_menu), 0, 0, gtk_status_icon_position_menu, _tray_icon, 1, _tray_icon_clicked_time);
+        }
+        else {
+            gtk_menu_popup (GTK_MENU (_factory_menu), 0, 0, 0, 0, 1, gtk_get_current_event_time ());
+        }
+
+        _tray_icon_clicked = false;
+        
     }
 }
 
