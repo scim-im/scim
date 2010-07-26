@@ -308,7 +308,7 @@ static guint                                            _panel_iochannel_hup_sou
 
 static bool                                             _on_the_spot                = true;
 static bool                                             _shared_input_method        = false;
-static bool                                             _use_key_snooper            = true;
+static bool                                             _use_key_snooper            = false;
 
 // A hack to shutdown the immodule cleanly even if im_module_exit () is not called when exiting.
 class FinalizeHandler
