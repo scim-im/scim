@@ -1066,11 +1066,13 @@ ui_initialize (void)
 #ifdef GDK_WINDOWING_X11
     // Add an event filter function to observe X root window's properties.
     GdkWindow *root_window = gdk_get_default_root_window ();
+    GdkEventMask event_mask;
 #if GDK_MULTIHEAD_SAFE
     if (_current_screen)
         root_window = gdk_screen_get_root_window (_current_screen);
 #endif
-    gdk_window_set_events (root_window, (GdkEventMask)GDK_PROPERTY_NOTIFY);
+    event_mask = (GdkEventMask) (gdk_window_get_events (root_window) | GDK_PROPERTY_NOTIFY);
+    gdk_window_set_events (root_window, event_mask); 
     gdk_window_add_filter (root_window, ui_event_filter, NULL);
 #endif
 
@@ -1317,9 +1319,11 @@ ui_switch_screen (GdkScreen *screen)
 
 #ifdef GDK_WINDOWING_X11
         GdkWindow *root_window = gdk_get_default_root_window ();
+        GdkEventMask event_mask;
         if (_current_screen)
             root_window = gdk_screen_get_root_window (_current_screen);
-        gdk_window_set_events (root_window, (GdkEventMask)GDK_PROPERTY_NOTIFY);
+        event_mask = (GdkEventMask) (gdk_window_get_events (root_window) | GDK_PROPERTY_NOTIFY);
+        gdk_window_set_events (root_window, event_mask); 
         gdk_window_add_filter (root_window, ui_event_filter, NULL);
 #endif
 
