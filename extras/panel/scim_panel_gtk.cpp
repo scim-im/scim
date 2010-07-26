@@ -409,8 +409,6 @@ static PangoFontDescription *_default_font_desc        = 0;
 static GtkStatusIcon     *_tray_icon                   = 0;
 // static GtkWidget         *_tray_icon_factory_button    = 0;
 // static gulong             _tray_icon_destroy_signal_id = 0;
-static bool              _tray_icon_clicked            = false;
-static guint             _tray_icon_clicked_time       = 0;
 #endif
 
 static gboolean           _input_window_draging        = FALSE;
@@ -647,6 +645,7 @@ ui_initialize (void)
     GtkWidget *input_window_vbox;
 
     ui_load_config ();
+    _toolbar_hidden = false;
 
     if (_lookup_table_window) gtk_widget_destroy (_lookup_table_window);
     if (_input_window) gtk_widget_destroy (_input_window);
@@ -1033,8 +1032,13 @@ ui_initialize (void)
     }
 
     //Init timeout callback
+    if (_toolbar_hide_timeout != 0) {
+        g_source_remove (_toolbar_hide_timeout);
+        _toolbar_hide_timeout = 0;
+
+    }
     if (_toolbar_always_show && _toolbar_hide_timeout_max > 0) {
-        _toolbar_hide_timeout = gtk_timeout_add (1000, ui_hide_window_timeout_cb, NULL);
+        _toolbar_hide_timeout = g_timeout_add (1000, ui_hide_window_timeout_cb, NULL);
         g_signal_connect (G_OBJECT (_toolbar_window), "enter-notify-event",
                           G_CALLBACK (ui_toolbar_window_crossing_cb),
                           GINT_TO_POINTER (0));
@@ -1695,16 +1699,12 @@ static void
 ui_tray_icon_popup_menu_cb (GtkStatusIcon *status_icon, guint button, 
     guint activate_time, gpointer user_data)
 {
-    _tray_icon_clicked = true;
-    _tray_icon_clicked_time = activate_time;
     action_show_command_menu ();
 }
 
 static void
 ui_tray_icon_activate_cb (GtkStatusIcon *status_icon, gpointer user_data)
 {
-    _tray_icon_clicked = true;
-    _tray_icon_clicked_time = gtk_get_current_event_time ();
     _panel_agent->request_factory_menu ();
 }
 
@@ -2459,12 +2459,8 @@ action_show_command_menu (void)
                       G_CALLBACK (ui_command_menu_exit_activate_cb),
                       0);
     gtk_widget_show_all (menu_item);
-    if (_tray_icon_clicked && _tray_icon) {
-        gtk_menu_popup (GTK_MENU (_command_menu), 0, 0, gtk_status_icon_position_menu, _tray_icon, 2, _tray_icon_clicked_time);
-    }
-    else
-        gtk_menu_popup (GTK_MENU (_command_menu), 0, 0, 0, 0, 2, activate_time);
-    _tray_icon_clicked = false;
+
+    gtk_menu_popup (GTK_MENU (_command_menu), 0, 0, 0, 0, 2, activate_time);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2532,11 +2528,14 @@ panel_agent_thread_func (gpointer data)
 
     if (!_panel_agent->run ())
         std::cerr << "Failed to run Panel.\n";
-
+/*
     G_LOCK (_global_resource_lock);
     _should_exit = true;
     G_UNLOCK (_global_resource_lock);
-
+*/
+    gdk_threads_enter ();
+    gtk_main_quit ();
+    gdk_threads_leave ();
     g_thread_exit (NULL);
     return ((gpointer) NULL);
 }
@@ -2753,6 +2752,7 @@ slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
         MapStringVectorSizeT groups;
         std::map<String,size_t> langs, recents;
 
+        guint32 activate_time = gtk_get_current_event_time ();
 
         _factory_menu_uuids.clear ();
         _factory_menu_activated = true;
@@ -2847,17 +2847,7 @@ slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
         g_signal_connect (G_OBJECT (_factory_menu), "deactivate",
                           G_CALLBACK (ui_factory_menu_deactivate_cb),
                           NULL);
-        
-        if (_tray_icon_clicked && _tray_icon) {
-            while (gtk_main_iteration_do (FALSE));
-            gtk_menu_popup (GTK_MENU (_factory_menu), 0, 0, gtk_status_icon_position_menu, _tray_icon, 1, _tray_icon_clicked_time);
-        }
-        else {
-            gtk_menu_popup (GTK_MENU (_factory_menu), 0, 0, 0, 0, 1, gtk_get_current_event_time ());
-        }
-
-        _tray_icon_clicked = false;
-        
+        gtk_menu_popup (GTK_MENU (_factory_menu), 0, 0, 0, 0, 1, activate_time);
     }
 }
 
@@ -3756,7 +3746,7 @@ int main (int argc, char *argv [])
 
     start_auto_start_helpers ();
 
-    _check_exit_timeout = gtk_timeout_add (500, check_exit_timeout_cb, NULL);
+    // _check_exit_timeout = g_timeout_add (500, check_exit_timeout_cb, NULL);
 
     gdk_threads_enter ();
     gtk_main ();
