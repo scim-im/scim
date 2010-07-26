@@ -982,9 +982,6 @@ ui_initialize (void)
 
     // Create help window
     {
-        GtkWidget *frame;
-        GtkWidget *vbox;
-
         _help_dialog = gtk_dialog_new_with_buttons (_("SCIM Help"),
                                 NULL,
                                 GtkDialogFlags (0),
@@ -1002,18 +999,9 @@ ui_initialize (void)
                                   G_CALLBACK (gtk_widget_hide_on_delete),
                                   GTK_OBJECT (_help_dialog));
 
-        frame = gtk_frame_new (_("Smart Common Input Method"));
-
-        gtk_box_pack_start (GTK_BOX (GTK_DIALOG (_help_dialog)->vbox), frame, TRUE, TRUE, 0);
-        gtk_widget_show (frame);
-
-        vbox = gtk_vbox_new (FALSE, 8);
-        gtk_container_add (GTK_CONTAINER (frame), vbox);
-        gtk_widget_show (vbox);
-
         _help_scroll = gtk_scrolled_window_new (NULL, NULL);
         gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (_help_scroll), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-        gtk_box_pack_start (GTK_BOX (vbox), _help_scroll, TRUE, TRUE, 0);
+        gtk_box_pack_start (GTK_BOX (GTK_DIALOG (_help_dialog)->vbox), _help_scroll, TRUE, TRUE, 0);
         gtk_widget_show (_help_scroll);
 
         _help_area = gtk_label_new ("");
