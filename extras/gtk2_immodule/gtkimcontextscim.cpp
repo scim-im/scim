@@ -63,6 +63,8 @@
 #include "scim_x11_utils.h"
 #endif
 
+#define SEND_EVENT_MASK 0x02
+
 using namespace scim;
 
 #include "gtkimcontextscim.h"
@@ -1024,7 +1026,7 @@ gtk_scim_key_snooper (GtkWidget    *grab_widget,
 
     gboolean ret = FALSE;
 
-    if (_focused_ic && _focused_ic->impl && (event->type == GDK_KEY_PRESS || event->type == GDK_KEY_RELEASE) && !event->send_event) {
+    if (_focused_ic && _focused_ic->impl && (event->type == GDK_KEY_PRESS || event->type == GDK_KEY_RELEASE) && !(event->send_event & SEND_EVENT_MASK)) {
         _focused_widget = grab_widget;
 
         KeyEvent key = keyevent_gdk_to_scim (_focused_ic, *event);
@@ -1054,7 +1056,7 @@ gtk_scim_key_snooper (GtkWidget    *grab_widget,
     } else {
         SCIM_DEBUG_FRONTEND(3) << "Failed snooper: "
                                << ((!_focused_ic || !_focused_ic->impl) ? "Invalid focused ic" :
-                                   (event->send_event ? "send event is set" : "unknown"))
+                                   ((event->send_event & SEND_EVENT_MASK) ? "send event is set" : "unknown"))
                                << "\n";
     }
 
@@ -1639,7 +1641,7 @@ keyevent_scim_to_gdk (const GtkIMContextSCIM *ic,
 
     gdkevent.type = (scimkey.is_key_release () ? GDK_KEY_RELEASE : GDK_KEY_PRESS);
     gdkevent.window = ((ic && ic->impl) ? ic->impl->client_window : 0);
-    gdkevent.send_event = TRUE;
+    gdkevent.send_event |= SEND_EVENT_MASK;
     gdkevent.time = get_time ();
     gdkevent.keyval = scimkey.code;
     gdkevent.length = 0;
