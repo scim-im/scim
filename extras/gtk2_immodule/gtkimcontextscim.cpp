@@ -137,6 +137,12 @@ static gboolean gtk_scim_key_snooper                    (GtkWidget              
 static void     gtk_im_slave_commit_cb                  (GtkIMContext           *context,
                                                          const char             *str,
                                                          GtkIMContextSCIM       *context_scim);
+static void     gtk_im_slave_preedit_changed_cb         (GtkIMContext           *context,
+                                                         GtkIMContextSCIM       *context_scim);
+static void     gtk_im_slave_preedit_start_cb           (GtkIMContext           *context,
+                                                         GtkIMContextSCIM       *context_scim);
+static void     gtk_im_slave_preedit_end_cb             (GtkIMContext           *context,
+                                                         GtkIMContextSCIM       *context_scim);
 
 /* private functions */
 static void     panel_slot_reload_config                (int                     context);
@@ -499,11 +505,30 @@ gtk_im_context_scim_init (GtkIMContextSCIM      *context_scim,
     context_scim->impl = NULL;
 
     /* slave exists for using gtk+'s table based input method */
+    context_scim->slave_preedit = false;
     context_scim->slave = gtk_im_context_simple_new ();
     g_signal_connect(G_OBJECT(context_scim->slave),
                      "commit",
                      G_CALLBACK(gtk_im_slave_commit_cb),
                      context_scim);
+    
+    g_signal_connect(G_OBJECT(context_scim->slave),
+                     "preedit-changed",
+                     G_CALLBACK(gtk_im_slave_preedit_changed_cb),
+                     context_scim);
+    
+    g_signal_connect(G_OBJECT(context_scim->slave),
+                     "preedit-start",
+                     G_CALLBACK(gtk_im_slave_preedit_start_cb),
+                     context_scim);
+    
+    g_signal_connect(G_OBJECT(context_scim->slave),
+                     "preedit-end",
+                     G_CALLBACK(gtk_im_slave_preedit_end_cb),
+                     context_scim);
+
+
+
 
     if (_backend.null ()) return;
 
@@ -609,6 +634,15 @@ gtk_im_context_scim_finalize (GObject *obj)
     g_signal_handlers_disconnect_by_func(context_scim->slave,
                                          (void *)gtk_im_slave_commit_cb,
                                          (void *)context_scim);
+    g_signal_handlers_disconnect_by_func(context_scim->slave,
+                                         (void *)gtk_im_slave_preedit_changed_cb,
+                                         (void *)context_scim);
+    g_signal_handlers_disconnect_by_func(context_scim->slave,
+                                         (void *)gtk_im_slave_preedit_start_cb,
+                                         (void *)context_scim);
+    g_signal_handlers_disconnect_by_func(context_scim->slave,
+                                         (void *)gtk_im_slave_preedit_end_cb,
+                                         (void *)context_scim);
     g_object_unref(context_scim->slave);
 
     gtk_im_context_scim_finalize_partial (context_scim);
@@ -649,8 +683,15 @@ gtk_im_context_scim_filter_keypress (GtkIMContext *context,
         if (!_snooper_installed)
             ret = gtk_scim_key_snooper (0, event, 0);
 
-        if (!ret && context_scim->slave)
-            ret = gtk_im_context_filter_keypress (context_scim->slave, event);
+        if (context_scim->slave) {
+            if (!ret ) {
+                ret = gtk_im_context_filter_keypress (context_scim->slave, event);
+            }
+            else if (context_scim->slave_preedit) {
+                context_scim->slave_preedit = false;
+                gtk_im_context_reset (context_scim->slave);
+            }
+        }
     }
 
     return ret;
@@ -853,6 +894,11 @@ gtk_im_context_scim_get_preedit_string (GtkIMContext   *context,
     SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_get_preedit_string...\n";
 
     GtkIMContextSCIM *context_scim = GTK_IM_CONTEXT_SCIM (context);
+    
+    if (context_scim->slave_preedit == true) {
+        gtk_im_context_get_preedit_string (context_scim->slave, str, attrs, cursor_pos);
+        return;
+    }
 
     if (context_scim && context_scim->impl && context_scim->impl->is_on) {
         String mbs = utf8_wcstombs (context_scim->impl->preedit_string);
@@ -1022,6 +1068,30 @@ gtk_im_slave_commit_cb (GtkIMContext     *context,
 {
     g_return_if_fail(str);
     g_signal_emit_by_name(context_scim, "commit", str);
+}
+
+static void
+gtk_im_slave_preedit_changed_cb (GtkIMContext     *context,
+                        GtkIMContextSCIM *context_scim)
+{
+    context_scim->slave_preedit = true;
+    g_signal_emit_by_name(context_scim, "preedit-changed");
+}
+
+static void
+gtk_im_slave_preedit_start_cb (GtkIMContext     *context,
+                        GtkIMContextSCIM *context_scim)
+{
+    context_scim->slave_preedit = true;
+    g_signal_emit_by_name(context_scim, "preedit-start");
+}
+
+static void
+gtk_im_slave_preedit_end_cb (GtkIMContext     *context,
+                        GtkIMContextSCIM *context_scim)
+{
+    context_scim->slave_preedit = false;
+    g_signal_emit_by_name(context_scim, "preedit-end");
 }
 
 /* Panel Slot functions */
