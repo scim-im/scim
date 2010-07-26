@@ -16,7 +16,7 @@
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 MAINTAINERCLEANFILES	= Makefile.in scim_types.h
-CLEANFILES		= libltdlc.la libscim.la *.bak
+CLEANFILES		= libscim.la *.bak
 DISTCLEANFILES		= scim_types.h
 EXTRA_DIST		= libscim.version-script
 
@@ -30,7 +30,8 @@ INCLUDES		= -I$(top_builddir) \
 			  -DSCIM_SYSCONFDIR=\"@SCIM_SYSCONFDIR@\" \
 			  -DSCIM_LIBEXECDIR=\"@SCIM_LIBEXECDIR@\" \
 			  -DSCIM_ICONDIR=\"@SCIM_ICONDIR@\" \
-			  -DSCIM_MODULE_PATH=\"@SCIM_MODULE_PATH@\"
+			  -DSCIM_MODULE_PATH=\"@SCIM_MODULE_PATH@\" \
+			  $(LTDLINCL)
 
 
 noinst_HEADERS		= \
@@ -123,6 +124,8 @@ libscim@SCIM_EPOCH@_la_SOURCES = scim_backend.cpp \
 			  scim_transaction.cpp \
 			  scim_utility.cpp
 
+libscim@SCIM_EPOCH@_la_DEPENDENCIES = $(LTDLDEPS)
+
 libscim@SCIM_EPOCH@_la_LDFLAGS= -version-info $(SCIM_CURRENT):$(SCIM_REVISION):$(SCIM_AGE) \
 			  -export-dynamic \
 			  -rpath $(libdir) \
@@ -130,9 +133,8 @@ libscim@SCIM_EPOCH@_la_LDFLAGS= -version-info $(SCIM_CURRENT):$(SCIM_REVISION):$
 			  @LIBTOOL_EXPORT_OPTIONS@ \
 			  @LIBICONV@ \
 			  @LTLIBINTL@ \
+			  $(LIBLTDL) \
 			  -lstdc++
-
-libscim@SCIM_EPOCH@_la_LIBADD	= -lltdl
 
 
 bin_PROGRAMS		= scim scim-config-agent
