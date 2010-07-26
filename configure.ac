@@ -69,8 +69,9 @@ ALL_LINGUAS="as bn_IN ca cs de es fi fr gu hi it ja kn ko ml mr nl pa pt_BR ru s
 AM_GNU_GETTEXT
 
 # Init libtool
-AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
+LT_CONFIG_LTDL_DIR([libltdl])
+LT_INIT([dlopen])
+LTDL_INIT
 AC_SUBST(LIBTOOL_DEPS)
 
 # libtool option to control which symbols are exported
