@@ -44,7 +44,6 @@ im_scim_la_CFLAGS  =@GTK2_CFLAGS@
 im_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     -avoid-version \
 		     -module \
-		     -lstdc++ \
 		     $(LD_VERSION_SCRIPT_OPTION) \
 		     @GTK2_LIBS@
 

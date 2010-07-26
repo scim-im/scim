@@ -133,8 +133,7 @@ libscim@SCIM_EPOCH@_la_LDFLAGS= -version-info $(SCIM_CURRENT):$(SCIM_REVISION):$
 			  @LIBTOOL_EXPORT_OPTIONS@ \
 			  @LIBICONV@ \
 			  @LTLIBINTL@ \
-			  $(LIBLTDL) \
-			  -lstdc++
+			  $(LIBLTDL)
 
 
 bin_PROGRAMS		= scim scim-config-agent
