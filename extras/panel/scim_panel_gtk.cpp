@@ -749,7 +749,6 @@ ui_initialize (void)
         GtkWidget *lookup_table_parent;
         GtkWidget *image;
         GtkWidget *separator;
-        GtkRequisition size;
 
         if (_lookup_table_embedded) {
             _lookup_table_window = gtk_vbox_new (FALSE, 0);
@@ -1607,12 +1606,12 @@ ui_create_factory_menu_entry (const PanelFactoryInfo &info,
     GtkWidget *icon_image;
     String text, tooltip;
 
-    if (show_lang && !show_name) {
-        text = scim_get_language_name (info.lang);
-        tooltip = info.name;
-    } else if (!show_lang && show_name) {
+    if ((!show_lang && show_name) || (show_lang && !show_name && (info.lang == "C" || info.lang == "~other"))) {
         text = info.name;
         tooltip = "";
+    } else if (show_lang && !show_name) {
+        text = scim_get_language_name (info.lang);
+        tooltip = info.name;
     } else {
         text = scim_get_language_name (info.lang) + " - " + info.name;
         tooltip = "";
@@ -2754,7 +2753,7 @@ slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
         size_t i;
 
         MapStringVectorSizeT groups;
-        std::map<String,size_t> recents;
+        std::map<String,size_t> langs, recents;
 
         guint32 activate_time = gtk_get_current_event_time ();
 
@@ -2766,6 +2765,7 @@ slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
 
         for (i = 0; i < factories.size (); ++i) {
             _factory_menu_uuids.push_back (factories [i].uuid);
+            langs [factories [i].lang]++;
 
             if (show_recent &&
                 std::find (_recent_factory_uuids.begin (), _recent_factory_uuids.end (),
@@ -2800,16 +2800,16 @@ slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
         // recently used factories
         if (show_recent && recents.size ()) {
             for (std::list<String>::iterator it = _recent_factory_uuids.begin (); it != _recent_factory_uuids.end (); ++it) {
+	
                 id = recents [*it];
                 info = factories [id];
 
-                ui_create_factory_menu_entry (info, id, GTK_MENU_SHELL (_factory_menu), true, true);
+                ui_create_factory_menu_entry (info, id, GTK_MENU_SHELL (_factory_menu), true, (langs [info.lang] > 1));
 
                 if (use_submenus) {
                     MapStringVectorSizeT::iterator g = groups.find (info.lang);
                     if (g != groups.end () && g->second.size () >= 1) {
                         g->second.push_back (id);
-                        use_submenus = true;
                     }
                 }
             }
@@ -2832,7 +2832,7 @@ slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
             for (i = 0; i < it->second.size (); ++i) {
                 id = it->second [i];
                 info = factories [id];
-                ui_create_factory_menu_entry (info, id, GTK_MENU_SHELL (submenu ? submenu : _factory_menu), !submenu, submenu || !use_submenus);
+                ui_create_factory_menu_entry (info, id, GTK_MENU_SHELL (submenu ? submenu : _factory_menu), !submenu, (langs [info.lang] > 1));
             }
 
             if (menu_item && submenu) {
