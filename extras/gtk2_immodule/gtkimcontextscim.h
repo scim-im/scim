@@ -39,6 +39,7 @@ struct _GtkIMContextSCIM
 {
   GtkIMContext object;
   GtkIMContext *slave;
+  bool slave_preedit;
 
   GtkIMContextSCIMImpl *impl;
 
