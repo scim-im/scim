@@ -111,7 +111,7 @@ using namespace scim;
 #define SCIM_PIN_DOWN_ICON_FILE     (SCIM_ICONDIR "/pin-down.png")
 
 #define TOOLBAR_ICON_SIZE                     16 
-#define TRAY_ICON_SIZE                        18
+#define TRAY_ICON_SIZE                        11
 #define LOOKUP_ICON_SIZE                      12
 
 /////////////////////////////////////////////////////////////////////////////
