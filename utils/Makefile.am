@@ -53,7 +53,6 @@ libscim_gtkutils@SCIM_EPOCH@_la_CXXFLAGS= @GTK2_CFLAGS@
 
 libscim_gtkutils@SCIM_EPOCH@_la_LDFLAGS= -version-info $(SCIM_CURRENT):$(SCIM_REVISION):$(SCIM_AGE) \
 				  -export-dynamic \
-				  -rpath $(libdir) \
 				  @LIBTOOL_EXPORT_OPTIONS@ \
 				  @LTLIBINTL@ \
 				  @GTK2_LIBS@ 
@@ -68,7 +67,6 @@ libscim_x11utils@SCIM_EPOCH@_la_CXXFLAGS= @X_CFLAGS@
 
 libscim_x11utils@SCIM_EPOCH@_la_LDFLAGS= -version-info $(SCIM_CURRENT):$(SCIM_REVISION):$(SCIM_AGE) \
 				  -export-dynamic \
-				  -rpath $(libdir) \
 				  @LIBTOOL_EXPORT_OPTIONS@ \
 				  @LTLIBINTL@ \
 				  @X_LIBS@ 

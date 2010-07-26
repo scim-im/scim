@@ -128,7 +128,6 @@ libscim@SCIM_EPOCH@_la_DEPENDENCIES = $(LTDLDEPS)
 
 libscim@SCIM_EPOCH@_la_LDFLAGS= -version-info $(SCIM_CURRENT):$(SCIM_REVISION):$(SCIM_AGE) \
 			  -export-dynamic \
-			  -rpath $(libdir) \
 			  $(LD_VERSION_SCRIPT_OPTION) \
 			  @LIBTOOL_EXPORT_OPTIONS@ \
 			  @LIBICONV@ \
