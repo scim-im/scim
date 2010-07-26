@@ -55,7 +55,6 @@ setup_la_CXXFLAGS	= @GTK2_CFLAGS@
 setup_la_LDFLAGS	= -avoid-version \
 		     	  -rpath $(moduledir) \
 			  -module \
-			  -lstdc++ \
 			  @LIBTOOL_EXPORT_OPTIONS@ \
 			  @GTK2_LIBS@ \
 			  @LTLIBINTL@
