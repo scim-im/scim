@@ -33,7 +33,7 @@ static const GtkIMContextInfo scim_info = {
   "SCIM Input Method",		/* Human readable name */
   "scim",			/* Translation domain */
   SCIM_LOCALEDIR,		/* Dir for bindtextdomain (not strictly needed for "gtk+") */
-  "ja:ko:zh"			/* Languages for which this module is the default */
+  ""			/* Languages for which this module is the default */
 };
 
 static const GtkIMContextInfo *info_list[] = {
