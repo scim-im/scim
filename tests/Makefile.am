@@ -49,7 +49,6 @@ test_helper_la_CXXFLAGS	= @GTK2_CFLAGS@
 test_helper_la_LDFLAGS	= -avoid-version \
 		     	  -rpath $(helpermoduledir) \
 			  -module \
-			  -lstdc++ \
 			  @LIBTOOL_EXPORT_OPTIONS@ \
 			  @GTK2_LIBS@ \
 			  @LTLIBINTL@
