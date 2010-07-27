@@ -42,6 +42,7 @@ typedef void (*ModuleExitFunc) (void);
 
 struct Module::ModuleImpl
 {
+    lt_dladvise advise;
     lt_dlhandle handle;
     ModuleInitFunc init;
     ModuleExitFunc exit;
@@ -120,18 +121,23 @@ Module::Module ()
     : m_impl (new ModuleImpl)
 {
     lt_dlinit ();
+    lt_dladvise_init (&(m_impl->advise));
+    lt_dladvise_ext (&(m_impl->advise));
+    lt_dladvise_global (&(m_impl->advise));
 }
 
 Module::Module (const String &name, const String &type)
     : m_impl (new ModuleImpl)
 {
-    lt_dlinit ();
+    Module();
+
     load (name, type);
 }
 
 Module::~Module ()
 {
     unload ();
+    lt_dladvise_destroy (&(m_impl->advise));
     lt_dlexit ();
     delete m_impl;
 }
@@ -169,13 +175,13 @@ Module::load (const String &name, const String &type)
 
     for (it = paths.begin (); it != paths.end (); ++it) {
         module_path = *it + String (SCIM_PATH_DELIM_STRING) + name;
-        new_handle = lt_dlopenext (module_path.c_str ());
+        new_handle = lt_dlopenadvise (module_path.c_str (), m_impl->advise);
         if (new_handle)
             break;
     }
 
     if (!new_handle) {
-        new_handle = lt_dlopenext (name.c_str ());
+        new_handle = lt_dlopenadvise (name.c_str (), m_impl->advise);
     }
 
     if (!new_handle)
