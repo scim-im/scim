@@ -1,6 +1,7 @@
 Currently there is no developer documentation available for scim.
 Please read header files and module/IMEngine/* to learn how to write
-Input Method Engine based on this library.
+Input Method Engine based on this library.  To compile scim from svn,
+run the bootstrap script in the toplevel directory first.
 
 if you are so boring about SCIM's config system. Just run scim-setup to start it.
 
