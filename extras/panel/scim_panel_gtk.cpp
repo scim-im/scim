@@ -479,12 +479,12 @@ static guint              _check_exit_timeout          = 0;
 
 static bool               _should_exit                 = false;
 
-static bool               _panel_is_on                 = false;
 
-static GThread           *_panel_agent_thread          = 0;
+static struct timeval     _last_menu_deactivate_time = {0, 0};
 
-static PanelAgent        *_panel_agent                 = 0;
-
+// client repository
+static PropertyRepository            _frontend_property_repository;
+static HelperPropertyRepository      _helper_property_repository;
 static std::vector<String> _factory_menu_uuids;
 
 static std::list<String>  _recent_factory_uuids;
@@ -1187,12 +1187,12 @@ ui_settle_toolbar_window (bool force)
 
     GtkRequisition ws;
     gint pos_x, pos_y;
-
-    gtk_widget_size_request (_toolbar_window, &ws);
-
-    pos_x = _config->read (String (SCIM_CONFIG_PANEL_GTK_TOOLBAR_POS_X),
                            workarea_x + workarea_width - ws.width);
     pos_y = _config->read (String (SCIM_CONFIG_PANEL_GTK_TOOLBAR_POS_Y),
+                           workarea_y + workarea_height - ws.height);
+    if (pos_x == -1 && pos_y == -1) {
+        pos_x = workarea_x + workarea_width  - ws.width;
+        pos_y = workarea_y + workarea_height - ws.height;
                            workarea_y + workarea_height - ws.height);
     if (pos_x == -1 && pos_y == -1) {
         pos_x = workarea_x + workarea_width  - ws.width;
@@ -1215,10 +1215,6 @@ ui_settle_toolbar_window (bool force)
     else if (pos_y < 0)
         pos_y = 0;
 
-    if (_toolbar_window_x != pos_x || _toolbar_window_y != pos_y || force) {
-        gtk_window_move (GTK_WINDOW (_toolbar_window), pos_x, pos_y);
-        _toolbar_window_x = pos_x;
-        _toolbar_window_y = pos_y;
     }
 }
 
@@ -1231,12 +1227,16 @@ ui_screen_width (void)
 #endif
     return gdk_screen_width ();
 }
-
-static int
-ui_screen_height (void)
+        return gdk_screen_get_width (_current_screen);
+#endif
+    return gdk_screen_width ();
 {
 #if GDK_MULTIHEAD_SAFE
     if (_current_screen)
+        return gdk_screen_get_height (_current_screen);
+#endif
+    return gdk_screen_height ();
+}
         return gdk_screen_get_height (_current_screen);
 #endif
     return gdk_screen_height ();
@@ -1929,11 +1929,11 @@ ui_toolbar_window_click_cb (GtkWidget *window,
     static gulong motion_handler;
     GdkCursor *cursor;
 
-    if (click_type == 0 && event->button <= 1) {
-        if (_toolbar_window_draging)
-            return FALSE;
-
-        // Connection pointer motion handler to this window.
+        if (!_config.null () &&
+            (_toolbar_window_x != pos_x || _toolbar_window_y != pos_y)) {
+            _config->write (
+                SCIM_CONFIG_PANEL_GTK_TOOLBAR_POS_X, pos_x);
+            _config->write (
         motion_handler = g_signal_connect (G_OBJECT (window), "motion-notify-event",
                                            G_CALLBACK (ui_toolbar_window_motion_cb),
                                            NULL);
