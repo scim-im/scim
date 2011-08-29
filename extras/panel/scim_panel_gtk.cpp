@@ -156,6 +156,9 @@ static void       ui_settle_input_window               (bool            relative
 static void       ui_settle_lookup_table_window        (bool            force    = false);
 static void       ui_settle_toolbar_window             (bool            force    = false);
 
+static bool       ui_get_screen_rect                   (GdkRectangle &rect);
+static int        ui_multi_monitor_width               (void);
+static int        ui_multi_monitor_height              (void);
 static int        ui_screen_width                      (void);
 static int        ui_screen_height                     (void);
 static void       ui_get_workarea                      (int            &x,
@@ -479,17 +482,19 @@ static guint              _check_exit_timeout          = 0;
 
 static bool               _should_exit                 = false;
 
+static bool               _panel_is_on                 = false;
 
-static struct timeval     _last_menu_deactivate_time = {0, 0};
+static GThread           *_panel_agent_thread          = 0;
 
-// client repository
-static PropertyRepository            _frontend_property_repository;
-static HelperPropertyRepository      _helper_property_repository;
+static PanelAgent        *_panel_agent                 = 0;
+
 static std::vector<String> _factory_menu_uuids;
 
 static std::list<String>  _recent_factory_uuids;
 
 static struct timeval     _last_menu_deactivate_time = {0, 0};
+
+static bool               _multi_monitors              = false;
 
 // client repository
 static PropertyRepository            _frontend_property_repository;
@@ -1187,13 +1192,17 @@ ui_settle_toolbar_window (bool force)
 
     GtkRequisition ws;
     gint pos_x, pos_y;
+
+    gtk_widget_size_request (_toolbar_window, &ws);
+
+    pos_x = _config->read (String (SCIM_CONFIG_PANEL_GTK_TOOLBAR_POS_X),
                            workarea_x + workarea_width - ws.width);
     pos_y = _config->read (String (SCIM_CONFIG_PANEL_GTK_TOOLBAR_POS_Y),
                            workarea_y + workarea_height - ws.height);
-    if (pos_x == -1 && pos_y == -1) {
-        pos_x = workarea_x + workarea_width  - ws.width;
-        pos_y = workarea_y + workarea_height - ws.height;
-                           workarea_y + workarea_height - ws.height);
+    if (_multi_monitors) {
+       pos_x = -1;
+       pos_y = -1;
+    }
     if (pos_x == -1 && pos_y == -1) {
         pos_x = workarea_x + workarea_width  - ws.width;
         pos_y = workarea_y + workarea_height - ws.height;
@@ -1215,7 +1224,71 @@ ui_settle_toolbar_window (bool force)
     else if (pos_y < 0)
         pos_y = 0;
 
+    if (_toolbar_window_x != pos_x || _toolbar_window_y != pos_y || force) {
+        gtk_window_move (GTK_WINDOW (_toolbar_window), pos_x, pos_y);
+        _toolbar_window_x = pos_x;
+        _toolbar_window_y = pos_y;
     }
+}
+
+static bool
+ui_get_screen_rect (GdkRectangle &rect)
+{
+#if GDK_MULTIHEAD_SAFE
+	GdkWindow * active_window;
+    int index;
+
+    if (_current_screen)
+    {
+        if ( gdk_screen_get_n_monitors (_current_screen) > 1)
+        {
+            _multi_monitors = true;
+            active_window = gdk_screen_get_active_window(_current_screen);
+            index = gdk_screen_get_monitor_at_window(_current_screen, active_window);
+            gdk_screen_get_monitor_geometry(_current_screen, index, &rect);
+            return TRUE;
+        }
+    }
+#endif
+    return FALSE;
+}
+
+static int
+ui_multi_monitor_width ()
+{
+#if GDK_MULTIHEAD_SAFE
+	GdkRectangle rect;
+    
+    if (_current_screen)
+    {
+        if ( ui_get_screen_rect (rect) )
+        {
+            return rect.x + rect.width;
+        }
+
+        return gdk_screen_get_width (_current_screen);
+    }
+#endif
+    return 0;
+}
+
+static int
+ui_multi_monitor_height ()
+{
+#if GDK_MULTIHEAD_SAFE
+	GdkRectangle rect;
+    
+    if (_current_screen)
+    {
+        if ( ui_get_screen_rect (rect) )
+        {
+            return rect.y + rect.height;
+        }
+
+        return gdk_screen_get_height (_current_screen);
+    }
+#endif
+    return 0;
 }
 
 static int
@@ -1223,21 +1296,17 @@ ui_screen_width (void)
 {
 #if GDK_MULTIHEAD_SAFE
     if (_current_screen)
-        return gdk_screen_get_width (_current_screen);
+        return ui_multi_monitor_width ();
 #endif
     return gdk_screen_width ();
 }
-        return gdk_screen_get_width (_current_screen);
-#endif
-    return gdk_screen_width ();
+
+static int
+ui_screen_height (void)
 {
 #if GDK_MULTIHEAD_SAFE
     if (_current_screen)
-        return gdk_screen_get_height (_current_screen);
-#endif
-    return gdk_screen_height ();
-}
-        return gdk_screen_get_height (_current_screen);
+        return ui_multi_monitor_height ();
 #endif
     return gdk_screen_height ();
 }
@@ -1929,11 +1998,11 @@ ui_toolbar_window_click_cb (GtkWidget *window,
     static gulong motion_handler;
     GdkCursor *cursor;
 
-        if (!_config.null () &&
-            (_toolbar_window_x != pos_x || _toolbar_window_y != pos_y)) {
-            _config->write (
-                SCIM_CONFIG_PANEL_GTK_TOOLBAR_POS_X, pos_x);
-            _config->write (
+    if (click_type == 0 && event->button <= 1) {
+        if (_toolbar_window_draging)
+            return FALSE;
+
+        // Connection pointer motion handler to this window.
         motion_handler = g_signal_connect (G_OBJECT (window), "motion-notify-event",
                                            G_CALLBACK (ui_toolbar_window_motion_cb),
                                            NULL);
@@ -1964,6 +2033,10 @@ ui_toolbar_window_click_cb (GtkWidget *window,
 
         if (!_config.null () &&
             (_toolbar_window_x != pos_x || _toolbar_window_y != pos_y)) {
+            if (_multi_monitors) {
+               pos_x = -1;
+               pos_y = -1;
+            }
             _config->write (
                 SCIM_CONFIG_PANEL_GTK_TOOLBAR_POS_X, pos_x);
             _config->write (
