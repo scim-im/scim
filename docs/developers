@@ -1,0 +1,27 @@
+Development notes for SCIM
+==========================
+
+If you want to write your own input method with SCIM, you should
+implement three classes, BackEnd, IMEngineFactory and IMEngineInstance:
+
+* BackEnd
+  Manage all of the IMEngineFactory objects in order to let FrontEnd
+  use them. 
+  See src/scim_backend.* to learn how to implement it.
+
+* IMEngineFactory
+  An input method has one IMEngineFactory objects which manages all of
+  the IMEngineInstance objects that FrontEnd requests to create. If there
+  are any global data which should be shared among all IMEngineInstances, such as
+  phrase library etc.,they should be put into IMEngineFactory and only transfer
+  the pointer to IMEngineInstance. 
+  See src/scim_imengine.* and modules/IMEngine/* to learn how to implement it.
+
+* IMEngineInstance
+  The real keyevents -> strings conversion work is done by this class.
+  The keyevents fired by client program will be transported to IMEngineInstance
+  by calling IMEngineInstance::process_key_event (...) from FrontEnd.
+  IMEngineInstance objects should process these key events and make response to
+  FrontEnd by calling base class functions show_preedit_string,
+  update_preedit_string etc. 
+  See modules/IMEngine/* to learn how to implement it.
