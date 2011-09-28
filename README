@@ -1,9 +1,11 @@
 Currently there is no developer documentation available for scim.
 Please read header files and module/IMEngine/* to learn how to write
-Input Method Engine based on this library.  To compile scim from svn,
-run the bootstrap script in the toplevel directory first.
+Input Method Engine based on this library.  
 
-if you are so boring about SCIM's config system. Just run scim-setup to start it.
+To compile scim from svn, run the bootstrap script in the toplevel directory
+first.  To prepare a new tarball, first adjust the values of the AC_INIT,
+SCIM_*_VERSION, SCIM_CURRENT and SCIM_REVISION variables in configure.ac as
+necessary.  Then run "./bootstrap && configure && make dist".
 
 The main program of SCIM is named scim. The usage of scim is:
 
