@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script
-AC_INIT(scim, 1.4.10, suzhe@tsinghua.org.cn)
+AC_INIT([scim],[1.4.10],[suzhe@tsinghua.org.cn])
 AC_CONFIG_SRCDIR([src/scim.h])
 
 ###########################################################
