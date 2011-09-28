@@ -521,7 +521,6 @@ AC_SUBST(SCIM_TEMPDIR)
 ###########################################################
 AC_SUBST(ac_aux_dir)
 AC_CONFIG_FILES([Makefile
-		 m4/Makefile 
 		 intl/Makefile
 		 po/Makefile.in
 		 src/Makefile
