@@ -5,7 +5,9 @@ Input Method Engine based on this library.
 To compile scim from svn, run the bootstrap script in the toplevel directory
 first.  To prepare a new tarball, first adjust the values of the AC_INIT,
 SCIM_*_VERSION, SCIM_CURRENT and SCIM_REVISION variables in configure.ac as
-necessary.  Then run "./bootstrap && configure && make dist".
+necessary.  Then run "./bootstrap && configure && make dist".  You should
+have doxygen and graphviz installed if you want to make an official tarball
+release or else no html files will be created in docs.
 
 The main program of SCIM is named scim. The usage of scim is:
 
