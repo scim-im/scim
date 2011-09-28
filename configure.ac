@@ -540,8 +540,6 @@ AC_CONFIG_FILES([Makefile
 	 	 docs/scim.cfg
 	 	 docs/Makefile
 	 	 docs/manual/Makefile
-	 	 docs/manual/zh_CN/Makefile
-		 docs/manual/zh_CN/figures/Makefile
 	 	 configs/Makefile
 		 extras/Makefile
 		 extras/gtk2_immodule/Makefile

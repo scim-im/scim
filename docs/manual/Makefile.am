@@ -18,5 +18,3 @@
 MAINTAINERCLEANFILES	= Makefile.in
 
 CLEANFILES		= *.bak
-
-SUBDIRS			= zh_CN
