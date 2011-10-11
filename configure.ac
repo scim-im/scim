@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script
-AC_INIT([scim],[1.4.10],[https://sf.net/tracker/?atid=650539&group_id=108454])
+AC_INIT([scim],[1.4.10],[http://sf.net/tracker/?atid=650539&group_id=108454])
 AC_CONFIG_SRCDIR([src/scim.h])
 
 ###########################################################
