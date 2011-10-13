@@ -61,6 +61,8 @@ pkgconfig_DATA          = scim.pc \
 			  $(GTK_UTILS_PKGCONFIG) \
 			  $(X11_UTILS_PKGCONFIG)
 
+ACLOCAL_AMFLAGS = -I m4
+
 .PHONY: update-ChangeLog
 
 update-ChangeLog:
