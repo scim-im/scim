@@ -1,13 +1,12 @@
-Currently there is no developer documentation available for scim.
-Please read header files and module/IMEngine/* to learn how to write
-Input Method Engine based on this library.  
+Source-derived documentation for developers is provided separately, courtesy
+of doxygen.  Look for scim-doc-$(VERSION).tar.gz on our website for download
+or browse online at http://oss.leggewie.org/scim/
 
-To compile scim from svn, run the bootstrap script in the toplevel directory
-first.  To prepare a new tarball, first adjust the values of the AC_INIT,
-SCIM_*_VERSION, SCIM_CURRENT and SCIM_REVISION variables in configure.ac as
-necessary.  Then run "./bootstrap && configure && make dist".  You should
-have doxygen and graphviz installed if you want to make an official tarball
-release or else no html files will be created in docs.
+To compile scim from svn, be sure to run the bootstrap script in the toplevel
+directory first.  To prepare a new tarball for release, adjust the values of
+the AC_INIT, SCIM_*_VERSION, SCIM_CURRENT and SCIM_REVISION variables in
+configure.ac as necessary.  Then run
+"./bootstrap && ./configure && make dist && make docs".
 
 The main program of SCIM is named scim. The usage of scim is:
 
@@ -127,3 +126,4 @@ the same route.
 Have fun!
 
 James Su <suzhe@tsinghua.org.cn>
+Rolf Leggewie <foss@rolf.leggewie.org>
