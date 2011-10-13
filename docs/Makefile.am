@@ -27,20 +27,10 @@ SUBDIRS			= manual
 
 html:
 if HAVE_DOXYGEN
-	(cd $(top_builddir)/docs; rm -fr html/*; $(DOXYGEN) scim.cfg)
+	(cd $(top_builddir)/docs; rm -fr html/*; $(DOXYGEN) scim.cfg; tar -czf scim-doc-$(SCIM_VERSION).tar.gz html)
 else
 	echo "***"
+	echo "*** Warning: Doxygen not found"
 	echo "*** Warning: Documentation not built"
 	echo "***"
 endif
-	
-dist-hook: html
-if HAVE_DOXYGEN
-	cp -Rp $(top_builddir)/docs/html $(distdir)
-else
-	echo "***"
-	echo "*** Warning: Documentation not built"
-	echo "*** DISTRIBUTION IS INCOMPLETE"
-	echo "***"
-endif
-

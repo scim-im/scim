@@ -33,7 +33,7 @@ EXTRA_DIST		= config.rpath  THANKS \
 			  intltool-update.in
 
 AUTOMAKE_OPTIONS 	= gnu
-SUBDIRS 		= src utils modules configs docs po extras data tests
+SUBDIRS 		= src utils modules configs po extras data tests
 
 MAINTAINERCLEANFILES 	= Makefile.in \
 			  aclocal.m4 \
@@ -43,7 +43,7 @@ MAINTAINERCLEANFILES 	= Makefile.in \
 
 DISTCLEANFILES		= scim.pc scim-gtkutils.pc intltool-extract intltool-merge intltool-update
 
-CLEANFILES		= *.bak 
+CLEANFILES		= *.bak *.tar.*
 
 ACLOCAL			= aclocal -I $(ac_aux_dir)
 
@@ -63,7 +63,10 @@ pkgconfig_DATA          = scim.pc \
 
 ACLOCAL_AMFLAGS = -I m4
 
-.PHONY: update-ChangeLog
+.PHONY: update-ChangeLog docs
 
 update-ChangeLog:
 	/bin/sh $(top_srcdir)/svn2cl.sh --authors=$(top_srcdir)/developers -f $(top_srcdir)/ChangeLog
+
+docs:
+	(cd $(top_srcdir)/docs ; make html ; cd - ; mv -iv docs/*.tar.* $(top_srcdir)/)
