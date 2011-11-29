@@ -18,4 +18,4 @@
 MAINTAINERCLEANFILES	= Makefile.in
 CLEANFILES		= *.bak
 
-SUBDIRS			= panel gtk2_immodule setup
+SUBDIRS			= panel gtk2_immodule gtk3_immodule setup
