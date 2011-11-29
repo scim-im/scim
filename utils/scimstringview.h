@@ -8,11 +8,11 @@
 G_BEGIN_DECLS
 
 #define SCIM_TYPE_STRING_VIEW            (scim_string_view_get_type ())
-#define SCIM_STRING_VIEW(obj)            (GTK_CHECK_CAST ((obj), SCIM_TYPE_STRING_VIEW, ScimStringView))
-#define SCIM_STRING_VIEW_CLASS(klass)    (GTK_CHECK_CLASS_CAST ((klass), SCIM_TYPE_STRING_VIEW, ScimStringViewClass))
-#define SCIM_IS_STRING_VIEW(obj)         (GTK_CHECK_TYPE ((obj), SCIM_TYPE_STRING_VIEW))
-#define SCIM_IS_STRING_VIEW_CLASS(klass) (GTK_CHECK_CLASS_TYPE ((klass), SCIM_TYPE_STRING_VIEW))
-#define SCIM_STRING_VIEW_GET_CLASS(obj)  (GTK_CHECK_GET_CLASS ((obj), SCIM_TYPE_STRING_VIEW, ScimStringViewClass))
+#define SCIM_STRING_VIEW(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), SCIM_TYPE_STRING_VIEW, ScimStringView))
+#define SCIM_STRING_VIEW_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), SCIM_TYPE_STRING_VIEW, ScimStringViewClass))
+#define SCIM_IS_STRING_VIEW(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), SCIM_TYPE_STRING_VIEW))
+#define SCIM_IS_STRING_VIEW_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), SCIM_TYPE_STRING_VIEW))
+#define SCIM_STRING_VIEW_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), SCIM_TYPE_STRING_VIEW, ScimStringViewClass))
 
 
 typedef struct _ScimStringView       ScimStringView;

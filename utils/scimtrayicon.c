@@ -328,7 +328,7 @@ make_transparent_again (GtkWidget *widget, GtkStyle *previous_style,
 static void
 make_transparent (GtkWidget *widget, gpointer user_data)
 {
-    if (GTK_WIDGET_NO_WINDOW (widget) || GTK_WIDGET_APP_PAINTABLE (widget))
+    if (!gtk_widget_get_has_window (widget) || gtk_widget_get_app_paintable (widget))
         return;
 
     gtk_widget_set_app_paintable (widget, TRUE);

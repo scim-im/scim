@@ -151,7 +151,6 @@ typedef std::map <String, std::vector <FilterInfo> >                            
 // Internal data declaration.
 static bool           __have_changed         = false;
 
-static GtkTooltips   *__widget_tooltips      = 0;
 static GtkTreeStore  *__factory_list_model   = 0;
 static GtkWidget     *__hotkey_button        = 0;
 static GtkWidget     *__filter_button        = 0;
@@ -287,8 +286,6 @@ create_setup_window ()
         GtkWidget *scrolledwindow;
         GtkWidget *button;
 
-        __widget_tooltips = gtk_tooltips_new ();
-
         // Create the toplevel box.
         window = gtk_vbox_new (FALSE, 0);
         gtk_widget_show (window);
@@ -316,8 +313,8 @@ create_setup_window ()
                           G_CALLBACK (on_hotkey_button_clicked),
                           NULL);
 
-        gtk_tooltips_set_tip (__widget_tooltips, __hotkey_button,
-                              _("Edit Hotkeys associated with the selected input method."), NULL);
+        gtk_widget_set_tooltip_text (__hotkey_button,
+                              _("Edit Hotkeys associated with the selected input method."));
 
         __filter_button = gtk_button_new_with_mnemonic (_("Select _Filters"));
         gtk_widget_show (__filter_button);
@@ -327,8 +324,8 @@ create_setup_window ()
                           G_CALLBACK (on_filter_button_clicked),
                           NULL);
 
-        gtk_tooltips_set_tip (__widget_tooltips, __filter_button,
-                              _("Select the Filters which will be attached to this input method."), NULL);
+        gtk_widget_set_tooltip_text (__filter_button,
+                              _("Select the Filters which will be attached to this input method."));
 
         view = create_factory_list_view ();
         gtk_widget_show (view);
@@ -353,8 +350,8 @@ create_setup_window ()
                           G_CALLBACK (on_expand_button_clicked),
                           (gpointer) view);
 
-        gtk_tooltips_set_tip (__widget_tooltips, button,
-                              _("Expand all language categories."), NULL);
+        gtk_widget_set_tooltip_text (button,
+                              _("Expand all language categories."));
 
         button = gtk_button_new_with_mnemonic (_("_Collapse"));
         gtk_widget_show (button);
@@ -364,8 +361,8 @@ create_setup_window ()
                           G_CALLBACK (on_collapse_button_clicked),
                           (gpointer) view);
 
-        gtk_tooltips_set_tip (__widget_tooltips, button,
-                              _("Collapse all language categories."), NULL);
+        gtk_widget_set_tooltip_text (button,
+                              _("Collapse all language categories."));
 
         button = gtk_button_new_with_mnemonic (_("E_nable All"));
         gtk_widget_show (button);
@@ -375,8 +372,8 @@ create_setup_window ()
                           G_CALLBACK (on_toggle_all_button_clicked),
                           (gpointer) (1));
 
-        gtk_tooltips_set_tip (__widget_tooltips, button,
-                              _("Enable all input methods."), NULL);
+        gtk_widget_set_tooltip_text (button,
+                              _("Enable all input methods."));
 
         button = gtk_button_new_with_mnemonic (_("_Disable All"));
         gtk_widget_show (button);
@@ -386,8 +383,8 @@ create_setup_window ()
                           G_CALLBACK (on_toggle_all_button_clicked),
                           (gpointer) (0));
 
-        gtk_tooltips_set_tip (__widget_tooltips, button,
-                              _("Disable all input methods."), NULL);
+        gtk_widget_set_tooltip_text (button,
+                              _("Disable all input methods."));
     }
     return window;
 }
@@ -601,7 +598,7 @@ scale_pixbuf (GdkPixbuf **pixbuf, int width, int height)
         if (gdk_pixbuf_get_width (*pixbuf) != width ||
             gdk_pixbuf_get_height (*pixbuf) != height) {
             GdkPixbuf *dest = gdk_pixbuf_scale_simple (*pixbuf, width, height, GDK_INTERP_BILINEAR);
-            gdk_pixbuf_unref (*pixbuf);
+            g_object_unref (*pixbuf);
             *pixbuf = dest;
         }
         return *pixbuf;
@@ -1423,8 +1420,6 @@ on_filter_button_clicked (GtkButton *button, gpointer user_data)
                                               GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
                                               NULL);
  
-        gtk_dialog_set_has_separator (GTK_DIALOG (dialog), TRUE);
-
         scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
         gtk_widget_show (scrolledwindow);
         gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow),

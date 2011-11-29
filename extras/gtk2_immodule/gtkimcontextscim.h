@@ -29,7 +29,7 @@
 #ifndef __GTK_IM_CONTEXT_SCIM_H__
 #define __GTK_IM_CONTEXT_SCIM_H__
 
-#include <gtk/gtkimcontext.h>
+#include <gtk/gtk.h>
 
 typedef struct _GtkIMContextSCIM       GtkIMContextSCIM;
 typedef struct _GtkIMContextSCIMClass  GtkIMContextSCIMClass;

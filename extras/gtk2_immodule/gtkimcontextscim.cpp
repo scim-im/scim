@@ -70,11 +70,11 @@ using namespace scim;
 #include "gtkimcontextscim.h"
 
 #define GTK_TYPE_IM_CONTEXT_SCIM             _gtk_type_im_context_scim
-#define GTK_IM_CONTEXT_SCIM(obj)             (GTK_CHECK_CAST ((obj), GTK_TYPE_IM_CONTEXT_SCIM, GtkIMContextSCIM))
-#define GTK_IM_CONTEXT_SCIM_CLASS(klass)     (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_IM_CONTEXT_SCIM, GtkIMContextSCIMClass))
-#define GTK_IS_IM_CONTEXT_SCIM(obj)          (GTK_CHECK_TYPE ((obj), GTK_TYPE_IM_CONTEXT_SCIM))
-#define GTK_IS_IM_CONTEXT_SCIM_CLASS(klass)  (GTK_CHECK_CLASS_TYPE ((klass), GTK_TYPE_IM_CONTEXT_SCIM))
-#define GTK_IM_CONTEXT_SCIM_GET_CLASS(obj)   (GTK_CHECK_GET_CLASS ((obj), GTK_TYPE_IM_CONTEXT_SCIM, GtkIMContextSCIMClass))
+#define GTK_IM_CONTEXT_SCIM(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_TYPE_IM_CONTEXT_SCIM, GtkIMContextSCIM))
+#define GTK_IM_CONTEXT_SCIM_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GTK_TYPE_IM_CONTEXT_SCIM, GtkIMContextSCIMClass))
+#define GTK_IS_IM_CONTEXT_SCIM(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTK_TYPE_IM_CONTEXT_SCIM))
+#define GTK_IS_IM_CONTEXT_SCIM_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), GTK_TYPE_IM_CONTEXT_SCIM))
+#define GTK_IM_CONTEXT_SCIM_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GTK_TYPE_IM_CONTEXT_SCIM, GtkIMContextSCIMClass))
 
 #ifndef SCIM_KEYBOARD_ICON_FILE
   #define SCIM_KEYBOARD_ICON_FILE            (SCIM_ICONDIR "/keyboard.png")
@@ -445,7 +445,7 @@ gtk_im_context_scim_register_type (GTypeModule *type_module)
         NULL,                 /* class_data */
         sizeof               (GtkIMContextSCIM),
         0,
-        (GtkObjectInitFunc)  gtk_im_context_scim_init,
+        (GInstanceInitFunc)  gtk_im_context_scim_init,
     };
 
     SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_register_type...\n";
@@ -1286,7 +1286,7 @@ panel_req_update_screen (GtkIMContextSCIM *ic)
 {
 #if GDK_MULTIHEAD_SAFE
     if (ic->impl->client_window) {
-        GdkScreen *screen = gdk_drawable_get_screen (GDK_DRAWABLE (ic->impl->client_window));
+        GdkScreen *screen = gdk_window_get_screen (ic->impl->client_window);
         if (screen) {
             int number = gdk_screen_get_number (screen);
             _panel_client.update_screen (ic->id, number);
@@ -1592,7 +1592,7 @@ get_gdk_keymap (GdkWindow *window)
 
 #if GDK_MULTIHEAD_SAFE
     if (window)
-        keymap = gdk_keymap_get_for_display (gdk_drawable_get_display (window));
+        keymap = gdk_keymap_get_for_display (gdk_window_get_display (window));
     else
 #endif
         keymap = gdk_keymap_get_default ();
