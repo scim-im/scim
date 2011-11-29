@@ -220,6 +220,10 @@ PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.4.0 pango >= 1.1.0 gdk-pixbuf-2.0 >= 2.4.
 			[SCIM_HAS_GTK2=yes],
 			[SCIM_HAS_GTK2=no])
 
+PKG_CHECK_MODULES(GTK3, [gtk+-3.0 >= 3.0.0 pango >= 1.1.0 gdk-pixbuf-2.0 >= 2.4.0],
+			[SCIM_HAS_GTK3=yes],
+			[SCIM_HAS_GTK3=no])
+
 SCIM_HAS_GTK2_2=no
 if test "$SCIM_HAS_GTK2" = "yes"; then
   if $PKG_CONFIG --exists "gtk+-2.0 >= 2.2" ; then
@@ -244,6 +248,11 @@ if test "$SCIM_HAS_GTK2" = "yes"; then
   AC_SUBST(GTK_BINARY_VERSION)
 fi
 
+if test "$SCIM_HAS_GTK3" = "yes"; then
+  GTK3_IM_MODULEDIR=$GTK_LIBDIR/gtk-3.0/immodules
+  AC_SUBST(GTK3_IM_MODULEDIR)
+fi
+
 # Check if we have gthread
 PKG_CHECK_MODULES(GTHREAD2,[gthread-2.0 >= 2.0.0],
 			[SCIM_HAS_GTHREAD2=yes],
@@ -264,6 +273,11 @@ AC_ARG_WITH(gtk-im-module-dir,
 	    AS_HELP_STRING([--with-gtk-im-module-dir=dir], 
 	    [Select gtk immodule dir]),
 	    GTK_IM_MODULEDIR=$with_gtk_im_module_dir)
+
+AC_ARG_WITH(gtk3-im-module-dir,
+	    AS_HELP_STRING([--with-gtk3-im-module-dir=dir], 
+	    [Select gtk3 immodule dir]),
+	    GTK3_IM_MODULEDIR=$with_gtk3_im_module_dir)
 
 AC_ARG_ENABLE(ld-version-script,
 	      [  --enable-ld-version-script Use ld version script to limit exported symbols], ,
@@ -312,6 +326,10 @@ AC_ARG_ENABLE(filter-sctc,
 AC_ARG_ENABLE(gtk2-immodule,
 	      [  --disable-gtk2-immodule   Do not build GTK2 IMModule], , 
        	      enable_gtk2_immodule=yes)
+
+AC_ARG_ENABLE(gtk3-immodule,
+	      [  --disable-gtk3-immodule   Do not build GTK3 IMModule], , 
+       	      enable_gtk3_immodule=yes)
 
 AC_ARG_ENABLE(panel-gtk,
               [  --disable-panel-gtk       Do not build GTK2 Panel], , 
@@ -402,6 +420,13 @@ else
   enable_gtk2_immodule=no
 fi
 
+if test "$enable_gtk3_immodule" = "yes" -a "$SCIM_HAS_GTK3" = "yes"; then
+  SCIM_BUILD_GTK3_IMMODULE=1
+else
+  SCIM_BUILD_GTK3_IMMODULE=0
+  enable_gtk3_immodule=no
+fi
+
 if test "$enable_setup_ui" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
   SCIM_BUILD_SCIM_SETUP=1
   AC_DEFINE(HAVE_SCIM_SETUP,1,[Have scim-setup program.])
@@ -466,6 +491,9 @@ AM_CONDITIONAL(SCIM_BUILD_IMENGINE_RAWCODE,
 AM_CONDITIONAL(SCIM_BUILD_GTK2_IMMODULE,
 		[test "$enable_gtk2_immodule" = "yes"])
 
+AM_CONDITIONAL(SCIM_BUILD_GTK3_IMMODULE,
+		[test "$enable_gtk3_immodule" = "yes"])
+
 AM_CONDITIONAL(SCIM_BUILD_FILTER_SCTC,
 		[test "$enable_filter_sctc" = "yes"])
 
@@ -494,6 +522,7 @@ AC_SUBST(SCIM_BUILD_IMENGINE_TABLE)
 AC_SUBST(SCIM_BUILD_IMENGINE_SOCKET)
 AC_SUBST(SCIM_BUILD_FILTER_SCTC)
 AC_SUBST(SCIM_BUILD_GTK2_IMMODULE)
+AC_SUBST(SCIM_BUILD_GTK3_IMMODULE)
 AC_SUBST(SCIM_BUILD_SCIM_SETUP)
 AC_SUBST(SCIM_BUILD_PANEL_GTK)
 AC_SUBST(SCIM_BUILD_GTK_UTILS)
@@ -542,6 +571,7 @@ AC_CONFIG_FILES([Makefile
 	 	 configs/Makefile
 		 extras/Makefile
 		 extras/gtk2_immodule/Makefile
+		 extras/gtk3_immodule/Makefile
 		 extras/setup/Makefile
 		 extras/setup/scim-setup
 		 extras/panel/Makefile
@@ -582,6 +612,9 @@ Module options:
 
   GTK2 IMModule            $enable_gtk2_immodule
   GTK2 IMModule dir        $GTK_IM_MODULEDIR
+
+  GTK3 IMModule            $enable_gtk3_immodule
+  GTK3 IMModule dir        $GTK3_IM_MODULEDIR
 
   GUI Setup Utility        $enable_setup_ui
 
