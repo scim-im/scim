@@ -4,12 +4,7 @@
 #include <pango/pango.h>
 
 #include <glib.h>
-#include <gtk/gtkmain.h>
-#include <gtk/gtksettings.h>
-#include <gtk/gtksignal.h>
-#include <gtk/gtkwindow.h>
-#include <gtk/gtkgc.h>
-#include <gtk/gtkstyle.h>
+#include <gtk/gtk.h>
 
 #include "scim_private.h"
 #include "scimstringview.h"
@@ -406,7 +401,7 @@ scim_string_view_get_property (GObject         *object,
 static void
 scim_string_view_init (ScimStringView *string_view)
 {
-  GTK_WIDGET_SET_FLAGS (string_view, GTK_CAN_FOCUS);
+  gtk_widget_set_can_focus (string_view, TRUE);
 
   string_view->text_size = MIN_SIZE;
   string_view->text = g_malloc (string_view->text_size);
@@ -456,7 +451,7 @@ scim_string_view_realize (GtkWidget *widget)
   GdkWindowAttr attributes;
   gint attributes_mask;
 
-  GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+  gtk_widget_set_realized (widget, TRUE);
   string_view = SCIM_STRING_VIEW (widget);
 
   attributes.window_type = GDK_WINDOW_CHILD;
@@ -488,8 +483,8 @@ scim_string_view_realize (GtkWidget *widget)
 
   widget->style = gtk_style_attach (widget->style, widget->window);
 
-  gdk_window_set_background (widget->window, &widget->style->base[GTK_WIDGET_STATE (widget)]);
-  gdk_window_set_background (string_view->text_area, &widget->style->base[GTK_WIDGET_STATE (widget)]);
+  gdk_window_set_background (widget->window, &widget->style->base[gtk_widget_get_state (widget)]);
+  gdk_window_set_background (string_view->text_area, &widget->style->base[gtk_widget_get_state (widget)]);
 
   gdk_window_show (string_view->text_area);
 
@@ -652,7 +647,7 @@ scim_string_view_size_allocate (GtkWidget     *widget,
   
   widget->allocation = *allocation;
   
-  if (GTK_WIDGET_REALIZED (widget))
+  if (gtk_widget_get_realized (widget))
     {
       /* We call gtk_widget_get_child_requisition, since we want (for
        * backwards compatibility reasons) the realization here to
@@ -687,9 +682,9 @@ scim_string_view_draw_frame (GtkWidget *widget)
                         "focus-line-width", &focus_width,
                         NULL);
   
-  gdk_window_get_size (widget->window, &width, &height);
+  gdk_drawable_get_size (widget->window, &width, &height);
   
-  if (GTK_WIDGET_HAS_FOCUS (widget) && !interior_focus)
+  if (gtk_widget_has_focus (widget) && !interior_focus)
     {
       x += focus_width;
       y += focus_width;
@@ -702,14 +697,14 @@ scim_string_view_draw_frame (GtkWidget *widget)
                     NULL, widget, "entry",
                     x, y, width, height);
 
-  if (GTK_WIDGET_HAS_FOCUS (widget) && !interior_focus)
+  if (gtk_widget_has_focus (widget) && !interior_focus)
     {
       x -= focus_width;
       y -= focus_width;
       width += 2 * focus_width;
       height += 2 * focus_width;
       
-      gtk_paint_focus (widget->style, widget->window, GTK_WIDGET_STATE (widget), 
+      gtk_paint_focus (widget->style, widget->window, gtk_widget_get_state (widget), 
                        NULL, widget, "entry",
                        0, 0, width, height);
     }
@@ -730,7 +725,7 @@ scim_string_view_expose (GtkWidget      *widget,
       get_text_area_size (string_view, NULL, NULL, &area_width, &area_height);
 
       gtk_paint_flat_box (widget->style, string_view->text_area, 
-                          GTK_WIDGET_STATE(widget), GTK_SHADOW_NONE,
+                          gtk_widget_get_state (widget), GTK_SHADOW_NONE,
                           NULL, widget, "entry_bg", 
                           0, 0, area_width, area_height);
       
@@ -820,10 +815,10 @@ scim_string_view_state_changed (GtkWidget      *widget,
 {
   ScimStringView *string_view = SCIM_STRING_VIEW (widget);
   
-  if (GTK_WIDGET_REALIZED (widget))
+  if (gtk_widget_get_realized (widget))
     {
-      gdk_window_set_background (widget->window, &widget->style->base[GTK_WIDGET_STATE (widget)]);
-      gdk_window_set_background (string_view->text_area, &widget->style->base[GTK_WIDGET_STATE (widget)]);
+      gdk_window_set_background (widget->window, &widget->style->base[gtk_widget_get_state (widget)]);
+      gdk_window_set_background (string_view->text_area, &widget->style->base[gtk_widget_get_state (widget)]);
     }
 
   gtk_widget_queue_draw (widget);
@@ -836,12 +831,12 @@ scim_string_view_style_set        (GtkWidget      *widget,
 {
   ScimStringView *string_view = SCIM_STRING_VIEW (widget);
 
-  if (previous_style && GTK_WIDGET_REALIZED (widget))
+  if (previous_style && gtk_widget_get_realized (widget))
     {
       scim_string_view_recompute (string_view);
 
-      gdk_window_set_background (widget->window, &widget->style->base[GTK_WIDGET_STATE (widget)]);
-      gdk_window_set_background (string_view->text_area, &widget->style->base[GTK_WIDGET_STATE (widget)]);
+      gdk_window_set_background (widget->window, &widget->style->base[gtk_widget_get_state (widget)]);
+      gdk_window_set_background (string_view->text_area, &widget->style->base[gtk_widget_get_state (widget)]);
     }
 }
 
@@ -977,7 +972,7 @@ scim_string_view_draw_text (ScimStringView *string_view)
 {
   GtkWidget *widget;
   
-  if (GTK_WIDGET_DRAWABLE (string_view))
+  if (gtk_widget_is_drawable (string_view))
     {
       PangoLayout *layout = scim_string_view_ensure_layout (string_view);
       gint x, y;
@@ -1248,7 +1243,7 @@ scim_string_view_draw_cursor (ScimStringView  *string_view)
     GTK_TEXT_DIR_LTR : GTK_TEXT_DIR_RTL;
   GtkTextDirection widget_direction = gtk_widget_get_direction (GTK_WIDGET (string_view));
   
-  if (GTK_WIDGET_DRAWABLE (string_view))
+  if (gtk_widget_is_drawable (string_view))
     {
       GtkWidget *widget = GTK_WIDGET (string_view);
       GdkRectangle cursor_location;
@@ -1264,7 +1259,7 @@ scim_string_view_draw_cursor (ScimStringView  *string_view)
       gint x1 = 0;
       gint x2 = 0;
 
-      gdk_window_get_size (string_view->text_area, &text_area_width, &text_area_height);
+      gdk_drawable_get_size (string_view->text_area, &text_area_width, &text_area_height);
 
       scim_string_view_get_cursor_locations (string_view, &strong_x, &weak_x);
 
@@ -1327,7 +1322,7 @@ scim_string_view_draw_cursor (ScimStringView  *string_view)
 static void
 scim_string_view_queue_draw (ScimStringView *string_view)
 {
-  if (GTK_WIDGET_REALIZED (string_view))
+  if (gtk_widget_get_realized (string_view))
     gdk_window_invalidate_rect (string_view->text_area, NULL, FALSE);
 }
 
@@ -1385,10 +1380,10 @@ scim_string_view_adjust_scroll (ScimStringView *string_view)
   PangoLayoutLine *line;
   PangoRectangle logical_rect;
 
-  if (!GTK_WIDGET_REALIZED (string_view))
+  if (!gtk_widget_get_realized (string_view))
     return;
   
-  gdk_window_get_size (string_view->text_area, &text_area_width, NULL);
+  gdk_drawable_get_size (string_view->text_area, &text_area_width, NULL);
   text_area_width -= 2 * INNER_BORDER;
 
   layout = scim_string_view_ensure_layout (string_view);

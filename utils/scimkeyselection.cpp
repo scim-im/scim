@@ -213,7 +213,7 @@ scim_key_selection_init (ScimKeySelection *keyselection)
     keyselection->key_code = gtk_entry_new ();
     gtk_widget_show (keyselection->key_code);
     gtk_box_pack_start (GTK_BOX (hbox), keyselection->key_code, TRUE, TRUE, 2);
-    gtk_entry_set_editable (GTK_ENTRY (keyselection->key_code), FALSE);
+    gtk_editable_set_editable (GTK_EDITABLE (keyselection->key_code), FALSE);
 
     button = gtk_button_new_with_label (_("..."));
     gtk_widget_show (button);
@@ -467,7 +467,7 @@ scim_key_grab_release_callback (GtkDialog   *dialog,
 GtkWidget*
 scim_key_selection_new (void)
 {
-  return GTK_WIDGET (gtk_type_new (SCIM_TYPE_KEY_SELECTION));
+  return GTK_WIDGET (g_object_new (SCIM_TYPE_KEY_SELECTION, NULL));
 }
 
 void
@@ -686,8 +686,6 @@ scim_key_selection_dialog_init (ScimKeySelectionDialog *keyseldialog)
 
     gtk_window_set_title (GTK_WINDOW (keyseldialog),
                           _("Key Selection"));
-
-    gtk_dialog_set_has_separator (GTK_DIALOG (dialog), TRUE);
 
     gtk_widget_pop_composite_child ();
 }
