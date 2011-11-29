@@ -94,7 +94,7 @@ SetupUI::SetupUI (const ConfigPointer &config, const String &display, const Help
     create_main_ui ();
     create_module_list_model ();
 
-    m_query_changed_timeout = gtk_timeout_add (200, query_changed_timeout_cb, this);
+    m_query_changed_timeout = g_timeout_add (200, query_changed_timeout_cb, this);
 
     m_helper_agent.open_connection (helper_info, display);
 
@@ -317,7 +317,7 @@ SetupUI::create_main_ui ()
     m_apply_button = gtk_button_new_from_stock ("gtk-apply");
     gtk_widget_show (m_apply_button);
     gtk_box_pack_end (GTK_BOX (hbox1), m_apply_button, FALSE, FALSE, 4);
-    GTK_WIDGET_SET_FLAGS (m_apply_button, GTK_CAN_DEFAULT);
+    gtk_widget_set_can_default (m_apply_button, TRUE);
     gtk_widget_set_sensitive (m_apply_button, FALSE);
 
     m_restore_button = gtk_button_new_from_stock ("gtk-revert-to-saved");
@@ -640,10 +640,10 @@ SetupUI::query_changed_timeout_cb (gpointer data)
         ui->m_current_module && ui->m_current_module->query_changed ())
         modified = true;
 
-    if (GTK_WIDGET_SENSITIVE (ui->m_apply_button) != modified)
+    if (gtk_widget_get_sensitive (ui->m_apply_button) != modified)
         gtk_widget_set_sensitive (ui->m_apply_button, modified);
 
-    if (GTK_WIDGET_SENSITIVE (ui->m_restore_button) != modified)
+    if (gtk_widget_get_sensitive (ui->m_restore_button) != modified)
         gtk_widget_set_sensitive (ui->m_restore_button, modified);
 
     return TRUE;
