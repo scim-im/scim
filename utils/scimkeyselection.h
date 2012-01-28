@@ -60,7 +60,11 @@ struct _ScimKeySelectionDialog
 
     GtkWidget *keysel;
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+    GtkWidget *content_area;
+#else
     GtkWidget *main_vbox;
+#endif
     GtkWidget *action_area;
 
     GtkWidget *ok_button;

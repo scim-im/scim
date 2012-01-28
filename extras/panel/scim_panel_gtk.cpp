@@ -277,7 +277,11 @@ static void       ui_command_menu_deactivate_cb        (GtkWidget      *item,
                                                         gpointer        user_data);
 
 #if ENABLE_TRAY_ICON
+#if GTK_CHECK_VERSION(3, 0, 0)
+static void       ui_tray_icon_destroy_cb              (GtkWidget      *object,
+#else
 static void       ui_tray_icon_destroy_cb              (GtkObject      *object,
+#endif
                                                         gpointer        user_data);
 static void       ui_tray_icon_popup_menu_cb           (GtkStatusIcon  *status_icon,
                                                         guint           button, 
@@ -990,19 +994,33 @@ ui_initialize (void)
                                 GTK_RESPONSE_OK,
                                 NULL);
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+        g_signal_connect_swapped (GTK_WIDGET (_help_dialog), 
+                                  "response", 
+                                  G_CALLBACK (gtk_widget_hide),
+                                  GTK_WIDGET (_help_dialog));
+#else
         g_signal_connect_swapped (GTK_OBJECT (_help_dialog), 
                                   "response", 
                                   G_CALLBACK (gtk_widget_hide),
                                   GTK_OBJECT (_help_dialog));
+#endif
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+        g_signal_connect_swapped (GTK_WIDGET (_help_dialog), 
+                                  "delete_event", 
+                                  G_CALLBACK (gtk_widget_hide_on_delete),
+                                  GTK_WIDGET (_help_dialog));
+#else
         g_signal_connect_swapped (GTK_OBJECT (_help_dialog), 
                                   "delete_event", 
                                   G_CALLBACK (gtk_widget_hide_on_delete),
                                   GTK_OBJECT (_help_dialog));
+#endif
 
         _help_scroll = gtk_scrolled_window_new (NULL, NULL);
         gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (_help_scroll), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-        gtk_box_pack_start (GTK_BOX (GTK_DIALOG (_help_dialog)->vbox), _help_scroll, TRUE, TRUE, 0);
+        gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (_help_dialog))), _help_scroll, TRUE, TRUE, 0);
         gtk_widget_show (_help_scroll);
 
         _help_area = gtk_label_new ("");
@@ -1894,9 +1912,25 @@ ui_input_window_click_cb (GtkWidget *window,
         cursor = gdk_cursor_new (GDK_TOP_LEFT_ARROW);
     
         // Grab the cursor to prevent losing events.
+#if GTK_CHECK_VERSION(3, 0, 0)
+        GdkDisplay    *display;
+        GdkDevice     *pointer;
+        GdkDeviceManager *device_manager;
+        display = gdk_window_get_display (gtk_widget_get_window (window));
+        device_manager = gdk_display_get_device_manager (display);
+        pointer = gdk_device_manager_get_client_pointer (device_manager);
+
+        /* FIXME Not sure if report to GDK_OWNERSHIP_WINDOW
+           or GDK_OWNERSHIP_APPLICATION */
+        gdk_device_grab (pointer, gtk_widget_get_window (window),
+                         GDK_OWNERSHIP_WINDOW, TRUE,
+                         GdkEventMask (GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK),
+                         cursor, event->time);
+#else
         gdk_pointer_grab (window->window, TRUE,
                           (GdkEventMask) (GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK),
                           NULL, cursor, event->time);
+#endif
         gdk_cursor_unref (cursor);
         return TRUE;
     } else if (click_type == 1) {
@@ -2000,9 +2034,25 @@ ui_toolbar_window_click_cb (GtkWidget *window,
         cursor = gdk_cursor_new (GDK_TOP_LEFT_ARROW);
 
         // Grab the cursor to prevent losing events.
+#if GTK_CHECK_VERSION(3, 0, 0)
+        GdkDisplay    *display;
+        GdkDevice     *pointer;
+        GdkDeviceManager *device_manager;
+        display = gdk_window_get_display (gtk_widget_get_window (window));
+        device_manager = gdk_display_get_device_manager (display);
+        pointer = gdk_device_manager_get_client_pointer (device_manager);
+
+        /* FIXME Not sure if report to GDK_OWNERSHIP_WINDOW
+           or GDK_OWNERSHIP_APPLICATION */
+        gdk_device_grab (pointer, gtk_widget_get_window (window),
+                         GDK_OWNERSHIP_WINDOW, TRUE,
+                         GdkEventMask (GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK),
+                         cursor, event->time);
+#else
         gdk_pointer_grab (window->window, TRUE,
                           (GdkEventMask) (GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK),
                           NULL, cursor, event->time);
+#endif
         gdk_cursor_unref (cursor);
         return TRUE;
     } else if (click_type == 1 && event->button <= 1) {
@@ -2086,9 +2136,25 @@ ui_lookup_table_window_click_cb (GtkWidget *window,
         cursor = gdk_cursor_new (GDK_TOP_LEFT_ARROW);
     
         // Grab the cursor to prevent losing events.
+#if GTK_CHECK_VERSION(3, 0, 0)
+        GdkDisplay    *display;
+        GdkDevice     *pointer;
+        GdkDeviceManager *device_manager;
+        display = gdk_window_get_display (gtk_widget_get_window (window));
+        device_manager = gdk_display_get_device_manager (display);
+        pointer = gdk_device_manager_get_client_pointer (device_manager);
+
+        /* FIXME Not sure if report to GDK_OWNERSHIP_WINDOW
+           or GDK_OWNERSHIP_APPLICATION */
+        gdk_device_grab (pointer, gtk_widget_get_window (window),
+                         GDK_OWNERSHIP_WINDOW, TRUE,
+                         GdkEventMask (GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK),
+                         cursor, event->time);
+#else
         gdk_pointer_grab (window->window, TRUE,
                           (GdkEventMask) (GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK),
                           NULL, cursor, event->time);
+#endif
         gdk_cursor_unref (cursor);
         return TRUE;
     } else if (click_type == 1) {
