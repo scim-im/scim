@@ -111,18 +111,25 @@ static void
 scim_key_selection_class_init (ScimKeySelectionClass *klass)
 {
     GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+#if GTK_CHECK_VERSION(3, 0, 0)
+#else
     GtkObjectClass *object_class;
     GtkWidgetClass *widget_class;
 
     object_class = (GtkObjectClass*) klass;
     widget_class = (GtkWidgetClass*) klass;
+#endif
     parent_class = (GtkWidgetClass*) g_type_class_peek_parent (klass);
 
     gobject_class->finalize = scim_key_selection_finalize;
 
     key_selection_signals[KEY_SELECTION_CHANGED] =
         g_signal_new ("key-selection-changed",
+#if GTK_CHECK_VERSION(3, 0, 0)
+                    G_TYPE_FROM_CLASS (gobject_class),
+#else
                     G_TYPE_FROM_CLASS (object_class),
+#endif
                     G_SIGNAL_RUN_FIRST,
                     G_STRUCT_OFFSET (ScimKeySelectionClass, changed),
                     NULL,
@@ -664,16 +671,28 @@ scim_key_selection_dialog_init (ScimKeySelectionDialog *keyseldialog)
     gtk_container_set_border_width (GTK_CONTAINER (keyseldialog), 4);
     gtk_window_set_resizable (GTK_WINDOW (keyseldialog), TRUE);
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+    keyseldialog->content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+#else
     keyseldialog->main_vbox = dialog->vbox;
+#endif
 
     keyseldialog->keysel = scim_key_selection_new ();
     gtk_container_set_border_width (GTK_CONTAINER (keyseldialog->keysel), 4);
     gtk_widget_show (keyseldialog->keysel);
+#if GTK_CHECK_VERSION(3, 0, 0)
+    gtk_box_pack_start (GTK_BOX (keyseldialog->content_area),
+#else
     gtk_box_pack_start (GTK_BOX (keyseldialog->main_vbox),
+#endif
                         keyseldialog->keysel, TRUE, TRUE, 0);
 
     /* Create the action area */
+#if GTK_CHECK_VERSION(3, 0, 0)
+    keyseldialog->action_area = gtk_dialog_get_action_area (GTK_DIALOG (dialog));
+#else
     keyseldialog->action_area = dialog->action_area;
+#endif
 
     keyseldialog->cancel_button = gtk_dialog_add_button (dialog,
                                                         GTK_STOCK_CANCEL,

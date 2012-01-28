@@ -32,7 +32,7 @@ endif
 
 noinst_HEADERS = gtkimcontextscim.h
 
-moduledir = @GTK_IM_MODULEDIR@
+moduledir = @GTK2_IM_MODULEDIR@
 
 module_LTLIBRARIES = $(CONFIG_GTK2_IMMODULE)
 

@@ -1427,7 +1427,11 @@ on_filter_button_clicked (GtkButton *button, gpointer user_data)
         gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow), 
                                              GTK_SHADOW_NONE);
   
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), scrolledwindow, TRUE, TRUE, 2);
+#else
         gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dialog)->vbox), scrolledwindow, TRUE, TRUE, 2);
+#endif
 
         view = create_filter_list_view ();
         set_filter_list_view_content (GTK_TREE_VIEW (view), __filter_infos, enabled_filters);
@@ -1436,11 +1440,19 @@ on_filter_button_clicked (GtkButton *button, gpointer user_data)
  
         separator = gtk_hseparator_new ();
         gtk_widget_show (separator);
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), separator, FALSE, FALSE, 2);
+#else
         gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dialog)->vbox), separator, FALSE, FALSE, 2);
+#endif
 
         hbox = gtk_hbox_new (FALSE, 4);
         gtk_widget_show (hbox);
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), hbox, FALSE, FALSE, 2);
+#else
         gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dialog)->vbox), hbox, FALSE, FALSE, 2);
+#endif
 
         button = gtk_button_new_with_mnemonic (_("Move _Up"));
         gtk_widget_show (button);
