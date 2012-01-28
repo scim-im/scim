@@ -48,14 +48,14 @@ libscim_gtkutils@SCIM_EPOCH@_la_SOURCES = scimstringview.c \
 				  scimkeyselection.cpp \
 				  $(TRAY_ICON_SOURCE)
 
-libscim_gtkutils@SCIM_EPOCH@_la_CFLAGS = @GTK2_CFLAGS@
-libscim_gtkutils@SCIM_EPOCH@_la_CXXFLAGS= @GTK2_CFLAGS@
+libscim_gtkutils@SCIM_EPOCH@_la_CFLAGS = @GTK_CFLAGS@
+libscim_gtkutils@SCIM_EPOCH@_la_CXXFLAGS= @GTK_CFLAGS@
 
 libscim_gtkutils@SCIM_EPOCH@_la_LDFLAGS= -version-info $(SCIM_CURRENT):$(SCIM_REVISION):$(SCIM_AGE) \
 				  -export-dynamic \
 				  @LIBTOOL_EXPORT_OPTIONS@ \
 				  @LTLIBINTL@ \
-				  @GTK2_LIBS@ 
+				  @GTK_LIBS@ 
 
 libscim_gtkutils@SCIM_EPOCH@_la_LIBADD= $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(X11_UTILS)
 

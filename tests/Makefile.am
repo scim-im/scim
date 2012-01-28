@@ -45,12 +45,12 @@ helpermoduledir		= $(libdir)/scim@SCIM_EPOCH@/$(SCIM_BINARY_VERSION)/Helper
 
 helpermodule_LTLIBRARIES= $(CONFIG_TEST_HELPER)
 test_helper_la_SOURCES	= scim_test_helper.cpp
-test_helper_la_CXXFLAGS	= @GTK2_CFLAGS@
+test_helper_la_CXXFLAGS	= @GTK_CFLAGS@
 test_helper_la_LDFLAGS	= -avoid-version \
 		     	  -rpath $(helpermoduledir) \
 			  -module \
 			  @LIBTOOL_EXPORT_OPTIONS@ \
-			  @GTK2_LIBS@ \
+			  @GTK_LIBS@ \
 			  @LTLIBINTL@
 test_helper_la_LIBADD	= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
 

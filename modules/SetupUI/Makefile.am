@@ -53,39 +53,39 @@ setupmodule_LTLIBRARIES  = $(CONFIG_FRONTEND_SETUP_MODULE) \
 			   $(CONFIG_PANEL_GTK_SETUP_MODULE)
 
 aaa_frontend_setup_la_SOURCES = scim_frontend_setup.cpp
-aaa_frontend_setup_la_CFLAGS  = @GTK2_CFLAGS@
-aaa_frontend_setup_la_CXXFLAGS= @GTK2_CFLAGS@
+aaa_frontend_setup_la_CFLAGS  = @GTK_CFLAGS@
+aaa_frontend_setup_la_CXXFLAGS= @GTK_CFLAGS@
 aaa_frontend_setup_la_LDFLAGS = -avoid-version \
 		    	     	  -rpath $(setupmoduledir) \
 		    		  -module \
     				  @LIBTOOL_EXPORT_OPTIONS@ \
-		    		  @GTK2_LIBS@ \
+		    		  @GTK_LIBS@ \
     				  @LTLIBINTL@
 aaa_frontend_setup_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
 				$(top_builddir)/utils/libscim-gtkutils@SCIM_EPOCH@.la
 
 
 aaa_imengine_setup_la_SOURCES = scim_imengine_setup.cpp
-aaa_imengine_setup_la_CFLAGS  = @GTK2_CFLAGS@
-aaa_imengine_setup_la_CXXFLAGS= @GTK2_CFLAGS@
+aaa_imengine_setup_la_CFLAGS  = @GTK_CFLAGS@
+aaa_imengine_setup_la_CXXFLAGS= @GTK_CFLAGS@
 aaa_imengine_setup_la_LDFLAGS = -avoid-version \
 				-rpath $(setupmoduledir) \
 				-module \
 				@LIBTOOL_EXPORT_OPTIONS@ \
-				@GTK2_LIBS@ \
+				@GTK_LIBS@ \
 				@LTLIBINTL@
 aaa_imengine_setup_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
 				$(top_builddir)/utils/libscim-gtkutils@SCIM_EPOCH@.la
 
 
 panel_gtk_setup_la_SOURCES     = scim_panel_gtk_setup.cpp
-panel_gtk_setup_la_CFLAGS      = @GTK2_CFLAGS@
-panel_gtk_setup_la_CXXFLAGS    = @GTK2_CFLAGS@
+panel_gtk_setup_la_CFLAGS      = @GTK_CFLAGS@
+panel_gtk_setup_la_CXXFLAGS    = @GTK_CFLAGS@
 panel_gtk_setup_la_LDFLAGS     = -avoid-version \
 			     	 -rpath $(setupmoduledir) \
 				 -module \
 				 @LIBTOOL_EXPORT_OPTIONS@ \
-				 @GTK2_LIBS@ \
+				 @GTK_LIBS@ \
 				 @LTLIBINTL@
 panel_gtk_setup_la_LIBADD      = $(top_builddir)/src/libscim@SCIM_EPOCH@.la
 
