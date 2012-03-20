@@ -50,13 +50,13 @@ setup_la_SOURCES	= scim_setup_ui.cpp \
 			  scim_setup_module.cpp \
 			  scim_setup_helper.cpp
 
-setup_la_CXXFLAGS	= @GTK2_CFLAGS@
+setup_la_CXXFLAGS	= @GTK_CFLAGS@
 
 setup_la_LDFLAGS	= -avoid-version \
 		     	  -rpath $(moduledir) \
 			  -module \
 			  @LIBTOOL_EXPORT_OPTIONS@ \
-			  @GTK2_LIBS@ \
+			  @GTK_LIBS@ \
 			  @LTLIBINTL@
 
 setup_la_LIBADD		= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
