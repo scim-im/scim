@@ -252,7 +252,11 @@ SetupUI::create_main_ui ()
 
     // Create statusbar.
     m_status_bar = gtk_statusbar_new ();
+#if GTK_CHECK_VERSION(3, 0, 0)
+    gtk_window_set_has_resize_grip (GTK_WINDOW(m_main_window), TRUE);
+#else
     gtk_statusbar_set_has_resize_grip (GTK_STATUSBAR (m_status_bar), TRUE);
+#endif
     gtk_widget_show (m_status_bar);
     gtk_box_pack_start (GTK_BOX (vbox1), m_status_bar, FALSE, FALSE, 0);
 
