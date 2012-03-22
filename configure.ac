@@ -248,7 +248,7 @@ fi
 if test "$SCIM_HAS_GTK3" = "yes"; then
   GTK3_VERSION=3.0.0
   GTK3_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk+-3.0`
-  GTK3_LIBDIR=`$PKG_CONFIG --variable=libdir gtk+-2.0`
+  GTK3_LIBDIR=`$PKG_CONFIG --variable=libdir gtk+-3.0`
   GTK3_IM_MODULEDIR=$GTK3_LIBDIR/gtk-3.0/immodules
   AC_SUBST(GTK3_IM_MODULEDIR)
 fi
