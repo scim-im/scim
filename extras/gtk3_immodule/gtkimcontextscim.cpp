@@ -455,6 +455,7 @@ gtk_im_context_scim_register_type (GTypeModule *type_module)
                                      "GtkIMContextSCIM",
                                      &im_context_scim_info,
                                      (GTypeFlags) 0);
+        g_type_module_use (type_module);
     }
 }
 
