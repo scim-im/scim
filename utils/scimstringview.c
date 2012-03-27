@@ -313,7 +313,7 @@ scim_string_view_class_init (ScimStringViewClass *class)
                                                         _("The contents of the string view"),
                                                         "",
                                                         G_PARAM_READABLE | G_PARAM_WRITABLE));
-  
+
   string_view_signals[MOVE_CURSOR] = g_signal_new ("move_cursor",
 #if GTK_CHECK_VERSION(3, 0, 0)
                                         G_TYPE_FROM_CLASS (gobject_class),
@@ -869,13 +869,10 @@ scim_string_view_expose (GtkWidget      *widget,
 #if GTK_CHECK_VERSION(3, 0, 0)
   if (gtk_cairo_should_draw_window (cr, gtk_widget_get_window (widget)))
     scim_string_view_draw_frame (widget, cr);
+  else if (gtk_cairo_should_draw_window (cr, string_view->text_area))
 #else
   if (gtk_widget_get_window (widget) == event->window)
     scim_string_view_draw_frame (widget);
-#endif
-#if GTK_CHECK_VERSION(3, 0, 0)
-  if (gtk_cairo_should_draw_window (cr, string_view->text_area))
-#else
   else if (string_view->text_area == event->window)
 #endif
     {
@@ -1165,9 +1162,10 @@ scim_string_view_draw_text (ScimStringView *string_view)
 
 #if GTK_CHECK_VERSION(3, 0, 0)
       cairo_t *cr = gdk_cairo_create (string_view->text_area);
-      GtkStyleContext *style = gtk_widget_get_style_context (widget);
       GdkRGBA rgba;
-      gtk_style_context_get_color (style, gtk_widget_get_state (widget), &rgba);
+      gtk_style_context_get_color (gtk_widget_get_style_context (widget),
+                                   gtk_widget_get_state (widget),
+                                   &rgba);
       gdk_cairo_set_source_rgba (cr, &rgba);
       cairo_move_to (cr, x, y);
       pango_cairo_show_layout (cr, layout);
@@ -1177,7 +1175,7 @@ scim_string_view_draw_text (ScimStringView *string_view)
                        x, y,
                        layout);
 #endif
-      
+       
       if (string_view->highlight_start >=0 &&
           string_view->highlight_start < string_view->highlight_end &&
           string_view->highlight_start < string_view->text_length)
@@ -1192,6 +1190,8 @@ scim_string_view_draw_text (ScimStringView *string_view)
           gint end_index = g_utf8_offset_to_pointer (text, end_pos) - text;
 #if GTK_CHECK_VERSION(3, 0, 0)
           cairo_region_t *clip_region = cairo_region_create ();
+          GdkRGBA selection_rgba;
+          GdkRGBA text_rgba;
 #else
           GdkRegion *clip_region = gdk_region_new ();
           GdkGC *text_gc;
@@ -1206,6 +1206,14 @@ scim_string_view_draw_text (ScimStringView *string_view)
           pango_layout_get_extents (layout, NULL, &logical_rect);
           
 #if GTK_CHECK_VERSION(3, 0, 0)
+          gtk_style_context_get_background_color (
+              gtk_widget_get_style_context (widget),
+              GTK_STATE_FLAG_ACTIVE,
+              &selection_rgba);
+          gtk_style_context_get_color (
+              gtk_widget_get_style_context (widget),
+              GTK_STATE_ACTIVE,
+              &text_rgba);
 #else
           selection_gc = widget->style->base_gc [GTK_STATE_ACTIVE];
           text_gc = widget->style->text_gc [GTK_STATE_ACTIVE];
@@ -1226,9 +1234,10 @@ scim_string_view_draw_text (ScimStringView *string_view)
                 
 #if GTK_CHECK_VERSION(3, 0, 0)
               cairo_t *cr = gdk_cairo_create (string_view->text_area);
-              cairo_set_source_surface (cr, cairo_get_target (cr), rect.x, rect.y);
+              cairo_set_source_surface (cr, cairo_get_target (cr), 0, 0);
               cairo_pattern_set_extend (cairo_get_source (cr), CAIRO_EXTEND_REPEAT);
-              cairo_rectangle (cr, 0, 0, rect.width-rect.x, rect.height-rect.y);
+              gdk_cairo_set_source_rgba (cr, &selection_rgba);
+              cairo_rectangle (cr, rect.x, rect.y, rect.width, rect.height);
               cairo_fill (cr);
               cairo_destroy (cr);
               cairo_region_union_rectangle (clip_region, &rect);
@@ -1244,10 +1253,7 @@ scim_string_view_draw_text (ScimStringView *string_view)
           cairo_t *cr = gdk_cairo_create (string_view->text_area);
           gdk_cairo_region (cr, clip_region);
           cairo_clip (cr);
-          GtkStyleContext *style = gtk_widget_get_style_context (widget);
-          GdkRGBA rgba;
-          gtk_style_context_get_color (style, gtk_widget_get_state (widget), &rgba);
-          gdk_cairo_set_source_rgba (cr, &rgba);
+          gdk_cairo_set_source_rgba (cr, &text_rgba);
           cairo_move_to (cr, x, y);
           pango_cairo_show_layout (cr, layout);
           cairo_destroy (cr);
