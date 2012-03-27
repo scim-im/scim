@@ -472,10 +472,17 @@ static bool               _ui_initialized              = false;
 
 static int                _lookup_table_index [SCIM_LOOKUP_TABLE_MAX_PAGESIZE+1];
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+static GdkRGBA           _normal_bg;
+static GdkRGBA           _normal_text;
+static GdkRGBA           _active_bg;
+static GdkRGBA           _active_text;
+#else
 static GdkColor           _normal_bg;
 static GdkColor           _normal_text;
 static GdkColor           _active_bg;
 static GdkColor           _active_text;
+#endif
 
 static ConfigModule      *_config_module               = 0;
 static ConfigPointer      _config;
@@ -524,10 +531,17 @@ ui_load_config (void)
     String str;
 
     // Read configurations.
+#if GTK_CHECK_VERSION(3, 0, 0)
+    gdk_rgba_parse (&_normal_bg,   "gray92");
+    gdk_rgba_parse (&_normal_text, "black");
+    gdk_rgba_parse (&_active_bg,   "light blue");
+    gdk_rgba_parse (&_active_text, "black");
+#else
     gdk_color_parse ("gray92",     &_normal_bg);
     gdk_color_parse ("black",      &_normal_text);
     gdk_color_parse ("light blue", &_active_bg);
     gdk_color_parse ("black",      &_active_text);
+#endif
 
     if (_default_font_desc) {
         pango_font_description_free (_default_font_desc);
@@ -543,19 +557,35 @@ ui_load_config (void)
 
         str = _config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_BG),
                              String ("gray92"));
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gdk_rgba_parse (&_normal_bg, str.c_str ());
+#else
         gdk_color_parse (str.c_str (), &_normal_bg);
+#endif
 
         str = _config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_TEXT),
                              String ("black"));
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gdk_rgba_parse (&_normal_text, str.c_str ());
+#else
         gdk_color_parse (str.c_str (), &_normal_text);
+#endif
 
         str = _config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_BG),
                              String ("light blue"));
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gdk_rgba_parse (&_active_bg, str.c_str ());
+#else
         gdk_color_parse (str.c_str (), &_active_bg);
+#endif
 
         str = _config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_TEXT),
                              String ("black"));
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gdk_rgba_parse (&_active_text, str.c_str ());
+#else
         gdk_color_parse (str.c_str (), &_active_text);
+#endif
 
         _toolbar_window_x = _config->read (String (SCIM_CONFIG_PANEL_GTK_TOOLBAR_POS_X),
                                            _toolbar_window_x);
@@ -687,7 +717,11 @@ ui_initialize (void)
         GtkWidget *frame;
 
         _input_window = gtk_window_new (GTK_WINDOW_POPUP);
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gtk_widget_override_background_color (_input_window, GTK_STATE_FLAG_NORMAL, &_normal_bg);
+#else
         gtk_widget_modify_bg (_input_window, GTK_STATE_NORMAL, &_normal_bg);
+#endif
         gtk_window_set_resizable (GTK_WINDOW (_input_window), FALSE);
         gtk_widget_add_events (_input_window,GDK_BUTTON_PRESS_MASK);
         gtk_widget_add_events (_input_window,GDK_BUTTON_RELEASE_MASK);
@@ -714,10 +748,17 @@ ui_initialize (void)
         _preedit_area = scim_string_view_new ();
         if (_default_font_desc)
             gtk_widget_modify_font (_preedit_area, _default_font_desc);
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gtk_widget_override_background_color (_preedit_area, GTK_STATE_FLAG_NORMAL, &_normal_bg);
+        gtk_widget_override_background_color (_preedit_area, GTK_STATE_FLAG_ACTIVE, &_active_bg);
+        gtk_widget_override_color (_preedit_area, GTK_STATE_FLAG_NORMAL, &_normal_text);
+        gtk_widget_override_color (_preedit_area, GTK_STATE_FLAG_ACTIVE, &_active_text);
+#else
         gtk_widget_modify_base (_preedit_area, GTK_STATE_NORMAL, &_normal_bg);
         gtk_widget_modify_base (_preedit_area, GTK_STATE_ACTIVE, &_active_bg);
         gtk_widget_modify_text (_preedit_area, GTK_STATE_NORMAL, &_normal_text);
         gtk_widget_modify_text (_preedit_area, GTK_STATE_ACTIVE, &_active_text);
+#endif
         scim_string_view_set_width_chars (SCIM_STRING_VIEW (_preedit_area), 24);
         scim_string_view_set_forward_event (SCIM_STRING_VIEW (_preedit_area), TRUE);
         scim_string_view_set_auto_resize (SCIM_STRING_VIEW (_preedit_area), TRUE);
@@ -731,10 +772,17 @@ ui_initialize (void)
         _aux_area = scim_string_view_new ();
         if (_default_font_desc)
             gtk_widget_modify_font (_aux_area, _default_font_desc);
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gtk_widget_override_background_color (_aux_area, GTK_STATE_FLAG_NORMAL, &_normal_bg);
+        gtk_widget_override_background_color (_aux_area, GTK_STATE_FLAG_ACTIVE, &_active_bg);
+        gtk_widget_override_color (_aux_area, GTK_STATE_FLAG_NORMAL, &_normal_text);
+        gtk_widget_override_color (_aux_area, GTK_STATE_FLAG_ACTIVE, &_active_text);
+#else
         gtk_widget_modify_base (_aux_area, GTK_STATE_NORMAL, &_normal_bg);
         gtk_widget_modify_base (_aux_area, GTK_STATE_ACTIVE, &_active_bg);
         gtk_widget_modify_text (_aux_area, GTK_STATE_NORMAL, &_normal_text);
         gtk_widget_modify_text (_aux_area, GTK_STATE_ACTIVE, &_active_text);
+#endif
         scim_string_view_set_width_chars (SCIM_STRING_VIEW (_aux_area), 24);
         scim_string_view_set_draw_cursor (SCIM_STRING_VIEW (_aux_area), FALSE);
         scim_string_view_set_forward_event (SCIM_STRING_VIEW (_aux_area), TRUE);
@@ -765,7 +813,11 @@ ui_initialize (void)
             gtk_box_pack_start (GTK_BOX (lookup_table_parent), separator, FALSE, FALSE, 0);
         } else {
             _lookup_table_window = gtk_window_new (GTK_WINDOW_POPUP);
+#if GTK_CHECK_VERSION(3, 0, 0)
+            gtk_widget_override_background_color (_lookup_table_window, GTK_STATE_FLAG_NORMAL, &_normal_bg);
+#else
             gtk_widget_modify_bg (_lookup_table_window, GTK_STATE_NORMAL, &_normal_bg);
+#endif
             gtk_window_set_resizable (GTK_WINDOW (_lookup_table_window), FALSE);
             gtk_widget_add_events (_lookup_table_window,GDK_BUTTON_PRESS_MASK);
             gtk_widget_add_events (_lookup_table_window,GDK_BUTTON_RELEASE_MASK);
@@ -794,10 +846,17 @@ ui_initialize (void)
                 _lookup_table_items [i] = scim_string_view_new ();
                 if (_default_font_desc)
                     gtk_widget_modify_font (_lookup_table_items [i], _default_font_desc);
+#if GTK_CHECK_VERSION(3, 0, 0)
+                gtk_widget_override_background_color (_lookup_table_items [i], GTK_STATE_FLAG_NORMAL, &_normal_bg);
+                gtk_widget_override_background_color (_lookup_table_items [i], GTK_STATE_FLAG_ACTIVE, &_active_bg);
+                gtk_widget_override_color (_lookup_table_items [i], GTK_STATE_FLAG_NORMAL, &_normal_text);
+                gtk_widget_override_color (_lookup_table_items [i], GTK_STATE_FLAG_ACTIVE, &_active_text);
+#else
                 gtk_widget_modify_base (_lookup_table_items [i], GTK_STATE_NORMAL, &_normal_bg);
                 gtk_widget_modify_base (_lookup_table_items [i], GTK_STATE_ACTIVE, &_active_bg);
                 gtk_widget_modify_text (_lookup_table_items [i], GTK_STATE_NORMAL, &_normal_text);
                 gtk_widget_modify_text (_lookup_table_items [i], GTK_STATE_ACTIVE, &_active_text);
+#endif
                 scim_string_view_set_width_chars (SCIM_STRING_VIEW (_lookup_table_items [i]), 80);
                 scim_string_view_set_has_frame (SCIM_STRING_VIEW (_lookup_table_items [i]), FALSE);
                 scim_string_view_set_forward_event (SCIM_STRING_VIEW (_lookup_table_items [i]), TRUE);
@@ -841,10 +900,17 @@ ui_initialize (void)
             _lookup_table_items [0] = scim_string_view_new ();
             if (_default_font_desc)
                 gtk_widget_modify_font (_lookup_table_items [0], _default_font_desc);
+#if GTK_CHECK_VERSION(3, 0, 0)
+            gtk_widget_override_background_color (_lookup_table_items [0], GTK_STATE_FLAG_NORMAL, &_normal_bg);
+            gtk_widget_override_background_color (_lookup_table_items [0], GTK_STATE_FLAG_ACTIVE, &_active_bg);
+            gtk_widget_override_color (_lookup_table_items [0], GTK_STATE_FLAG_NORMAL, &_normal_text);
+            gtk_widget_override_color (_lookup_table_items [0], GTK_STATE_FLAG_ACTIVE, &_active_text);
+#else
             gtk_widget_modify_base (_lookup_table_items [0], GTK_STATE_NORMAL, &_normal_bg);
             gtk_widget_modify_base (_lookup_table_items [0], GTK_STATE_ACTIVE, &_active_bg);
             gtk_widget_modify_text (_lookup_table_items [0], GTK_STATE_NORMAL, &_normal_text);
             gtk_widget_modify_text (_lookup_table_items [0], GTK_STATE_ACTIVE, &_active_text);
+#endif
             scim_string_view_set_forward_event (SCIM_STRING_VIEW (_lookup_table_items [0]), TRUE);
             scim_string_view_set_auto_resize (SCIM_STRING_VIEW (_lookup_table_items [0]), TRUE);
             scim_string_view_set_has_frame (SCIM_STRING_VIEW (_lookup_table_items [0]), FALSE);
@@ -881,14 +947,26 @@ ui_initialize (void)
         }
 
         gtk_button_set_relief (GTK_BUTTON (_lookup_table_up_button), GTK_RELIEF_NONE);
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gtk_widget_override_background_color (_lookup_table_up_button, GTK_STATE_FLAG_ACTIVE, &_normal_bg);
+        gtk_widget_override_background_color (_lookup_table_up_button, GTK_STATE_FLAG_INSENSITIVE, &_normal_bg);
+        gtk_widget_override_background_color (_lookup_table_up_button, GTK_STATE_FLAG_PRELIGHT, &_normal_bg);
+#else
         gtk_widget_modify_bg (_lookup_table_up_button, GTK_STATE_ACTIVE, &_normal_bg);
         gtk_widget_modify_bg (_lookup_table_up_button, GTK_STATE_INSENSITIVE, &_normal_bg);
         gtk_widget_modify_bg (_lookup_table_up_button, GTK_STATE_PRELIGHT, &_normal_bg);
+#endif
 
         gtk_button_set_relief (GTK_BUTTON (_lookup_table_down_button), GTK_RELIEF_NONE);
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gtk_widget_override_background_color (_lookup_table_down_button, GTK_STATE_FLAG_ACTIVE, &_normal_bg);
+        gtk_widget_override_background_color (_lookup_table_down_button, GTK_STATE_FLAG_INSENSITIVE, &_normal_bg);
+        gtk_widget_override_background_color (_lookup_table_down_button, GTK_STATE_FLAG_PRELIGHT, &_normal_bg);
+#else
         gtk_widget_modify_bg (_lookup_table_down_button, GTK_STATE_ACTIVE, &_normal_bg);
         gtk_widget_modify_bg (_lookup_table_down_button, GTK_STATE_INSENSITIVE, &_normal_bg);
         gtk_widget_modify_bg (_lookup_table_down_button, GTK_STATE_PRELIGHT, &_normal_bg);
+#endif
 
         if (!_lookup_table_embedded)
             gtk_window_move (GTK_WINDOW (_lookup_table_window), ui_screen_width (), ui_screen_height ());
@@ -2308,7 +2386,11 @@ create_pango_attrlist (const String        &mbs,
                     attr->end_index = end_index;
                     pango_attr_list_insert (attrlist, attr);
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+                    attr = pango_attr_background_new (65536*_active_bg.red, 65536*_active_bg.green, 65536*_active_bg.blue);
+#else
                     attr = pango_attr_background_new (_active_bg.red, _active_bg.green, _active_bg.blue);
+#endif
                     attr->start_index = start_index;
                     attr->end_index = end_index;
                     pango_attr_list_insert (attrlist, attr);
