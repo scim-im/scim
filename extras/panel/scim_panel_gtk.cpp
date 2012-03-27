@@ -747,7 +747,12 @@ ui_initialize (void)
         //Create preedit area
         _preedit_area = scim_string_view_new ();
         if (_default_font_desc)
+#if GTK_CHECK_VERSION(3, 0, 0)
+            gtk_widget_override_font (_preedit_area, _default_font_desc);
+#else
             gtk_widget_modify_font (_preedit_area, _default_font_desc);
+#endif
+
 #if GTK_CHECK_VERSION(3, 0, 0)
         gtk_widget_override_background_color (_preedit_area, GTK_STATE_FLAG_NORMAL, &_normal_bg);
         gtk_widget_override_background_color (_preedit_area, GTK_STATE_FLAG_ACTIVE, &_active_bg);
@@ -771,7 +776,12 @@ ui_initialize (void)
         //Create aux area
         _aux_area = scim_string_view_new ();
         if (_default_font_desc)
+#if GTK_CHECK_VERSION(3, 0, 0)
+            gtk_widget_override_font (_aux_area, _default_font_desc);
+#else
             gtk_widget_modify_font (_aux_area, _default_font_desc);
+#endif
+
 #if GTK_CHECK_VERSION(3, 0, 0)
         gtk_widget_override_background_color (_aux_area, GTK_STATE_FLAG_NORMAL, &_normal_bg);
         gtk_widget_override_background_color (_aux_area, GTK_STATE_FLAG_ACTIVE, &_active_bg);
@@ -845,7 +855,12 @@ ui_initialize (void)
             for (int i=0; i<SCIM_LOOKUP_TABLE_MAX_PAGESIZE; ++i) {
                 _lookup_table_items [i] = scim_string_view_new ();
                 if (_default_font_desc)
+#if GTK_CHECK_VERSION(3, 0, 0)
+                    gtk_widget_override_font (_lookup_table_items [i], _default_font_desc);
+#else
                     gtk_widget_modify_font (_lookup_table_items [i], _default_font_desc);
+#endif
+
 #if GTK_CHECK_VERSION(3, 0, 0)
                 gtk_widget_override_background_color (_lookup_table_items [i], GTK_STATE_FLAG_NORMAL, &_normal_bg);
                 gtk_widget_override_background_color (_lookup_table_items [i], GTK_STATE_FLAG_ACTIVE, &_active_bg);
@@ -899,7 +914,12 @@ ui_initialize (void)
 
             _lookup_table_items [0] = scim_string_view_new ();
             if (_default_font_desc)
+#if GTK_CHECK_VERSION(3, 0, 0)
+                gtk_widget_override_font (_lookup_table_items [0], _default_font_desc);
+#else
                 gtk_widget_modify_font (_lookup_table_items [0], _default_font_desc);
+#endif
+
 #if GTK_CHECK_VERSION(3, 0, 0)
             gtk_widget_override_background_color (_lookup_table_items [0], GTK_STATE_FLAG_NORMAL, &_normal_bg);
             gtk_widget_override_background_color (_lookup_table_items [0], GTK_STATE_FLAG_ACTIVE, &_active_bg);
@@ -1597,7 +1617,11 @@ ui_create_label (const String   &name,
     gint width, height;
 
     if (_default_font_desc)
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gtk_widget_override_font (label, _default_font_desc);
+#else
         gtk_widget_modify_font (label, _default_font_desc);
+#endif
 
     gtk_icon_size_lookup (GTK_ICON_SIZE_MENU, &width, &height);
 
@@ -2911,7 +2935,11 @@ slot_update_factory_info (const PanelFactoryInfo &info)
         } else {
             newlabel = gtk_label_new (info.name.c_str ());
             if (_default_font_desc)
+#if GTK_CHECK_VERSION(3, 0, 0)
+                gtk_widget_override_font (newlabel, _default_font_desc);
+#else
                 gtk_widget_modify_font (newlabel, _default_font_desc);
+#endif
             gtk_widget_show (newlabel);
         }
 
