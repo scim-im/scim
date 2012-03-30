@@ -64,10 +64,6 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [The gettext domain])
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER([config.h])
 
-# Init gettext
-ALL_LINGUAS="as bn_IN ca cs de es fi fr gu hi it ja kn ko ml mr nl pa pt_BR ru sk sv ta te vi zh_CN zh_TW"
-AM_GNU_GETTEXT
-
 # Init libtool
 LT_CONFIG_LTDL_DIR([libltdl])
 LT_INIT([dlopen])
@@ -84,6 +80,13 @@ AC_SUBST(LIBTOOL_EXPORT_OPTIONS)
 AC_PROG_CXX
 AC_PROG_CC
 AC_LANG(C++)
+
+AC_GNU_SOURCE
+
+# Init gettext
+ALL_LINGUAS="as bn_IN ca cs de es fi fr gu hi it ja kn ko ml mr nl pa pt_BR ru sk sv ta te vi zh_CN zh_TW"
+AM_GNU_GETTEXT
+
 
 # Checks if doxygen is avaiable
 
@@ -599,7 +602,7 @@ AC_SUBST(SCIM_TEMPDIR)
 ##                      Output files.                    ##
 ###########################################################
 AC_SUBST(ac_aux_dir)
-AC_CONFIG_FILES([Makefile
+AC_CONFIG_FILES([Makefile po/Makefile.in
 		 intl/Makefile
 		 po/Makefile.in
 		 src/Makefile
