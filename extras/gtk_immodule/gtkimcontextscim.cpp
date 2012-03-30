@@ -1,5 +1,5 @@
 /** @file gtkimcontextscim.cpp
- *  @brief immodule for GTK3.
+ *  @brief immodule for GTK.
  */
 
 /* 
@@ -326,8 +326,10 @@ public:
         SCIM_DEBUG_FRONTEND(1) << "FinalizeHandler::FinalizeHandler ()\n";
     }
     ~FinalizeHandler () {
-        SCIM_DEBUG_FRONTEND(1) << "FinalizeHandler::~FinalizeHandler ()\n";
-        gtk_im_context_scim_shutdown ();
+        if (_scim_initialized) {
+            SCIM_DEBUG_FRONTEND(1) << "FinalizeHandler::~FinalizeHandler ()\n";
+            gtk_im_context_scim_shutdown ();
+        }
     }
 };
 
@@ -1731,7 +1733,7 @@ initialize (void)
         }
     }
 
-    SCIM_DEBUG_FRONTEND(1) << "Initializing GTK3 SCIM IMModule...\n";
+    SCIM_DEBUG_FRONTEND(1) << "Initializing GTK SCIM IMModule...\n";
 
     // Get system language.
     _language = scim_get_locale_language (scim_get_current_locale ());
@@ -1875,7 +1877,7 @@ initialize (void)
 static void
 finalize (void)
 {
-    SCIM_DEBUG_FRONTEND(1) << "Finalizing GTK3 SCIM IMModule...\n";
+    SCIM_DEBUG_FRONTEND(1) << "Finalizing GTK SCIM IMModule...\n";
 
     if (_snooper_installed) {
         gtk_key_snooper_remove(_snooper_id);

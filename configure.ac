@@ -620,8 +620,8 @@ AC_CONFIG_FILES([Makefile
 	 	 docs/manual/Makefile
 	 	 configs/Makefile
 		 extras/Makefile
-		 extras/gtk2_immodule/Makefile
-		 extras/gtk3_immodule/Makefile
+		 extras/gtk_immodule/gtk2/Makefile
+		 extras/gtk_immodule/gtk3/Makefile
 		 extras/setup/Makefile
 		 extras/setup/scim-setup
 		 extras/panel/Makefile
