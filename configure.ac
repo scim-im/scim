@@ -2,6 +2,7 @@
 AC_INIT([scim],[1.4.10],[http://sf.net/tracker/?atid=650539&group_id=108454])
 AC_CONFIG_SRCDIR([src/scim.h])
 
+
 ###########################################################
 ##          Some definitions of Version macros.          ##
 ###########################################################
@@ -84,6 +85,7 @@ AC_LANG(C++)
 # Init gettext
 ALL_LINGUAS="as bn_IN ca cs de es fi fr gu hi it ja kn ko ml mr nl pa pt_BR ru sk sv ta te vi zh_CN zh_TW"
 AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION(0.18)
 
 # Checks if doxygen is avaiable
 
@@ -600,7 +602,6 @@ AC_SUBST(SCIM_TEMPDIR)
 ###########################################################
 AC_SUBST(ac_aux_dir)
 AC_CONFIG_FILES([Makefile
-		 intl/Makefile
 		 po/Makefile.in
 		 src/Makefile
 		 src/scim_types.h
@@ -626,9 +627,6 @@ AC_CONFIG_FILES([Makefile
 		 extras/setup/scim-setup
 		 extras/panel/Makefile
 		 tests/Makefile
-		 intltool-extract
-		 intltool-merge
-		 intltool-update
 		 scim.pc
 		 scim-gtkutils.pc
 		 scim-x11utils.pc
@@ -674,4 +672,3 @@ Module options:
 
   Enable TrayIcon          $enable_tray_icon
 ])
-
