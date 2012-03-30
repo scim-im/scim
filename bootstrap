@@ -20,8 +20,7 @@
 #! /bin/sh
 
 set -x
-gettextize --force --no-changelog
-aclocal -I m4
+aclocal
 autoheader
 libtoolize -c --automake --ltdl
 automake --add-missing --copy --include-deps
