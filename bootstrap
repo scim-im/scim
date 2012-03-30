@@ -21,6 +21,6 @@
 
 set -x
 autoreconf --force --install
-intltoolize
+intltoolize --force
 autoreconf
 ## @end 1
