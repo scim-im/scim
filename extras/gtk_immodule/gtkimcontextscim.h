@@ -1,5 +1,5 @@
 /** @file gtkimcontextscim.h
- *  @brief immodule for GTK2.
+ *  @brief immodule for GTK2/GTK3.
  */
 
 /* 

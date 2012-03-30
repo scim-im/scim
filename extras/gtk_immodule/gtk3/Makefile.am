@@ -1,5 +1,5 @@
 MAINTAINERCLEANFILES 	= Makefile.in
-EXTRA_DIST		= im-scim.version-script
+EXTRA_DIST		= ../im-scim.version-script
 
 INCLUDES		= -I$(top_builddir) \
 			  -I$(top_builddir)/src \
@@ -30,13 +30,13 @@ if SCIM_LD_VERSION_SCRIPT
 LD_VERSION_SCRIPT_OPTION="-Wl,--version-script=$(srcdir)/im-scim.version-script"
 endif
 
-noinst_HEADERS = gtkimcontextscim.h
+noinst_HEADERS = ../gtkimcontextscim.h
 
 moduledir = @GTK3_IM_MODULEDIR@
 
 module_LTLIBRARIES = $(CONFIG_GTK3_IMMODULE)
 
-im_scim_la_SOURCES = gtkimcontextscim.cpp imscim.cpp
+im_scim_la_SOURCES = ../gtkimcontextscim.cpp ../imscim.cpp
 
 im_scim_la_CXXFLAGS=@GTK3_CFLAGS@
 im_scim_la_CFLAGS  =@GTK3_CFLAGS@
