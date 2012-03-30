@@ -24,7 +24,7 @@ AUX_DIST                = $(ac_aux_dir)/config.guess \
 			$(ac_aux_dir)/ltmain.sh \
 			$(ac_aux_dir)/missing
 
-EXTRA_DIST		= config.rpath  THANKS \
+EXTRA_DIST		= m4/ChangeLog  config.rpath  THANKS \
 			  mkinstalldirs \
 			  bootstrap \
 	      		  scim.spec \
