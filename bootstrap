@@ -20,9 +20,7 @@
 #! /bin/sh
 
 set -x
-aclocal -I m4
-autoheader
-libtoolize -c --automake --ltdl
-automake --add-missing --copy --include-deps
-autoconf
+autoreconf --force --install
+intltoolize
+autoreconf
 ## @end 1
