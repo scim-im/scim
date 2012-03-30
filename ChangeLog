@@ -1,3 +1,7 @@
+2012-03-30  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* Makefile.am (EXTRA_DIST): Add m4/ChangeLog.
+
 2009-11-25 14:09  paxerit
 
 	* Integrated patch that fixed a focusing bug that has been reported
