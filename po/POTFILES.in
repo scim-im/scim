@@ -1,5 +1,5 @@
-extras/gtk_immodule/gtkimcontextscim.cpp
-extras/gtk_immodule/imscim.cpp
+extras/gtk2_immodule/gtkimcontextscim.cpp
+extras/gtk2_immodule/imscim.cpp
 extras/panel/scim_panel_gtk.cpp
 extras/setup/scim-setup.desktop.in
 extras/setup/scim_setup_helper.cpp
