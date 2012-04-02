@@ -25,6 +25,7 @@
 
 #define Uses_SCIM_ICONV
 
+#include <cstring>
 #include "scim.h"
 
 static const char * utf8_strings [] = 
@@ -52,7 +53,7 @@ int main ()
 	while (*ptr) {
 		std::cout << "Convert: " << *ptr << "\n";
 
-		if (to_utf8.convert (wcs, *ptr, strlen (*ptr))) {
+		if (to_utf8.convert (wcs, *ptr, std::strlen (*ptr))) {
 			std::cout << "--> UTF-8 OK! ";
 			if (to_gb18030.convert (mbs, wcs) && to_gb18030.convert (wcs, mbs)) {
 				std::cout << "--> GB18030 OK!\n";
@@ -75,7 +76,7 @@ int main ()
 		} else {
 			std::cout << "--> UTF-8 Failed!\n";
 		}
-		if (to_utf8.test_convert (*ptr, strlen (*ptr))) {
+		if (to_utf8.test_convert (*ptr, std::strlen (*ptr))) {
 			std::cout << "Test UTF-8 OK!\n";
 		} else {
 			std::cout << "Test UTF-8 Failed!\n";
