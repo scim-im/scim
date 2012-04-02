@@ -26,6 +26,8 @@
 #define Uses_SCIM_SOCKET
 #define Uses_SCIM_SOCKET_TRANSACTION
 
+#include <cstring>
+
 #include "scim.h"
 #include <ctype.h>
 #include <unistd.h>
@@ -82,10 +84,10 @@ int main (int argc, char *argv[])
 		while (*ptr) {
 			char tmp [4096];
 
-			if ((size = client.write (*ptr, strlen (*ptr))) > 0) {
+			if ((size = client.write (*ptr, std::strlen (*ptr))) > 0) {
 				std::cout << "Write " << size << " bytes to socket server ok!\n";
 				if (client.read_with_timeout (tmp, size, 1000) == size &&
-					strncmp (*ptr, tmp, size) == 0) {
+					std::strncmp (*ptr, tmp, size) == 0) {
 					std::cout << "Read back ok!\n";
 				} else {
 					std::cerr << "Read back failed!\n";

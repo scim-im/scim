@@ -214,7 +214,7 @@ static void run (const String &display)
 {
     char **argv = new char * [4];
     int    argc = 1;
-    argv [0] = "test-helper";
+    argv [0] = const_cast<char*>("test-helper");
     argv [1] = 0;
 
 	HelperAgent  agent;
@@ -226,7 +226,11 @@ static void run (const String &display)
     gtk_init (&argc, &argv);
 
     main_window = gtk_window_new (GTK_WINDOW_POPUP);
+#if GTK_CHECK_VERSION(3, 0, 0)
+    gtk_window_set_resizable (GTK_WINDOW (main_window), FALSE);
+#else
     gtk_window_set_policy (GTK_WINDOW (main_window), FALSE, FALSE, TRUE);
+#endif
     gtk_widget_hide (main_window);
 
     vbox = gtk_vbox_new (FALSE, 0);
