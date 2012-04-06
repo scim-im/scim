@@ -819,13 +819,14 @@ gtk_im_context_scim_focus_out (GtkIMContext *context)
 
     SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_focus_out(" << context_scim->id << ")...\n";
 
-    if (_snooper_installed) {
-        SCIM_DEBUG_FRONTEND(2) << "Remove key snooper.\n";
-        gtk_key_snooper_remove (_snooper_id);
-        _snooper_installed = false;
-    }
-
     if (context_scim && context_scim->impl && context_scim == _focused_ic) {
+
+        if (_snooper_installed) {
+            SCIM_DEBUG_FRONTEND(2) << "Remove key snooper.\n";
+            gtk_key_snooper_remove (_snooper_id);
+            _snooper_installed = false;
+        }
+
         _panel_client.prepare (context_scim->id);
         context_scim->impl->si->focus_out ();
         if (context_scim->impl->shared_si) context_scim->impl->si->reset ();
