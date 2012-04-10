@@ -706,6 +706,11 @@ scim_key_selection_dialog_init (ScimKeySelectionDialog *keyseldialog)
     gtk_window_set_title (GTK_WINDOW (keyseldialog),
                           _("Key Selection"));
 
+#if GTK_CHECK_VERSION(2, 22, 0)
+#else
+    gtk_dialog_set_has_separator (GTK_DIALOG (dialog), TRUE);
+#endif
+
     gtk_widget_pop_composite_child ();
 }
 

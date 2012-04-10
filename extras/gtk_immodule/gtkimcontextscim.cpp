@@ -1596,7 +1596,11 @@ get_gdk_keymap (GdkWindow *window)
 
 #if GDK_MULTIHEAD_SAFE
     if (window)
+#if GTK_CHECK_VERSION(2, 24, 0)
         keymap = gdk_keymap_get_for_display (gdk_window_get_display (window));
+#else
+        keymap = gdk_keymap_get_for_display (gdk_drawable_get_display (window));
+#endif
     else
 #endif
         keymap = gdk_keymap_get_default ();
