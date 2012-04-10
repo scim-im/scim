@@ -248,8 +248,11 @@ create_setup_window ()
 #else
         __widget_toolbar_show_behaviour = gtk_combo_box_new_text ();
         gtk_combo_box_append_text (GTK_COMBO_BOX (__widget_toolbar_show_behaviour), 
+                                   _(__toolbar_show_behaviour_text[SCIM_TOOLBAR_SHOW_ALWAYS]));
         gtk_combo_box_append_text (GTK_COMBO_BOX (__widget_toolbar_show_behaviour),
+                                   _(__toolbar_show_behaviour_text[SCIM_TOOLBAR_SHOW_ON_DEMAND]));
         gtk_combo_box_append_text (GTK_COMBO_BOX (__widget_toolbar_show_behaviour),
+                                   _(__toolbar_show_behaviour_text[SCIM_TOOLBAR_SHOW_NEVER]));
 #endif
         gtk_widget_show (__widget_toolbar_show_behaviour);
         gtk_box_pack_start (GTK_BOX (hbox), __widget_toolbar_show_behaviour, FALSE, FALSE, 0);
