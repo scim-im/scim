@@ -1290,7 +1290,11 @@ panel_req_update_screen (GtkIMContextSCIM *ic)
 {
 #if GDK_MULTIHEAD_SAFE
     if (ic->impl->client_window) {
+#if GTK_CHECK_VERSION(2, 24, 0)
         GdkScreen *screen = gdk_window_get_screen (ic->impl->client_window);
+#else
+        GdkScreen *screen = gdk_drawable_get_screen (GDK_DRAWABLE (ic->impl->client_window));
+#endif
         if (screen) {
             int number = gdk_screen_get_number (screen);
             _panel_client.update_screen (ic->id, number);

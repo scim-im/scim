@@ -4,7 +4,8 @@
 #include <pango/pango.h>
 
 #include <glib.h>
-#if GTK_CHECK_VERSION(2, 24, 0)
+#include <gtk/gtk.h>
+#if GTK_CHECK_VERSION(2, 22, 0)
 #else
 #include <gtk/gtkmain.h>
 #include <gtk/gtksettings.h>
@@ -13,7 +14,6 @@
 #include <gtk/gtkgc.h>
 #include <gtk/gtkstyle.h>
 #endif
-#include <gtk/gtk.h>
 
 #include "scim_private.h"
 #include "scimstringview.h"
@@ -445,7 +445,7 @@ scim_string_view_get_property (GObject         *object,
 static void
 scim_string_view_init (ScimStringView *string_view)
 {
-#if GTK_VERSION_CHECK(2, 18, 0)
+#if GTK_CHECK_VERSION(2, 18, 0)
   gtk_widget_set_can_focus (GTK_WIDGET (string_view), TRUE);
 #else
   GTK_WIDGET_SET_FLAGS (string_view, GTK_CAN_FOCUS);
