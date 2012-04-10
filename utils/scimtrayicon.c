@@ -245,7 +245,11 @@ scim_tray_icon_send_manager_message (ScimTrayIcon *icon,
     ev.window = window;
     ev.message_type = icon->system_tray_opcode_atom;
     ev.format = 32;
+#if GTK_CHECK_VERSION(2, 14, 0)
     ev.data.l[0] = gdk_x11_get_server_time (gtk_widget_get_window (GTK_WIDGET (icon)));
+#else
+    ev.data.l[0] = gdk_x11_get_server_time (GTK_WIDGET (icon)->window);
+#endif
     ev.data.l[1] = message;
     ev.data.l[2] = data1;
     ev.data.l[3] = data2;
@@ -327,7 +331,11 @@ transparent_expose_event (GtkWidget *widget, GdkEventExpose *event, gpointer use
 {
 #if GTK_CHECK_VERSION(3, 0, 0)
 #else
+#if GTK_CHECK_VERSION(2, 14, 0)
     gdk_window_clear_area (gtk_widget_get_window (widget), event->area.x, event->area.y,
+#else
+    gdk_window_clear_area (widget->window, event->area.x, event->area.y,
+#endif
                            event->area.width, event->area.height);
 #endif
     return FALSE;
@@ -338,22 +346,30 @@ make_transparent_again (GtkWidget *widget, GtkStyle *previous_style,
                         gpointer user_data)
 {
 #if GTK_CHECK_VERSION(3, 0, 0)
-#else
+#elif GTK_CHECK_VERSION(2, 14, 0)
     gdk_window_set_back_pixmap (gtk_widget_get_window (widget), NULL, TRUE);
+#else
+    gdk_window_set_back_pixmap (widget->window, NULL, TRUE);
 #endif
 }
 
 static void
 make_transparent (GtkWidget *widget, gpointer user_data)
 {
+#if GTK_CHECK_VERSION(2, 18, 0)
     if (!gtk_widget_get_has_window (widget) || gtk_widget_get_app_paintable (widget))
+#else
+    if (GTK_WIDGET_NO_WINDOW (widget) || GTK_WIDGET_APP_PAINTABLE (widget))
+#endif
         return;
 
     gtk_widget_set_app_paintable (widget, TRUE);
     gtk_widget_set_double_buffered (widget, FALSE);
 #if GTK_CHECK_VERSION(3, 0, 0)
-#else
+#elif GTK_CHECK_VERSION(2, 14, 0)
     gdk_window_set_back_pixmap (gtk_widget_get_window (widget), NULL, TRUE);
+#else
+    gdk_window_set_back_pixmap (widget->window, NULL, TRUE);
 #endif
     g_signal_connect (widget, "expose_event",
                       G_CALLBACK (transparent_expose_event), NULL);

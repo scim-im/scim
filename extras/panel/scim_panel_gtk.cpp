@@ -408,6 +408,11 @@ static GtkWidget         *_help_scroll                 = 0;
 static GtkWidget         *_help_area                   = 0;
 static GtkWidget         *_command_menu                = 0;
 
+#if GTK_CHECK_VERSION(2, 12, 0)
+#else
+static GtkTooltips       *_tooltips                    = 0;
+#endif
+
 static PangoFontDescription *_default_font_desc        = 0;
 
 #if ENABLE_TRAY_ICON
@@ -690,6 +695,10 @@ ui_initialize (void)
     if (_input_window) gtk_widget_destroy (_input_window);
     if (_toolbar_window) gtk_widget_destroy (_toolbar_window);
     if (_help_dialog) gtk_widget_destroy (_help_dialog);
+#if GTK_CHECK_VERSION(2, 12, 0)
+#else
+    if (_tooltips) gtk_object_destroy (GTK_OBJECT (_tooltips));
+#endif
 
 #if ENABLE_TRAY_ICON
     if (_tray_icon) {
@@ -704,6 +713,10 @@ ui_initialize (void)
     _input_window = 0;
     _toolbar_window = 0;
     _help_dialog = 0;
+#if GTK_CHECK_VERSION(2, 12, 0)
+#else
+    _tooltips = 0;
+#endif
 
 #if GDK_MULTIHEAD_SAFE
     // Initialize the Display and Screen.
@@ -1165,17 +1178,41 @@ ui_initialize (void)
 
     // Init the tooltips
     {
+#if GTK_CHECK_VERSION(2, 12, 0)
+#else
+        _tooltips = gtk_tooltips_new ();
+
+        gtk_tooltips_set_delay (_tooltips, 1000);
+#endif
+
         if (_window_stick_button)
+#if GTK_CHECK_VERSION(2, 12, 0)
             gtk_widget_set_tooltip_text (_window_stick_button,
                                   _("Stick/unstick the input window and the toolbar."));
+#else
+            gtk_tooltips_set_tip (_tooltips, _window_stick_button,
+                                  _("Stick/unstick the input window and the toolbar."),
+                                  NULL);
+#endif
 
         if (_help_button)
+#if GTK_CHECK_VERSION(2, 12, 0)
             gtk_widget_set_tooltip_text (_help_button,
                                   _("Show a brief help about SCIM and the current input method."));
+#else
+            gtk_tooltips_set_tip (_tooltips, _help_button,
+                                  _("Show a brief help about SCIM and the current input method."),
+#endif
 
         if (_menu_button)
+#if GTK_CHECK_VERSION(2, 12, 0)
             gtk_widget_set_tooltip_text (_menu_button,
                                   _("Show command menu."));
+#else
+            gtk_tooltips_set_tip (_tooltips, _menu_button,
+                                  _("Show command menu."),
+                                  NULL);
+#endif
     }
 
 #ifdef GDK_WINDOWING_X11
@@ -1531,7 +1568,11 @@ ui_switch_screen (GdkScreen *screen)
 // static void
 // ui_tray_icon_realize_cb (GtkWidget *widget)
 // {
+// #if GTK_CHECK_VERSION(2, 18, 0)
 //     if (!gtk_widget_get_has_window (widget) || gtk_widget_get_app_paintable (widget))
+// #else
+//     if (GTK_WIDGET_NO_WINDOW (widget) || GTK_WIDGET_APP_PAINTABLE (widget))
+// #endif
 //         return;
 // 
 //     gtk_widget_set_app_paintable (widget, TRUE);
@@ -1806,7 +1847,11 @@ ui_create_factory_menu_entry (const PanelFactoryInfo &info,
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
     if (tooltip != "")
+#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (menu_item, tooltip.c_str ());
+#else
+        gtk_tooltips_set_tip (_tooltips, menu_item, tooltip.c_str (), NULL);
+#endif
 
     return menu_item;
 }
@@ -1827,7 +1872,11 @@ ui_help_button_click_cb (GtkButton *button,
 {
     SCIM_DEBUG_MAIN (3) << "  ui_help_button_click_cb...\n";
 
+#if GTK_CHECK_VERSION(2, 18, 0)
     if (gtk_widget_get_visible (_help_dialog)) {
+#else
+    if (GTK_WIDGET_VISIBLE (_help_dialog)) {
+#endif
         gtk_widget_hide (_help_dialog);
     } else {
         action_request_help ();
@@ -2326,9 +2375,15 @@ ui_can_hide_input_window (void)
 {
     if (!_panel_is_on) return true;
 
+#if GTK_CHECK_VERSION(2, 18, 0)
     if (gtk_widget_get_visible (_preedit_area) ||
         gtk_widget_get_visible (_aux_area) ||
         (_lookup_table_embedded && gtk_widget_get_visible (_lookup_table_window)))
+#else
+    if (GTK_WIDGET_VISIBLE (_preedit_area) ||
+        GTK_WIDGET_VISIBLE (_aux_area) ||
+        (_lookup_table_embedded && GTK_WIDGET_VISIBLE (_lookup_table_window)))
+#endif
         return false;
     return true;
 }
@@ -2481,7 +2536,11 @@ static void
 ui_command_menu_help_activate_cb (GtkMenuItem *item,
                                   gpointer     user_data)
 {
+#if GTK_CHECK_VERSION(2, 18, 0)
     if (gtk_widget_get_visible (_help_dialog)) {
+#else
+    if (GTK_WIDGET_VISIBLE (_help_dialog)) {
+#endif
         gtk_widget_hide (_help_dialog);
     } else {
         action_request_help ();
@@ -2623,7 +2682,11 @@ action_show_command_menu (void)
         if ((_helper_list [i].option & SCIM_HELPER_STAND_ALONE) != 0 &&
             (_helper_list [i].option & SCIM_HELPER_AUTO_START) == 0) {
             menu_item = gtk_image_menu_item_new_with_label (_helper_list [i].name.c_str ());
+#if GTK_CHECK_VERSION(2, 12, 0)
             gtk_widget_set_tooltip_text (menu_item, _helper_list [i].description.c_str ());
+#else
+            gtk_tooltips_set_tip (_tooltips, menu_item, _helper_list [i].description.c_str (), NULL);
+#endif
             icon = ui_create_icon (_helper_list [i].icon, NULL, width, height, false);
 
             if (icon)
@@ -2950,10 +3013,19 @@ slot_update_factory_info (const PanelFactoryInfo &info)
             gtk_container_add (GTK_CONTAINER (_factory_button), newlabel);
         }
 
+#if GTK_CHECK_VERSION(2, 18, 0)
         if (!gtk_widget_get_visible (_factory_button) && !_toolbar_hidden)
+#else
+        if (!GTK_WIDGET_VISIBLE (_factory_button) && !_toolbar_hidden)
+#endif
             gtk_widget_show (_factory_button);
 
+#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (_factory_button, info.name.c_str ());
+#else
+        if (_tooltips)
+            gtk_tooltips_set_tip (_tooltips, _factory_button, info.name.c_str (), NULL);
+#endif
 
         ui_settle_toolbar_window ();
     }
@@ -3124,7 +3196,11 @@ slot_show_preedit_string (void)
 {
     gtk_widget_show (_preedit_area);
 
+#if GTK_CHECK_VERSION(2, 18, 0)
     if (_panel_is_on && !gtk_widget_get_visible (_input_window))
+#else
+    if (_panel_is_on && !GTK_WIDGET_VISIBLE (_input_window))
+#endif
         gtk_widget_show (_input_window);
 
     ui_settle_input_window (true, true);
@@ -3136,7 +3212,11 @@ slot_show_aux_string (void)
 {
     gtk_widget_show (_aux_area);
 
+#if GTK_CHECK_VERSION(2, 18, 0)
     if (_panel_is_on && !gtk_widget_get_visible (_input_window))
+#else
+    if (_panel_is_on && !gtk_widget_get_visible (_input_window))
+#endif
         gtk_widget_show (_input_window);
 
     ui_settle_input_window (true, true);
@@ -3148,7 +3228,11 @@ slot_show_lookup_table (void)
 {
     gtk_widget_show (_lookup_table_window);
 
+#if GTK_CHECK_VERSION(2, 18, 0)
     if (_panel_is_on && _lookup_table_embedded && !gtk_widget_get_visible (_input_window)) {
+#else
+    if (_panel_is_on && _lookup_table_embedded && !GTK_WIDGET_VISIBLE (_input_window)) {
+#endif
         gtk_widget_show (_input_window);
         ui_settle_input_window (true, true);
     }
@@ -3470,8 +3554,13 @@ create_properties_node (PropertyRepository           &repository,
 
     gtk_widget_set_sensitive (node, begin->active ());
 
+#if GTK_CHECK_VERSION(2, 12, 0)
     if (begin->get_tip ().length ())
         gtk_widget_set_tooltip_text (node, begin->get_tip ().c_str ());
+#else
+    if (_tooltips && begin->get_tip ().length ())
+        gtk_tooltips_set_tip (_tooltips, node, begin->get_tip ().c_str (), NULL);
+#endif
 
     g_object_set_data_full (G_OBJECT (node), "property_key", g_strdup (begin->get_key ().c_str ()), g_free);
 
@@ -3724,8 +3813,13 @@ update_property (PropertyRepository &repository,
 
             gtk_widget_set_sensitive (it->widget, property.active ());
 
+#if GTK_CHECK_VERSION(2, 12, 0)
             if (property.get_tip ().length ())
                 gtk_widget_set_tooltip_text (it->widget, property.get_tip ().c_str ());
+#else
+            if (_tooltips && property.get_tip ().length ())
+                gtk_tooltips_set_tip (_tooltips, it->widget, property.get_tip ().c_str (), NULL);
+#endif
 
             it->property = property;
             break;

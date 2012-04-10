@@ -151,6 +151,10 @@ typedef std::map <String, std::vector <FilterInfo> >                            
 // Internal data declaration.
 static bool           __have_changed         = false;
 
+#if GTK_CHECK_VERSION(2, 12, 0)
+#else
+static GtkTooltips   *__widget_tooltips      = 0;
+#endif
 static GtkTreeStore  *__factory_list_model   = 0;
 static GtkWidget     *__hotkey_button        = 0;
 static GtkWidget     *__filter_button        = 0;
@@ -286,6 +290,11 @@ create_setup_window ()
         GtkWidget *scrolledwindow;
         GtkWidget *button;
 
+#if GTK_CHECK_VERSION(2, 12, 0)
+#else
+        __widget_tooltips = gtk_tooltips_new ();
+#endif
+
         // Create the toplevel box.
         window = gtk_vbox_new (FALSE, 0);
         gtk_widget_show (window);
@@ -313,8 +322,13 @@ create_setup_window ()
                           G_CALLBACK (on_hotkey_button_clicked),
                           NULL);
 
+#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (__hotkey_button,
                               _("Edit Hotkeys associated with the selected input method."));
+#else
+        gtk_tooltips_set_tip (__widget_tooltips, __hotkey_button,
+                              _("Edit Hotkeys associated with the selected input method."), NULL);
+#endif
 
         __filter_button = gtk_button_new_with_mnemonic (_("Select _Filters"));
         gtk_widget_show (__filter_button);
@@ -324,8 +338,13 @@ create_setup_window ()
                           G_CALLBACK (on_filter_button_clicked),
                           NULL);
 
+#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (__filter_button,
                               _("Select the Filters which will be attached to this input method."));
+#else
+        gtk_tooltips_set_tip (__widget_tooltips, __filter_button,
+                              _("Select the Filters which will be attached to this input method."), NULL);
+#endif
 
         view = create_factory_list_view ();
         gtk_widget_show (view);
@@ -350,8 +369,13 @@ create_setup_window ()
                           G_CALLBACK (on_expand_button_clicked),
                           (gpointer) view);
 
+#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (button,
                               _("Expand all language categories."));
+#else
+        gtk_tooltips_set_tip (__widget_tooltips, button,
+                              _("Expand all language categories."), NULL);
+#endif
 
         button = gtk_button_new_with_mnemonic (_("_Collapse"));
         gtk_widget_show (button);
@@ -361,8 +385,13 @@ create_setup_window ()
                           G_CALLBACK (on_collapse_button_clicked),
                           (gpointer) view);
 
+#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (button,
                               _("Collapse all language categories."));
+#else
+        gtk_tooltips_set_tip (__widget_tooltips, button,
+                              _("Collapse all language categories."), NULL);
+#endif
 
         button = gtk_button_new_with_mnemonic (_("E_nable All"));
         gtk_widget_show (button);
@@ -372,8 +401,13 @@ create_setup_window ()
                           G_CALLBACK (on_toggle_all_button_clicked),
                           (gpointer) (1));
 
+#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (button,
                               _("Enable all input methods."));
+#else
+        gtk_tooltips_set_tip (__widget_tooltips, button,
+                              _("Enable all input methods."), NULL);
+#endif
 
         button = gtk_button_new_with_mnemonic (_("_Disable All"));
         gtk_widget_show (button);
@@ -383,8 +417,13 @@ create_setup_window ()
                           G_CALLBACK (on_toggle_all_button_clicked),
                           (gpointer) (0));
 
+#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (button,
                               _("Disable all input methods."));
+#else
+        gtk_tooltips_set_tip (__widget_tooltips, button,
+                              _("Disable all input methods."), NULL);
+#endif
     }
     return window;
 }
@@ -1419,6 +1458,11 @@ on_filter_button_clicked (GtkButton *button, gpointer user_data)
                                               GTK_STOCK_OK,GTK_RESPONSE_OK,
                                               GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
                                               NULL);
+
+#if GTK_CHECK_VERSION(2, 22, 0)
+#else
+        gtk_dialog_set_has_separator (GTK_DIALOG (dialog), TRUE);
+#endif
  
         scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
         gtk_widget_show (scrolledwindow);
