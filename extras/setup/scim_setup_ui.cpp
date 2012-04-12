@@ -310,7 +310,7 @@ SetupUI::create_main_ui ()
     gtk_widget_show (ok_button);
     gtk_box_pack_end (GTK_BOX (hbox1), ok_button, FALSE, FALSE, 4);
 
-    exit_button = gtk_button_new_from_stock ("gtk-quit");
+    exit_button = gtk_button_new_from_stock ("gtk-cancel");
     gtk_widget_show (exit_button);
     gtk_box_pack_end (GTK_BOX (hbox1), exit_button, FALSE, FALSE, 4);
 
