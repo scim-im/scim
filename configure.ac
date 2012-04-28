@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script
-AC_INIT([scim],[1.4.12.1],[http://sf.net/tracker/?atid=650539&group_id=108454])
+AC_INIT([scim],[1.4.12],[http://sf.net/tracker/?atid=650539&group_id=108454])
 AC_CONFIG_SRCDIR([src/scim.h])
 
 
@@ -11,7 +11,7 @@ SCIM_MAJOR_VERSION=1
 SCIM_MINOR_VERSION=4
 SCIM_MICRO_VERSION=12
 
-SCIM_VERSION=$SCIM_MAJOR_VERSION.$SCIM_MINOR_VERSION.$SCIM_MICRO_VERSION.1
+SCIM_VERSION=$SCIM_MAJOR_VERSION.$SCIM_MINOR_VERSION.$SCIM_MICRO_VERSION
 
 AC_SUBST(SCIM_MAJOR_VERSION)
 AC_SUBST(SCIM_MINOR_VERSION)
