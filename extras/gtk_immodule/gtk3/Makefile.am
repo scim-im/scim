@@ -27,7 +27,7 @@ X11_UTILS=$(top_builddir)/utils/libscim-x11utils@SCIM_EPOCH@.la
 endif
 
 if SCIM_LD_VERSION_SCRIPT
-LD_VERSION_SCRIPT_OPTION="-Wl,--version-script=$(srcdir)/im-scim.version-script"
+LD_VERSION_SCRIPT_OPTION="-Wl,--version-script=$(srcdir)/../im-scim.version-script"
 endif
 
 noinst_HEADERS = ../gtkimcontextscim.h
