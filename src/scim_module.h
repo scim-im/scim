@@ -67,6 +67,8 @@ public:
     String get_path () const;
 
     void * symbol (const String & sym) const;
+protected:
+    void init();
 };
 
 int scim_get_module_list (std::vector <String>& mod_list, const String& type = "");
