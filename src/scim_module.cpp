@@ -42,6 +42,9 @@ typedef void (*ModuleExitFunc) (void);
 
 struct Module::ModuleImpl
 {
+#if SCIM_LTDLADVISE
+    lt_dladvise advise;
+#endif
     lt_dlhandle handle;
     ModuleInitFunc init;
     ModuleExitFunc exit;
@@ -119,19 +122,32 @@ scim_get_module_list (std::vector <String>& mod_list, const String& type)
 Module::Module ()
     : m_impl (new ModuleImpl)
 {
-    lt_dlinit ();
+    init ();
 }
 
 Module::Module (const String &name, const String &type)
     : m_impl (new ModuleImpl)
 {
-    lt_dlinit ();
+    init ();
     load (name, type);
+}
+
+void Module::init ()
+{
+    lt_dlinit ();
+#if SCIM_LTDLADVISE
+    lt_dladvise_init (&(m_impl->advise));
+    lt_dladvise_ext (&(m_impl->advise));
+    lt_dladvise_global (&(m_impl->advise));
+#endif
 }
 
 Module::~Module ()
 {
     unload ();
+#if SCIM_LTDLADVISE
+    lt_dladvise_destroy (&(m_impl->advise));
+#endif
     lt_dlexit ();
     delete m_impl;
 }
@@ -169,13 +185,21 @@ Module::load (const String &name, const String &type)
 
     for (it = paths.begin (); it != paths.end (); ++it) {
         module_path = *it + String (SCIM_PATH_DELIM_STRING) + name;
+#if SCIM_LTDLADVISE
+        new_handle = lt_dlopenadvise (module_path.c_str (), m_impl->advise);
+#else
         new_handle = lt_dlopenext (module_path.c_str ());
+#endif
         if (new_handle)
             break;
     }
 
     if (!new_handle) {
+#if SCIM_LTDLADVISE
+        new_handle = lt_dlopenadvise (name.c_str (), m_impl->advise);
+#else
         new_handle = lt_dlopenext (name.c_str ());
+#endif
     }
 
     if (!new_handle)

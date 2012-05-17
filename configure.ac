@@ -293,6 +293,10 @@ AC_ARG_ENABLE(ld-version-script,
 	      [  --enable-ld-version-script Use ld version script to limit exported symbols], ,
        	      enable_ld_version_script=no)
 
+AC_ARG_ENABLE(ltdladvise,
+	      [  --enable-ltdladvise       Use lt_dladvise for module loading], ,
+       	      enable_ltdladvise=no)
+
 AC_ARG_ENABLE(debug,
 	      [  --enable-debug            Turn on debugging], , 
 	      enable_debug=no)
@@ -372,6 +376,12 @@ if test "$enable_tests" = "yes"; then
 else
   SCIM_BUILD_TESTS=0
   enable_tests=no
+fi
+
+if test "$enable_ltdladvise" = "yes"; then
+  SCIM_LTDLADVISE=1
+else
+  SCIM_LTDLADVISE=0
 fi
 
 if test "$enable_config_simple" = "yes"; then
@@ -521,6 +531,9 @@ fi
 AM_CONDITIONAL(SCIM_LD_VERSION_SCRIPT,
 		[test "$enable_ld_version_script" = "yes"])
 
+AM_CONDITIONAL(SCIM_LTDLADVISE,
+		[test "$enable_ltdladvise" = "yes"])
+
 AM_CONDITIONAL(SCIM_BUILD_TESTS,
 		[test "$enable_tests" = "yes"])
 
@@ -566,6 +579,7 @@ AM_CONDITIONAL(SCIM_BUILD_TRAY_ICON,
 AM_CONDITIONAL(SCIM_BUILD_PANEL_GTK,
 	        [test "$enable_panel_gtk" = "yes"])
 
+AC_SUBST(SCIM_LTDLADVISE)
 AC_SUBST(SCIM_BUILD_TESTS)
 AC_SUBST(SCIM_BUILD_CONFIG_SIMPLE)
 AC_SUBST(SCIM_BUILD_CONFIG_SOCKET)
@@ -644,6 +658,7 @@ Build options:
   Build tests/*            $enable_tests
   Enable debug             $enable_debug
   Enable ld version script $enable_ld_version_script
+  Enable lt_dladvise       $enable_ltdladvise
 
 Module options:           
   Simple config module     $enable_config_simple
