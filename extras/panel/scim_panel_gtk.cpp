@@ -170,7 +170,7 @@ static void       ui_get_workarea                      (int            &x,
 static gboolean   ui_create_tray_icon_when_idle        (gpointer        data);
 #endif
 
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
 static void       ui_switch_screen                     (GdkScreen      *screen);
 #endif
 
@@ -381,7 +381,7 @@ static gboolean   check_exit_timeout_cb                (gpointer data);
 /////////////////////////////////////////////////////////////////////////////
 // Declaration of internal variables.
 /////////////////////////////////////////////////////////////////////////////
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
 static GdkScreen         *_current_screen              = 0;
 #endif
 
@@ -718,7 +718,7 @@ ui_initialize (void)
     _tooltips = 0;
 #endif
 
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
     // Initialize the Display and Screen.
     _current_screen  = gdk_screen_get_default ();
 #endif
@@ -1219,7 +1219,7 @@ ui_initialize (void)
     // Add an event filter function to observe X root window's properties.
     GdkWindow *root_window = gdk_get_default_root_window ();
     GdkEventMask event_mask;
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
     if (_current_screen)
         root_window = gdk_screen_get_root_window (_current_screen);
 #endif
@@ -1373,7 +1373,7 @@ ui_settle_toolbar_window (bool force)
 static bool
 ui_get_screen_rect (GdkRectangle &rect)
 {
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
 	GdkWindow * active_window;
     int index;
 
@@ -1395,7 +1395,7 @@ ui_get_screen_rect (GdkRectangle &rect)
 static int
 ui_multi_monitor_width ()
 {
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
 	GdkRectangle rect;
     
     if (_current_screen)
@@ -1414,7 +1414,7 @@ ui_multi_monitor_width ()
 static int
 ui_multi_monitor_height ()
 {
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
 	GdkRectangle rect;
     
     if (_current_screen)
@@ -1433,7 +1433,7 @@ ui_multi_monitor_height ()
 static int
 ui_screen_width (void)
 {
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
     if (_current_screen)
         return ui_multi_monitor_width ();
 #endif
@@ -1443,7 +1443,7 @@ ui_screen_width (void)
 static int
 ui_screen_height (void)
 {
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
     if (_current_screen)
         return ui_multi_monitor_height ();
 #endif
@@ -1460,7 +1460,7 @@ ui_get_workarea (int &x, int &y, int &width, int &height)
     gint format, length, current_desktop = 0;
     guchar *data;
 
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
     if (_current_screen)
         root_window = gdk_screen_get_root_window (_current_screen);
 #endif
@@ -1495,7 +1495,7 @@ ui_get_workarea (int &x, int &y, int &width, int &height)
     }
 }
 
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
 static void
 ui_switch_screen (GdkScreen *screen)
 {
@@ -2588,7 +2588,7 @@ ui_property_activate_cb (GtkWidget      *widget,
     GtkWidget *submenu = (GtkWidget *) g_object_get_data (G_OBJECT (widget), "property_submenu");
 
     if (submenu) {
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
         if (_current_screen)
             gtk_menu_set_screen (GTK_MENU (submenu), _current_screen);
 #endif
@@ -2665,7 +2665,7 @@ action_show_command_menu (void)
 
     _command_menu = gtk_menu_new ();
 
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
     if (_current_screen)
         gtk_menu_set_screen (GTK_MENU (_command_menu), _current_screen);
 #endif
@@ -2963,7 +2963,7 @@ slot_turn_off (void)
 static void
 slot_update_screen (int num)
 {
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
     if (gdk_display_get_n_screens (gdk_display_get_default ()) > num) {
 
         GdkScreen *screen = gdk_display_get_screen (gdk_display_get_default (), num);
@@ -3102,7 +3102,7 @@ slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
 
         _factory_menu = gtk_menu_new ();
 
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
     if (_current_screen)
         gtk_menu_set_screen (GTK_MENU (_factory_menu), _current_screen);
 #endif
@@ -4070,7 +4070,7 @@ int main (int argc, char *argv [])
 
     // get current display.
     {
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
         const char *p = gdk_display_get_name (gdk_display_get_default ());
 #else
         const char *p = getenv ("DISPLAY");
