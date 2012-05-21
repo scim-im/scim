@@ -80,7 +80,7 @@ AC_SUBST(LIBTOOL_EXPORT_OPTIONS)
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
-AC_LANG(C++)
+AC_LANG(C)
 
 # Init gettext
 ALL_LINGUAS="as bn_IN ca cs de es fi fr gu hi it ja kn ko ml mr nl pa pt_BR ru sk sv ta te vi zh_CN zh_TW"
