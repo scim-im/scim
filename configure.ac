@@ -228,23 +228,10 @@ PKG_CHECK_MODULES(GTK3, [gtk+-3.0 >= 3.0.0 pango >= 1.1.0 gdk-pixbuf-2.0 >= 2.4.
 
 SCIM_HAS_GTK2_2=no
 if test "$SCIM_HAS_GTK2" = "yes"; then
-  if $PKG_CONFIG --exists "gtk+-2.0 >= 2.2" ; then
-    SCIM_HAS_GTK2_2=yes
-    GTK2_VERSION=2.2.0
-    AC_DEFINE(GDK_MULTIHEAD_SAFE,1,[Force use of GDK's multihead-safe APIs.])
-  fi
-  if $PKG_CONFIG --exists "gtk+-2.0 >= 2.3.5" ; then
-    SCIM_HAS_GTK2_4=yes
-    GTK2_VERSION=2.3.5
-    AC_DEFINE(HAVE_GTK_DRAW_INSERTION_CURSOR,1,[Have gtk_draw_insertion_cursor ().])
-  fi
   GTK2_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk+-2.0`
   GTK2_LIBDIR=`$PKG_CONFIG --variable=libdir gtk+-2.0`
   GTK2_IM_MODULEDIR=$GTK2_LIBDIR/gtk-2.0/$GTK2_BINARY_VERSION/immodules
   AC_SUBST(GTK2_IM_MODULEDIR)
-  # AC_SUBST(GTK2_LIBDIR)
-  # AC_SUBST(GTK2_VERSION)
-  # AC_SUBST(GTK2_BINARY_VERSION)
 fi
 
 if test "$SCIM_HAS_GTK3" = "yes"; then
@@ -252,7 +239,6 @@ if test "$SCIM_HAS_GTK3" = "yes"; then
   GTK3_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk+-3.0`
   GTK3_LIBDIR=`$PKG_CONFIG --variable=libdir gtk+-3.0`
   GTK3_IM_MODULEDIR=$GTK3_LIBDIR/gtk-3.0/$GTK3_BINARY_VERSION/immodules
-  AC_DEFINE(HAVE_GTK_DRAW_INSERTION_CURSOR,1,[Have gtk_draw_insertion_cursor ().])
 
   AC_SUBST(GTK3_IM_MODULEDIR)
 fi

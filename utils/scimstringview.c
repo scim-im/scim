@@ -1360,7 +1360,7 @@ scim_string_view_draw_text (ScimStringView *string_view)
     }
 }
 
-#ifndef HAVE_GTK_DRAW_INSERTION_CURSOR
+#if !GTK_CHECK_VERSION(2, 3, 5)
 typedef struct _CursorInfo CursorInfo;
 
 struct _CursorInfo

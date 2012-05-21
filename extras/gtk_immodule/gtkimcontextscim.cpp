@@ -1288,7 +1288,7 @@ panel_slot_change_factory (int context, const String &uuid)
 static void
 panel_req_update_screen (GtkIMContextSCIM *ic)
 {
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
     if (ic->impl->client_window) {
 #if GTK_CHECK_VERSION(2, 24, 0)
         GdkScreen *screen = gdk_window_get_screen (ic->impl->client_window);
@@ -1424,7 +1424,7 @@ panel_initialize ()
     String display_name;
 
     {
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
         const char *p = gdk_display_get_name (gdk_display_get_default ());
 #else
         const char *p = getenv ("DISPLAY");
@@ -1598,7 +1598,7 @@ get_gdk_keymap (GdkWindow *window)
 {
     GdkKeymap *keymap;
 
-#if GDK_MULTIHEAD_SAFE
+#if GTK_CHECK_VERSION(2, 2, 0)
     if (window)
 #if GTK_CHECK_VERSION(2, 24, 0)
         keymap = gdk_keymap_get_for_display (gdk_window_get_display (window));
