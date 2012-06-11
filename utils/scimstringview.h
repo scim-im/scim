@@ -88,7 +88,7 @@ gint       scim_string_view_get_width_chars      (ScimStringView *entry);
 void       scim_string_view_set_text             (ScimStringView *entry,
                                                   const gchar    *text);
 /* returns a reference to the text */
-G_CONST_RETURN gchar* scim_string_view_get_text  (ScimStringView *entry);
+const gchar* scim_string_view_get_text  (ScimStringView *entry);
 
 void       scim_string_view_set_position         (ScimStringView *entry,
                                                   gint            position);
