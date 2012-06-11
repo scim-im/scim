@@ -296,7 +296,11 @@ create_setup_window ()
 #endif
 
         // Create the toplevel box.
+#if GTK_CHECK_VERSION(3, 2, 0)
+        window = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+#else
         window = gtk_vbox_new (FALSE, 0);
+#endif
         gtk_widget_show (window);
 
         label = gtk_label_new (_("The installed input method services:"));
@@ -350,11 +354,19 @@ create_setup_window ()
         gtk_widget_show (view);
         gtk_container_add (GTK_CONTAINER (scrolledwindow), view);
 
+#if GTK_CHECK_VERSION(3, 2, 0)
+        sep = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
+#else
         sep = gtk_hseparator_new ();
+#endif
         gtk_widget_show (sep);
         gtk_box_pack_start (GTK_BOX (window), sep, FALSE, FALSE, 2);
 
+#if GTK_CHECK_VERSION(3, 2, 0)
+        hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+#else
         hbox = gtk_hbox_new (FALSE, 0);
+#endif
         gtk_widget_show (hbox);
         gtk_box_pack_start (GTK_BOX (window), hbox, FALSE, FALSE, 2);
 
@@ -1482,7 +1494,11 @@ on_filter_button_clicked (GtkButton *button, gpointer user_data)
  
         gtk_container_add (GTK_CONTAINER (scrolledwindow), view);
  
+#if GTK_CHECK_VERSION(3, 2, 0)
+        separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
+#else
         separator = gtk_hseparator_new ();
+#endif
         gtk_widget_show (separator);
 #if GTK_CHECK_VERSION(3, 0, 0)
         gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), separator, FALSE, FALSE, 2);
@@ -1490,7 +1506,11 @@ on_filter_button_clicked (GtkButton *button, gpointer user_data)
         gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dialog)->vbox), separator, FALSE, FALSE, 2);
 #endif
 
+#if GTK_CHECK_VERSION(3, 2, 0)
+        hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 4);
+#else
         hbox = gtk_hbox_new (FALSE, 4);
+#endif
         gtk_widget_show (hbox);
 #if GTK_CHECK_VERSION(3, 0, 0)
         gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), hbox, FALSE, FALSE, 2);

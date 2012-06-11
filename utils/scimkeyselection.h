@@ -93,14 +93,14 @@ void                  scim_key_selection_append_keys     (ScimKeySelection      
                                                           const gchar            *keys);
 
 
-G_CONST_RETURN gchar* scim_key_selection_get_keys        (ScimKeySelection       *keyselection);
+const gchar* scim_key_selection_get_keys        (ScimKeySelection       *keyselection);
 
 
 GType                 scim_key_selection_dialog_get_type (void) G_GNUC_CONST;
 GtkWidget*            scim_key_selection_dialog_new      (const gchar            *title);
 void                  scim_key_selection_dialog_set_keys (ScimKeySelectionDialog *ksd,
                                                           const gchar            *keys);
-G_CONST_RETURN gchar* scim_key_selection_dialog_get_keys (ScimKeySelectionDialog *ksd);
+const gchar* scim_key_selection_dialog_get_keys (ScimKeySelectionDialog *ksd);
 
 G_END_DECLS
 
