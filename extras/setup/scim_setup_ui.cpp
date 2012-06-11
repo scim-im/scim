@@ -240,7 +240,11 @@ SetupUI::create_main_ui ()
         g_object_unref (icon);
     }
 
+#if GTK_CHECK_VERSION(3, 2, 0)
+    vbox1 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+#else
     vbox1 = gtk_vbox_new (FALSE, 0);
+#endif
     gtk_widget_show (vbox1);
     gtk_container_add (GTK_CONTAINER (m_main_window), vbox1);
 
@@ -288,7 +292,11 @@ SetupUI::create_main_ui ()
     gtk_tree_view_append_column (GTK_TREE_VIEW (m_module_list_view), module_list_column);
 
     // Create vbox for work area and button area.
+#if GTK_CHECK_VERSION(3, 2, 0)
+    vbox2 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+#else
     vbox2 = gtk_vbox_new (FALSE, 0);
+#endif
     gtk_widget_show (vbox2);
     gtk_paned_pack2 (GTK_PANED (hpaned1), vbox2, TRUE, FALSE);
 
@@ -297,12 +305,20 @@ SetupUI::create_main_ui ()
     gtk_widget_show (frame1);
     gtk_box_pack_start (GTK_BOX (vbox2), frame1, TRUE, TRUE, 0);
 
+#if GTK_CHECK_VERSION(3, 2, 0)
+    m_work_area = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+#else
     m_work_area = gtk_vbox_new (FALSE, 0);
+#endif
     gtk_widget_show (m_work_area);
     gtk_container_add (GTK_CONTAINER (frame1), m_work_area);
 
     // Create hbox for button area.
+#if GTK_CHECK_VERSION(3, 2, 0)
+    hbox1 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+#else
     hbox1 = gtk_hbox_new (FALSE, 0);
+#endif
     gtk_widget_show (hbox1);
     gtk_box_pack_end (GTK_BOX (vbox2), hbox1, FALSE, FALSE, 8);
 
@@ -367,7 +383,11 @@ SetupUI::create_splash_view ()
     GtkWidget *label;
     GtkWidget *separator;
 
+#if GTK_CHECK_VERSION(3, 2, 0)
+    vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+#else
     vbox = gtk_vbox_new (FALSE, 0);
+#endif
     gtk_widget_show (vbox);
 
     view = gtk_label_new (NULL);

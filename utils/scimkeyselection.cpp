@@ -211,7 +211,11 @@ scim_key_selection_init (ScimKeySelection *keyselection)
                       (GtkAttachOptions) (0), 4, 4);
     gtk_misc_set_alignment (GTK_MISC (label), 1, 0.5);
 
+#if GTK_CHECK_VERSION(3, 2, 0)
+    hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+#else
     hbox = gtk_hbox_new (FALSE, 0);
+#endif
     gtk_widget_show (hbox);
     gtk_table_attach (GTK_TABLE (table), hbox, 1, 2, 0, 1,
                       (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
@@ -234,7 +238,11 @@ scim_key_selection_init (ScimKeySelection *keyselection)
                       (GtkAttachOptions) (0), 4, 4);
     gtk_misc_set_alignment (GTK_MISC (label), 1, 0.5);
 
+#if GTK_CHECK_VERSION(3, 2, 0)
+    hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+#else
     hbox = gtk_hbox_new (FALSE, 0);
+#endif
     gtk_widget_show (hbox);
     gtk_table_attach (GTK_TABLE (table), hbox, 1, 2, 1, 2,
                       (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
@@ -256,7 +264,11 @@ scim_key_selection_init (ScimKeySelection *keyselection)
     gtk_widget_show (keyselection->toggle_release);
     gtk_box_pack_start (GTK_BOX (hbox), keyselection->toggle_release, TRUE, TRUE, 2);
 
+#if GTK_CHECK_VERSION(3, 2, 0)
+    hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+#else
     hbox = gtk_hbox_new (FALSE, 0);
+#endif
     gtk_widget_show (hbox);
     gtk_table_attach (GTK_TABLE (table), hbox, 1, 2, 2, 3,
                       (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
@@ -279,7 +291,11 @@ scim_key_selection_init (ScimKeySelection *keyselection)
     gtk_widget_show (keyselection->toggle_capslock);
     gtk_box_pack_start (GTK_BOX (hbox), keyselection->toggle_capslock, TRUE, TRUE, 2);
     
+#if GTK_CHECK_VERSION(3, 2, 0)
+    hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+#else
     hbox = gtk_hbox_new (TRUE, 0);
+#endif
     gtk_widget_show (hbox);
     gtk_box_pack_start (GTK_BOX (keyselection), hbox, FALSE, FALSE, 4);
 
@@ -513,7 +529,7 @@ scim_key_selection_set_keys (ScimKeySelection *keyselection,
     scim_key_selection_append_keys (keyselection, keys);
 }
 
-G_CONST_RETURN gchar*
+const gchar*
 scim_key_selection_get_keys (ScimKeySelection *keyselection)
 {
     g_return_val_if_fail (SCIM_IS_KEY_SELECTION (keyselection), NULL);
@@ -727,7 +743,7 @@ scim_key_selection_dialog_new (const gchar *title)
     return GTK_WIDGET (keyseldialog);
 }
 
-G_CONST_RETURN gchar*
+const gchar*
 scim_key_selection_dialog_get_keys (ScimKeySelectionDialog *ksd)
 {
     return scim_key_selection_get_keys (SCIM_KEY_SELECTION (ksd->keysel));

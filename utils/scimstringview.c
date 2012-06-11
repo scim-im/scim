@@ -550,7 +550,11 @@ scim_string_view_realize (GtkWidget *widget)
 #endif
   gdk_window_set_user_data (string_view->text_area, string_view);
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+  g_object_unref (attributes.cursor);
+#else
   gdk_cursor_unref (attributes.cursor);
+#endif
 
 #if GTK_CHECK_VERSION(3, 0, 0)
   GtkStyleContext *style = gtk_widget_get_style_context (widget);
@@ -715,7 +719,11 @@ get_text_area_size (ScimStringView *string_view,
   GtkRequisition requisition;
   GtkWidget *widget = GTK_WIDGET (string_view);
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+  gtk_widget_get_preferred_size (widget, &requisition, NULL);
+#else
   gtk_widget_get_child_requisition (widget, &requisition);
+#endif
 
   get_borders (string_view, &xborder, &yborder);
 
@@ -750,7 +758,12 @@ get_widget_window_size (ScimStringView *string_view,
   GtkRequisition requisition;
   GtkWidget *widget = GTK_WIDGET (string_view);
       
+  // FIXME
+#if GTK_CHECK_VERSION(3, 0, 0)
+  gtk_widget_get_preferred_size (widget, &requisition, NULL);
+#else
   gtk_widget_get_child_requisition (widget, &requisition);
+#endif
 
 #if GTK_CHECK_VERSION(3, 0, 0)
   GtkAllocation allocation;
@@ -1979,7 +1992,7 @@ scim_string_view_get_forward_event (ScimStringView *string_view)
 }
 
 
-G_CONST_RETURN gchar*
+const gchar*
 scim_string_view_get_text (ScimStringView *string_view)
 {
   g_return_val_if_fail (SCIM_IS_STRING_VIEW (string_view), NULL);
