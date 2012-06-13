@@ -1,0 +1,12 @@
+Makefile.in
+.deps
+.libs
+Makefile
+libscimbridgecommon.la
+libscimbridgecommon_la-scim-bridge-attribute.lo
+libscimbridgecommon_la-scim-bridge-display.lo
+libscimbridgecommon_la-scim-bridge-key-event.lo
+libscimbridgecommon_la-scim-bridge-message.lo
+libscimbridgecommon_la-scim-bridge-messenger.lo
+libscimbridgecommon_la-scim-bridge-path.lo
+libscimbridgecommon_la-scim-bridge-string.lo

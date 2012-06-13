@@ -1,0 +1,329 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+    <head>
+        <link rel="stylesheet" type="text/css" href="../document.css">
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta name="author" content="Ryo Dairiki">
+        <title>Scim Bridge: Developer Manual</title>
+    </head>
+    <body>
+        <p class="bullet_in">Scim Bridge Developer Manual: The communication protocol</p>
+        <a href="index.html">Up</a>
+        <hr/>
+        <p>
+            <p class="bullet_in" id="who_does_need">Who does need this section?</p>
+            <p class="description">
+                Basically, you don't have to know about the communication protocol between the agent and the clients because the client library interprets it for you. So, this section is mainly written for...
+                <ul>
+                    <li>core developers of scim-bridge.</li>
+                    <li>he or she who wants to write clients without using C language.</li>
+                    <li>he or she who wants to write an alternative agent.</li>
+                </ul>
+            </p>
+            <p class="bullet_in" id="fundamental_rules">Let's know about the fumdamental rules</p>
+            <p class="description">
+                <ul>
+                    <li>
+                        Every message is described in UTF8, and it ends with '\n'.
+                    </li>
+                    <li>
+                        Every message must begin with the header. It can also has some following arguments.
+                    </li>
+                    <li>
+                        All the items (the header and the arguments) in a message are seperated by spaces (' ').<br/>
+                        Note, the seperator of two spaces indicate that there are a *NULL* argument between them.
+                    </li>
+                    <li>
+                        Space characters (' ') or line feed characters ('\n') included in headers and arguments must be espaced by '\', like "\s" and "\n".<br/>
+                        Note, '\' itself must be espaced by itself. 
+                    </li>
+                    <li>
+                        Some commands expect response from the other. It will block until the responsive message arrives, so you have to send it as soon as possible.
+                    </li>
+                </ul>
+            </p>
+            <p class="description">
+                Now, you can communicate with the agent by open the unix domain socket in O_RDWR mode.
+            </p>
+            <p class="bullet_in" id="command_list">The command list</p>
+            <p class="description">
+                The following list describes all the commands go through the socket.
+                <p class="caption">From the agent to clients:</p>
+                <ul>
+                    <li><b>preedit_mode_changed</b>
+                        <ul>
+                            <li>The way to show the preedit has been changed.</li>
+                            <li>This message is the response of <b>set_preedit_mode</b>.</li>
+                        </ul>
+                    </li>
+                    <li><b>imcontext_registered</b> <i>id</i>
+                        <ul>
+                            <li>An IMContext has been registered.</li>
+                            <li>This message is the response of <b>register_imcontext</b>.</li>
+                            <li><i>id</i> stands for the ID for the new IMContext.</li>
+                        </ul>
+                    </li>
+                    <li><b>imcontext_deregistered</b>
+                        <ul>
+                            <li>An IMContext has been deregistered.</li>
+                            <li>This message is the response of <b>deregister_imcontext</b>.</li>
+                        </ul>
+                    </li>
+                    <li><b>imcontext_reseted</b>
+                        <ul>
+                            <li>An IMContext has been reseted.</li>
+                            <li>This message is the response of <b>reset_imcontext</b>.</li>
+                        </ul>
+                    </li>
+                    <li><b>focus_changed</b>
+                        <ul>
+                            <li>The focus has been changed.</li>
+                            <li>This message is the response of <b>set_focus</b>.</li>
+                        </ul>
+                    </li>
+                    <li><b>cursor_location_changed</b>
+                        <ul>
+                            <li>The cursor position in the display has been changed.</li>
+                            <li>This message is the response of <b>set_cursor_location</b>.</li>
+                        </ul>
+                    </li>
+                    <li><b>update_preedit</b> <i>id</i>
+                        <ul>
+                            <li>Update the embedded preedit.</li>
+                            <li>You should expect <b>preedit_updated</b> as the response.</li>
+                            <li><i>id</i> stands for the ID of IMContext.</li>
+                        </ul>
+                    </li>
+                    <li><b>set_preedit_shown</b> <i>id</i> <i>shown</i>
+                        <ul>
+                            <li>Update visibility of the preedit.</li>
+                            <li><i>id</i> stands for the ID of IMContext.</li>
+                            <li><i>shown</i> stands for new visiblity. Give it "true" or "false".</li>
+                            <li>Note that clients shouldn't change the preedit until <b>update_preedit</b> is called.</li>
+                            <li>This command can be ignored if invalid IMContext is requested.</li>
+                        </ul>
+                    </li>
+                    <li><b>set_preedit_string</b> <i>id</i> <i>string</i>
+                        <ul>
+                            <li>Update the preedit string.</li>
+                            <li><i>id</i> stands for the ID of IMContext.</li>
+                            <li><i>string</i> stands for new preedit string.</li>
+                            <li>Note that clients shouldn't change the preedit until <b>update_preedit</b> is called.</li>
+                            <li>This command can be ignored if invalid IMContext is requested, or the preedit is not shown.</li>
+                        </ul>
+                    </li>
+                    <li><b>set_preedit_attributes</b> <i>id</i> <i>begin1</i> <i>end1</i> <i>type1</i> <i>value1</i> <i>begin2</i> ...
+                        <ul>
+                            <li>Update the attributes of the preedit string.</li>
+                            <li><i>id</i> stands for the ID of IMContext.</li>
+                            <li><i>begin*</i> stands for begining index (in wcs) of the attribute.</li>
+                            <li><i>end*</i> stands for ending index (in wcs) of the attribute.</li>
+                            <li><i>type*</i> stands for the type of the attribute.</li>
+                            <li><i>value*</i> stands for the value of the attribute.</li>
+                            <li>Please read <a href="#attributes">here</a> if you want to know what attributes are supported.</li>
+                            <li>Note that clients shouldn't change the preedit until <b>update_preedit</b> is called.</li>
+                            <li>This command can be ignored if invalid IMContext is requested, or the preedit is not shown.</li>
+                        </ul>
+                    </li>
+                    <li><b>commit_string</b> <i>id</i> <i>string</i>
+                        <ul>
+                            <li>Commit a string into the focused widget.</li>
+                            <li>You should expect <b>string_committed</b> as the response.</li>
+                            <li><i>id</i> stands for the ID of IMContext.</li>
+                            <li><i>string</i> stands for the string to commit.</li>
+                        </ul>
+                    </li>
+                    <li><b>get_surrounding_string</b> <i>id</i> <i>before_max</i> <i>after_max</i>
+                        <ul>
+                            <li>Get the surrounding string of the caret.</li>
+                            <li>You should expect <b>surrounding_string_gotten</b> as the response.</li>
+                            <li><i>id</i> stands for the ID of IMContext.</li>
+                            <li><i>before_max</i> is the maximum expected wide characters before the caret.</li>
+                            <li><i>after_max</i> is the maximum expected wide characters after the caret.</li>
+                        </ul>
+                    </li>
+                    <li><b>delete_surrounding_string</b> <i>id</i> <i>offset</i> <i>length</i>
+                        <ul>
+                            <li>Delete a part of the surrounding string of the caret.</li>
+                            <li>You have to get it by <b>get_surrounding_string</b> before using this.</li>
+                            <li>You should expect <b>surrounding_string_deleted</b> as the response.</li>
+                            <li><i>id</i> stands for the ID of IMContext.</li>
+                            <li><i>offset</i> is the starting offset of the text to remove from the caret.</li>
+                            <li><i>length</i> is the length of the text to remove.</li>
+                        </ul>
+                    </li>
+                    <li><b>replace_surrounding_string</b> <i>id</i> <i>corsor_index</i> <i>string</i>
+                        <ul>
+                            <li>Replace the surrounding string of the caret.</li>
+                            <li>You have to get it by <b>get_surrounding_string</b> before using this.</li>
+                            <li>You should expect <b>surrounding_string_replaced</b> as the response.</li>
+                            <li><i>id</i> stands for the ID of IMContext.</li>
+                            <li><i>cursor_index</i> is the new caret position in the new surrounding string.</li>
+                            <li><i>string</i> is the text to be set as the new surrounding string.</li>
+                        </ul>
+                    </li>
+                    <li><b>beep</b> <i>id</i>
+                        <ul>
+                            <li>Make a beep sound.</li>
+                            <li>You should expect <b>beeped</b> as the response.</li>
+                            <li><i>id</i> stands for the ID of IMContext.</li>
+                        </ul>
+                    </li>
+                    <li><b>key_event_handled</b> <i>consumed</i>
+                        <ul>
+                            <li>The key event has been handled.</li>
+                            <li><i>consumed</i> stands for if the event has been consumed. You'll get "true" if the event has been consumed. Otherwise, you'll get "false".</li>
+                            <li>Note, the events which has not been consumed must be passed to GUI library as the fallback key events.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="caption">From the clients to agent:</p>
+                <ul>
+                    <li><b>set_preedit_mode</b> <i>id</i> <i>mode</i>
+                        <ul>
+                            <li>Set the way to show the preedit.</li>
+                            <li>You should expect <b>preedit_mode_changed</b> as the response.</li>
+                            <li><i>id</i> stands for the ID for the new IMContext. You can give it "-1" to change the default value for the client.</li>
+                            <li><i>mode</i> stands for how to show the preedit. See also <a href="#modes">here</a>.</li>
+                            <li>Note, the default mode is "any".</li>
+                        </ul>
+                    </li>
+                    <li><b>set_cursor_location</b> <i>x</i> <i>y</i>
+                        <ul>
+                            <li>Change the cursor location in the screen.</li>
+                            <li>Note, the location must be an abolute location in the screen.</li>
+                            <li>You must send this message unless you use "embedded" or "floating" for all the preedits, the lookup tables.</li>
+                        </ul>
+                    </li>
+                    <li><b>register_imcontext</b>
+                        <ul>
+                            <li>Register a new imcontext to the agent.</li>
+                            <li>You should expect <b>imcontext_registered</b> as the response.</li>
+                        </ul>
+                    </li>
+                    <li><b>deregister_imcontext</b> <i>id</i>
+                        <ul>
+                            <li>Request to deregister of an imcontext.</li>
+                            <li><i>id</i> stands for the ID of IMContext.</li>
+                            <li>You should expect <b>imcontext_reseted</b> as the response.</li>
+                        </ul>
+                    </li>
+                    <li><b>reset_imcontext</b> <i>id</i>
+                        <ul>
+                            <li>Request to reset of an imcontext.</li>
+                            <li><i>id</i> stands for the ID of IMContext.</li>
+                            <li>You should expect <b>imcontext_reseted</b> as the response.</li>
+                        </ul>
+                    </li>
+                    <li><b>string_commited</b>
+                        <ul>
+                            <li>A string  is commited into the focused widget.</li>
+                            <li>This messages is the response of <b>commit_string</b>.</li>
+                        </ul>
+                    </li>
+                    <li><b>preedit_updated</b>
+                        <ul>
+                            <li>The embedded preedit has been updated.</li>
+                            <li>This message is the response of <b>update_preedit</b>.</li>
+                        </ul>
+                    </li>
+                    <li><b>set_focus</b> <i>id</i> <i>focus_in</i>
+                        <ul>
+                            <li>Request to focus or unfocus an IMContext.</li>
+                            <li>You should expect <b>focus_changed</b> as the response.</li> 
+                            <li><i>id</i> stands for the ID of IMContext.</li>
+                            <li><i>focus_in</i> stands for which request this is. Give it "true" if you want to focus this. Otherwise, give it "false".</li>
+                        </ul>
+                    </li>
+                    <li><b>handle_key_event</b> <i>id</i> <i>key_code</i> <i>key_pressed</i> <i>modifier1</i> <i>modifier2</i> ...
+                        <ul>
+                            <li>Handle a key event.</li>
+                            <li>You should expect <b>key_event_handled</b> as the response.</li> 
+                            <li><i>id</i> stands for the ID of IMContext.</li>
+                            <li><i>key_code</i> stands for the code of the key. (I'll give you a list of them later...)</li>
+                            <li><i>key_pressed</i> stands for whether the key is pressed or not. Give it "true" if the key is pressed. Otherwise, give it "false".</li>
+                            <li><i>modifier*</i> stands for the modifier accompanied with the event key. (I'll give you a list of them later...)</li>
+                        </ul>
+                    </li>
+                    <li><b>forward_key_event</b> <i>id</i> <i>key_code</i> <i>key_pressed</i> <i>modifier1</i> <i>modifier2</i> ...
+                        <ul>
+                            <li>A key event has been forwarded from the agent.</li>
+                            <li><i>key_code</i> stands for the code of the key. (I'll give you a list of them later...)</li>
+                            <li><i>key_pressed</i> stands for whether the key is pressed or not. You'll get "true" if the key is pressed. Otherwise, you'll get "false".</li>
+                            <li><i>modifier*</i> stands for the modifier accompanied with the event key. (I'll give you a list of them later...)</li>
+                        </ul>
+                    </li>
+                    <li><b>surrounding_string_gotten</b> <i>retval</i> <i>string</i> <i>cursor_position</i>
+                        <ul>
+                            <li>The surrounding string has been gotten.</li>
+                            <li>This is the response of <b>get_surrounding_string</b>.</li>
+                            <li><i>retval</i> returns "TRUE" if it succeeded, otherwise it returns "FALSE".</li>
+                            <li><i>cursor_position</i> is the caret position in the surrounding string. None is given if (retval) is FALSE.</li>
+                            <li><i>string</i> is the surrounding string. None is given if <i>retval</i> is "FALSE".</li>
+                        </ul>
+                    </li>
+                    <li><b>surrounding_string_deleted</b> <i>retval</i>
+                        <ul>
+                            <li>The surrounding string of the caret has been deleted.</li>
+                            <li>This is the response of <b>delete_surrounding_string</b>.</li>
+                            <li><i>retval</i> returns "TRUE" if it succeeded, otherwise it returns "FALSE".</li>
+                        </ul>
+                    </li>
+                    <li><b>surrounding_string_replaced</b> <i>retval</i>
+                        <ul>
+                            <li>The surrounding string of the caret has been replaced.</li>
+                            <li>This is the response of <b>replace_surrounding_string</b>.</li>
+                            <li><i>retval</i> returns "TRUE" if it succeeded, otherwise it returns "FALSE".</li>
+                        </ul>
+                    </li>
+                </ul>
+            </p>
+            <br/>
+            <p class="bullet_in" id="attributes">Appendix: Supported attributes</p>
+            <p class="description">
+                <table border="1" rules="all">
+                    <tr>
+                        <th>Type</th><th>Description</th><th>Supported values</th>
+                    </tr>
+                    <tr>
+                        <td>foreground</td><td>Change the text color of the preedit.</td><td>Colors in the format of "#RRGGBB".</td>
+                    </tr>
+                    <tr>
+                        <td>background</td><td>Change the background color of the preedit.</td><td>Colors in the format of "#RRGGBB".</td>
+                    </tr>
+                    <tr>
+                        <td>decoratation</td><td>Change the background color of the preedit.</td><td>"reverse" to exchange the foreground color and background one.<br/>"hilight" to hilight the preedit.<br/>"underline" to add a line under the preedit.</td>
+                    </tr>
+                    <tr>
+                        <td>none</td><td>Invalid attribute.</td><td>"none" is recommanded.</td>
+                    </tr>
+                </table>
+            </p>
+            <br/>
+            <p class="bullet_in" id="modes">Appendix: Modes for the the preedit.</p>
+            <p class="description">
+                <table border="1" rules="all">
+                    <tr>
+                        <th>Type</th><th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>embedded</td><td>The clients show the one by itself. The agent must not show the one.</td>
+                    </tr>
+                    <tr>
+                        <td>hanging</td><td>The agent show the one just under the caret if the caret position is available. Otherwise, this is the same as "floating".</td>
+                    </tr>
+                    <tr>
+                        <td>floating</td><td>The agent show the one in any position.</td>
+                    </tr>
+                    <tr>
+                        <td>any</td><td>The agent uses it following to its preference.</td>
+                    </tr>
+                </table>
+            </p>
+        </p>
+        <hr/>
+        <p class="copyright">
+            Copyright (c) 2006 Ryo Dairiki &lt;ryo-dairiki@users.sourceforge.net&gt;
+        </p>
+    </body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+    <head>
+        <link rel="stylesheet" type="text/css" href="../document.css">
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta name="author" content="Ryo Dairiki">
+        <title>Scim Bridge: Developer Manual</title>
+    </head>
+    <body>
+        <p class="bullet_in">Scim Bridge Developer Manual: The clients</p>
+        <a href="index.html">Up</a>
+        <hr/>
+        <p>
+            <p class="bullet_in" id="introduction">The introduction</p>
+            <p class="description">
+                The clients of scim-bridge communicates with the agent with utf8 string messages, but you don't have to understand them at all. There are the client library to handle them. All you have to do is to understand how to use this library.
+            </p>
+            <p class="bullet_in" id="event_loop">Let's learn about the event loop</p>
+            <p class="description">
+                Most GUI applications have their own event loop.
+                The event loop is unique for each process, and all the GUI events are handled in this big loop.
+                Immodules could have another thread, but I don't recommand that because most GUI libraries are not "thread-safe".
+                You should handle GUI events in the GUI thread and change the preedit only from the same thread.
+                The most difficult point is the communication with the agent.
+            </p>
+            <p class="bullet_in" id="handle">How should I handle messages?</p>
+            <p class="description">
+                The first step you should do is to add the <em>pool trigger</em> for your GUI library.
+                This invokes an event when the message from the agent available.
+                Creating another thread to pooling the socket is not recommanded as many GUI library is not thread safe.
+                The ancient scim-bridge-0.1.* always has troubles with the violation of the GUI thread policy.
+                <p class="caption">Example:</p>
+                <pre class="example">
+
+// This function is called while initializing the immodule.
+void scim_bridge_client_gtk_initialize ()
+{
+    ...
+
+    // Try to initialize scim client library.
+    if (!scim_bridge_client_initialize ()) {
+
+        // Add the IO channel for the socket.
+        messenger_iochannel = g_io_channel_unix_new (scim_bridge_client_get_socket_fd ());
+
+        // Register the IO channel to the GUI event loop, 
+        // so that it calls <b>handle_message ()</b> when the message is arrived.
+        messenger_event_source = g_io_add_watch (messenger_iochannel, G_IO_IN, &handle_message, NULL);
+
+    } else {
+        scim_bridge_perrorln ("Error: Cannot initialize the client library");
+        return;
+    }
+
+    ...
+}
+                </pre>
+            </p>
+            <p class="description">
+                In the event handler, you have to read_and_dispatch the message. It reads the message, translate it into C function calls for you. Note, read_and_dispatch might be block itself when there is no message at all.
+                <ul>
+                    <li>retval_t <b>scim_bridge_client_read_and_dispatch</b> ()
+                        <ul>
+                            <li>Read and dispatch the message.</li>
+                            <li>It returns RETVAL_SUCCEEDED if succeeded, otherwise it returns RETVAL_FAILED.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="caption">Example:</p>
+                <pre class="example">
+
+// This function is called when a message is arrived from the agent.
+static gboolean handle_message (GIOChannel *source, GIOCondition condition, gpointer data)
+{
+    // Get the file discriptor for the socket.
+    const int socket_fd = scim_bridge_client_get_socket_fd ();
+
+    fd_set read_set;
+    FD_ZERO (&read_set);
+    FD_SET (socket_fd, &read_set);
+
+    struct timeval timeout;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 0;
+
+    // The GTK+ has some bug that it sometimes give us invalid pool events.
+    // I have to check if an message is really available.
+    if (select (socket_fd + 1, &read_set, NULL, NULL, &timeout) > 0) {
+        
+        // There should be an message arraived.
+        // Now, read and dispatch the message.
+        if (scim_bridge_client_read_and_dispatch ()) {
+            // Error.
+            scim_bridge_perrorln ("Error: IO exception");
+        }
+    }
+
+    return TRUE;
+}
+                </pre>
+            </p>
+            <p class="description">
+                Note, some of the functions may block until the agent returns a response, but another message from the agent may interrupt to invoke the helper function while blocking. You might make a serious bug without understanding this feature. :&lt;
+            </p>
+            <p class="bullet_in" id="register">The registration</p>
+            <p class="description">
+                When a new IMContext is allocated, you have to register it to the agent. You can get the unique ID for the IMContext if registration is succeeded. Of course, you also have to unregister it when it's freed. Note, the agent would free all the imcontext of the client when the connection is lost by accidents.
+                <ul>
+                    <li>retval_t <b>scim_bridge_client_register_imcontext</b> (ScimBridgeClientIMContext *<i>imcontext</i>)
+                        <ul>
+                            <li>Register the new IMContext to the agent.</li>
+                            <li>It gives the IMContext an uniqe ID if succeeded. Otherwise, the ID of the IMContext is set to -1.</li>
+                        </ul>
+                    </li>
+                    <li>retval_t <b>scim_bridge_client_deregister_imcontext</b> (ScimBridgeClientIMContext *<i>imcontext</i>)
+                        <ul>
+                            <li>Deregister the IMContext from the agent.</li>
+                            <li>It sets the ID of the IMContext to -1.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </p>
+            <p class="bullet_in" id="preedit">The preedit</p>
+            <p class="description">
+                You can change the way to show the preedit for the client by following function. This is useful especially in the case the agent cannot show the preedit for you; The client can stop the agent showing the preedit and show the one by itself.
+                <ul>
+                    <li>retval_t <b>scim_bridge_client_set_preedit_mode</b> (const ScimBridgeClientIMContext *<i>imcontext</i>, scim_bridge_preedit_mode_t <i>mode</i>)
+                        <ul>
+                            <li>Set the way to show the preedit.</li>
+                            <li>The default value is SCIM_BRIDGE_PREEDIT_ANY, but you can chage that by giving NULL to <i>imcontext</i>.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </p>
+            <p class="bullet_in" id="key_event">The key event</p>
+            <p class="description">
+                As it says, the agent sometimes ignores the key events. In that case, the client can handle it by itself. If the "A" key is pressed and ignored, the client can commit "A" by its own. Otherwise, the client should not be handle it by its own. There is some arguments about the acclerator key events. Some say that the accelerator key events and nmemonic key events should not be passed the IM but be handled by the clients, while others say that IM should handle all the key events first. There is no standard for this, but I personally believe that the accelerators should be handled by the clients first and be passed to the agent later if it has not been consumed. :)
+                <ul>
+                    <li>retval_t <b>scim_bridge_handle_key_event</b> (const ScimBridgeClientIMContext *<i>imcontext</i>, const ScimBridgeKeyEvent *<i>key_event</i>, boolean *<i>consumed</i>)
+                        <ul>
+                            <li>Request the agent to handle a key event.</li>
+                            <li>When the event is consumed, The flag <i>consumed</i> gives TRUE.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="caption">Example:</p>
+                <pre class="example">
+
+// This function is called everytime a key event occures unless it's an accelerator key event.
+gboolean scim_bridge_client_imcontext_filter_key_event (GtkIMContext *context, GdkEventKey *event)
+{
+    ...
+
+    // Get the imcontext which is currently focused.
+    ScimBridgeClientIMContext *imcontext = SCIM_BRIDGE_CLIENT_IMCONTEXT (context);
+
+    // Check if the imcontext is valid.
+    if (scim_bridge_client_is_active () && imcontext != NULL && !key_snooper_used) {
+        ...
+
+        // Translate the key event of Gtk+ into the one of scim-bridge.
+        ScimBridgeKeyEvent *bridge_key_event = scim_bridge_alloc_key_event ();
+        scim_bridge_key_event_gdk_to_bridge (bridge_key_event, imcontext->client_window, event);
+
+        // Pass it to the agent.
+        boolean consumed = FALSE;
+        const retval_t retval_error = scim_bridge_client_handle_key_event (imcontext, bridge_key_event, &consumed);
+
+        if (retval_error) {
+            // Error
+            scim_bridge_perrorln ("IO error occured");
+        } else if (consumed) {
+            // The key event has been consumed.
+            // Do not handle it any more.
+            return TRUE;
+        }
+    }
+
+    // The key event has not been consumed.
+    // Handle it by the fallback handler.
+    return gtk_im_context_filter_keypress (fallback_imcontext, event);
+}
+                </pre>
+            </p>
+            <p class="bullet_in" id="focus">The focus and the cursor location</p>
+            <p class="description">
+                The information about the focus is very important. Without it, the agent can't handle IM events properly. You have to tell the agent everytime an IMContext loses its focus or gains a focus. When the focus is moved from an IMContext to another one, please tell focus-out first and then tell focus-in.
+                <ul>
+                    <li>retval_t <b>scim_bridge_client_set_focus</b> (const ScimBridgeClientIMContext *<i>imcontext</i>, boolean <i>focus_in</i>)
+                        <ul>
+                            <li>The focus of an IMContext has been changed.</li>
+                            <li><i>focus_in</i> stands for the type of this focus changing. Give it TRUE if the IMContext gets the focus newly, otherwise give it FALSE.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="caption">Example:</p>
+                <pre class="example">
+// This function is called when it gains the focus.
+void scim_bridge_client_imcontext_focus_in (GtkIMContext *context)
+{
+    ...
+
+    // Get the imcontex which gets the focus now.
+    ScimBridgeClientIMContext *imcontext = SCIM_BRIDGE_CLIENT_IMCONTEXT (context);
+
+    // If another IMContext still has the focus, get it back. 
+    if (focused_imcontext != NULL && focused_imcontext != imcontext) {
+        scim_bridge_client_imcontext_focus_out (GTK_IM_CONTEXT (focused_imcontext));
+    }
+
+    focused_imcontext = imcontext;
+
+    ...
+    if (scim_bridge_client_is_active () && imcontext != NULL) {
+        
+        // Tell the agent the focus changing.
+        if (scim_bridge_client_set_focus (imcontext, TRUE)) {
+            // Error
+            scim_bridge_perrorln ("Cannot handle `focus-in` properly");
+        }
+    }
+
+    ....
+}
+
+// This function is called when it loses the focus.
+void scim_bridge_client_imcontext_focus_out (GtkIMContext *context)
+{
+    ...
+
+    ScimBridgeClientIMContext *imcontext = SCIM_BRIDGE_CLIENT_IMCONTEXT (context);
+
+    focused_imcontext = imcontext;
+
+    // Hide the preedit. (Not necessary, but recommanded)
+    if (imcontext-&gt;preedit_shown) {
+        scim_bridge_client_imcontext_set_preedit_shown (imcontext, FALSE);
+        scim_bridge_client_imcontext_update_preedit (imcontext);
+    }
+    if (scim_bridge_client_is_active () && imcontext != NULL) {
+
+        // Tell the agent the focus changing.
+        if (scim_bridge_client_set_focus (imcontext, FALSE)) {
+            scim_bridge_perrorln ("Cannot handle `focus-out` properly");
+        }
+    }
+
+    ...
+    focused_imcontext = NULL;
+}
+                </pre>
+            </p>
+            <p class="description">
+                The cursor location is required by the agent when it shows the preedit and the lookup table. You have to tell the agent the cursor position in the display continually to update the location of them properly, otherwise they won't show up in the correct positions. On the other hand, you don't have to tell it when all of them are showen by the clients.
+                <ul>
+                    <li>retval_t <b>scim_bridge_client_set_cursor_location</b> (const ScimBridgeClientIMContext *<i>imcontext</i>, int <i>x</i>, int <i>y</i>)
+                        <ul>
+                            <li>Change the cursor location in the display.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </p>
+        </p>
+        <hr/>
+        <p class="copyright">
+            Copyright (c) 2006 Ryo Dairiki &lt;ryo-dairiki@users.sourceforge.net&gt;
+        </p>
+    </body>
+</html>

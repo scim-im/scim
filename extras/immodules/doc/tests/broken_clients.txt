@@ -1,0 +1,29 @@
+* Kill a client:
+
+Steps:
+1. Open a terminal on the X.
+2. export the environmental variable, "GTK_IM_MODULE=scim-bridge".
+3. Launch "scim-bridge --verbose --standalone --noexit".
+4. Launch "gedit" and "yelp".
+5. Kill the client by "sleep 5; killall gedit". Please stay focusing or typing in gedit until it exits.
+
+Expected results:
+- The client exits.
+- The agent notices that the client is downed. (Such kind of messages are shown)
+- You are still able to use scim-bridge on "yelp".
+
+
+
+* Suspend a client.
+
+Steps:
+1. Open a terminal on the X.
+2. export the environmental variable, "GTK_IM_MODULE=scim-bridge".
+3. Launch "scim-bridge --verbose --standalone --noexit".
+4. Launch "gedit" and "yelp".
+5. Kill the client by "sleep 5; killall -SIGSTOP gedit". Please stay focusing or typing in gedit until it exits.
+
+Expected results:
+- The client suspends.
+- You are still able to use scim-bridge on "yelp".
+- (You can resume the client by "killall -SIGCONT gedit" later)

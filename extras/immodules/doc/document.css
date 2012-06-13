@@ -1,0 +1,72 @@
+body
+{
+    background-color: #FFFFFF;
+    font-family: "sans";
+    font-size: medium;
+    margin-top: 1em;
+    margin-left: 1em;
+    margin-right: 1em;
+    margin-bottom: 1em;
+    text-align: left;
+}
+
+ul
+{
+    margin-bottom: 1em;
+}
+
+li
+{
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+td
+{ 
+    padding: 0.5em;
+}
+
+table
+{
+    border-width: 1; 
+    margin-left: 1em;
+}
+
+.example
+{
+    margin-left: 2em;
+    margin-right: 2em;
+    background: #CCCCCC;
+}
+
+.description
+{
+    margin: 1em;
+}
+
+.cauntion
+{
+    font-size: large;
+    font-weight: bold;
+    font-style: italic;
+    color: #FF0000;
+}
+
+.caption
+{
+    margin-left: 1em;
+    font-size: medium;
+    font-weight: bold;
+}
+
+.bullet_in
+{
+    font-size: large;
+    text-align: left;
+}
+
+.copyright
+{
+    font-size: medium;
+    text-align: right;
+}

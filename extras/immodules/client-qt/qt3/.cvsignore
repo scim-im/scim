@@ -1,0 +1,16 @@
+*.la
+*.lo
+Makefile
+*.in
+scim-bridge-client-qt.h
+scim-bridge-client-key-event-utility-qt.cpp
+scim-bridge-client-imcontext-qt.h
+moc_scim-bridge-client-qt.cpp
+scim-bridge-client-key-event-utility-qt.h
+scim-bridge-client-imcontext-qt.cpp
+scim-bridge-clinet-common-qt.h
+im-scim-bridge-qt.cpp
+scim-bridge-client-common-qt.h
+scim-bridge-client-qt.cpp
+*.deps
+*.libs
