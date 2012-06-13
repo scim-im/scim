@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+    <head>
+        <link rel="stylesheet" type="text/css" href="../document.css">
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta name="author" content="Ryo Dairiki">
+        <title>Scim Bridge: Developer Manual</title>
+    </head>
+    <body>
+        <p class="bullet_in">Scim Bridge Developer Manual: IMContexts</p>
+        <a href="index.html">Up</a>
+        <hr/>
+        <p>
+            <p class="bullet_in" id="imcontext">About this datatype</p>
+            <p class="description">
+                The IMContext is the data type for input methods. This contains context data of input method, such as focused widgets or current lines. IMContexts behave as interface between the client library of scim-bridge and GUI libraries. Every message from the agent invokes functions of the current IMContext, and GUI events should be treated as events from IMContexts (see <a href="client.html">the previous section</a>). So basically, all the functions of IMContext is to be implemented by you.
+            </p>
+            <p class="description">
+            </p>
+            <p class="bullet_in" id="register">Registering and deregistering it</p>
+            <p class="description">
+                In allocating and finalizing IMContexts, the client must call <b>scim_bridge_client_register_imcontext</b> and <b>scim_bridge_client_degister_imcontext</b>. See <a href="client.html#register">the previous section</a>.
+            </p>
+            <p class="bullet_in" id="preedit">Showing the preedit string</p>
+            <p class="description">
+                In the embedded preedit mode, preedit related functions are called everytime the agent update the preedit. There are some functions to implement to show it.
+                <ul>
+                    <li>void <b>scim_bridge_client_imcontext_update_preedit</b> (ScimBridgeClientIMContext *<i>imcontext</i>)
+                        <ul>
+                            <li>Update the preedit.</li>
+                            <li>All the changes are applied by calling this function.</li>
+                        </ul>
+                    </li>
+                    <li>void <b>scim_bridge_client_imcontext_set_preedit_shown</b> (ScimBridgeClientIMContext *<i>imcontext</i>, boolean <i>shown</i>)
+                        <ul>
+                            <li>Set the visibility of the preedit.</li>
+                            <li><i>shown</i> stands for the visibility, TRUE to show it.</li>
+                        </ul>
+                    </li>
+                    <li>void <b>scim_bridge_client_imcontext_set_preedit_string</b> (ScimBridgeClientIMContext *<i>imcontext</i>, const char *<i>string</i>)
+                        <ul>
+                            <li>Set the contents of the preedit.</li>
+                            <li><i>string</i> is the utf8 encoded string for the preedit.</li>
+                        </ul>
+                    </li>
+                    <li>void <b>scim_bridge_client_imcontext_set_preedit_attributes</b> (ScimBridgeClientIMContext *<i>imcontext</i>, const ScimBridgeAttribute **<i>attributes</i>, int <i>attribute_count</i>)
+                        <ul>
+                            <li>Set the attributes (= appearance) of the preedit.</li>
+                            <li><i>attributes</i> is the array of the attributes for the preedit.</li>
+                            <li><i>attribute_count</i> is the number of the attributes.</li>
+                        </ul>
+                    </li>
+                    <li>void <b>scim_bridge_client_imcontext_set_preedit_cursor_position</b> (ScimBridgeClientIMContext *<i>imcontext</i>, int <i>cursor_position</i>)
+                        <ul>
+                            <li>Set the caret index in the preedit.</li>
+                            <li><i>cursor_position</i> is the caret index, 0 means that the caret is in the front of the preediting resion.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </p>
+            <p class="bullet_in" id="commit">Commiting a string</p>
+            <p class="description">
+                Commit functions are called everytime you settle the preedit string. 
+                <ul>
+                    <li>void <b>scim_bridge_client_imcontext_set_commit_string</b> (ScimBridgeClientIMContext *<i>imcontext</i>, const char *<i>string</i>)
+                        <ul>
+                            <li>Set the string to commit.</li>
+                        </ul>
+                    </li>
+                    <li>void <b>scim_bridge_client_imcontext_commit_string</b> (ScimBridgeClientIMContext *<i>imcontext</i>)
+                        <ul>
+                            <li>Commit a string.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </p>
+            <p class="bullet_in" id="key_event">Handling key events</p>
+            <p class="description">
+                When the key is pressed, the client should call <b>scim_bridge_handle_key_event</b>. See <a href="client.html#key_event">the previous section</a>.
+            </p>
+            <p class="description">
+                There are also forwarding key events from the agent. Please add it into the GUI event queue.
+                <ul>
+                    <li>void <b>scim_bridge_client_imcontext_forward_key_event</b> (const ScimBridgeClientIMContext *<i>imcontext</i>, const ScimBridgeKeyEvent *<i>key_event</i>)
+                        <ul>
+                            <li>A key event is forwarded from the agent.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="caption">Example:</p>
+                <pre class="example">
+// This function is called when a key event is forwarded from the agent.
+void scim_bridge_client_imcontext_forward_key_event (const ScimBridgeClientIMContext *imcontext, const ScimBridgeKeyEvent *key_event)
+{
+    // Translate it into GTK key event.
+    GdkEventKey gdk_event;
+    scim_bridge_key_event_bridge_to_gdk (&gdk_event, imcontext->client_window, key_event);
+
+    // Then add it into gtk event queue.
+    gdk_event_put ((GdkEvent*) &gdk_event);
+}
+                </pre>
+            </p>
+            <p class="bullet_in" id="focus">Handling the focus and the cursor location</p>
+            <p class="description">
+                The focus information and the cursor locations should be send the agent. Follow the instruction in <a href="client.html#focus">the previous section</a>.
+            </p>
+            <p class="bullet_in" id="surrounding">Processing the surrounding text</p>
+            <p class="description">
+                There are some IME which use the text around input cursor. The clients should be able to handle at least one paragraph before and after the cursor. This feature is very important for IMEs of some languages. They choose which character to insert following to the characters before and after the insertation position. The following functions are called when manupulation of the surrounding text is required.
+                <ul>
+                    <li>boolean <b>scim_bridge_client_imcontext_get_surrounding_text</b> (ScimBridgeClientIMContext *<i>imcontext</i>, int <i>before_max</i>, int <i>after_max</i>, char **<i>string</i>, int *<i>cursor_position</i>)
+                        <ul>
+                            <li>The surrounding text is required from the agent.</li>
+                            <li>Return TRUE if it succeeded to get the surrounding text, otherwise return FALSE.</li>
+                            <li><i>before_max</i> and <i>after_max</i> are the maximum wchars to get before and after the cursor.</li>
+                            <li><i>string</i> is the pointer for the gotten text. You can give it "NULL" if not available.</li>
+                            <li><i>cursor_position</i> is the cursor_position (in wchar) in the gotten text.</li>
+                        </ul>
+                    </li>
+                    <li>boolean <b>scim_bridge_client_imcontext_delete_surrounding_text</b> (ScimBridgeClientIMContext *<i>imcontext</i>, int <i>offset</i>, int<i>length</i>)
+                        <ul>
+                            <li>Delete a part of the surrounding text.</li>
+                            <li>This function is applied on the surrounding text, which is gotten by the previous call of <b>get_surrounding_text</b> ().</li>
+                            <li>Return TRUE if it succeeded to delete that, otherwise return FALSE.</li>
+                            <li><i>offset</i> is the begining offset (in wchar) of the text to delete from the caret.</li>
+                            <li><i>length</i> is the length of the text to remove.</li>
+                        </ul>
+                    </li>
+                    <li>boolean <b>scim_bridge_client_imcontext_replace_surrounding_text</b> (ScimBridgeClientIMContext *<i>imcontext</i>, int <i>cursor_position</i>, const char *<i>string</i>)
+                        <ul>
+                            <li>Replace the surrounding text.</li>
+                            <li>This function is applied on the surrounding text, which is gotten by the previous call of <b>get_surrounding_text</b> ().</li>
+                            <li>Return TRUE if it succeeded to replace the surrounding text, otherwise return FALSE.</li>
+                            <li><i>cursor_position</i> is the cursor_position (in wchar) in the new text.</li>
+                            <li><i>string</i> is the new text to set as the surrounding text.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </p>
+            <p class="bullet_in" id="misc">Misc functions</p>
+            <p class="description">
+                There are some functions you have to implement, but they can be ignored if you doesn't need it. If you wonder how to implement, leave them as dummy (empty) implimentations.
+                <ul>
+                    <li>void <b>scim_bridge_client_imcontext_beep</b> (const ScimBridgeIMContext *imcontext)
+                        <ul>
+                            <li>Make a beep sound.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </p>
+        </p>
+        <hr/>
+        <p class="copyright">
+            Copyright (c) 2006 Ryo Dairiki &lt;ryo-dairiki@users.sourceforge.net&gt;
+        </p>
+    </body>
+</html>

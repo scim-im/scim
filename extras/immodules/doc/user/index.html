@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+    <head>
+        <link rel="stylesheet" type="text/css" href="../document.css">
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta name="author" content="Ryo Dairiki">
+        <title>Scim Bridge: User Manual</title>
+    </head>
+    <body>
+        <p class="bullet_in">Scim Bridge User Manual</p>
+        <a href="../index.html">Up</a>
+        <hr/>
+        <p>
+            <p class="bullet_in" id="install">How to install?</p>
+            <p class="description">
+                The most component of scim-bridge can be installed just by "make install". However, there are some steps you have to do before you use it.
+            </p>
+            <p class="description">
+                The first step is registering the IMModule. Please run "update-gtk-immodules (host-triplet)" for GTK+ from the terminal with the root privilege. "(host-triplet)" is the architecture you use, for example, "x86_64-redhat-linux-gnu" in my case. If you have no error, go for the next step.
+            </p>
+            <p class="description">
+                The second step is choosing the new IMModule as the default IMModule. This is achived by exporting an environmental value as "GTK_IM_MODULE=scim-bridge" for GTK+. You can test this temporary from a X terminal. Please export it and launch "gedit". If the scim-bridge works correctly, you see "scim-bridge-agent" in the output of "ps -A". Most os have their own ways to export it it a X session. There seems no standard way to achieve this. Please follow the instruction of yours. :(
+            </p>
+        </p>
+        <p>
+            <p class="bullet_in" id="debug">How to debug it?</p>
+            <p class="description">
+                The debug output from the client is easily gotten by exporting environmental variables, that is "SCIM_BRIDGE_DEBUG_LEVEL". This variable decides the verbosity of the debug output. If you set it "9", you get all the debug output from the client. On the other hand, "0" makes it quiet, kills all the debug output.
+            </p>
+            <p class="description">
+                On the other hand, the debug output from the agent is difficult to get, because it detaches itself from the console and fork as soon as it launches. You can disable this feature by launch it manually (kill the agent process beforehand) with the argument "--standalone", which prevent the process to daemonize itself. You can get the debug output by giving the argument "--verbose". There is also another usefull argument for debugging. That is "--noexit". Without it, the agent exits automatically when the last client is gone.
+            </p>
+        </p>
+        <p>
+            <p class="bullet_in" id="undocumented">Is there any undocumnented features?</p>
+            <p class="description">
+                There are some undocumented features in scim-bridge. They are written only for dealing with bugs of famous (infamous?) applications, so they might be removed in the feature releases without any notification.
+            </p>
+            <p class="description">
+                <ul>
+                    <li>Key snooper. (enabled by the environmental variable, "SCIM_BRIDGE_KEY_SNOOPER=true")
+                        <ul>
+                            <li>Use "key snooper" to sneak all the key events in gtk+ apps.</li>
+                            <li>Please use it for OpenOffice.org, which doesn't pass the key releasing events to IMModules.</li>
+                            <li>Note, it might kill key accelerators of the applications.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </p>
+        </p>
+        <p>
+            <p class="bullet_in" id="trobule">Where can I send a bug report?</p>
+            <p class="description">
+                Scim-bridge is developed as the part of <a href="http://www.scim-im.org/">SCIM project</a>. You can report it directly into <a href="http://sourceforge.net/mail/?group_id=108454">the mailing list of that</a>. (The most recommanded one is scim-devel-list, I won't miss it if you post there) But please note that you have to tell the distributors first if you use the package included in the distribution, or the package maden by someone else. They might know the better way to solve your problem than I do. :)
+            </p>
+        </p>
+        <hr/>
+        <p class="copyright">
+            Copyright (c) 2006 Ryo Dairiki &lt;ryo-dairiki@users.sourceforge.net&gt;
+        </p>
+    </body>
+</html>

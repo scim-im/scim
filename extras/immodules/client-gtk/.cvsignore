@@ -1,0 +1,9 @@
+Makefile.in
+.deps
+.libs
+Makefile
+im-scim-bridge.la
+im_scim_bridge_la-im-scim-bridge-gtk.lo
+im_scim_bridge_la-scim-bridge-client-gtk.lo
+im_scim_bridge_la-scim-bridge-client-imcontext-gtk.lo
+im_scim_bridge_la-scim-bridge-client-key-event-utility-gtk.lo

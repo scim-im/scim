@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+    <head>
+        <link rel="stylesheet" type="text/css" href="../document.css">
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta name="author" content="Ryo Dairiki">
+        <title>Scim Bridge: Developer Manual</title>
+    </head>
+    <body>
+        <p class="bullet_in">Scim Bridge Developer Manual: The introduction</p>
+        <a href="index.html">Up</a>
+        <hr/>
+        <p>
+            <p class="bullet_in" id="about_author">About the author</p>
+            <p class="description">
+                This library is mainly written by one of a member of SCIM project, Ryo Dairiki.<br/>
+                Please contact me freely if you find any bug.<br/>
+                Any other reports are also welcomed.
+            </p>
+            <p class="bullet_in" id="what_is_this_for">What is this for?</p>
+            <p class="description">
+                Scim-bridge is wrapper library for SCIM, written in C. It is firstly written to solve problems occured by the ABI transition of GNU libstdc++ between 3.* branch and 4.* branch. That's not the problem in the most of cases because you usually used the same compiler for SCIM and GUI apps.
+            </p>
+            <p class="description">
+                But there are some cases you have to load the shared libraries into apps compiled on the different C++ ABI. For example, you cannot use SCIM compiled by g++ 4.* on acroread, which seems to be compiled by g++ 3.*. But you can load Scim-bridge even in that case, because it is written in C not C++.
+            </p>
+            <p class="description">
+                There is another benefit of it too, that is, you can reduce the complexity of dependency tree around SCIM by using Scim-bridge. Scim-bridge is seperated in two parts, the agent and the clients. The agent is the IME server which communicates with SCIM. The clients are IMModules which communicate only with the agent so that there is no binary dependency between the clients and SCIM. The binary dependency between the GUI apps and SCIM often cause problems, and difficult to solve. I hope this will help the packagers of SCIM.
+            </p>
+            <p class="bullet_in" id="how_does_it_work">How does it work?</p>
+            <p class="description">
+                The immodule of Scim-bridge, that is, scim-bridge-clients forward key events to the agent over the unix domain socket. And the agent handled them and send back the commands to update the preedit or show lookup table.
+            </p>
+            <p class="bullet_in" id="future_plan">The plan for the future</p>
+            <p class="description">
+                There are some plans for the future.
+                <ul>
+                    <li>Qt client</li>
+                    <li>Console client</li>
+                    <li>UIM agent</li>
+                </ul>
+            </p>
+        </p>
+        <hr/>
+        <p class="copyright">
+            Copyright (c) 2006 Ryo Dairiki &lt;ryo-dairiki@users.sourceforge.net&gt;
+        </p>
+    </body>
+</html>

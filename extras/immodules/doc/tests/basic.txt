@@ -1,0 +1,38 @@
+* Basic tests:
+
+Preparation:
+1. Kill all the process of "scim-bridge" before the tests.
+2. Confirm that the IME is currently turned off if you use "shared-imengine" mode.
+3. Open a terminal on the X.
+4. export the environmental variable, "GTK_IM_MODULE=scim-bridge".
+5. export the environmental variable, "SCIM_BRIDGE_DEBUG_LEVEL=9".
+6. Launch "gedit".
+
+
+Steps:
+0-1. Confirm that the debug strings are appeared in the terminal.
+0-3. Confirm that the IME is still deactivated.
+0-4. Type "hello, world!" to check if SCIM-Bridge is correctly loaded.
+0-5. Focus in and out the the window, and then type "hello, again".
+0-6. Press "ctrl+F" to open the fiding dialog.
+0-7. Switch the focus between the dialog and the main window.
+0-8. Type other strings to confirm that focus transition is correctly handled.
+0-9. Close the fiding dialog with the focus staying on the entry field of it.
+
+Expected results:
+- "scim-bridge" will be launched and it'll exit on quitting gedit.
+- Nothing special is occured.
+
+
+Steps:
+1-1. Turn on the IME from the menu on the panel. (I use "scim-anthy" in the following case)
+1-2. Check if the status display of the panel has been changed.
+1-3. Type something to confirm the preedit is correctly shown.
+1-4. Move the cursor in the preedit forward and backward.
+1-5. Enter the coversation mode, and show the lookup table. The lookup table should be shown just under the cursor.
+1-6. Shrink and expand the conversation segments to check the appearance of the preedit is correctly applied.
+1-7. Commit it, and see if the string is correctly inserted.
+1-8. Focus out the main window with the preedit shown. The preedit should be killed that time.
+
+Expected results:
+- Nothing to say.
