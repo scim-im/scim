@@ -1,0 +1,190 @@
+2009-04-18 13:50  ryo-dairiki
+
+	* configure.ac: - Prepare for 0.4.16
+
+2009-03-09 16:08  ryo-dairiki
+
+	* agent/scim-bridge-agent-accept-listener.cpp: - Fix an incorrect
+	  argument for accept() system call.
+
+2009-02-14 16:23  ryo-dairiki
+
+	* agent/scim-bridge-agent.cpp: - Apply
+	  "launching-order-of-x11-frontend" patch.
+
+2009-02-14 16:18  ryo-dairiki
+
+	* agent/scim-bridge-agent.cpp: - Now it respects ValidKeyMasks.
+
+2009-02-03 14:37  ryo-dairiki
+
+	* agent/scim-bridge-agent-imcontext.cpp: - Apply "fixes mis-ordered
+	  focus event for scim-bridge" patch.
+
+2009-01-18 02:59  ryo-dairiki
+
+	* agent/scim-bridge-agent.cpp: - Added "reduce memory footprint"
+	  patch again.
+
+2009-01-17 17:29  ryo-dairiki
+
+	* ABOUT-NLS, Makefile.am, agent/Makefile.am,
+	  agent/scim-bridge-agent-application.cpp,
+	  agent/scim-bridge-agent-imcontext.cpp,
+	  agent/scim-bridge-agent.cpp,
+	  agent/utils/scim-bridge-agent-panel-client.cpp,
+	  client-common/Makefile.am, client-gtk/Makefile.am,
+	  client-qt/qt3/Makefile.am, client-qt/qt4/Makefile.am,
+	  common/Makefile.am, common/intl.h, common/scim-bridge.h,
+	  configure.ac, doc/Makefile.am, intltool-extract.in,
+	  intltool-merge.in, intltool-update.in, po, tests/Makefile.am: -
+	  Upgrade configuration files.
+
+2008-12-22 15:00  ryo-dairiki
+
+	* ChangeLog, configure.ac: - Add "enable-all" option for configure
+	  script.
+
+2008-12-20 02:38  ryo-dairiki
+
+	* ChangeLog, Makefile.am, configure.ac, intl, m4: - Remove gettext
+	  support.
+
+2008-12-20 02:26  ryo-dairiki
+
+	* ABOUT-NLS, ChangeLog, Makefile.am, agent/scim-bridge-agent.cpp,
+	  bootstrap, config.rpath, configure.ac, m4/ChangeLog,
+	  m4/gettext.m4, m4/iconv.m4, m4/lib-link.m4, m4/po.m4: - Reve
+	  gettext support.
+
+2008-12-20 01:17  ryo-dairiki
+
+	* ChangeLog, agent/scim-bridge-agent.cpp, configure.ac: - Import
+	  "reduce scim-bridge virtual memory usage" patch.
+
+2008-09-15 09:13  yurivict
+
+	* ChangeLog, agent/scim-bridge-agent-output.cpp,
+	  agent/scim-bridge-agent.cpp,
+	  agent/utils/scim-bridge-agent-panel-client.cpp,
+	  client-common/scim-bridge-client-output.c,
+	  client-common/scim-bridge-client.c,
+	  client-gtk/scim-bridge-client-imcontext-gtk.c,
+	  client-qt/qt3/Makefile.am, client-qt/qt4/Makefile.am,
+	  common/intl.h, common/scim-bridge-attribute.c,
+	  common/scim-bridge-display.c, common/scim-bridge-key-event.c,
+	  common/scim-bridge-message.c, common/scim-bridge-messenger.c,
+	  common/scim-bridge-path.c, common/scim-bridge-string.h:
+	  Miscellaneous code portability fixes
+
+2008-08-18 21:24  yurivict
+
+	* ., .cdtproject, .cproject, .cvsignore, .project, .settings,
+	  .settings/org.eclipse.cdt.core.prefs, ABOUT-NLS, AUTHORS,
+	  COPYING, ChangeLog, INSTALL, Makefile.am, NEWS, README, agent,
+	  agent/.cvsignore, agent/Makefile.am,
+	  agent/scim-bridge-agent-accept-listener.cpp,
+	  agent/scim-bridge-agent-accept-listener.h,
+	  agent/scim-bridge-agent-application.cpp,
+	  agent/scim-bridge-agent-client-listener.cpp,
+	  agent/scim-bridge-agent-client-listener.h,
+	  agent/scim-bridge-agent-imcontext.cpp,
+	  agent/scim-bridge-agent-imcontext.h,
+	  agent/scim-bridge-agent-interruption-listener.cpp,
+	  agent/scim-bridge-agent-interruption-listener.h,
+	  agent/scim-bridge-agent-output.cpp,
+	  agent/scim-bridge-agent-panel-listener-protected.h,
+	  agent/scim-bridge-agent-panel-listener.cpp,
+	  agent/scim-bridge-agent-panel-listener.h,
+	  agent/scim-bridge-agent-protected.h,
+	  agent/scim-bridge-agent-signal-listener.cpp,
+	  agent/scim-bridge-agent-signal-listener.h,
+	  agent/scim-bridge-agent-socket-client.h,
+	  agent/scim-bridge-agent.cpp, agent/scim-bridge-agent.h,
+	  agent/utils, agent/utils/scim-bridge-agent-panel-client.cpp,
+	  agent/utils/scim-bridge-agent-panel-client.h, bootstrap,
+	  client-common, client-common/.cvsignore,
+	  client-common/Makefile.am,
+	  client-common/scim-bridge-client-debug.c,
+	  client-common/scim-bridge-client-imcontext.h,
+	  client-common/scim-bridge-client-output.c,
+	  client-common/scim-bridge-client-protected.h,
+	  client-common/scim-bridge-client.c,
+	  client-common/scim-bridge-client.h, client-gtk,
+	  client-gtk/.cvsignore, client-gtk/Makefile.am,
+	  client-gtk/im-scim-bridge-gtk.c,
+	  client-gtk/scim-bridge-client-gtk.c,
+	  client-gtk/scim-bridge-client-gtk.h,
+	  client-gtk/scim-bridge-client-imcontext-gtk.c,
+	  client-gtk/scim-bridge-client-imcontext-gtk.h,
+	  client-gtk/scim-bridge-client-key-event-utility-gtk.c,
+	  client-gtk/scim-bridge-client-key-event-utility-gtk.h, client-qt,
+	  client-qt/.cvsignore, client-qt/im-scim-bridge-qt.cpp,
+	  client-qt/qt3, client-qt/qt3/.cvsignore,
+	  client-qt/qt3/Makefile.am, client-qt/qt4,
+	  client-qt/qt4/.cvsignore, client-qt/qt4/Makefile.am,
+	  client-qt/scim-bridge-client-common-qt.h,
+	  client-qt/scim-bridge-client-imcontext-qt.cpp,
+	  client-qt/scim-bridge-client-imcontext-qt.h,
+	  client-qt/scim-bridge-client-key-event-utility-qt.cpp,
+	  client-qt/scim-bridge-client-key-event-utility-qt.h,
+	  client-qt/scim-bridge-client-qt.cpp,
+	  client-qt/scim-bridge-client-qt.h, common, common/.cvsignore,
+	  common/Makefile.am, common/intl.h,
+	  common/scim-bridge-attribute.c, common/scim-bridge-attribute.h,
+	  common/scim-bridge-debug.h, common/scim-bridge-display.c,
+	  common/scim-bridge-display.h, common/scim-bridge-imcontext.h,
+	  common/scim-bridge-key-code.h, common/scim-bridge-key-event.c,
+	  common/scim-bridge-key-event.h,
+	  common/scim-bridge-message-constant.h,
+	  common/scim-bridge-message.c, common/scim-bridge-message.h,
+	  common/scim-bridge-messenger.c, common/scim-bridge-messenger.h,
+	  common/scim-bridge-output.h, common/scim-bridge-path.c,
+	  common/scim-bridge-path.h, common/scim-bridge-string.c,
+	  common/scim-bridge-string.h, common/scim-bridge.h, config.rpath,
+	  configure.ac, cvs2cl.pl, developers, doc, doc/.cvsignore,
+	  doc/LICENSE.GPL, doc/LICENSE.LGPL, doc/Makefile.am, doc/api,
+	  doc/api/.cvsignore, doc/developer, doc/developer/client.html,
+	  doc/developer/imcontext.html, doc/developer/index.html,
+	  doc/developer/introduction.html, doc/developer/protocol.html,
+	  doc/document.css, doc/doxygen.conf, doc/icon,
+	  doc/icon/kasasagi.png, doc/icon/kasasagi.svg, doc/index.html,
+	  doc/tests, doc/tests/basic.txt, doc/tests/broken_clients.txt,
+	  doc/tests/fallback.txt, doc/tests/im_status.txt,
+	  doc/tests/launching.txt, doc/user, doc/user/index.html, intl,
+	  intl/.cvsignore, intl/ChangeLog, intl/Makefile.in, intl/VERSION,
+	  intl/bindtextdom.c, intl/config.charset, intl/dcgettext.c,
+	  intl/dcigettext.c, intl/dcngettext.c, intl/dgettext.c,
+	  intl/dngettext.c, intl/eval-plural.h, intl/explodename.c,
+	  intl/export.h, intl/finddomain.c, intl/gettext.c,
+	  intl/gettextP.h, intl/gmo.h, intl/hash-string.c,
+	  intl/hash-string.h, intl/intl-compat.c, intl/intl-exports.c,
+	  intl/l10nflist.c, intl/langprefs.c, intl/libgnuintl.h.in,
+	  intl/loadinfo.h, intl/loadmsgcat.c, intl/localcharset.c,
+	  intl/localcharset.h, intl/locale.alias, intl/localealias.c,
+	  intl/localename.c, intl/lock.c, intl/lock.h, intl/log.c,
+	  intl/ngettext.c, intl/os2compat.c, intl/os2compat.h,
+	  intl/osdep.c, intl/plural-exp.c, intl/plural-exp.h,
+	  intl/plural.c, intl/plural.y, intl/printf-args.c,
+	  intl/printf-args.h, intl/printf-parse.c, intl/printf-parse.h,
+	  intl/printf.c, intl/ref-add.sin, intl/ref-del.sin,
+	  intl/relocatable.c, intl/relocatable.h, intl/textdomain.c,
+	  intl/vasnprintf.c, intl/vasnprintf.h, intl/vasnwprintf.h,
+	  intl/version.c, intl/wprintf-parse.h, intl/xsize.h,
+	  intltool-extract.in, intltool-merge.in, intltool-update.in, m4,
+	  m4/ChangeLog, m4/codeset.m4, m4/gettext.m4, m4/glibc2.m4,
+	  m4/glibc21.m4, m4/iconv.m4, m4/intdiv0.m4, m4/intl.m4,
+	  m4/intldir.m4, m4/intmax.m4, m4/inttypes-pri.m4,
+	  m4/inttypes_h.m4, m4/lcmessage.m4, m4/lib-ld.m4, m4/lib-link.m4,
+	  m4/lib-prefix.m4, m4/lock.m4, m4/longdouble.m4, m4/longlong.m4,
+	  m4/nls.m4, m4/po.m4, m4/printf-posix.m4, m4/progtest.m4,
+	  m4/size_max.m4, m4/stdint_h.m4, m4/uintmax_t.m4, m4/ulonglong.m4,
+	  m4/visibility.m4, m4/wchar_t.m4, m4/wint_t.m4, m4/xsize.m4, po,
+	  po/.cvsignore, po/ChangeLog, po/Makefile.in.in, po/Makevars,
+	  po/POTFILES.in, po/Rules-quot, po/boldquot.sed,
+	  po/en@boldquot.header, po/en@quot.header, po/insert-header.sin,
+	  po/quot.sed, po/remove-potcdate.sed, po/remove-potcdate.sin,
+	  po/scim.pot, po/stamp-po, tests, tests/.cvsignore,
+	  tests/Makefile.am, tests/gtk.immodules.in, tests/test-exec.sh.in:
+	  Initial import from CVS HEAD.
+

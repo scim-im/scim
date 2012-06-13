@@ -1,0 +1,6 @@
+Makefile.in
+scim-bridge
+.deps
+.libs
+Makefile
+.*.swp

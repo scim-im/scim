@@ -1,0 +1,29 @@
+* Launch the scim-bridge in the "standalone" mode:
+
+Steps:
+1. Open a terminal on the X.
+2. export the environmental variable, "GTK_IM_MODULE=scim-bridge".
+3. Launch "scim-bridge --verbose --standalone".
+
+Expected results:
+- The process of "scim-bridge" will be invoked. (You can check this by "ps -A | grep scim-bridge")
+- The lockfile, "scim-bridge-<version>.lockfile-<uid>@localhost:<display_number>.<screen_number>" is created under "/tmp" dir.
+- The socket, "scim-bridge-<version>.socket-<uid>@localhost:<display_number>.<screen_number>" is created under "/tmp" dir.
+- You'll see the startup messages from the scim-bridge.
+- "^c" (= ctrl-c) kills the agent process without any error.
+- The lockfile and the socket are removed on exiting.
+
+
+
+* Launch another process of scim-bridge in the "standalone" mode:
+
+Steps:
+1. Open a terminal on the X.
+2. export the environmental variable, "GTK_IM_MODULE=scim-bridge".
+3. Launch "scim-bridge --verbose --standalone".
+4. Open another terminal on the X, and repeat from 2 and 3 on the new terminal.
+
+Expected results:
+- The new process will exit automatically with the message of "Another agent is running, exitting...".
+- The old process still remains and is kicking.
+- The old lockfile and the socket remains under the directory of "/tmp".

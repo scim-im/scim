@@ -1,0 +1,29 @@
+* Turn on and off the IME in the shared IME mode:
+
+Steps:
+1. Open the scim-setup and turn on "Share the same input method among all applications" in the "global" category, and exit.
+2. Turn on the IME.
+3. Shift the focus into another window.
+4. Turn off the IME.
+5. Shift the focus back to the previous window.
+
+Expected results:
+- The status of the IME are shared between the windows.
+- The on-and-off status is shared.
+- The always the same IME are selected.
+
+
+* Turn on and off the IME in the non-shared IME mode:
+
+Steps:
+1. Open the scim-setup and turn off "Share the same input method among all applications" in the "global" category, and exit.
+2. Turn on the IME.
+3. Shift the focus into another window.
+4. Turn off the IME.
+5. Shift the focus back to the previous window.
+6. Tuen on the IME, and choose another IME by the panel.
+7. Focus back the other window.
+
+Expected results:
+- The IME are always off when you focus a window.
+- The IME are not shared between the window; You can choose different one for each window.

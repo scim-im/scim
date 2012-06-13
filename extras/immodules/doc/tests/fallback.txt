@@ -1,0 +1,19 @@
+* Confirm that the fallback imengine in GTK behaves politely for SCIM:
+
+Steps:
+1. Launch gedit on the X.
+2. Choose US/Keyboard from SCIM panel, or disable SCIM by "ctrl+space".
+3. Type "Ctrl+Shift+123" in gedit. (Ctrl and Shift are pressed while typing 1, 2, and 3)
+4. Release Ctrl+Shift.
+5. Repeat step3.
+6. Click the desktop to focus out gedit.
+7. Return the focus on gedit again.
+8. Choose SCIM-Anthy or SCIM-Pinyin form SCIM panel.
+9. Repeat step3.
+
+Expected results:
+- Underlined text, "u123" appears as a preedit in step3.
+- The preedit vanished, and the character for U+0123 ("g" with a dash mark) is inserted in step4.
+- The preedit canceled in step6.
+- No preedit or commitment on gedit in step7.
+- Nothing happens in step 9.
