@@ -29,8 +29,8 @@ extern "C" {
 #endif /* __cplusplus */
 
 static const GtkIMContextInfo scim_info = { 
-  "scim",			/* ID */
-  "SCIM Input Method",		/* Human readable name */
+  "scim-orig",			/* ID */
+  "SCIM Input Method (orig)",		/* Human readable name */
   "scim",			/* Translation domain */
   SCIM_LOCALEDIR,		/* Dir for bindtextdomain (not strictly needed for "gtk+") */
   ""			/* Languages for which this module is the default */
