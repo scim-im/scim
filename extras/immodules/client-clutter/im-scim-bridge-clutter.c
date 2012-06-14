@@ -31,7 +31,7 @@
 static const ClutterIMContextInfo scim_bridge_info =
 {
     /* ID */
-    "scim-bridge",
+    "scim",
     /* Human readable name */
     "SCIM Bridge Input Method",
     /* Translation domain */
@@ -81,7 +81,7 @@ void im_module_list (const ClutterIMContextInfo ***contexts, int *context_count)
 
 ClutterIMContext *im_module_create (const gchar *context_id)
 {
-    if (strcmp (context_id, "scim-bridge") == 0) {
+    if (strcmp (context_id, "scim") == 0) {
         return scim_bridge_client_imcontext_new ();
     } else {
         return NULL;

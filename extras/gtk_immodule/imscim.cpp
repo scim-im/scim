@@ -63,7 +63,7 @@ im_module_list (const GtkIMContextInfo ***contexts,
 GtkIMContext *
 im_module_create (const gchar *context_id)
 {
-  if (strcmp (context_id, "scim") == 0)
+  if (strcmp (context_id, "scim-orig") == 0)
     return gtk_im_context_scim_new ();
   else
     return NULL;
