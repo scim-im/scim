@@ -28,22 +28,22 @@ noinst_HEADERS = ../scim-bridge-client-gtk.h \
 
 moduledir = @GTK3_LIBDIR@/gtk-3.0/@GTK3_BINARY_VERSION@/immodules
 
-module_LTLIBRARIES = im-scim-bridge.la
+module_LTLIBRARIES = im-scim.la
 
-im_scim_bridge_la_SOURCES = ../im-scim-bridge-gtk.c \
+im_scim_la_SOURCES = ../im-scim-bridge-gtk.c \
 							../scim-bridge-client-gtk.c \
 							../scim-bridge-client-imcontext-gtk.c \
 							../scim-bridge-client-key-event-utility-gtk.c
 
-im_scim_bridge_la_CXXFLAGS=@GTK3_CFLAGS@
-im_scim_bridge_la_CFLAGS  =@GTK3_CFLAGS@
+im_scim_la_CXXFLAGS=@GTK3_CFLAGS@
+im_scim_la_CFLAGS  =@GTK3_CFLAGS@
 
-im_scim_bridge_la_LDFLAGS = -rpath $(moduledir) \
+im_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     -avoid-version -no-undefined \
 		     -module \
 		     @GTK3_LIBS@
 
-im_scim_bridge_la_LIBADD  = $(top_builddir)/common/libscimbridgecommon.la \
+im_scim_la_LIBADD  = $(top_builddir)/common/libscimbridgecommon.la \
 							$(top_builddir)/client-common/libscimbridgeclientcommon.la
 
 endif
