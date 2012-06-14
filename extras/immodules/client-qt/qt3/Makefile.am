@@ -25,23 +25,23 @@ INCLUDES		= -I$(top_builddir) \
 noinst_HEADERS = ../scim-bridge-client-qt.h ../scim-bridge-client-imcontext-qt.h  ../scim-bridge-client-key-event-utility-qt.h ../scim-bridge-client-common-qt.h
 
 moduledir = @QT3_PREFIX@/plugins/inputmethods
-module_LTLIBRARIES = im-scim-bridge.la
+module_LTLIBRARIES = im-scim.la
 
-im_scim_bridge_la_SOURCES = ../im-scim-bridge-qt.cpp \
+im_scim_la_SOURCES = ../im-scim-bridge-qt.cpp \
 							../scim-bridge-client-qt.cpp \
 							../scim-bridge-client-imcontext-qt.cpp \
 							../scim-bridge-client-key-event-utility-qt.cpp \
 							moc_scim-bridge-client-qt.cpp
 
-im_scim_bridge_la_CXXFLAGS=@QT3_CFLAGS@ -DQT_IMMODULE
-im_scim_bridge_la_CFLAGS  =@QT3_CFLAGS@ -DQT_IMMODULE
+im_scim_la_CXXFLAGS=@QT3_CFLAGS@ -DQT_IMMODULE
+im_scim_la_CFLAGS  =@QT3_CFLAGS@ -DQT_IMMODULE
 
-im_scim_bridge_la_LDFLAGS = -rpath $(moduledir) \
+im_scim_la_LDFLAGS = -rpath $(moduledir) \
 							-avoid-version -no-undefined \
 							-module \
 							@QT3_LIBS@
 
-im_scim_bridge_la_LIBADD  = $(top_builddir)/common/libscimbridgecommon.la \
+im_scim_la_LIBADD  = $(top_builddir)/common/libscimbridgecommon.la \
 							$(top_builddir)/client-common/libscimbridgeclientcommon.la
 
 MOC = @QT3_PREFIX@/bin/moc
