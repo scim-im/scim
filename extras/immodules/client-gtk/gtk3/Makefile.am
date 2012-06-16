@@ -26,7 +26,6 @@ noinst_HEADERS = ../scim-bridge-client-gtk.h \
 				 ../scim-bridge-client-imcontext-gtk.h \
 				 ../scim-bridge-client-key-event-utility-gtk.h
 
-# moduledir = @GTK3_LIBDIR@/gtk-3.0/@GTK3_BINARY_VERSION@/immodules
 moduledir = @GTK3_IM_MODULEDIR@
 
 module_LTLIBRARIES = im-scim.la
