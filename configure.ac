@@ -295,7 +295,7 @@ if test "$SCIM_HAS_QT4" = "yes"; then
 fi
 
 # Check if we should build scim-bridge-clutter-immodule
-PKG_CHECK_MODULES(CLUTTER, clutter-0.9 clutter-imcontext-0.1,
+PKG_CHECK_MODULES(CLUTTER, clutter-1.0 clutter-imcontext-0.1,
            [SCIM_HAS_CLUTTER=yes],
            [SCIM_HAS_CLUTTER=no])
 
@@ -397,7 +397,7 @@ AC_ARG_ENABLE(orig-gtk3-immodule,
        	      enable_orig_gtk3_immodule=no)
 
 AC_ARG_ENABLE(agent,
-          [AS_HELP_STRING([--enable-im-agent], [build scim-im-agent])], , 
+          [AS_HELP_STRING([--enable-im-agent], [build scim-im-agent (required by other immodules)])], , 
               enable_im_agent=yes)
 
 AC_ARG_ENABLE(gtk2-immodule,
@@ -417,7 +417,8 @@ AC_ARG_ENABLE(qt4-immodule,
        	      enable_qt4_immodule=yes)
 
 AC_ARG_ENABLE(clutter-immodule,
-          [AS_HELP_STRING([--disable-clutter-immodule], [build CLUTTER IM module])], , )
+          [AS_HELP_STRING([--disable-clutter-immodule], [Do not build CLUTTER IM module])], , 
+       	      enable_clutter_immodule=yes)
 
 AC_ARG_ENABLE(panel-gtk,
               [  --disable-panel-gtk       Do not build GTK2 Panel], , 
@@ -553,6 +554,8 @@ if test "$enable_gtk2_immodule" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
   SCIM_BUILD_GTK2_IMMODULE=1
   SCIM_BUILD_IMMODULE=1
   enable_immodule=yes
+  SCIM_BUILD_IM_AGENT=1
+  enable_im_agent=yes
 else
   SCIM_BUILD_GTK2_IMMODULE=0
   enable_gtk2_immodule=no
@@ -562,6 +565,8 @@ if test "$enable_gtk3_immodule" = "yes" -a "$SCIM_HAS_GTK3" = "yes"; then
   SCIM_BUILD_GTK3_IMMODULE=1
   SCIM_BUILD_IMMODULE=1
   enable_immodule=yes
+  SCIM_BUILD_IM_AGENT=1
+  enable_im_agent=yes
 else
   SCIM_BUILD_GTK3_IMMODULE=0
   enable_gtk3_immodule=no
@@ -571,6 +576,8 @@ if test "$enable_qt3_immodule" = "yes" -a "$SCIM_HAS_QT3" = "yes"; then
   SCIM_BUILD_QT3_IMMODULE=1
   SCIM_BUILD_IMMODULE=1
   enable_immodule=yes
+  SCIM_BUILD_IM_AGENT=1
+  enable_im_agent=yes
 else
   SCIM_BUILD_QT3_IMMODULE=0
   enable_qt3_immodule=no
@@ -580,6 +587,8 @@ if test "$enable_qt4_immodule" = "yes" -a "$SCIM_HAS_QT4" = "yes"; then
   SCIM_BUILD_QT4_IMMODULE=1
   SCIM_BUILD_IMMODULE=1
   enable_immodule=yes
+  SCIM_BUILD_IM_AGENT=1
+  enable_im_agent=yes
 else
   SCIM_BUILD_QT4_IMMODULE=0
   enable_qt4_immodule=no
@@ -589,6 +598,8 @@ if test "$enable_clutter_immodule" = "yes" -a "$SCIM_HAS_CLUTTER" = "yes"; then
   SCIM_BUILD_CLUTTER_IMMODULE=1
   SCIM_BUILD_IMMODULE=1
   enable_immodule=yes
+  SCIM_BUILD_IM_AGENT=1
+  enable_im_agent=yes
 else
   SCIM_BUILD_CLUTTER_IMMODULE=0
   enable_clutter_immodule=no
