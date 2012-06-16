@@ -18,7 +18,7 @@ INCLUDES		= -I$(top_builddir) \
 			  -DSCIM_TEMPDIR=\"@SCIM_TEMPDIR@\" \
 			  -DSCIM_KEYBOARD_ICON_FILE=\"@SCIM_ICONDIR@/keyboard.png\"
 
-if SCIM_BUILD_GTK3_IMMODULE
+if SCIM_BUILD_ORIG_GTK3_IMMODULE
 CONFIG_GTK3_IMMODULE = im-scim-orig.la
 endif
 

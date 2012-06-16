@@ -18,8 +18,6 @@ AC_SUBST(SCIM_MINOR_VERSION)
 AC_SUBST(SCIM_MICRO_VERSION)
 AC_SUBST(SCIM_VERSION)
 
-# libtool versioning for SCIM
-
 # increment if the interface has additions, changes, removals.
 SCIM_CURRENT=10
 
@@ -52,6 +50,24 @@ AC_DEFINE_UNQUOTED(SCIM_VERSION, "$SCIM_VERSION", [The release version of SCIM l
 AC_DEFINE_UNQUOTED(SCIM_MAJOR_VERSION, $SCIM_MAJOR_VERSION, [The Major version of SCIM library.])
 AC_DEFINE_UNQUOTED(SCIM_MINOR_VERSION, $SCIM_MINOR_VERSION, [The Minor version of SCIM library.])
 AC_DEFINE_UNQUOTED(SCIM_MICRO_VERSION, $SCIM_MICRO_VERSION, [The Micro version of SCIM library.])
+
+
+# for scim-bridge integration
+SCIM_BRIDGE_MAJOR_VERSION=$SCIM_MAJOR_VERSION
+SCIM_BRIDGE_MINOR_VERSION=$SCIM_MINOR_VERSION
+SCIM_BRIDGE_MICRO_VERSION=$SCIM_MICRO_VERSION
+
+SCIM_BRIDGE_VERSION=$SCIM_VERSION
+AC_SUBST(SCIM_BRIDGE_MAJOR_VERSION)
+AC_SUBST(SCIM_BRIDGE_MINOR_VERSION)
+AC_SUBST(SCIM_BRIDGE_MICRO_VERSION)
+AC_SUBST(SCIM_BRIDGE_VERSION)
+
+AC_DEFINE_UNQUOTED(SCIM_BRIDGE_VERSION, "$SCIM_BRIDGE_VERSION", [The release version of SCIM library.])
+AC_DEFINE_UNQUOTED(SCIM_BRIDGE_MAJOR_VERSION, $SCIM_BRIDGE_MAJOR_VERSION, [The Major version of SCIM library.])
+AC_DEFINE_UNQUOTED(SCIM_BRIDGE_MINOR_VERSION, $SCIM_BRIDGE_MINOR_VERSION, [The Minor version of SCIM library.])
+AC_DEFINE_UNQUOTED(SCIM_BRIDGE_MICRO_VERSION, $SCIM_BRIDGE_MICRO_VERSION, [The Micro version of SCIM library.])
+
 
 GETTEXT_PACKAGE=scim
 AC_SUBST(GETTEXT_PACKAGE)
@@ -228,6 +244,9 @@ PKG_CHECK_MODULES(GTK3, [gtk+-3.0 >= 3.0.0 pango >= 1.1.0 gdk-pixbuf-2.0 >= 2.4.
 
 SCIM_HAS_GTK2_2=no
 if test "$SCIM_HAS_GTK2" = "yes"; then
+  if $PKG_CONFIG --exists "gtk+-2.0 >= 2.2" ; then
+    AC_DEFINE(GDK_MULTIHEAD_SAFE,1,[Force use of GDK's multihead-safe APIs.])
+  fi
   GTK2_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk+-2.0`
   GTK2_LIBDIR=`$PKG_CONFIG --variable=libdir gtk+-2.0`
   GTK2_IM_MODULEDIR=$GTK2_LIBDIR/gtk-2.0/$GTK2_BINARY_VERSION/immodules
@@ -239,7 +258,6 @@ if test "$SCIM_HAS_GTK3" = "yes"; then
   GTK3_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk+-3.0`
   GTK3_LIBDIR=`$PKG_CONFIG --variable=libdir gtk+-3.0`
   GTK3_IM_MODULEDIR=$GTK3_LIBDIR/gtk-3.0/$GTK3_BINARY_VERSION/immodules
-
   AC_SUBST(GTK3_IM_MODULEDIR)
 fi
 
@@ -247,6 +265,49 @@ fi
 PKG_CHECK_MODULES(GTHREAD2,[gthread-2.0 >= 2.0.0],
 			[SCIM_HAS_GTHREAD2=yes],
 			[SCIM_HAS_GTHREAD2=no])
+
+
+# Check if we should build scim-bridge-qt-immodule
+PKG_CHECK_MODULES(QT3, [qt-mt >= 3.3],
+            [SCIM_HAS_QT3=yes],
+            [SCIM_HAS_QT3=no])
+
+if test "$SCIM_HAS_QT3" = "yes"; then
+  if test -z "$QT3_PREFIX"; then
+    QT3_PREFIX=`$PKG_CONFIG --variable=prefix qt-mt`
+    QT3_LIBDIR=`$PKG_CONFIG --variable=libdir qt-mt`
+  fi
+  AC_SUBST(QT3_PREFIX)
+  AC_SUBST(QT3_LIBDIR)
+fi
+
+PKG_CHECK_MODULES(QT4, [QtGui >= 4.0, QtCore >= 4.0],
+            [SCIM_HAS_QT4=yes],
+            [SCIM_HAS_QT4=no])
+
+if test "$SCIM_HAS_QT4" = "yes"; then
+  if test -z "$QT4_PREFIX"; then
+    QT4_PREFIX=`$PKG_CONFIG --variable=prefix QtCore`
+    QT4_LIBDIR=`$PKG_CONFIG --variable=libdir QtCore`
+  fi
+  AC_SUBST(QT4_PREFIX)
+  AC_SUBST(QT4_LIBDIR)
+fi
+
+# Check if we should build scim-bridge-clutter-immodule
+PKG_CHECK_MODULES(CLUTTER, clutter-0.9 clutter-imcontext-0.1,
+           [SCIM_HAS_CLUTTER=yes],
+           [SCIM_HAS_CLUTTER=no])
+
+if test "$SCIM_HAS_CLUTTER" = "yes"; then
+  CLUTTER_IMCONTEXT_LIBDIR=`$PKG_CONFIG --variable=libdir clutter-imcontext-0.1`
+  AC_SUBST(CLUTTER_LIBDIR)
+  AC_SUBST(CLUTTER_VERSION)
+  AC_SUBST(CLUTTER_BINARY_VERSION)
+  AC_SUBST(CLUTTER_IMCONTEXT_LIBDIR)
+  enable_clutter_immodule="yes";
+fi
+
 
 # Checks for X11 header files.
 AC_PATH_XTRA
@@ -291,6 +352,10 @@ AC_ARG_ENABLE(tests,
 	      [  --enable-tests            Build tests/*], , 
        	      enable_tests=no)
 
+AC_ARG_ENABLE(documents,
+          [AS_HELP_STRING([--enable-documents], [build documents])], , 
+              enable_documents=yes)
+
 AC_ARG_ENABLE(hash-map,
 	      [  --enable-hash-map         Use hast_map instead of std::map internally], , 
 	      enable_hash_map=no)
@@ -320,16 +385,39 @@ AC_ARG_ENABLE(im-socket,
        	      enable_im_socket=yes)
 
 AC_ARG_ENABLE(filter-sctc,
-	      [  --disable-filter-sctc     Do not build Simplified/Traditional Chinese conversion Filter module], , 
+	      [  --disable-filter-sctc     Do not build Simplified/Traditional Chinese conversion Filter module], ,
        	      enable_filter_sctc=yes)
 
+AC_ARG_ENABLE(orig-gtk2-immodule,
+	      [  --enable-orig-gtk2-immodule   Build original GTK2 IMModule], ,
+       	      enable_orig_gtk2_immodule=no)
+
+AC_ARG_ENABLE(orig-gtk3-immodule,
+	      [  --enable-orig-gtk3-immodule   Build original GTK3 IMModule], ,
+       	      enable_orig_gtk3_immodule=no)
+
+AC_ARG_ENABLE(agent,
+          [AS_HELP_STRING([--enable-im-agent], [build scim-im-agent])], , 
+              enable_im_agent=yes)
+
 AC_ARG_ENABLE(gtk2-immodule,
-	      [  --disable-gtk2-immodule   Do not build GTK2 IMModule], , 
+	      [  --disable-gtk2-immodule   Do not build GTK2 IMModule], ,
        	      enable_gtk2_immodule=yes)
 
 AC_ARG_ENABLE(gtk3-immodule,
-	      [  --disable-gtk3-immodule   Do not build GTK3 IMModule], , 
+	      [  --disable-gtk3-immodule   Do not build GTK3 IMModule], ,
        	      enable_gtk3_immodule=yes)
+
+AC_ARG_ENABLE(qt3-immodule,
+	      [  --disable-at3-immodule    Do not build QT3 IMModule], ,
+       	      enable_qt3_immodule=yes)
+
+AC_ARG_ENABLE(qt4-immodule,
+	      [  --disable-qt4-immodule    Do not build QT4 IMModule], ,
+       	      enable_qt4_immodule=yes)
+
+AC_ARG_ENABLE(clutter-immodule,
+          [AS_HELP_STRING([--disable-clutter-immodule], [build CLUTTER IM module])], , )
 
 AC_ARG_ENABLE(panel-gtk,
               [  --disable-panel-gtk       Do not build GTK2 Panel], , 
@@ -355,6 +443,8 @@ if test "$enable_debug" = "yes"; then
   AC_DEFINE(ENABLE_DEBUG,1,[Define this to enable the debug facility in libscim])
   CFLAGS="$CFLAGS -g"
   CXXFLAGS="$CXXFLAGS -g"
+else
+  enable_debug=no
 fi
 
 if test "$enable_tests" = "yes"; then
@@ -362,6 +452,13 @@ if test "$enable_tests" = "yes"; then
 else
   SCIM_BUILD_TESTS=0
   enable_tests=no
+fi
+
+if test "$enable_documents" = "yes"; then
+  SCIM_DOCUMENTS=1
+else
+  SCIM_DOCUMENTS=0
+  enable_documents=no
 fi
 
 if test "$enable_ltdladvise" = "yes"; then
@@ -419,8 +516,43 @@ else
   enable_filter_sctc=no
 fi
 
+if test "$enable_orig_gtk2_immodule" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
+  SCIM_BUILD_ORIG_GTK2_IMMODULE=1
+else
+  SCIM_BUILD_ORIG_GTK2_IMMODULE=0
+  enable_orig_gtk2_immodule=no
+fi
+
+if test "$enable_orig_gtk3_immodule" = "yes" -a "$SCIM_HAS_GTK3" = "yes"; then
+  SCIM_BUILD_ORIG_GTK3_IMMODULE=1
+else
+  SCIM_BUILD_ORIG_GTK3_IMMODULE=0
+  enable_orig_gtk3_immodule=no
+fi
+
+if test "$enable_gtk3_immodule" = "yes" -a "$SCIM_HAS_GTK3" = "yes"; then
+  SCIM_BUILD_GTK3_IMMODULE=1
+  SCIM_BUILD_IMMODULE=1
+  enable_immodule=yes
+else
+  SCIM_BUILD_GTK3_IMMODULE=0
+  enable_gtk3_immodule=no
+fi
+
+if test "$enable_im_agent" = "yes"; then
+  SCIM_BUILD_IM_AGENT=1
+else
+  SCIM_BUILD_IM_AGENT=0
+  enable_im_agent=no
+fi
+
+SCIM_BUILD_IMMODULE=0
+enable_immodule=no
+
 if test "$enable_gtk2_immodule" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
   SCIM_BUILD_GTK2_IMMODULE=1
+  SCIM_BUILD_IMMODULE=1
+  enable_immodule=yes
 else
   SCIM_BUILD_GTK2_IMMODULE=0
   enable_gtk2_immodule=no
@@ -428,9 +560,38 @@ fi
 
 if test "$enable_gtk3_immodule" = "yes" -a "$SCIM_HAS_GTK3" = "yes"; then
   SCIM_BUILD_GTK3_IMMODULE=1
+  SCIM_BUILD_IMMODULE=1
+  enable_immodule=yes
 else
   SCIM_BUILD_GTK3_IMMODULE=0
   enable_gtk3_immodule=no
+fi
+
+if test "$enable_qt3_immodule" = "yes" -a "$SCIM_HAS_QT3" = "yes"; then
+  SCIM_BUILD_QT3_IMMODULE=1
+  SCIM_BUILD_IMMODULE=1
+  enable_immodule=yes
+else
+  SCIM_BUILD_QT3_IMMODULE=0
+  enable_qt3_immodule=no
+fi
+
+if test "$enable_qt4_immodule" = "yes" -a "$SCIM_HAS_QT4" = "yes"; then
+  SCIM_BUILD_QT4_IMMODULE=1
+  SCIM_BUILD_IMMODULE=1
+  enable_immodule=yes
+else
+  SCIM_BUILD_QT4_IMMODULE=0
+  enable_qt4_immodule=no
+fi
+
+if test "$enable_clutter_immodule" = "yes" -a "$SCIM_HAS_CLUTTER" = "yes"; then
+  SCIM_BUILD_CLUTTER_IMMODULE=1
+  SCIM_BUILD_IMMODULE=1
+  enable_immodule=yes
+else
+  SCIM_BUILD_CLUTTER_IMMODULE=0
+  enable_clutter_immodule=no
 fi
 
 if test "$SCIM_HAS_GTK3" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
@@ -523,6 +684,9 @@ AM_CONDITIONAL(SCIM_LTDLADVISE,
 AM_CONDITIONAL(SCIM_BUILD_TESTS,
 		[test "$enable_tests" = "yes"])
 
+AM_CONDITIONAL(SCIM_BUILD_DOCUMENTS,
+        [test "$enable_documents" = "yes"])
+
 AM_CONDITIONAL(SCIM_BUILD_CONFIG_SIMPLE,
 		[test "$enable_config_simple" = "yes"])
 
@@ -541,11 +705,32 @@ AM_CONDITIONAL(SCIM_BUILD_IMENGINE_SOCKET,
 AM_CONDITIONAL(SCIM_BUILD_IMENGINE_RAWCODE,
 		[test "$enable_im_rawcode" = "yes"])
 
+AM_CONDITIONAL(SCIM_BUILD_ORIG_GTK2_IMMODULE,
+		[test "$enable_orig_gtk2_immodule" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_ORIG_GTK3_IMMODULE,
+		[test "$enable_orig_gtk3_immodule" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_IM_AGENT,
+        [test "$enable_im_agent" = "yes"])
+
 AM_CONDITIONAL(SCIM_BUILD_GTK2_IMMODULE,
-		[test "$enable_gtk2_immodule" = "yes"])
+        [test "$enable_gtk2_immodule" = "yes"])
 
 AM_CONDITIONAL(SCIM_BUILD_GTK3_IMMODULE,
-		[test "$enable_gtk3_immodule" = "yes"])
+        [test "$enable_gtk3_immodule" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_QT3_IMMODULE,
+        [test "$enable_qt3_immodule" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_QT4_IMMODULE,
+        [test "$enable_qt4_immodule" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_CLUTTER_IMMODULE,
+        [test "$enable_clutter_immodule" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_IMMODULE,
+        [test "$enable_immodule" = "yes"])
 
 AM_CONDITIONAL(SCIM_BUILD_FILTER_SCTC,
 		[test "$enable_filter_sctc" = "yes"])
@@ -567,6 +752,7 @@ AM_CONDITIONAL(SCIM_BUILD_PANEL_GTK,
 
 AC_SUBST(SCIM_LTDLADVISE)
 AC_SUBST(SCIM_BUILD_TESTS)
+AC_SUBST(SCIM_BUILD_DOCUMENTS)
 AC_SUBST(SCIM_BUILD_CONFIG_SIMPLE)
 AC_SUBST(SCIM_BUILD_CONFIG_SOCKET)
 AC_SUBST(SCIM_BUILD_FRONTEND_X11)
@@ -575,12 +761,20 @@ AC_SUBST(SCIM_BUILD_IMENGINE_RAWCODE)
 AC_SUBST(SCIM_BUILD_IMENGINE_TABLE)
 AC_SUBST(SCIM_BUILD_IMENGINE_SOCKET)
 AC_SUBST(SCIM_BUILD_FILTER_SCTC)
-AC_SUBST(SCIM_BUILD_GTK2_IMMODULE)
-AC_SUBST(SCIM_BUILD_GTK3_IMMODULE)
+AC_SUBST(SCIM_BUILD_ORIG_GTK2_IMMODULE)
+AC_SUBST(SCIM_BUILD_ORIG_GTK3_IMMODULE)
 AC_SUBST(SCIM_BUILD_SCIM_SETUP)
 AC_SUBST(SCIM_BUILD_PANEL_GTK)
 AC_SUBST(SCIM_BUILD_GTK_UTILS)
 AC_SUBST(SCIM_BUILD_X11_UTILS)
+AC_SUBST(SCIM_BUILD_IM_AGENT)
+AC_SUBST(SCIM_BUILD_GTK2_IMMODULE)
+AC_SUBST(SCIM_BUILD_GTK3_IMMODULE)
+AC_SUBST(SCIM_BUILD_QT3_IMMODULE)
+AC_SUBST(SCIM_BUILD_QT4_IMMODULE)
+AC_SUBST(SCIM_BUILD_CLUTTER_IMMODULE)
+AC_SUBST(SCIM_BUILD_IMMODULE)
+
 
 # Output All necessary Paths.
 SCIM_DATADIR="$datadir/scim"
@@ -590,6 +784,8 @@ SCIM_MODULE_PATH="$libdir/scim$SCIM_EPOCH"
 SCIM_LIBEXECDIR="$libdir/scim$SCIM_EPOCH"
 SCIM_LOCALEDIR="$datadir/locale"
 SCIM_TEMPDIR="/tmp"
+SCIM_PREFIX="$prefix"
+SCIM_LIBDIR="$libdir"
 
 AC_SUBST(SCIM_DATADIR)
 AC_SUBST(SCIM_SYSCONFDIR)
@@ -598,6 +794,8 @@ AC_SUBST(SCIM_MODULE_PATH)
 AC_SUBST(SCIM_LIBEXECDIR)
 AC_SUBST(SCIM_LOCALEDIR)
 AC_SUBST(SCIM_TEMPDIR)
+AC_SUBST(SCIM_PREFIX)
+AC_SUBST(SCIM_LIBDIR)
 
 ###########################################################
 ##                      Output files.                    ##
@@ -628,6 +826,17 @@ AC_CONFIG_FILES([Makefile
 		 extras/setup/Makefile
 		 extras/setup/scim-setup
 		 extras/panel/Makefile
+		 extras/immodules/Makefile 
+		 extras/immodules/common/Makefile
+		 extras/immodules/agent/Makefile
+		 extras/immodules/client-common/Makefile
+		 extras/immodules/client-gtk/gtk2/Makefile
+		 extras/immodules/client-gtk/gtk3/Makefile
+		 extras/immodules/client-qt/qt3/Makefile
+		 extras/immodules/client-qt/qt4/Makefile
+		 extras/immodules/client-clutter/Makefile
+		 extras/immodules/tests/Makefile
+		 extras/immodules/doc/Makefile
 		 tests/Makefile
 		 scim.pc
 		 scim-gtkutils.pc
@@ -645,6 +854,7 @@ Build options:
   Enable debug             $enable_debug
   Enable ld version script $enable_ld_version_script
   Enable lt_dladvise       $enable_ltdladvise
+  Build documents          $enable_documents
 
 Module options:           
   Simple config module     $enable_config_simple
@@ -661,17 +871,23 @@ Module options:
   GTK Utility Library      $enable_gtk_utils
   X11 Utility Library      $enable_x11_utils
 
-  GTK2 IMModule            $enable_gtk2_immodule
-  GTK2 IMModule dir        $GTK2_IM_MODULEDIR
-
-  GTK3 IMModule            $enable_gtk3_immodule
-  GTK3 IMModule dir        $GTK3_IM_MODULEDIR
-
   GTK Version              $USE_GTK_VERSION
+
+  GTK2 IMModule dir        $GTK2_IM_MODULEDIR
+  GTK3 IMModule dir        $GTK3_IM_MODULEDIR
 
   GUI Setup Utility        $enable_setup_ui
 
   GTK Panel GUI            $enable_panel_gtk
 
   Enable TrayIcon          $enable_tray_icon
+
+  Original GTK2 IMModule   $enable_orig_gtk2_immodule
+  Original GTK3 IMModule   $enable_orig_gtk3_immodule
+  Agent                    $enable_im_agent
+  GTK2 IMModule            $enable_gtk2_immodule
+  GTK3 IMModule            $enable_gtk3_immodule
+  QT3 IMModule             $enable_qt3_immodule
+  QT4 IMModule             $enable_qt4_immodule
+  CLUTTER IMModule         $enable_clutter_immodule
 ])

@@ -15,11 +15,11 @@
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-if SCIM_BRIDGE_BUILD_TESTS
+if SCIM_BUILD_TESTS
 
 do_subst = sed -e 's,[@]top_builddir[@],@top_builddir@,g'
 
-if SCIM_BRIDGE_BUILD_TESTS
+if SCIM_BUILD_TESTS
 noinst_SCRIPTS = test-exec.sh gtk.immodules
 
 test-exec.sh: test-exec.sh.in
