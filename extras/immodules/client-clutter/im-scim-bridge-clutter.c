@@ -33,7 +33,7 @@ static const ClutterIMContextInfo scim_bridge_info =
     /* ID */
     "scim",
     /* Human readable name */
-    "SCIM Bridge Input Method",
+    "SCIM Input Method",
     /* Translation domain */
     "",
     /* Dir for bindtextdomain (not strictly needed for "clutter") */
