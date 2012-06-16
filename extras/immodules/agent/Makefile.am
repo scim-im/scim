@@ -15,10 +15,11 @@
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-if SCIM_BRIDGE_BUILD_AGENT
+if SCIM_BUILD_IM_AGENT
 
 INCLUDES		= -I$(top_srcdir) \
-                  -I$(top_srcdir)/common \
+                  -I$(top_srcdir)/src \
+                  -I$(top_srcdir)/extras/immodules/common \
                   -DSCIM_LOCALEDIR=\"@SCIM_LOCALEDIR@\" \
                   -DSCIM_ICONDIR=\"@SCIM_ICONDIR@\" \
 				  -DSCIM_KEYBOARD_ICON_FILE=\"@SCIM_ICONDIR@/keyboard.png\" \
@@ -38,9 +39,9 @@ noinst_HEADERS		= scim-bridge-agent.h \
                       scim-bridge-agent-socket-client.h \
 					  utils/scim-bridge-agent-panel-client.h
                       
-bin_PROGRAMS = scim-bridge
+bin_PROGRAMS = scim-im-agent
 
-scim_bridge_SOURCES	= scim-bridge-agent-application.cpp \
+scim_im_agent_SOURCES = scim-bridge-agent-application.cpp \
 				      scim-bridge-agent.cpp \
 				      scim-bridge-agent-client-listener.cpp \
                       scim-bridge-agent-imcontext.cpp \
@@ -52,9 +53,10 @@ scim_bridge_SOURCES	= scim-bridge-agent-application.cpp \
 					  utils/scim-bridge-agent-panel-client.cpp
 
 #scim_bridge_CFLAGS	= @SCIM_CFLAGS@
-scim_bridge_CXXFLAGS	= @SCIM_CFLAGS@
-scim_bridge_LDFLAGS	= @SCIM_LIBS@
-scim_bridge_LDADD     = $(top_builddir)/common/libscimbridgecommon.la
+#scim_bridge_CXXFLAGS	= @SCIM_CFLAGS@
+#scim_bridge_LDFLAGS	= @SCIM_LIBS@
+scim_im_agent_LDADD	= $(top_builddir)/extras/immodules/common/libscimbridgecommon.la \
+						$(top_builddir)/src/libscim@SCIM_EPOCH@.la
 
 endif
 

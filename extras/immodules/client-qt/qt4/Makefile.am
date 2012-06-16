@@ -15,16 +15,16 @@
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-if SCIM_BRIDGE_BUILD_QT4_IMMODULE
+if SCIM_BUILD_QT4_IMMODULE
 
 INCLUDES		= -I$(top_builddir) \
 	    		  -I$(top_srcdir) \
-			  -I$(top_srcdir)/common \
-			  -I$(top_srcdir)/client-common
+			  -I$(top_srcdir)/extras/immodules/common \
+			  -I$(top_srcdir)/extras/immodules/client-common
 
 noinst_HEADERS = ../scim-bridge-client-qt.h ../scim-bridge-client-imcontext-qt.h ../scim-bridge-client-key-event-utility-qt.h ../scim-bridge-client-common-qt.h
 
-moduledir = @QT4_PREFIX@/plugins/inputmethods
+moduledir = @QT4_LIBDIR@/qt4/plugins/inputmethods
 module_LTLIBRARIES = im-scim.la
 
 im_scim_la_SOURCES = ../im-scim-bridge-qt.cpp \
@@ -41,10 +41,10 @@ im_scim_la_LDFLAGS = -rpath $(moduledir) \
 							-module \
 							@QT4_LIBS@
 
-im_scim_la_LIBADD  = $(top_builddir)/common/libscimbridgecommon.la \
-							$(top_builddir)/client-common/libscimbridgeclientcommon.la
+im_scim_la_LIBADD  = $(top_builddir)/extras/immodules/common/libscimbridgecommon.la \
+					$(top_builddir)/extras/immodules/client-common/libscimbridgeclientcommon.la
 
-MOC = @QT4_PREFIX@/bin/moc
+MOC = @QT4_PREFIX@/bin/moc-qt4
 
 moc_scim-bridge-client-qt.cpp: ../scim-bridge-client-qt.h
 	$(MOC) $< -o $@

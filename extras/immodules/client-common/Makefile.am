@@ -15,9 +15,27 @@
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-if SCIM_BRIDGE_BUILD_IMMODULE
+if SCIM_BUILD_IMMODULE
 
-INCLUDES		= -I$(top_srcdir)/common
+INCLUDES        = -I$(top_builddir) \
+              -I$(top_builddir)/src \
+              -I$(top_srcdir) \
+              -I$(top_srcdir)/src \
+              -I$(top_srcdir)/intl \
+              -I$(top_srcdir)/data \
+              -I$(top_srcdir)/utils \
+              -I$(top_srcdir)/extras/panel \
+			  -I$(top_srcdir)/extras/immodules/common \
+			  -I$(top_srcdir)/extras/immodules/client-common \
+              -DSCIM_DATADIR=\"@SCIM_DATADIR@\" \
+              -DSCIM_LOCALEDIR=\"@SCIM_LOCALEDIR@\" \
+              -DSCIM_SYSCONFDIR=\"@SCIM_SYSCONFDIR@\" \
+              -DSCIM_LIBEXECDIR=\"@SCIM_LIBEXECDIR@\" \
+              -DSCIM_ICONDIR=\"@SCIM_ICONDIR@\" \
+              -DSCIM_MODULE_PATH=\"@SCIM_MODULE_PATH@\" \
+              -DSCIM_TEMPDIR=\"@SCIM_TEMPDIR@\" \
+              -DSCIM_KEYBOARD_ICON_FILE=\"@SCIM_ICONDIR@/keyboard.png\"
+
 
 noinst_HEADERS		= scim-bridge-client.h  scim-bridge-client-protected.h scim-bridge-client-imcontext.h
 
@@ -27,7 +45,7 @@ libscimbridgeclientcommon_la_SOURCES	= scim-bridge-client.c \
 										  scim-bridge-client-output.c \
 										  scim-bridge-client-debug.c
 
-libscimbridgeclientcommon_la_CFLAGS	= @SCIM_CFLAGS@
+#libscimbridgeclientcommon_la_CFLAGS	= @SCIM_CFLAGS@
 #libscimbridgeclientcommon_la_CXXFLAGS	= @SCIM_CFLAGS@
 #libscimbridgeclientcommon_la_LDFLAGS	= @SCIM_LIBS@ 
 
