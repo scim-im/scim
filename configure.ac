@@ -277,6 +277,8 @@ if test "$SCIM_HAS_QT3" = "yes"; then
     QT3_PREFIX=`$PKG_CONFIG --variable=prefix qt-mt`
     QT3_LIBDIR=`$PKG_CONFIG --variable=libdir qt-mt`
   fi
+  QT3_IM_MODULEDIR=$QT3_LIBDIR/qt3/plugins/inputmethods
+  AC_SUBST(QT3_IM_MODULEDIR)
   AC_SUBST(QT3_PREFIX)
   AC_SUBST(QT3_LIBDIR)
 fi
@@ -290,6 +292,8 @@ if test "$SCIM_HAS_QT4" = "yes"; then
     QT4_PREFIX=`$PKG_CONFIG --variable=prefix QtCore`
     QT4_LIBDIR=`$PKG_CONFIG --variable=libdir QtCore`
   fi
+  QT4_IM_MODULEDIR=$QT4_LIBDIR/qt4/plugins/inputmethods
+  AC_SUBST(QT4_IM_MODULEDIR)
   AC_SUBST(QT4_PREFIX)
   AC_SUBST(QT4_LIBDIR)
 fi
@@ -301,6 +305,8 @@ PKG_CHECK_MODULES(CLUTTER, clutter-1.0 clutter-imcontext-0.1,
 
 if test "$SCIM_HAS_CLUTTER" = "yes"; then
   CLUTTER_IMCONTEXT_LIBDIR=`$PKG_CONFIG --variable=libdir clutter-imcontext-0.1`
+  CLUTTER_IM_MODULEDIR=$CLUTTER_IMCONTEXT_LIBDIR/clutter-imcontext/immodules
+  AC_SUBST(CLUTTER_IM_MODULEDIR)
   AC_SUBST(CLUTTER_LIBDIR)
   AC_SUBST(CLUTTER_VERSION)
   AC_SUBST(CLUTTER_BINARY_VERSION)
@@ -320,113 +326,174 @@ fi
 ###########################################################
 ##             Definiation of compile args.              ##
 ###########################################################
-AC_ARG_WITH(gtk2-im-module-dir,
-	    AS_HELP_STRING([--with-gtk2-im-module-dir=dir], 
-	    [Select gtk2 immodule dir]),
-	    GTK2_IM_MODULEDIR=$with_gtk2_im_module_dir)
+AC_ARG_WITH([gtk2-im-module-dir],
+	[AS_HELP_STRING([--with-gtk2-im-module-dir=dir],
+		[Select GTK2 immodule dir])],
+	[GTK2_IM_MODULEDIR=$with_gtk2_im_module_dir])
 
-AC_ARG_WITH(gtk3-im-module-dir,
-	    AS_HELP_STRING([--with-gtk3-im-module-dir=dir], 
-	    [Select gtk3 immodule dir]),
-	    GTK3_IM_MODULEDIR=$with_gtk3_im_module_dir)
+AC_ARG_WITH([gtk3-im-module-dir],
+	[AS_HELP_STRING([--with-gtk3-im-module-dir=dir], 
+	    [Select GTK3 immodule dir])],
+	[GTK3_IM_MODULEDIR=$with_gtk3_im_module_dir])
 
-AC_ARG_WITH(gtk-version,
-	    AS_HELP_STRING([--with-gtk-version=2 or 3], 
-	    [Select gtk version if both gtk2 and gtk3 are available (default is 3)]),
-	    [WANT_GTK_VERSION=$withval],
-		[WANT_GTK_VERSION=3])
+AC_ARG_WITH([qt3-im-module-dir],
+	[AS_HELP_STRING([--with-qt3-im-module-dir=dir],
+		[Select QT3 immodule dir])],
+	[QT3_IM_MODULEDIR=$with_qt3_im_module_dir])
 
-AC_ARG_ENABLE(ld-version-script,
-	      [  --enable-ld-version-script Use ld version script to limit exported symbols], ,
-       	      enable_ld_version_script=no)
+AC_ARG_WITH([qt4-im-module-dir],
+	[AS_HELP_STRING([--with-qt4-im-module-dir=dir],
+		[Select QT4 immodule dir])],
+	[QT4_IM_MODULEDIR=$with_qt4_im_module_dir])
 
-AC_ARG_ENABLE(ltdladvise,
-	      [  --enable-ltdladvise       Use lt_dladvise for module loading], ,
-       	      enable_ltdladvise=no)
+AC_ARG_WITH([clutter-im-module-dir],
+	[AS_HELP_STRING([--with-clutter-im-module-dir=dir],
+		[Select clutter immodule dir])],
+	[CLUTTER_IM_MODULEDIR=$with_clutter_im_module_dir])
 
-AC_ARG_ENABLE(debug,
-	      [  --enable-debug            Turn on debugging], , 
-	      enable_debug=no)
+AC_ARG_WITH([gtk-version],
+	[AS_HELP_STRING([--with-gtk-version=2 or 3], 
+		[Select gtk version if both gtk2 and gtk3 are available (default is 3)])],
+	[WANT_GTK_VERSION=$withval],
+	[WANT_GTK_VERSION=3])
 
-AC_ARG_ENABLE(tests,
-	      [  --enable-tests            Build tests/*], , 
-       	      enable_tests=no)
+AC_ARG_ENABLE([ld-version-script],
+	[AS_HELP_STRING([--enable-ld-version-script],
+		[Use ld version script to limit exported symbols])],
+	[],
+	[enable_ld_version_script=no])
 
-AC_ARG_ENABLE(documents,
-          [AS_HELP_STRING([--enable-documents], [build documents])], , 
-              enable_documents=yes)
+AC_ARG_ENABLE([ltdladvise],
+	[AS_HELP_STRING([--enable-ltdladvise],
+		[Use lt_dladvise for module loading])],
+	[],
+	[enable_ltdladvise=no])
 
-AC_ARG_ENABLE(hash-map,
-	      [  --enable-hash-map         Use hast_map instead of std::map internally], , 
-	      enable_hash_map=no)
+AC_ARG_ENABLE([debug],
+	[AS_HELP_STRING([--enable-debug],
+		[Turn on debugging])],
+	[], 
+	[enable_debug=no])
 
-AC_ARG_ENABLE(config-simple,
-	      [  --disable-config-simple   Do not build Simple Config module], , 
-       	      enable_config_simple=yes)
+AC_ARG_ENABLE([tests],
+	[AS_HELP_STRING([--enable-tests],
+		[Build tests/*])],
+	[], 
+	[enable_tests=no])
 
-AC_ARG_ENABLE(config-socket,
-	      [  --disable-config-socket   Do not build Socket Config module], , 
-       	      enable_config_socket=yes)
+AC_ARG_ENABLE([documents],
+	[AS_HELP_STRING([--enable-documents],
+		[build documents])],
+	[], 
+	[enable_documents=no])
 
-AC_ARG_ENABLE(frontend-x11,
-	      [  --disable-frontend-x11    Do not build X11 FrontEnd module], , 
-       	      enable_frontend_x11=yes)
+AC_ARG_ENABLE([hash-map],
+	[AS_HELP_STRING([--enable-hash-map],
+		[Use hash_map instead of std::map internally])],
+	[],
+	[enable_hash_map=no])
 
-AC_ARG_ENABLE(frontend-socket,
-	      [  --disable-frontend-socket Do not build Socket FrontEnd module], , 
-       	      enable_frontend_socket=yes)
+AC_ARG_ENABLE([config-simple],
+	[AS_HELP_STRING([--disable-config-simple],
+		[Do not build Simple Config module])],
+	[],
+	[enable_config_simple=yes])
 
-AC_ARG_ENABLE(im-rawcode,
-	      [  --disable-im-rawcode      Do not build RawCode IMEngine module], , 
-       	      enable_im_rawcode=yes)
+AC_ARG_ENABLE([config-socket],
+	[AS_HELP_STRING([--disable-config-socket],
+		[Do not build Socket Config module])],
+	[],
+	[enable_config_socket=yes])
 
-AC_ARG_ENABLE(im-socket,
-	      [  --disable-im-socket       Do not build Socket IMEngine module], ,
-       	      enable_im_socket=yes)
+AC_ARG_ENABLE([frontend-x11],
+	[AS_HELP_STRING([--disable-frontend-x11],
+		[Do not build X11 FrontEnd module])],
+	[],
+	[enable_frontend_x11=yes])
 
-AC_ARG_ENABLE(filter-sctc,
-	      [  --disable-filter-sctc     Do not build Simplified/Traditional Chinese conversion Filter module], ,
-       	      enable_filter_sctc=yes)
+AC_ARG_ENABLE([frontend-socket],
+	[AS_HELP_STRING([--disable-frontend-socket],
+		[Do not build Socket FrontEnd module])],
+	[], 
+	[enable_frontend_socket=yes])
 
-AC_ARG_ENABLE(orig-gtk2-immodule,
-	      [  --enable-orig-gtk2-immodule   Build original GTK2 IMModule], ,
-       	      enable_orig_gtk2_immodule=no)
+AC_ARG_ENABLE([im-rawcode],
+	[AS_HELP_STRING([--disable-im-rawcode],
+		[Do not build RawCode IMEngine module])],
+	[], 
+	[enable_im_rawcode=yes])
 
-AC_ARG_ENABLE(orig-gtk3-immodule,
-	      [  --enable-orig-gtk3-immodule   Build original GTK3 IMModule], ,
-       	      enable_orig_gtk3_immodule=no)
+AC_ARG_ENABLE([im-socket],
+	[AS_HELP_STRING([--disable-im-socket],
+		[Do not build Socket IMEngine module])],
+	[],
+	[enable_im_socket=yes])
 
-AC_ARG_ENABLE(agent,
-          [AS_HELP_STRING([--enable-im-agent], [build scim-im-agent (required by other immodules)])], , 
-              enable_im_agent=yes)
+AC_ARG_ENABLE([filter-sctc],
+	[AS_HELP_STRING([--disable-filter-sctc],
+		[Do not build Simplified/Traditional Chinese conversion Filter module])],
+	[],
+	[enable_filter_sctc=yes])
 
-AC_ARG_ENABLE(gtk2-immodule,
-	      [  --disable-gtk2-immodule   Do not build GTK2 IMModule], ,
-       	      enable_gtk2_immodule=yes)
+AC_ARG_ENABLE([orig-gtk2-immodule],
+	[AS_HELP_STRING([--enable-orig-gtk2-immodule],
+		[Build original GTK2 IMModule])],
+	[],
+	[enable_orig_gtk2_immodule=no])
 
-AC_ARG_ENABLE(gtk3-immodule,
-	      [  --disable-gtk3-immodule   Do not build GTK3 IMModule], ,
-       	      enable_gtk3_immodule=yes)
+AC_ARG_ENABLE([orig-gtk3-immodule],
+	[AS_HELP_STRING([--enable-orig-gtk3-immodule],
+		[Build original GTK3 IMModule])],
+	[],
+	[enable_orig_gtk3_immodule=no])
 
-AC_ARG_ENABLE(qt3-immodule,
-	      [  --disable-at3-immodule    Do not build QT3 IMModule], ,
-       	      enable_qt3_immodule=yes)
+AC_ARG_ENABLE([agent],
+	[AS_HELP_STRING([--disable-im-agent],
+		[Do not build scim-im-agent (required by other immodules)])],
+	[], 
+	[enable_im_agent=yes])
 
-AC_ARG_ENABLE(qt4-immodule,
-	      [  --disable-qt4-immodule    Do not build QT4 IMModule], ,
-       	      enable_qt4_immodule=yes)
+AC_ARG_ENABLE([gtk2-immodule],
+	[AS_HELP_STRING([--disable-gtk2-immodule],
+		[Do not build GTK2 IMModule])],
+	[],
+	[enable_gtk2_immodule=yes])
 
-AC_ARG_ENABLE(clutter-immodule,
-          [AS_HELP_STRING([--disable-clutter-immodule], [Do not build CLUTTER IM module])], , 
-       	      enable_clutter_immodule=yes)
+AC_ARG_ENABLE([gtk3-immodule],
+	[AS_HELP_STRING([--disable-gtk3-immodule],
+		[Do not build GTK3 IMModule])],
+	[],
+	[enable_gtk3_immodule=yes])
 
-AC_ARG_ENABLE(panel-gtk,
-              [  --disable-panel-gtk       Do not build GTK2 Panel], , 
-              enable_panel_gtk=check)
+AC_ARG_ENABLE([qt3-immodule],
+	[AS_HELP_STRING([--disable-qt3-immodule],
+		[Do not build QT3 IMModule])],
+	[],
+	[enable_qt3_immodule=yes])
 
-AC_ARG_ENABLE(setup-ui,
-	      [  --disable-setup-ui        Do not build Setup UI], , 
-       	      enable_setup_ui=yes)
+AC_ARG_ENABLE([qt4-immodule],
+	[AS_HELP_STRING([--disable-qt4-immodule],
+		[Do not build QT4 IMModule])],
+	[],
+	[enable_qt4_immodule=yes])
+
+AC_ARG_ENABLE([clutter-immodule],
+	[AS_HELP_STRING([--disable-clutter-immodule],
+		[Do not build CLUTTER IMModule])],
+	[], 
+	[enable_clutter_immodule=yes])
+
+AC_ARG_ENABLE([panel-gtk],
+	[AS_HELP_STRING([--disable-panel-gtk],
+		[Do not build GTK2 Panel])],
+	[], 
+	[enable_panel_gtk=check])
+
+AC_ARG_ENABLE([setup-ui],
+	[AS_HELP_STRING([--disable-setup-ui],
+		[Do not build Setup UI])],
+	[], 
+	[enable_setup_ui=yes])
 
 if test "$have_x" = "yes"; then
   SCIM_BUILD_X11_UTILS=1
@@ -846,7 +913,6 @@ AC_CONFIG_FILES([Makefile
 		 extras/immodules/client-qt/qt3/Makefile
 		 extras/immodules/client-qt/qt4/Makefile
 		 extras/immodules/client-clutter/Makefile
-		 extras/immodules/tests/Makefile
 		 extras/immodules/doc/Makefile
 		 tests/Makefile
 		 scim.pc
@@ -886,6 +952,9 @@ Module options:
 
   GTK2 IMModule dir        $GTK2_IM_MODULEDIR
   GTK3 IMModule dir        $GTK3_IM_MODULEDIR
+  QT3 IMModule dir         $QT3_IM_MODULEDIR
+  QT4 IMModule dir         $QT4_IM_MODULEDIR
+  Clutter IMModule dir     $CLUTTER_IM_MODULEDIR
 
   GUI Setup Utility        $enable_setup_ui
 
@@ -895,7 +964,8 @@ Module options:
 
   Original GTK2 IMModule   $enable_orig_gtk2_immodule
   Original GTK3 IMModule   $enable_orig_gtk3_immodule
-  Agent                    $enable_im_agent
+
+  Scim IM Agent            $enable_im_agent
   GTK2 IMModule            $enable_gtk2_immodule
   GTK3 IMModule            $enable_gtk3_immodule
   QT3 IMModule             $enable_qt3_immodule

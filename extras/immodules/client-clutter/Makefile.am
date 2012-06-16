@@ -24,24 +24,24 @@ INCLUDES		= -I$(top_builddir) \
 
 noinst_HEADERS = scim-bridge-client-clutter.h scim-bridge-client-imcontext-clutter.h  scim-bridge-client-key-event-utility-clutter.h
 
-moduledir = @CLUTTER_IMCONTEXT_LIBDIR@/clutter-imcontext/immodules
+moduledir = @CLUTTER_IM_MODULEDIR@
 
-module_LTLIBRARIES = im-scim-bridge.la
+module_LTLIBRARIES = im-scim.la
 
-im_scim_bridge_la_SOURCES = im-scim-bridge-clutter.c \
+im_scim_la_SOURCES = im-scim-bridge-clutter.c \
 							scim-bridge-client-clutter.c \
 							scim-bridge-client-imcontext-clutter.c \
 							scim-bridge-client-key-event-utility-clutter.c
 
-im_scim_bridge_la_CXXFLAGS=@CLUTTER_CFLAGS@
-im_scim_bridge_la_CFLAGS  =@CLUTTER_CFLAGS@
+im_scim_la_CXXFLAGS=@CLUTTER_CFLAGS@
+im_scim_la_CFLAGS  =@CLUTTER_CFLAGS@
 
-im_scim_bridge_la_LDFLAGS = -rpath $(moduledir) \
+im_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     -avoid-version -no-undefined \
 		     -module \
 		     @CLUTTER_LIBS@
 
-im_scim_bridge_la_LIBADD  = $(top_builddir)/extras/immodules/common/libscimbridgecommon.la \
+im_scim_la_LIBADD  = $(top_builddir)/extras/immodules/common/libscimbridgecommon.la \
 							$(top_builddir)/extras/immodules/client-common/libscimbridgeclientcommon.la
 
 endif
