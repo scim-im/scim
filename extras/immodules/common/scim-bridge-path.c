@@ -38,7 +38,7 @@ static const char LOCKFILE_DIR[] = "/tmp/";
 static const char LOCKFILE_NAME[] = "lockfile";
 
 static const char AGENT_DIR[] = "";
-static const char AGENT_NAME[] = "scim-bridge";
+static const char AGENT_NAME[] = "scim-im-agent";
 
 static const char HOST_NAME[] = "localhost";
 

@@ -15,18 +15,19 @@
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-if SCIM_BRIDGE_BUILD_GTK3_IMMODULE
+if SCIM_BUILD_GTK3_IMMODULE
 
 INCLUDES		= -I$(top_builddir) \
 	    		  -I$(top_srcdir) \
-			  -I$(top_srcdir)/common \
-			  -I$(top_srcdir)/client-common
+			  -I$(top_srcdir)/extras/immodules/common \
+			  -I$(top_srcdir)/extras/immodules/client-common
 
 noinst_HEADERS = ../scim-bridge-client-gtk.h \
 				 ../scim-bridge-client-imcontext-gtk.h \
 				 ../scim-bridge-client-key-event-utility-gtk.h
 
-moduledir = @GTK3_LIBDIR@/gtk-3.0/@GTK3_BINARY_VERSION@/immodules
+# moduledir = @GTK3_LIBDIR@/gtk-3.0/@GTK3_BINARY_VERSION@/immodules
+moduledir = @GTK3_IM_MODULEDIR@
 
 module_LTLIBRARIES = im-scim.la
 
@@ -43,8 +44,8 @@ im_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     -module \
 		     @GTK3_LIBS@
 
-im_scim_la_LIBADD  = $(top_builddir)/common/libscimbridgecommon.la \
-							$(top_builddir)/client-common/libscimbridgeclientcommon.la
+im_scim_la_LIBADD  = $(top_builddir)/extras/immodules/common/libscimbridgecommon.la \
+					$(top_builddir)/extras/immodules/client-common/libscimbridgeclientcommon.la
 
 endif
 

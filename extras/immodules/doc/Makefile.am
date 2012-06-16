@@ -15,7 +15,7 @@
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-if SCIM_BRIDGE_BUILD_DOCUMENTS
+if SCIM_BUILD_DOCUMENTS
 
 api:
 	-rm -rf api; cd ..; doxygen doc/doxygen.conf
