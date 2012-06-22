@@ -40,6 +40,6 @@
 /**
  * The identifier name for SCIM input module.
  */
-const QString SCIM_BRIDGE_IDENTIFIER_NAME = "scim-bridge";
+const QString SCIM_BRIDGE_IDENTIFIER_NAME = "scim";
 
 #endif                                            /*SCIMBRIDGECOMMONQT_H_*/

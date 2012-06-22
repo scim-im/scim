@@ -32,9 +32,9 @@
 static const GtkIMContextInfo scim_bridge_info =
 {
     /* ID */
-    "scim-bridge",
+    "scim",
     /* Human readable name */
-    "SCIM Bridge Input Method",
+    "SCIM Input Method",
     /* Translation domain */
     "",
     /* Dir for bindtextdomain (not strictly needed for "gtk+") */
@@ -82,7 +82,7 @@ void im_module_list (const GtkIMContextInfo ***contexts, int *context_count)
 
 GtkIMContext *im_module_create (const gchar *context_id)
 {
-    if (strcmp (context_id, "scim-bridge") == 0) {
+    if (strcmp (context_id, "scim") == 0) {
         return scim_bridge_client_imcontext_new ();
     } else {
         return NULL;

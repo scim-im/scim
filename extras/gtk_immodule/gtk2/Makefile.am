@@ -18,8 +18,8 @@ INCLUDES		= -I$(top_builddir) \
 			  -DSCIM_TEMPDIR=\"@SCIM_TEMPDIR@\" \
 			  -DSCIM_KEYBOARD_ICON_FILE=\"@SCIM_ICONDIR@/keyboard.png\"
 
-if SCIM_BUILD_GTK2_IMMODULE
-CONFIG_GTK2_IMMODULE = im-scim.la
+if SCIM_BUILD_ORIG_GTK2_IMMODULE
+CONFIG_GTK2_IMMODULE = im-scim-orig.la
 endif
 
 if SCIM_BUILD_X11_UTILS
@@ -36,15 +36,15 @@ moduledir = @GTK2_IM_MODULEDIR@
 
 module_LTLIBRARIES = $(CONFIG_GTK2_IMMODULE)
 
-im_scim_la_SOURCES = ../gtkimcontextscim.cpp ../imscim.cpp
+im_scim_orig_la_SOURCES = ../gtkimcontextscim.cpp ../imscim.cpp
 
-im_scim_la_CXXFLAGS=@GTK2_CFLAGS@
-im_scim_la_CFLAGS  =@GTK2_CFLAGS@
+im_scim_orig_la_CXXFLAGS=@GTK2_CFLAGS@
+im_scim_orig_la_CFLAGS  =@GTK2_CFLAGS@
 
-im_scim_la_LDFLAGS = -rpath $(moduledir) \
+im_scim_orig_la_LDFLAGS = -rpath $(moduledir) \
 		     -avoid-version \
 		     -module \
 		     $(LD_VERSION_SCRIPT_OPTION) \
 		     @GTK2_LIBS@
 
-im_scim_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(X11_UTILS)
+im_scim_orig_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(X11_UTILS)

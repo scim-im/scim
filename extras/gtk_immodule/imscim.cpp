@@ -29,8 +29,8 @@ extern "C" {
 #endif /* __cplusplus */
 
 static const GtkIMContextInfo scim_info = { 
-  "scim",			/* ID */
-  "SCIM Input Method",		/* Human readable name */
+  "scim-orig",			/* ID */
+  "SCIM Input Method (orig)",		/* Human readable name */
   "scim",			/* Translation domain */
   SCIM_LOCALEDIR,		/* Dir for bindtextdomain (not strictly needed for "gtk+") */
   ""			/* Languages for which this module is the default */
@@ -63,7 +63,7 @@ im_module_list (const GtkIMContextInfo ***contexts,
 GtkIMContext *
 im_module_create (const gchar *context_id)
 {
-  if (strcmp (context_id, "scim") == 0)
+  if (strcmp (context_id, "scim-orig") == 0)
     return gtk_im_context_scim_new ();
   else
     return NULL;
