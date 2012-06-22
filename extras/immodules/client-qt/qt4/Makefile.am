@@ -44,7 +44,7 @@ im_scim_la_LDFLAGS = -rpath $(moduledir) \
 im_scim_la_LIBADD  = $(top_builddir)/extras/immodules/common/libscimbridgecommon.la \
 					$(top_builddir)/extras/immodules/client-common/libscimbridgeclientcommon.la
 
-MOC = @QT4_PREFIX@/bin/moc-qt4
+MOC = @QT4_MOC@
 
 moc_scim-bridge-client-qt.cpp: ../scim-bridge-client-qt.h
 	$(MOC) $< -o $@
