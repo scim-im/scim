@@ -277,7 +277,9 @@ if test "$SCIM_HAS_QT3" = "yes"; then
     QT3_PREFIX=`$PKG_CONFIG --variable=prefix qt-mt`
     QT3_LIBDIR=`$PKG_CONFIG --variable=libdir qt-mt`
   fi
+  QT3_MOC=$QT3_PREFIX/bin/moc
   QT3_IM_MODULEDIR=$QT3_LIBDIR/qt3/plugins/inputmethods
+  AC_SUBST(QT3_MOC)
   AC_SUBST(QT3_IM_MODULEDIR)
   AC_SUBST(QT3_PREFIX)
   AC_SUBST(QT3_LIBDIR)
@@ -292,7 +294,9 @@ if test "$SCIM_HAS_QT4" = "yes"; then
     QT4_PREFIX=`$PKG_CONFIG --variable=prefix QtCore`
     QT4_LIBDIR=`$PKG_CONFIG --variable=libdir QtCore`
   fi
+  QT4_MOC=$QT4_PREFIX/bin/moc
   QT4_IM_MODULEDIR=$QT4_LIBDIR/qt4/plugins/inputmethods
+  AC_SUBST(QT4_MOC)
   AC_SUBST(QT4_IM_MODULEDIR)
   AC_SUBST(QT4_PREFIX)
   AC_SUBST(QT4_LIBDIR)
@@ -331,10 +335,25 @@ AC_ARG_WITH([gtk2-im-module-dir],
 		[Select GTK2 immodule dir])],
 	[GTK2_IM_MODULEDIR=$with_gtk2_im_module_dir])
 
+AC_ARG_WITH([gtk2-im-module-dir],
+	[AS_HELP_STRING([--with-gtk2-im-module-dir=dir],
+		[Select GTK2 immodule dir])],
+	[GTK2_IM_MODULEDIR=$with_gtk2_im_module_dir])
+
 AC_ARG_WITH([gtk3-im-module-dir],
 	[AS_HELP_STRING([--with-gtk3-im-module-dir=dir], 
 	    [Select GTK3 immodule dir])],
 	[GTK3_IM_MODULEDIR=$with_gtk3_im_module_dir])
+
+AC_ARG_WITH([qt3-moc],
+	[AS_HELP_STRING([--with-qt3-moc=file],
+		[Select QT3 moc program (default to QT3_PREFIX/bin/moc)])],
+	[QT3_MOC=$with_qt3_moc])
+
+AC_ARG_WITH([qt4-moc],
+	[AS_HELP_STRING([--with-qt4-moc=file],
+		[Select QT4 moc program (default to QT4_PREFIX/bin/moc)])],
+	[QT4_MOC=$with_qt4_moc])
 
 AC_ARG_WITH([qt3-im-module-dir],
 	[AS_HELP_STRING([--with-qt3-im-module-dir=dir],
@@ -950,17 +969,20 @@ Module options:
 
   GTK Version              $USE_GTK_VERSION
 
+  GUI Setup Utility        $enable_setup_ui
+
+  GTK Panel GUI            $enable_panel_gtk
+
+  Enable TrayIcon          $enable_tray_icon
+
   GTK2 IMModule dir        $GTK2_IM_MODULEDIR
   GTK3 IMModule dir        $GTK3_IM_MODULEDIR
   QT3 IMModule dir         $QT3_IM_MODULEDIR
   QT4 IMModule dir         $QT4_IM_MODULEDIR
   Clutter IMModule dir     $CLUTTER_IM_MODULEDIR
 
-  GUI Setup Utility        $enable_setup_ui
-
-  GTK Panel GUI            $enable_panel_gtk
-
-  Enable TrayIcon          $enable_tray_icon
+  QT3 moc program          $QT3_MOC
+  QT4 moc program          $QT4_MOC
 
   Original GTK2 IMModule   $enable_orig_gtk2_immodule
   Original GTK3 IMModule   $enable_orig_gtk3_immodule
