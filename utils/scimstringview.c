@@ -883,7 +883,7 @@ scim_string_view_draw_frame (GtkWidget *widget)
 #if GTK_CHECK_VERSION(3, 0, 0)
   GtkStyleContext *style = gtk_widget_get_style_context(widget);
   gtk_style_context_save (style);
-  gtk_style_context_set_state (style, GTK_STATE_NORMAL);
+  gtk_style_context_set_state (style, GTK_STATE_FLAG_NORMAL);
   gtk_render_frame (style, cr, x, y, width, height);
 #else
 #if GTK_CHECK_VERSION(2, 14, 0)
