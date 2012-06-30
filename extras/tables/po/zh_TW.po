@@ -1,0 +1,818 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: scim 0.1.4\n"
+"Report-Msgid-Bugs-To: http://sourceforge.net/projects/scim\n"
+"POT-Creation-Date: 2006-01-12 17:11+0800\n"
+"PO-Revision-Date: 2004-08-12 22:41+0800\n"
+"Last-Translator: Jim Huang <jserv@kaffe.org>\n"
+"Language-Team: scim@freedesktop.org\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/scim_table_imengine.cpp:183
+msgid "Full/Half Letter"
+msgstr "全/半形"
+
+#: src/scim_table_imengine.cpp:184
+msgid "Full/Half Punct"
+msgstr ""
+
+#: src/scim_table_imengine.cpp:188
+msgid "The status of the current input method. Click to change it."
+msgstr "目前輸入法的模式狀態，滑鼠點選可切換模式。"
+
+#: src/scim_table_imengine.cpp:189
+msgid "The input mode of the letters. Click to toggle between half and full."
+msgstr "英文字母輸入模式。滑鼠點選可切換 全型/半型 模式。"
+
+#: src/scim_table_imengine.cpp:190
+msgid ""
+"The input mode of the puncutations. Click to toggle between half and full."
+msgstr "標點符號輸入模式。滑鼠點選擊可切換 全型/半型 模式。"
+
+#: src/scim_table_imengine.cpp:302
+msgid ""
+"Hot Keys:\n"
+"\n"
+"  "
+msgstr ""
+"快速鍵：\n"
+"\n"
+"  "
+
+#: src/scim_table_imengine.cpp:304
+msgid ""
+"    Switch between full/half width letter mode.\n"
+"\n"
+"  "
+msgstr ""
+"    切換全型和半型英文字母模式。\n"
+"\n"
+"  "
+
+#: src/scim_table_imengine.cpp:306
+msgid ""
+"    Switch between full/half width punctuation mode.\n"
+"\n"
+"  "
+msgstr ""
+"    切換 全/半型 標點符號模式。\n"
+"\n"
+"  "
+
+#: src/scim_table_imengine.cpp:308
+msgid ""
+"    Switch between Forward/Input mode.\n"
+"\n"
+"  "
+msgstr ""
+"    切換 轉送/輸入 模式。\n"
+"\n"
+"  "
+
+#: src/scim_table_imengine.cpp:310
+msgid ""
+"    Add a new phrase.\n"
+"\n"
+"  "
+msgstr ""
+"    新增片語.\n"
+"\n"
+"  "
+
+#: src/scim_table_imengine.cpp:312
+msgid ""
+"    Delete the selected phrase.\n"
+"\n"
+msgstr ""
+"    刪除所選定的片語.\n"
+"\n"
+
+#: src/scim_table_imengine.cpp:313
+msgid ""
+"  Control+Down:\n"
+"    Move lookup cursor to next shorter phrase\n"
+"    Only available when LongPhraseFirst option is set.\n"
+"\n"
+msgstr ""
+"  Control+Down:\n"
+"    將列表的遊標移到下一個更短的片語\n"
+"    只有在設定了 LongPhraseFirst 選項的時候才會作用。\n"
+"\n"
+
+#: src/scim_table_imengine.cpp:315
+msgid ""
+"  Control+Up:\n"
+"    Move lookup cursor to previous longer phrase\n"
+"    Only available when LongPhraseFirst option is set.\n"
+"\n"
+msgstr ""
+"  Control+Up:\n"
+"    將列表的遊標移到上一個更長的片語\n"
+"    只在設定了 LongPhraseFirst 選項的時候才會作用。\n"
+"\n"
+
+#: src/scim_table_imengine.cpp:317
+msgid ""
+"  Esc:\n"
+"    reset the input method.\n"
+"\n"
+"\n"
+msgstr ""
+"  Esc:\n"
+"    重設輸入法。\n"
+"\n"
+"\n"
+
+#: src/scim_table_imengine.cpp:318
+msgid ""
+"How to add a phrase:\n"
+"    Input the new phrase as normal, then press the\n"
+"  hot key. A hint will be shown to let you input a key\n"
+"  for this phrase.\n"
+"    Input a key then press the space bar.\n"
+"  A hint will be shown to indicate whether\n"
+"  the phrase was added sucessfully.\n"
+msgstr ""
+"如何新增片語：\n"
+"    就如平常作法輸入該新片語，然後按下快速鍵。\n"
+"  這時會出現一個提示來讓您為這個片語設定快速鍵。\n"
+"    輸入一個鍵值然後按下空白鍵，\n"
+"  之後會再出現一個提示以確認該片語是否成功地新增了。\n"
+
+#: src/scim_table_imengine.cpp:838
+msgid "En"
+msgstr "英"
+
+#: src/scim_table_imengine.cpp:1688
+msgid "Input a key string for phrase: "
+msgstr "為這個片語輸入一個鍵值: "
+
+#: src/scim_table_imengine.cpp:1690
+msgid "Success."
+msgstr "成功。"
+
+#: src/scim_table_imengine.cpp:1693
+msgid "Failed."
+msgstr "失敗。"
+
+#: src/scim_make_table.cpp:138
+msgid ""
+"Too few argument!\n"
+"Usage:\n"
+"  scim-make-table <table_file> [options]\n"
+"\n"
+"  table_file\tthe table file for table module\n"
+"  -b\t\tconvert to binary format, otherwise to text format\n"
+"  -o output\tsave new table to file output\n"
+"  -no\t\tdo not save new phrase table\n"
+"  -if ifreq\tload phrase frequencies from this file\n"
+"  -of ofreq\tsave phrase frequencies to this file\n"
+"  -s file\tspecifiy the source file to count phrase ages.\n"
+msgstr ""
+"參數不足！\n"
+"用法：\n"
+"  scim-make-table <表格檔名> [選項]\n"
+"\n"
+"  表格檔名\t對照表程式模組所使用的對照檔\n"
+"  -b\t\t轉換成二進制格式，否則使用純文字格式\n"
+"  -o output\t把新的對照表儲存為檔案輸出\n"
+"  -no\t\t不要儲存新的片語表\n"
+"  -if ifreq\t從這個檔案中載入常用的片語\n"
+"  -of ofreq\t把常用的片語儲存到這個檔案中\n"
+"  -s file\t指定一個來源檔以計算片語使用頻率。\n"
+
+# modules/Server/scim_make_table.cpp 167
+#: src/scim_make_table.cpp:162
+msgid "option -no cannot be used with -o\n"
+msgstr "選項 -no 不能和 -o 一起使用\n"
+
+#: src/scim_make_table.cpp:171
+msgid "option -o cannot be used with -no\n"
+msgstr "選項 -o 不能和 -no 一起使用\n"
+
+#: src/scim_make_table.cpp:175 src/scim_make_table.cpp:184
+#: src/scim_make_table.cpp:193
+msgid "No argument for option "
+msgstr "在選項中沒有指定參數"
+
+#: src/scim_make_table.cpp:209
+msgid "Invalid option: "
+msgstr "不正確的選項："
+
+#: src/scim_make_table.cpp:215
+msgid "Loading table file "
+msgstr "正在載入對照檔 "
+
+#: src/scim_make_table.cpp:215 src/scim_make_table.cpp:228
+#: src/scim_make_table.cpp:234
+msgid " ...\n"
+msgstr ""
+
+#: src/scim_make_table.cpp:218
+msgid "table file load failed!"
+msgstr "對照檔載入失敗！"
+
+#: src/scim_make_table.cpp:228
+msgid "Saving frequency table file "
+msgstr "正在儲存常用對照檔 "
+
+#: src/scim_make_table.cpp:230
+msgid "frequency table file load failed!"
+msgstr "常用對照檔載入失敗！"
+
+#: src/scim_make_table.cpp:234
+msgid "Saving table file "
+msgstr "正在儲存對照檔 "
+
+#: src/scim_make_table.cpp:237
+msgid "Table file save failed!"
+msgstr "對照檔儲存失敗！"
+
+#: src/scim_table_imengine_setup.cpp:102
+msgid "Generic Table"
+msgstr "泛用對照表"
+
+#: src/scim_table_imengine_setup.cpp:107
+msgid "An IMEngine Module which uses generic table input method file."
+msgstr "一個使用泛用對照表輸入文字的功能模組。"
+
+#: src/scim_table_imengine_setup.cpp:211
+msgid "Full width _punctuation:"
+msgstr "切換 全/半型 標點符號(_P)："
+
+#: src/scim_table_imengine_setup.cpp:213
+msgid "Select full width puncutation keys"
+msgstr "選擇 全/半型 標點符號模式切換鍵"
+
+#: src/scim_table_imengine_setup.cpp:215
+msgid ""
+"The key events to switch full/half width punctuation input mode. Click on "
+"the button on the right to edit it."
+msgstr "用來切換 全/半型 標點符號輸入模式的按鍵，按鈕上滑鼠點選可編輯。"
+
+#: src/scim_table_imengine_setup.cpp:228
+msgid "Full width _letter:"
+msgstr "切換 全/半 型英文字母(_L)："
+
+#: src/scim_table_imengine_setup.cpp:230
+msgid "Select full width letter keys"
+msgstr "選擇 全/半型 英文字母模式切換鍵"
+
+#: src/scim_table_imengine_setup.cpp:232
+msgid ""
+"The key events to switch full/half width letter input mode. Click on the "
+"button on the right to edit it."
+msgstr "用來切換 全/半型 英文字母輸入模式的按鍵，按鈕上滑鼠點選可編輯。"
+
+#: src/scim_table_imengine_setup.cpp:245
+msgid "_Mode switch:"
+msgstr "輸入模式切換(_M)："
+
+#: src/scim_table_imengine_setup.cpp:247
+msgid "Select mode switch keys"
+msgstr "選擇輸入模式切換鍵"
+
+#: src/scim_table_imengine_setup.cpp:249
+msgid ""
+"The key events to change current input mode. Click on the button on the "
+"right to edit it."
+msgstr "用來切換目前輸入模式的按鍵，按鈕上滑鼠點選可編輯。"
+
+#: src/scim_table_imengine_setup.cpp:265
+msgid "_Add phrase:"
+msgstr "新增片語(_A)："
+
+#: src/scim_table_imengine_setup.cpp:267
+msgid "Select add phrase keys."
+msgstr "選擇新增片語鍵。"
+
+#: src/scim_table_imengine_setup.cpp:269
+msgid ""
+"The key events to add a new user defined phrase. Click on the button on the "
+"right to edit it."
+msgstr "用來新增片語的按鍵，按鈕上滑鼠點選可編輯。"
+
+#: src/scim_table_imengine_setup.cpp:283
+msgid "_Delete phrase:"
+msgstr "刪除片語(_D)："
+
+#: src/scim_table_imengine_setup.cpp:285
+msgid "Select delete phrase keys."
+msgstr "選擇刪除片語鍵。"
+
+#: src/scim_table_imengine_setup.cpp:287
+msgid ""
+"The key events to delete a selected phrase. Click on the button on the right "
+"to edit it."
+msgstr "用來刪除所選定片語的按鍵，按鈕上滑鼠點選可編輯。"
+
+#: src/scim_table_imengine_setup.cpp:414
+msgid "Show _prompt"
+msgstr "顯示提示訊息(_P)"
+
+#: src/scim_table_imengine_setup.cpp:419
+msgid "Show key _hint"
+msgstr "顯現提示訊息(_H)"
+
+#: src/scim_table_imengine_setup.cpp:424
+msgid "Save _user table in binary format"
+msgstr "以二進制格式儲存使用者的對照表(_U)"
+
+#: src/scim_table_imengine_setup.cpp:429
+msgid "Show the u_ser defined phrases first"
+msgstr "優先顯示使用者自訂的片語(_S)"
+
+#: src/scim_table_imengine_setup.cpp:434
+msgid "Show the _longer phrases first"
+msgstr "優先顯示較長的片語(_L)"
+
+#: src/scim_table_imengine_setup.cpp:458
+msgid ""
+"If this option is checked, the key prompt of the currently selected phrase "
+"will be shown."
+msgstr "如果勾取這個選項，則顯示目前所選定片語按鍵的提示訊息。"
+
+#: src/scim_table_imengine_setup.cpp:463
+msgid ""
+"If this option is checked, the remaining keystrokes of the phraseswill be "
+"shown on the lookup table."
+msgstr "如果勾取這個選項，將在選詞列表中顯示每個片語所保留的輸入按鍵。"
+
+#: src/scim_table_imengine_setup.cpp:468
+msgid ""
+"If this option is checked, the user table will be stored with binary format, "
+"this will increase the loading speed."
+msgstr "如果勾取這個選項，使用者對照表將以二進制格式儲存，如此會提高載入速度。"
+
+#: src/scim_table_imengine_setup.cpp:473
+msgid ""
+"If this option is checked, the user defined phrases will be shown in front "
+"of others. "
+msgstr "如果勾取這個選項，將優先顯示使用者自訂的片語。"
+
+#: src/scim_table_imengine_setup.cpp:478
+msgid ""
+"If this option is checked, the longer phrase will be shown in front of "
+"others. "
+msgstr "如果勾取這個選項，將優先顯示較長的片語。"
+
+#: src/scim_table_imengine_setup.cpp:573
+msgid "The installed tables:"
+msgstr "已安裝的對照表："
+
+#: src/scim_table_imengine_setup.cpp:604
+msgid "Name"
+msgstr "名稱"
+
+#: src/scim_table_imengine_setup.cpp:625
+msgid "Language"
+msgstr "語言"
+
+#: src/scim_table_imengine_setup.cpp:641
+msgid "Type"
+msgstr "格式"
+
+#: src/scim_table_imengine_setup.cpp:657
+msgid "File"
+msgstr "檔案"
+
+#: src/scim_table_imengine_setup.cpp:679
+msgid "_Install"
+msgstr "安裝(_I)"
+
+#: src/scim_table_imengine_setup.cpp:683
+msgid "Install a new table."
+msgstr "安裝新的對照表"
+
+#: src/scim_table_imengine_setup.cpp:689
+msgid "_Delete"
+msgstr "刪除(_D)"
+
+#: src/scim_table_imengine_setup.cpp:693
+msgid "Delete the selected table."
+msgstr "刪除所選定的對照表。"
+
+#: src/scim_table_imengine_setup.cpp:699
+msgid "_Properties"
+msgstr "內容(_P)"
+
+#: src/scim_table_imengine_setup.cpp:703
+msgid "Edit the properties of the selected table."
+msgstr "編輯所選定的對照表的內容"
+
+#: src/scim_table_imengine_setup.cpp:733
+msgid "Generic"
+msgstr "泛用"
+
+#: src/scim_table_imengine_setup.cpp:741
+msgid "Keyboard"
+msgstr "鍵盤"
+
+#: src/scim_table_imengine_setup.cpp:751
+msgid "Table Management"
+msgstr "管理對照表"
+
+#: src/scim_table_imengine_setup.cpp:953
+msgid "Select an icon file"
+msgstr "選擇一個圖示檔"
+
+#: src/scim_table_imengine_setup.cpp:1077
+msgid "User"
+msgstr "使用者"
+
+#: src/scim_table_imengine_setup.cpp:1077
+msgid "System"
+msgstr "系統"
+
+#: src/scim_table_imengine_setup.cpp:1245
+msgid "Please select the table file to be installed."
+msgstr "請選擇所要安裝的對照檔。"
+
+#: src/scim_table_imengine_setup.cpp:1273
+msgid "Failed to install the table! It's already in table file directory."
+msgstr "無法安裝該對照表！它已存在於對照檔目錄中了。"
+
+#: src/scim_table_imengine_setup.cpp:1292
+msgid "Failed to load the table file!"
+msgstr "無法載入該對照檔！"
+
+#: src/scim_table_imengine_setup.cpp:1312
+msgid ""
+"Failed to install the table! Another version of this table was already "
+"installed."
+msgstr "無法安裝該對照表！已安裝了這個對照表的另一個版本。"
+
+#: src/scim_table_imengine_setup.cpp:1326
+msgid ""
+"Another version of this table was already installed. Do you want to replace "
+"it with the new one?"
+msgstr "已安裝了這個對照表的另一個版本。您是否想要用新的將其取代？"
+
+#: src/scim_table_imengine_setup.cpp:1352
+msgid ""
+"Failed to install the table! A table with the same file name was already "
+"installed."
+msgstr "無法安裝該對照表！已安裝了使用相同檔名的對照表。"
+
+#: src/scim_table_imengine_setup.cpp:1366
+msgid ""
+"A table with the same file name was already installed. Do you want to "
+"overwrite it?"
+msgstr "已安裝了使用相同檔名的對照表。您是否想要覆蓋過去？"
+
+#: src/scim_table_imengine_setup.cpp:1385
+#, c-format
+msgid "Failed to install the table to %s!"
+msgstr "無法將對照表安裝至 %s！"
+
+#: src/scim_table_imengine_setup.cpp:1422
+#, c-format
+msgid "Can not delete the file %s!"
+msgstr "無法刪除 %s 這個檔案！"
+
+#: src/scim_table_imengine_setup.cpp:1433
+msgid "Are you sure to delete this table file?"
+msgstr "您確定要刪除這個對照檔嗎？"
+
+#: src/scim_table_imengine_setup.cpp:1446
+msgid "Failed to delete the table file!"
+msgstr "無法刪除這個對照檔！"
+
+#: src/scim_table_imengine_setup.cpp:1461
+#: src/scim_table_imengine_setup.cpp:1859
+#: src/scim_table_imengine_setup.cpp:1882
+#: src/scim_table_imengine_setup.cpp:1906
+#: src/scim_table_imengine_setup.cpp:1930
+#: src/scim_table_imengine_setup.cpp:1954
+#: src/scim_table_imengine_setup.cpp:1978
+#: src/scim_table_imengine_setup.cpp:2002
+#: src/scim_table_imengine_setup.cpp:2026
+#: src/scim_table_imengine_setup.cpp:2051
+#: src/scim_table_imengine_setup.cpp:2078
+#: src/scim_table_imengine_setup.cpp:2101
+msgid "True"
+msgstr "是"
+
+#: src/scim_table_imengine_setup.cpp:1463
+msgid "False"
+msgstr "否"
+
+#: src/scim_table_imengine_setup.cpp:1507
+#: src/scim_table_imengine_setup.cpp:1508
+msgid "Split Keys:"
+msgstr "斷句鍵："
+
+#: src/scim_table_imengine_setup.cpp:1509
+msgid "The key strokes to split inputted string."
+msgstr "用來對所輸入字串斷句的按鍵。"
+
+#: src/scim_table_imengine_setup.cpp:1515
+#: src/scim_table_imengine_setup.cpp:1516
+msgid "Commit Keys:"
+msgstr "傳送鍵："
+
+#: src/scim_table_imengine_setup.cpp:1517
+msgid "The key strokes to commit converted result to client."
+msgstr "本按鍵可將轉換結果傳遞到用戶端。"
+
+#: src/scim_table_imengine_setup.cpp:1523
+#: src/scim_table_imengine_setup.cpp:1524
+msgid "Forward Keys:"
+msgstr "轉送鍵："
+
+#: src/scim_table_imengine_setup.cpp:1525
+msgid "The key strokes to forward inputted string to client."
+msgstr "本按鍵可將輸入的字串傳遞到用戶端。"
+
+#: src/scim_table_imengine_setup.cpp:1531
+#: src/scim_table_imengine_setup.cpp:1532
+msgid "Select Keys:"
+msgstr "選擇按鍵："
+
+#: src/scim_table_imengine_setup.cpp:1533
+msgid "The key strokes to select candidate phrases in lookup table."
+msgstr "本按鍵用以在片語列表中選擇候選字詞。"
+
+#: src/scim_table_imengine_setup.cpp:1539
+#: src/scim_table_imengine_setup.cpp:1540
+msgid "Page Up Keys:"
+msgstr "上一頁按鍵："
+
+#: src/scim_table_imengine_setup.cpp:1541
+msgid "The lookup table page up keys"
+msgstr "片語列表的上一頁按鍵"
+
+#: src/scim_table_imengine_setup.cpp:1547
+#: src/scim_table_imengine_setup.cpp:1548
+msgid "Page Down Keys:"
+msgstr "下一頁按鍵"
+
+#: src/scim_table_imengine_setup.cpp:1549
+msgid "The lookup table page down keys"
+msgstr "片語列表的下一頁按鍵"
+
+#: src/scim_table_imengine_setup.cpp:1572
+msgid "Table Properties"
+msgstr "對照表內容"
+
+#: src/scim_table_imengine_setup.cpp:1596
+msgid "Name:"
+msgstr "名稱："
+
+#: src/scim_table_imengine_setup.cpp:1610
+msgid "The name of this table."
+msgstr "該對照表的名稱。"
+
+#: src/scim_table_imengine_setup.cpp:1615
+msgid "Author:"
+msgstr "作者："
+
+#: src/scim_table_imengine_setup.cpp:1629
+msgid "The author of this table."
+msgstr "該對照表的作者。"
+
+#: src/scim_table_imengine_setup.cpp:1634
+msgid "UUID:"
+msgstr ""
+
+#: src/scim_table_imengine_setup.cpp:1648
+msgid "The unique ID of this table."
+msgstr "該對照表的識別碼。"
+
+#: src/scim_table_imengine_setup.cpp:1653
+msgid "Serial Number:"
+msgstr "序號："
+
+#: src/scim_table_imengine_setup.cpp:1667
+msgid "The serial number of this table."
+msgstr "該對照表的序號。"
+
+#: src/scim_table_imengine_setup.cpp:1672
+msgid "Icon File:"
+msgstr "圖示檔："
+
+#: src/scim_table_imengine_setup.cpp:1689
+msgid "Browse"
+msgstr "瀏覽"
+
+#: src/scim_table_imengine_setup.cpp:1698
+msgid "The icon file of this table."
+msgstr "該對照表的圖示檔。"
+
+#: src/scim_table_imengine_setup.cpp:1703
+msgid "Supported Languages:"
+msgstr "所支援的語言："
+
+#: src/scim_table_imengine_setup.cpp:1717
+msgid "The languages supported by this table."
+msgstr "該對照表所支援的語言。"
+
+#: src/scim_table_imengine_setup.cpp:1722
+msgid "Status Prompt:"
+msgstr "狀態提示："
+
+#: src/scim_table_imengine_setup.cpp:1736
+msgid "A prompt string to be shown in status area."
+msgstr "在狀態區中所顯現的提示字串。"
+
+#: src/scim_table_imengine_setup.cpp:1741
+msgid "Valid Input Chars:"
+msgstr "可用的輸入字元："
+
+#: src/scim_table_imengine_setup.cpp:1755
+msgid "The valid input chars of this table."
+msgstr "在該對照表中可用的輸入字元。"
+
+#: src/scim_table_imengine_setup.cpp:1760
+msgid "Multi Wildcard Char:"
+msgstr "萬用比對字元："
+
+#: src/scim_table_imengine_setup.cpp:1774
+msgid ""
+"The multi wildcard chars of this table. These chars can be used to match one "
+"or more arbitrary chars."
+msgstr "該對照表所使用的萬用比對字元。這些字元可以用來代表一個或多個任意字元。"
+
+#: src/scim_table_imengine_setup.cpp:1780
+msgid "Single Wildcard Char:"
+msgstr "單一比對字元："
+
+#: src/scim_table_imengine_setup.cpp:1794
+msgid ""
+"The single wildcard chars of this table.These chars can be used to match one "
+"arbitrary char."
+msgstr "該對照表所使用的單一比對字元。這些字元可以用來代表一個任意字元。"
+
+#: src/scim_table_imengine_setup.cpp:1818
+msgid "..."
+msgstr ""
+
+#: src/scim_table_imengine_setup.cpp:1832
+msgid "Max Key Length:"
+msgstr "鍵的最大長度"
+
+#: src/scim_table_imengine_setup.cpp:1847
+msgid "The maxmium length of key strings."
+msgstr "鍵值的最大長度。"
+
+#: src/scim_table_imengine_setup.cpp:1852
+msgid "Show Key Prompt:"
+msgstr "顯示按鍵訊息(_P)"
+
+#: src/scim_table_imengine_setup.cpp:1870
+msgid "If true then the key prompts will be shown instead of the raw keys."
+msgstr "如果勾取這個選項，將顯示按鍵訊息而非原始按鍵。"
+
+#: src/scim_table_imengine_setup.cpp:1875
+msgid "Auto Select:"
+msgstr "自動選擇："
+
+#: src/scim_table_imengine_setup.cpp:1893
+msgid ""
+"If true then the first candidate phrase will be selected automatically when "
+"inputing the next key."
+msgstr "啟用之後，在輸入下一鍵時會自動選擇列表中的第一個片語。"
+
+#: src/scim_table_imengine_setup.cpp:1899
+msgid "Auto Wildcard:"
+msgstr "自動比對："
+
+#: src/scim_table_imengine_setup.cpp:1917
+msgid ""
+"If true then a multi wildcard char will be append to the end of inputted key "
+"string when searching phrases."
+msgstr "啟用之後，在尋找片語時會在所輸入字串的後面加上萬用比對字元。"
+
+#: src/scim_table_imengine_setup.cpp:1923
+msgid "Auto Commit:"
+msgstr "自動傳送："
+
+#: src/scim_table_imengine_setup.cpp:1941
+msgid ""
+"If true then the converted result string will be committed to client "
+"automatically."
+msgstr "啟用之後，所轉換後的字串會自動傳遞到用戶端。"
+
+#: src/scim_table_imengine_setup.cpp:1947
+msgid "Auto Split:"
+msgstr "自動斷句："
+
+#: src/scim_table_imengine_setup.cpp:1965
+msgid ""
+"If true then the inputted key string will be splitted automatically when "
+"necessary."
+msgstr "啟用之後，所輸入的字串會適當自動斷句。"
+
+#: src/scim_table_imengine_setup.cpp:1971
+msgid "Discard Invalid Key:"
+msgstr "丟棄無效的鍵值:"
+
+#: src/scim_table_imengine_setup.cpp:1989
+msgid ""
+"If true then the invalid key will be discarded automatically.This option is "
+"only valid when Auto Select and Auto Commit is true."
+msgstr ""
+"如果啟用本選項，無效的鍵值將被自動丟棄。本選項只會在自動選字和自動傳送功能生"
+"效時有效。"
+
+#: src/scim_table_imengine_setup.cpp:1995
+msgid "Dynamic Adjust:"
+msgstr "動態調整："
+
+#: src/scim_table_imengine_setup.cpp:2013
+msgid "If true then the phrases' frequencies will be adjusted dynamically."
+msgstr "啟用之後，會自動調整片語的使用頻率。"
+
+#: src/scim_table_imengine_setup.cpp:2019
+msgid "Auto Fill Preedit Area:"
+msgstr "自動填充預編輯區："
+
+#: src/scim_table_imengine_setup.cpp:2037
+msgid ""
+"If true then the preedit string will be filled up with the current candiate "
+"phrase automatically.This option is only valid when Auto Select is TRUE."
+msgstr ""
+"如果啟用本選項，預先編輯字串將自動被目前候選字詞所填充。本選項只會在自動選字"
+"功能生效時有效。"
+
+#: src/scim_table_imengine_setup.cpp:2044
+msgid "Always Show Lookup Table:"
+msgstr "一直顯示選詞列表："
+
+#: src/scim_table_imengine_setup.cpp:2062
+msgid ""
+"If true then the lookup table will always be shown when any candidate phrase "
+"is available. Otherwise the lookup table will only be shown when necessary.\n"
+"If Auto Fill is false, then this option will be no effect, and always be "
+"true."
+msgstr ""
+"啟用後查詢表格的動作將會永遠顯示候選字詞，否則，查詢表格視窗將只會在必要時顯"
+"示。\n"
+"如果自動填充功能被關閉，本選項將不會有所影響，並一直保持啟用。"
+
+#: src/scim_table_imengine_setup.cpp:2071
+msgid "Default Full Width Punct:"
+msgstr "預設全型標點符號："
+
+#: src/scim_table_imengine_setup.cpp:2089
+msgid "If true then full width punctuations will be inputted by default."
+msgstr "啟用之後，會預設輸入全型標點符號。"
+
+#: src/scim_table_imengine_setup.cpp:2094
+msgid "Default Full Width Letter:"
+msgstr "預設全型英文字母："
+
+#: src/scim_table_imengine_setup.cpp:2112
+msgid "If true then full width letters will be inputted by default."
+msgstr "啟用之後，會預設輸入全型英文字母。"
+
+#: src/scim_table_imengine_setup.cpp:2262
+msgid "Invalid icon file."
+msgstr "不正確的圖示檔。"
+
+#: src/scim_table_imengine_setup.cpp:2267
+msgid "Invalid languages."
+msgstr "不正確的語言。"
+
+#: src/scim_table_imengine_setup.cpp:2272
+msgid "Invalid status prompt."
+msgstr "不正確的狀態提示。"
+
+#: src/scim_table_imengine_setup.cpp:2280
+msgid "Invalid multi wildcard chars."
+msgstr "不正確的萬用比對字元。"
+
+#: src/scim_table_imengine_setup.cpp:2292
+msgid "Invalid single wildcard chars."
+msgstr "不正確的單一比對字元。"
+
+#: src/scim_table_imengine_setup.cpp:2300
+msgid "Invalid commit keys."
+msgstr "不正確的傳送鍵。"
+
+#: src/scim_table_imengine_setup.cpp:2305
+msgid "Invalid select keys."
+msgstr "不正確的選擇鍵。"
+
+#: src/scim_table_imengine_setup.cpp:2310
+msgid "Invalid page up keys."
+msgstr "不正確的上一頁鍵"
+
+#: src/scim_table_imengine_setup.cpp:2315
+msgid "Invalid page down keys."
+msgstr "不正確的下一頁鍵"
+
+#: src/scim_table_imengine_setup.cpp:2321
+msgid "Invalid max key length."
+msgstr "不正確的最大鍵值長度"
+
+#: src/scim_table_imengine_setup.cpp:2520
+#, c-format
+msgid "Failed to save table %s!"
+msgstr "無法儲存對照表 %s ！"

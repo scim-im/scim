@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE kcfg SYSTEM "http://www.kde.org/standards/kcfg/1.0/kcfg.dtd">
+<kcfg>
+  <kcfgfile name="skimrc"/>
+  <group name="SCIM">
+    <entry name="_IMEngine_Table_ShowPrompt" key="/IMEngine/Table/ShowPrompt" type="Bool">
+      <label>show prompt in table server</label>
+      <default>false</default>
+    </entry>
+    <entry name="_IMEngine_Table_ShowKeyHint" key="/IMEngine/Table/ShowKeyHint" type="Bool">
+      <label>show key hint in table server</label>
+      <default>false</default>
+    </entry>
+    <entry name="_IMEngine_Table_UserTableBinary" key="/IMEngine/Table/UserTableBinary" type="Bool">
+      <label>user table is in binary format</label>
+      <default>false</default>
+    </entry>
+    <entry name="_IMEngine_Table_UserPhraseFirst" key="/IMEngine/Table/UserPhraseFirst" type="Bool">
+      <label>user defined phrases first</label>
+      <default>false</default>
+    </entry>
+    <entry name="_IMEngine_Table_LongPhraseFirst" key="/IMEngine/Table/LongPhraseFirst" type="Bool">
+      <label>longer phrases first</label>
+      <default>false</default>
+    </entry>
+    
+    <entry name="_IMEngine_Table_FullWidthPunctKey" key="/IMEngine/Table/FullWidthPunctKey" type="String">
+      <label>shortcut for toggle punctuation width</label>
+      <default>Control+period</default>
+    </entry>
+    <entry name="_IMEngine_Table_FullWidthLetterKey" key="/IMEngine/Table/FullWidthLetterKey" type="String">
+      <label>shortcut for toggle letter width</label>
+      <default>Shift+space</default>
+    </entry>
+    <entry name="_IMEngine_Table_ModeSwitchKey" key="/IMEngine/Table/ModeSwitchKey" type="String">
+      <label>shortcut for mode switch</label>
+      <default>Alt+Shift_L,Alt+Shift_R,Shift+Shift_L+KeyRelease,Shift+Shift_R+KeyRelease</default>
+    </entry>
+    <entry name="_IMEngine_Table_AddPhraseKey" key="/IMEngine/Table/AddPhraseKey" type="String">
+      <label>shortcut for adding phrase</label>
+      <default>Control+a,Control+equal</default>
+    </entry>
+    <entry name="_IMEngine_Table_DeletePhraseKey" key="/IMEngine/Table/DeletePhraseKey" type="String">
+      <label>shortcut for deleting phrase</label>
+      <default>Control+d,Control+minus</default>
+    </entry>
+  </group>
+</kcfg>

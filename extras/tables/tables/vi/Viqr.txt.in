@@ -1,0 +1,256 @@
+### File header must not be modified
+### This file must be encoded into UTF-8.
+SCIM_Generic_Table_Phrase_Library_TEXT
+VERSION_1_0
+
+### Begin Table definition.
+BEGIN_DEFINITION
+
+### An unique id to distinguish this table among others.
+### Use uuidgen to generate this kind of id.
+UUID = 2cabf172-9051-4d0f-9e1e-523beb32362e
+
+### A unique number indicates the version of this file.
+### For example the last modified date of this file.
+### This number must be less than 2^32.
+SERIAL_NUMBER = 20041009
+
+ICON = @SCIM_ICONDIR@/Viqr.png
+
+### The default name of this table
+NAME = Viqr
+
+### The local names of this table 
+### NAME.am = vi_VN
+
+### Supported languages of this table
+LANGUAGES = vi_VN
+
+### The author of this table
+AUTHOR = Samuel Thibault <samuel.thibault@ens-lyon.org>
+
+### Prompt string to be displayed in the status area.
+STATUS_PROMPT = đ
+
+### If true then the first candidate phrase
+### will be selected automatically during inputing.
+AUTO_SELECT = TRUE
+
+### If true then a multi wildcard will be appended
+### at the end of inputing string automatically.
+AUTO_WILDCARD = FALSE
+
+### If true then the result string will be committed to client automatically.
+### This should be used with AUTO_SELECT = TRUE.
+AUTO_COMMIT = TRUE
+
+### If true then the inputted string will be automatically splitted during inputing.
+AUTO_SPLIT = TRUE
+
+### If true then the phrases' frequencies will be adjusted dynamically.
+DYNAMIC_ADJUST = FALSE
+
+### If true then the preedit area will be filled up by the current candidate phrase automatically.
+AUTO_FILL = TRUE
+
+### If true then the lookup table will always be shown if there is any candidate phrase.
+### Otherwise the lookup table won't be shown unless the user requires it by moving the preedit caret left.
+ALWAYS_SHOW_LOOKUP = FALSE
+
+### Enable full width punctuation property
+USE_FULL_WIDTH_PUNCT = FALSE
+
+### Use full width punctuation by default
+DEF_FULL_WIDTH_PUNCT = FALSE
+
+### Enable full width letter property
+USE_FULL_WIDTH_LETTER = FALSE
+
+### Use full width letter by default
+DEF_FULL_WIDTH_LETTER = FALSE
+
+### The maxmium length of a key.
+MAX_KEY_LENGTH = 3
+
+### Valid input chars.
+VALID_INPUT_CHARS = DAEIOUY'`?~.^(+daeiouy
+
+### Single wildcard char, can have multiple chars.
+###SINGLE_WILDCARD_CHAR = ?
+
+### Multi wildcard char.
+###MULTI_WILDCARD_CHAR = *
+
+### The key strokes to split inputted string.
+###SPLIT_KEYS = quoteright
+
+### The key strokes to commit the convert result to client.
+COMMIT_KEYS = VoidSymbol
+
+### The key strokes to forward the inputted string to client.
+FORWARD_KEYS = VoidSymbol
+
+### The key strokes to select candidiate phrases.
+SELECT_KEYS = VoidSymbol
+
+### The key strokes to page up the lookup table.
+PAGE_UP_KEYS = VoidSymbol
+
+### The key strokes to page down the lookup table.
+PAGE_DOWN_KEYS = VoidSymbol
+
+END_DEFINITION
+
+### Begin Table data.
+BEGIN_TABLE
+A	A	0
+A'	Á	0
+A`	À	0
+A?	Ả	0
+A~	Ã	0
+A.	Ạ	0
+A^	Â	0
+A^'	Ấ	0
+A^`	Ầ	0
+A^?	Ẩ	0
+A^~	Ẫ	0
+A^.	Ậ	0
+A(	Ă	0
+A('	Ắ	0
+A(`	Ằ	0
+A(?	Ẳ	0
+A(~	Ẵ	0
+A(.	Ặ	0
+E	E	0
+E'	É	0
+E`	È	0
+E?	Ẻ	0
+E~	Ẽ	0
+E.	Ẹ	0
+E^	Ê	0
+E^'	Ế	0
+E^`	Ề	0
+E^?	Ể	0
+E^~	Ễ	0
+E^.	Ệ	0
+O	O	0
+O'	Ó	0
+O`	Ò	0
+O?	Ỏ	0
+O~	Õ	0
+O.	Ọ	0
+O^	Ô	0
+O^'	Ố	0
+O^`	Ồ	0
+O^?	Ổ	0
+O^~	Ỗ	0
+O^.	Ộ	0
+O+	Ơ	0
+O+'	Ớ	0
+O+`	Ờ	0
+O+?	Ở	0
+O+~	Ỡ	0
+O+.	Ợ	0
+U	U	0
+U'	Ú	0
+U`	Ù	0
+U?	Ủ	0
+U~	Ũ	0
+U.	Ụ	0
+U+	Ư	0
+U+'	Ứ	0
+U+`	Ừ	0
+U+?	Ử	0
+U+~	Ữ	0
+U+.	Ự	0
+I	I	0
+I'	Í	0
+I`	Ì	0
+I?	Ỉ	0
+I~	Ĩ	0
+I.	Ị	0
+Y	Y	0
+Y'	Ý	0
+Y`	Ỳ	0
+Y?	Ỷ	0
+Y~	Ỹ	0
+Y.	Ỵ	0
+D	D	0
+DD	Đ	0
+dD	Đ	0
+Dd	Đ	0
+a	a	0
+a'	á	0
+a`	à	0
+a?	ả	0
+a~	ã	0
+a.	ạ	0
+a^	â	0
+a^'	ấ	0
+a^`	ầ	0
+a^?	ẩ	0
+a^~	ẫ	0
+a^.	ậ	0
+a(	ă	0
+a('	ắ	0
+a(`	ằ	0
+a(?	ẳ	0
+a(~	ẵ	0
+a(.	ặ	0
+e	e	0
+e'	é	0
+e`	è	0
+e?	ẻ	0
+e~	ẽ	0
+e.	ẹ	0
+e^	ê	0
+e^'	ế	0
+e^`	ề	0
+e^?	ể	0
+e^~	ễ	0
+e^.	ệ	0
+o	o	0
+o'	ó	0
+o`	ò	0
+o?	ỏ	0
+o~	õ	0
+o.	ọ	0
+o^	ô	0
+o^'	ố	0
+o^`	ồ	0
+o^?	ổ	0
+o^~	ỗ	0
+o^.	ộ	0
+o+	ơ	0
+o+'	ớ	0
+o+`	ờ	0
+o+?	ở	0
+o+~	ỡ	0
+o+.	ợ	0
+u	u	0
+u'	ú	0
+u`	ù	0
+u?	ủ	0
+u~	ũ	0
+u.	ụ	0
+u+	ư	0
+u+'	ứ	0
+u+`	ừ	0
+u+?	ử	0
+u+~	ữ	0
+u+.	ự	0
+i	i	0
+i'	í	0
+i`	ì	0
+i?	ỉ	0
+i~	ĩ	0
+i.	ị	0
+y	y	0
+y'	ý	0
+y`	ỳ	0
+y?	ỷ	0
+y~	ỹ	0
+y.	ỵ	0
+d	d	0 
+dd	đ	0
+END_TABLE

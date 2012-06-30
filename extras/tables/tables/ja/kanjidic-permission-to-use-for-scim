@@ -1,0 +1,222 @@
+From nobody Mon Dec 13 11:45:27 2004
+To: Jim Breen <jim.breen@infotech.monash.edu.au>
+Cc: Zhe Su <zsu@novell.com>, Juergen Weigert <jw@suse.de> 
+Subject: SCIM and KANJIDIC licencense
+Reply-to: mfabian@suse.de
+X-Face: "';oPz9V1+<,`}1ZuxRv~EiSusWq*{Yjr"Sdvbhq'?q=2R\\6Y9O/,SAE`{J|6I=|w/sQg<
+ rW_N'E3IV6~f8?\l#Es`]S`mv',PY(`8{$$R?+gLu}Qv/Mn>)?uladFjJ@yl!_p_Jh;5QxlD6zL:?r
+ IXe4FfK$C^mWhh$o`yt;.r.FLZLQOWBt><!;-.DYZ)Nu&1?~*:\36\BGz]"L;nue;l\%sJ/]l{is5O
+ Ew?0CF}dPS(ezG0xqUR)xa(L&&c;x{By"`oKvM&i!%+
+X-Draft-From: ("nnml:breen-jim" 34)
+References: <200312022229.hB2MToed026492@nexus.csse.monash.edu.au>
+	<s3twu9ex17t.fsf@magellan.suse.de>
+From: Mike FABIAN <mfabian@suse.de>
+Date: Wed, 08 Dec 2004 12:47:47 +0100
+In-Reply-To: <s3twu9ex17t.fsf@magellan.suse.de> (Mike FABIAN's message of
+ "Wed, 03 Dec 2003 00:13:26 +0100")
+Message-ID: <s3teki1f1uk.fsf_-_@magellan.suse.de>
+User-Agent: Gnus/5.1006 (Gnus v5.10.6) XEmacs/21.4 (Security Through
+ Obscurity, linux)
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="=-=-="
+Xref: magellan.suse.de breen-jim:35
+Status: RO
+Content-Length: 313981
+Lines: 4348
+
+--=-=-=
+Content-Type: text/plain; charset=iso-2022-jp
+
+Dear Jim,
+
+SuSE Linux 9.2 includes the input method software SCIM
+developed by Zhe Su <zsu@novell.com> (I added him to the CC:).
+
+SCIM includes a Japanese input method called 日本式　which converts
+kana to kanji according to the Nippon Latin transliteration system.
+But on top of that, this input method also supports the input
+of kanji via their romanized readings, for example one
+can type "hitomi" to get a candidate window for the
+following kanji
+
+    hitomi  瞳      0
+    hitomi  眸      0
+    hitomi  睛      0
+
+and select one to input it into the application.
+
+These readings are in the table Nippon.txt.in in the source code of
+the scim-tables package. Nippon.txt.in has apparently been compiled
+from KANJIDIC. I attach Nippon.txt.in here for your reference.
+
+The KANJIDIC license at
+
+http://www.csse.monash.edu.au/groups/edrdg/licence.html
+
+states:
+
+ h. may make and distribute modified versions of the files, or works derived
+    from the files, under the same conditions applying to verbatim copies. Where
+    a modified version or derived work is being made and distributed, the nature
+    of the modification and derivation must be made clear in documentation
+    accompanying the distribution of the work. (The author of the modified
+    version or derived work is encouraged to make any additional information
+    information available for inclusion in later versions of the file(s).)
+
+[...]
+
+ k. may use these files as part of, or in association with a software package or
+    system. Full acknowledgement of the source of the files must be made both in
+    the promotional material, WWW pages and software documentation, and copies
+    of the documentation of the files and of this licence statement must be
+    included in the distribution. Where the files play a major part in the
+    package, e.g. in the case of the package being a dictionary system based on
+    the files, prominent reference to the source and status of the files must be
+    made on any GUI screens, etc. associated with using the files. In the case
+    of the EDICT, JMdict and KANJIDIC files, the following URLs must be used or
+    quoted:
+
+[...]
+
+Recently our legal department wondered whether we are allowed to use
+this information derived from KANJIDIC in SCIM and how to acknowledge
+it properly. I added Juergen Weigert <jw@suse.de> to the CC:, he is
+responsible for checking license and copyright issues in SuSE
+packages.
+
+So what must we do in case of SCIM? Is it enough to include the
+complete page
+
+http://www.csse.monash.edu.au/groups/edrdg/licence.html
+
+in the scim-tables-ja rpm package? That is what we are currently
+doing. If we need to do more, what would that be?
+
+I hope that we can continue using EDICT, KANJIDIC and information
+derived from those dictionaries.
+
+Yours sincerely,
+
+      Mike
+
+
+--=-=-=
+Content-Type: text/plain; charset=iso-2022-jp
+
+
+-- 
+Mike FABIAN   <mfabian@suse.de>   http://www.suse.de/~mfabian
+睡眠不足はいい仕事の敵だ。
+
+--=-=-=--
+
+From nobody Mon Dec 13 11:43:42 2004
+X-From-Line: jwb@nexus.csse.monash.edu.au  Sun Dec 12 04:46:39 2004
+Return-Path: <jwb@nexus.csse.monash.edu.au>
+Received: from imap-dhs.suse.de [149.44.160.59]
+	by localhost with IMAP (fetchmail-6.2.5)
+	for mfabian@localhost (single-drop); Sun, 12 Dec 2004 04:46:39 +0100 (CET)
+Received: from imap-dhs.suse.de ([unix socket])
+	by imap-dhs (Cyrus v2.1.16) with LMTP; Sun, 12 Dec 2004 04:37:40 +0100
+X-Sieve: CMU Sieve 2.2
+Received: from hermes.suse.de (hermes.suse.de [149.44.160.1])
+	(using TLSv1 with cipher EDH-RSA-DES-CBC3-SHA (168/168 bits))
+	(Client CN "hermes.suse.de", Issuer "SuSE Linux AG internal IMAP-Server CA" (verified OK))
+	by imap-dhs.suse.de (Postfix) with ESMTP id 30AE4796588
+	for <mfabian@imap-dhs.suse.de>; Sun, 12 Dec 2004 04:37:40 +0100 (CET)
+Received: by hermes.suse.de (Postfix)
+	id 1965E11023C; Sun, 12 Dec 2004 04:37:40 +0100 (CET)
+Received: from scanhost.suse.de (scanhost.suse.de [149.44.160.36])
+	by hermes.suse.de (Postfix) with ESMTP
+	id 125E4110233; Sun, 12 Dec 2004 04:37:40 +0100 (CET)
+Received: from hermes.suse.de ([149.44.160.1])
+ by scanhost.suse.de (scanhost [149.44.160.36]) (amavisd-new, port 10025)
+ with ESMTP id 32184-08; Sun, 12 Dec 2004 04:37:35 +0100 (CET)
+Received: from Cantor.suse.de (mail-ex.suse.de [195.135.220.2])
+	(using TLSv1 with cipher EDH-RSA-DES-CBC3-SHA (168/168 bits))
+	(No client certificate requested)
+	by hermes.suse.de (Postfix) with ESMTP
+	id B1AEDDD25F; Sun, 12 Dec 2004 04:37:32 +0100 (CET)
+Received: from ALPHA8.ITS.MONASH.EDU.AU (alpha8.its.monash.edu.au [130.194.1.8])
+	by Cantor.suse.de (Postfix) with ESMTP id 3E7C4120228D;
+	Sun, 12 Dec 2004 04:37:29 +0100 (CET)
+Received: from localhost ([130.194.13.87]) by vaxh.its.monash.edu.au
+ (PMDF V5.2-31 #39306)
+ with ESMTP id <01LIBC4TDOJQ8WXYFF@vaxh.its.monash.edu.au>; Sun,
+ 12 Dec 2004 14:37:17 +1100
+Received: from curly.its.monash.edu.au (localhost.localdomain [127.0.0.1])
+	by localhost (Postfix) with ESMTP	id 31B8DAB543; Sun,
+ 12 Dec 2004 14:37:17 +1100 (EST)
+Received: from nexus.csse.monash.edu.au
+ (nexus.csse.monash.edu.au [130.194.64.4])	by curly.its.monash.edu.au (Postfix)
+ with ESMTP	id 0CD214FB10; Sun, 12 Dec 2004 14:37:17 +1100 (EST)
+Received: from nexus.csse.monash.edu.au (localhost [127.0.0.1])
+	by nexus.csse.monash.edu.au (8.12.8+Sun/8.12.8) with ESMTP id iBC3bGa5010299;
+ Sun, 12 Dec 2004 14:37:16 +1100 (EST)
+Received: (from jwb@localhost)	by nexus.csse.monash.edu.au
+ (8.12.8+Sun/8.12.2/Submit) id iBC3bFwc010298; Sun,
+ 12 Dec 2004 14:37:15 +1100 (EST)
+Date: Sun, 12 Dec 2004 14:37:15 +1100 (EST)
+From: Jim Breen <Jim.Breen@infotech.monash.edu.au>
+Subject: Re: SCIM and KANJIDIC licencense
+To: mfabian@suse.de, Jim Breen <jim.breen@infotech.monash.edu.au>
+Cc: Zhe Su <zsu@novell.com>, Juergen Weigert <jw@suse.de>
+Reply-To: Jim Breen <jim.breen@infotech.monash.edu.au>
+X-Gnus-Mail-Source: file:/home/mfabian/.procmail/incoming
+Message-id: <200412120337.iBC3bFwc010298@nexus.csse.monash.edu.au>
+MIME-version: 1.0
+X-Mailer: Mail User's Shell (7.2.5 10/14/92)
+Content-type: text/plain; charset=ISO-2022-JP
+Content-transfer-encoding: 7BIT
+X-Virus-Scanned: by amavisd-new at scanhost.suse.de
+X-Spam-Status: No, hits=-1.9 tagged_above=-20.0 required=5.0 tests=BAYES_30,
+ MY_LINUX
+X-Spam-Level: 
+X-Bogosity: No, tests=bogofilter, spamicity=0.000000, version=0.92.8
+Xref: magellan.suse.de new:9554
+Status: RO
+Content-Length: 1500
+Lines: 42
+
+Hi Mike, and everyone.
+
+[Mike FABIAN (SCIM and KANJIDIC licencense) writes:]
+>> SuSE Linux 9.2 includes the input method software SCIM
+>> developed by Zhe Su <zsu@novell.com> (I added him to the CC:).
+
+Cutting to the chase....
+
+>> So what must we do in case of SCIM? Is it enough to include the
+>> complete page
+>> 
+>> http://www.csse.monash.edu.au/groups/edrdg/licence.html
+>> 
+>> in the scim-tables-ja rpm package? That is what we are currently
+>> doing. If we need to do more, what would that be?
+>> 
+>> I hope that we can continue using EDICT, KANJIDIC and information
+>> derived from those dictionaries.
+
+I think for the Nippon.txt.in file, that is quite sufficient. 
+
+If it helps, I hereby give permission for the Japanese readings from the
+KANJIDIC, KANJD212 and KANJDIDIC2 files to be used to build data files
+for SCIM, provided that use is explained in associated documentation,
+e.g. in comments within the files, and a copy of the licence is included
+with the distribution of those data files.
+
+In other words, what you are doing now.
+
+I'm curious about the "Nippon Latin transliteration system". Does it do
+as much as the usual villains? (Wnn, Canna, ...)
+
+Cheers
+
+Jim
+
+-- 
+Jim Breen                                http://www.csse.monash.edu.au/~jwb/
+Computer Science & Software Engineering,                Tel: +61 3 9905 9554
+Monash University, VIC 3800, Australia                  Fax: +61 3 9905 5146
+(Monash Provider No. 00008C)                ジム・ブリーン@モナシュ大学
+

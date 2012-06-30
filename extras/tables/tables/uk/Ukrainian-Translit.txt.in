@@ -1,0 +1,184 @@
+### File header must not be modified
+### This file must be encoded into UTF-8.
+### This file is derived from GTK2 Input Method Cyrillic Transliterated
+SCIM_Generic_Table_Phrase_Library_TEXT
+VERSION_1_0
+
+### Begin Table definition.
+BEGIN_DEFINITION
+
+### An unique id to distinguish this table among others.
+### Use uuidgen to generate this kind of id.
+UUID = 9068f86e-02b5-400b-9732-4f9433ac9968
+
+### A unique number indicates the version of this file.
+### For example the last modified date of this file.
+### This number must be less than 2^32.
+SERIAL_NUMBER = 20061108
+
+ICON = @SCIM_ICONDIR@/Ukrainian-Translit.png
+
+### The default name of this table
+NAME = Ua-Translit
+
+### The local names of this table 
+###NAME.ua_UA = 
+
+### Supported languages of this table
+LANGUAGES = uk_UA
+
+### The author of this table
+AUTHOR = Daniil Ivanov <daniil.ivanov@gmail.com>
+
+### Prompt string to be displayed in the status area.
+STATUS_PROMPT = Ua
+
+### The Keyboard Layout used by this table. Unset or set to "Unknown" to accept any kind of layouts.
+KEYBOARD_LAYOUT = US_Default
+
+### If true then the first candidate phrase
+### will be selected automatically during inputing.
+AUTO_SELECT = TRUE
+
+### If true then a multi wildcard will be appended
+### at the end of inputing string automatically.
+AUTO_WILDCARD = FALSE
+
+### If true then the result string will be committed to client automatically.
+### This should be used with AUTO_SELECT = TRUE.
+AUTO_COMMIT = TRUE
+
+### If true then the inputted string will be automatically splitted during inputing.
+AUTO_SPLIT = TRUE
+
+### If true then the phrases' frequencies will be adjusted dynamically.
+DYNAMIC_ADJUST = FALSE
+
+### If true then the preedit area will be filled up by the current candidate phrase automatically.
+AUTO_FILL = TRUE
+
+### If true then the lookup table will always be shown if there is any candidate phrase.
+### Otherwise the lookup table won't be shown unless the user requires it by moving the preedit caret left.
+ALWAYS_SHOW_LOOKUP = FALSE
+
+### Enable full width punctuation property
+USE_FULL_WIDTH_PUNCT = FALSE
+
+### Use full width punctuation by default
+DEF_FULL_WIDTH_PUNCT = FALSE
+
+### Enable full width letter property
+USE_FULL_WIDTH_LETTER = FALSE
+
+### Use full width letter by default
+DEF_FULL_WIDTH_LETTER = FALSE
+
+### The maxmium length of a key.
+MAX_KEY_LENGTH = 2
+
+### Valid input chars.
+VALID_INPUT_CHARS = ABWGDE&VZIJKLMNOPRSTUFHCYX"'abwgdevzijklmnoprstufhcyx"'
+
+### Single wildcard char, can have multiple chars.
+###SINGLE_WILDCARD_CHAR = ?
+
+### Multi wildcard char.
+###MULTI_WILDCARD_CHAR = *
+
+### The key strokes to split inputted string.
+###SPLIT_KEYS = quoteright
+
+### The key strokes to commit the convert result to client.
+COMMIT_KEYS = Shift+space
+
+### The key strokes to forward the inputted string to client.
+FORWARD_KEYS = Return
+
+### The key strokes to select candidiate phrases.
+SELECT_KEYS = 1,2,3,4,5,6,7,8,9
+
+### The key strokes to page up the lookup table.
+PAGE_UP_KEYS = Page_Up
+
+### The key strokes to page down the lookup table.
+PAGE_DOWN_KEYS = Page_Down
+
+END_DEFINITION
+
+### Begin Table data.
+BEGIN_TABLE
+A	А	0
+B	Б	0
+V	В	0
+G	Г	0
+G'	Ґ	0
+D	Д	0
+E	Е	0
+E'	Є	0
+ZH	Ж	0
+Zh	Ж	0
+Z	З	0
+I	І	0
+Ji	Ї	0
+JI	Ї	0
+Y	И	0
+J	Й	0
+K	К	0
+L	Л	0
+M	М	0
+N	Н	0
+O	О	0
+P	П	0
+R	Р	0
+S	С	0
+T	Т	0
+U	У	0
+F	Ф	0
+H	Х	0
+C	Ц	0
+CH	Ч	0
+Ch	Ч	0
+Sh	Ш	0
+SH	Ш	0
+Sj	Щ	0
+SJ	Щ	0
+''	Ь	0
+JU	Ю	0
+Ju	Ю	0
+Ja	Я	0
+JA	Я	0
+"	'	0
+a	а	0
+b	б	0
+v	в	0
+g	г	0
+g'	ґ	0
+d	д	0
+e	е	0
+e'	є	0
+zh	ж	0
+z	з	0
+i	і	0
+ji	ї	0
+y	и	0
+j	й	0
+k	к	0
+l	л	0
+m	м	0
+n	н	0
+o	о	0
+p	п	0
+r	р	0
+s	с	0
+t	т	0
+u	у	0
+f	ф	0
+h	х	0
+c	ц	0
+ch	ч	0
+sh	ш	0
+sj	щ	0
+'	ь	0
+ju	ю	0
+ja	я	0
+END_TABLE

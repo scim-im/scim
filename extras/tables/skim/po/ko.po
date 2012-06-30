@@ -1,0 +1,483 @@
+# translation of ko.po to Korean translation of skim. 
+# Copyright (C) 2004 THE skim'S COPYRIGHT HOLDER 
+# This file is distributed under the same license as the skim package.
+# LiuCougar <liuspider@users.sourceforge.net>, 2004. 
+# Kitae Kim<neeum@yahoo.com>, 2004.
+# 
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: skim 1.0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-05-10 23:35+0000\n"
+"PO-Revision-Date: 2004-09-26 11:58+0800\n"
+"Last-Translator: Kitae <neeum@yahoo.com>\n"
+"Language-Team: Korean <ko@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../setupui/generictableui.cpp:166
+msgid "Generic Table"
+msgstr "일반 테이블"
+
+#: ../setupui/generictableui.cpp:167
+msgid "Show &prompt"
+msgstr "프롬프트 보이기(&p)"
+
+#: ../setupui/generictableui.cpp:168
+msgid "Show key &hint"
+msgstr "힌트보이기(&h)"
+
+#: ../setupui/generictableui.cpp:169
+msgid "Save &user table in binary format"
+msgstr "사용자 테이블을 바이너리 형식으로 저장(&u)"
+
+#: ../setupui/generictableui.cpp:170
+msgid "Show the u&ser defined phrases first"
+msgstr "사용자 정의 문절을 먼저 보임(&s)"
+
+#: ../setupui/generictableui.cpp:171
+msgid "Show &longer phrases first"
+msgstr "긴 문절을 먼저 보임"
+
+#: ../setupui/generictableui.cpp:172
+msgid "General"
+msgstr "일반"
+
+#: ../setupui/generictableui.cpp:173
+msgid "Full width &letter"
+msgstr "전각 문자(&l)"
+
+#: ../setupui/generictableui.cpp:174
+msgid "&Mode switch"
+msgstr "모드 전환(&M)"
+
+#: ../setupui/generictableui.cpp:175
+msgid "Full width &punctuation"
+msgstr "전각 구두점(&p)"
+
+#: ../setupui/generictableui.cpp:176
+msgid "&Add phrase"
+msgstr "문절 더하기(&A)"
+
+#: ../setupui/generictableui.cpp:177
+msgid "&Delete phrase"
+msgstr "문절 지우기(&D)"
+
+#: ../setupui/generictableui.cpp:178
+msgid "Keyboard"
+msgstr "자판"
+
+#~ msgid "Reload all modules"
+#~ msgstr "모든 모듈 새로 불러들이기"
+
+#~ msgid "SCIM Help"
+#~ msgstr "SCIM 도움말"
+
+#~ msgid "Input Method"
+#~ msgstr "입력모드"
+
+#~ msgid "KDE Frontend for SCIM Input Method Platform"
+#~ msgstr "KDE 를 위한 SCIM 입력 방식"
+
+#~ msgid "Start as daemon."
+#~ msgstr "데몬으로 시작."
+
+#~ msgid "List all availabe skim plugins."
+#~ msgstr "사용가능한 스킴플러그인 리스트."
+
+#~ msgid "Uses specified Config module."
+#~ msgstr "특화된 설정 모듈사용."
+
+#~ msgid ""
+#~ "A comma separated list of plugin names. All of these plugins will be "
+#~ "loaded no matter whether they are enabled in the setting file."
+#~ msgstr ""
+#~ "플러그인 리스트에서 구분된 쉼표. 플러그인들이 설정에 활성화 과 되어 있던 "
+#~ "않되어있던간에 모든 플러그인이 새로 불러들여 질것입니다."
+
+#~ msgid ""
+#~ "A comma separated list of plugin names. All of these plugins will be "
+#~ "disabled no matter whether they are disabled in the setting file."
+#~ msgstr ""
+#~ "플러그인 리스트에서 구분된 쉼표. 플러그인들이 설정에 불활성화 되어 있던 간"
+#~ "에있던간에 모든 플러그인이 불활성화 될것입니다."
+
+#~ msgid "Quit if no connected client."
+#~ msgstr "연결된 클라이언트가 없으면 종료."
+
+#, fuzzy
+#~ msgid " Enable debug info, to specific LEVEL.."
+#~ msgstr "디버깅 정보 활성화, -v 더많은 정보 제공."
+
+#~ msgid "Current version of skim"
+#~ msgstr "스킴의 현재 버전"
+
+#~ msgid "Output debug file.(No effort, always use none)"
+#~ msgstr "디버그파일 출력.(효과없음. 항상 사용않함으로 선택)"
+
+#~ msgid "Force start even if scim panel socket can not be established."
+#~ msgstr "SCIM 패널 소켓연결이 되지 않았어도  강제 시작."
+
+#~ msgid "Core Developer"
+#~ msgstr "주 개발자"
+
+#~ msgid "SCIM Core Author"
+#~ msgstr "SCIM 주 제작자"
+
+#~ msgid "Doc writer and German translator"
+#~ msgstr "문서 제작및 독일어 번역자"
+
+#~ msgid "Art designer and Korean translator"
+#~ msgstr "그래픽 디자인 및 한국어 번역자"
+
+#~ msgid "Japanese translator"
+#~ msgstr "일본어 번역자"
+
+#~ msgid "_: NAME OF TRANSLATORS\\nYour names"
+#~ msgstr "김기태"
+
+#~ msgid "_: EMAIL OF TRANSLATORS\\nYour emails"
+#~ msgstr "neeum@yahoo.com"
+
+#~ msgid ""
+#~ "Installed skim Plugins:\n"
+#~ "\tName\t\t\tComment\n"
+#~ msgstr ""
+#~ "설치된 스킴 플러그인:\n"
+#~ "\t이름\t\t\t설명\n"
+
+#~ msgid "&General"
+#~ msgstr "일반(&G)"
+
+#~ msgid "Grab Key"
+#~ msgstr "잡는 키"
+
+#~ msgid ""
+#~ "<center>Please press shortcut...</center><p>When you release a key this "
+#~ "dialog will be closed automatically.</p>"
+#~ msgstr ""
+#~ "<center>단축키를 누르세요.</center></p>키늘 놓았을때이 창은 자동으로 닫힘"
+#~ "니다.</p>"
+
+#~ msgid "Control"
+#~ msgstr "Control"
+
+#~ msgid "Alt"
+#~ msgstr "Alt"
+
+#~ msgid "Shift"
+#~ msgstr "Shift"
+
+#~ msgid "Release"
+#~ msgstr "버전"
+
+#~ msgid "Edit Shortcut List"
+#~ msgstr "단축키 리스트 수정"
+
+#~ msgid "Edit Shortcuts"
+#~ msgstr "단축키 수정"
+
+#~ msgid "Warning"
+#~ msgstr "경고"
+
+#~ msgid "\"%1\" is not a valid shortcut!"
+#~ msgstr "\"%1\" 는 잘못된 단축키입니다."
+
+#~ msgid "Always Show"
+#~ msgstr "항상 보임"
+
+#~ msgid "Auto Snap"
+#~ msgstr "자동 스냅"
+
+#~ msgid "Show input method name"
+#~ msgstr "입력방법 보이기"
+
+#~ msgid "Main Window"
+#~ msgstr "주 창"
+
+#~ msgid "Reload"
+#~ msgstr "새로 불러 들이기"
+
+#~ msgid "Enable Quit Action in Right Click Menu"
+#~ msgstr "종료하기 기능을 오른쪽 버튼 클릭 메뉴에 활성화"
+
+#~ msgid "SCIM Global Settings"
+#~ msgstr "SCIM 전체 설정"
+
+#~ msgid "&Panel Program"
+#~ msgstr "패널 프로그램(&P)"
+
+#~ msgid "scim-panel-kde"
+#~ msgstr "scim-panel-kde"
+
+#~ msgid "scim-panel-gtk"
+#~ msgstr "scim-panel-gtk"
+
+#~ msgid "&Config Module"
+#~ msgstr "설정 모듈(&C)"
+
+#~ msgid "Advanced"
+#~ msgstr "고급"
+
+#~ msgid "Advanced Settings"
+#~ msgstr "고급 설정"
+
+#~ msgid "&Supported Unicode Locales"
+#~ msgstr "유니코드 로케일 지원(&S)"
+
+#~ msgid "&FrontEnd Socket Address"
+#~ msgstr "프로트엔드 소케 주소(&F)"
+
+#~ msgid "&IMEngine Socket Address"
+#~ msgstr "IM엔지 소켓 주소(&I)"
+
+#~ msgid "C&onfig Socket Address"
+#~ msgstr "소켓 주소 설정(&o)"
+
+#~ msgid "P&anel Socket Address"
+#~ msgstr "패널 소켓 주소(&a)"
+
+#~ msgid "Socket &Timeout"
+#~ msgstr "소켓 시간제한(&T)"
+
+#~ msgid "X Window (XIM)"
+#~ msgstr "X 윈도우 (XIM)"
+
+#~ msgid "S&tart skim automatically when KDE starts"
+#~ msgstr "KDE 시작시 skim 자동 시작(&t)"
+
+#~ msgid "XIM Settings"
+#~ msgstr "XIM 설정"
+
+#~ msgid "&On the Spot"
+#~ msgstr "On the Spot(&O)"
+
+#~ msgid "Keyboard Shortcuts"
+#~ msgstr "키보다 단축키"
+
+#~ msgid "Trigger:"
+#~ msgstr "시작키:"
+
+#~ msgid "Next Input Method:"
+#~ msgstr "다음 입력방법:"
+
+#~ msgid "Previous Input Method:"
+#~ msgstr "이전 입력방법:"
+
+#~ msgid "&Show input method menu:"
+#~ msgstr "입력방법 보이기(&S)"
+
+#~ msgid "Configure skim"
+#~ msgstr "skim 설정"
+
+#~ msgid "Name"
+#~ msgstr "이름"
+
+#, fuzzy
+#~ msgid "&Disable All"
+#~ msgstr "문절 기능 끄기(&D)"
+
+#~ msgid "Options"
+#~ msgstr "설정"
+
+#~ msgid "Use &Capslock"
+#~ msgstr "CapsLock 키 사용(&C)"
+
+#~ msgid "Use &Dvorak keyboard"
+#~ msgstr "드보락 자판 사용(&D)"
+
+#~ msgid "&Show candidate comment"
+#~ msgstr "추천 문자 보이기(&S)"
+
+#~ msgid "Trigger Keys:"
+#~ msgstr "구동 키:"
+
+#~ msgid "Hangul to Hanja keys:"
+#~ msgstr "한글, 한자 변환 키:"
+
+#~ msgid "Manual mode keys:"
+#~ msgstr "수동 모드 키:"
+
+#~ msgid "Comment"
+#~ msgstr "설명"
+
+#, fuzzy
+#~ msgid "Edit Supported Locales"
+#~ msgstr "유니코드 로케일 지원(&S)"
+
+#~ msgid ""
+#~ "If you want to use skim (scim-panel-kde) or scim-qtimm (Qt immodule "
+#~ "support for SCIM), please select kconfig as the config module."
+#~ msgstr ""
+#~ "스킴 (scim-panel-kde) 또는 scim-qtimm (SCIM을 지원하는 Qt immodule) 을 사"
+#~ "용하려고 한다면, kconfig 를 선택하고 모듈설정을 조절 하세요."
+
+#~ msgid "Input Window Settings"
+#~ msgstr "입력창 설정"
+
+#~ msgid "Highlight Selected Candidate"
+#~ msgstr "선택된 추천 하이라이트"
+
+#~ msgid "Enable Mouse Support"
+#~ msgstr "마우스 기능 활성화"
+
+#~ msgid "Sticky"
+#~ msgstr "붙이기"
+
+#~ msgid "Lookup Table is Vertical"
+#~ msgstr "미리보기 테이블 세로로 보기"
+
+#~ msgid "Font"
+#~ msgstr "글꼴"
+
+#~ msgid "Smart Pinyin"
+#~ msgstr "똑똑한 평음"
+
+#~ msgid "Auto &combin phrase"
+#~ msgstr "자동 문절 비교(&c)"
+
+#~ msgid "Auto &fill preedit"
+#~ msgstr "자동 미리수정(preedit) 채움(&f)"
+
+#~ msgid "&Match longer phrase"
+#~ msgstr "보다 긴 음절 비교(&M)"
+
+#~ msgid "Always show lookup &table"
+#~ msgstr "미리보기 테이블 항상 보이기(&t)"
+
+#~ msgid "Show all &keys"
+#~ msgstr "모든 키 보이기(&k)"
+
+#~ msgid "&Dynamic adjust"
+#~ msgstr "능동 적용(&D)"
+
+#~ msgid "&Burst stack size"
+#~ msgstr "빠른 찾기 크기(&B)"
+
+#~ msgid "Max &user phrase length"
+#~ msgstr "사용자 문절 최대 길이(&u)"
+
+#~ msgid "Max &preedit length"
+#~ msgstr "preedit 최대 길이"
+
+#~ msgid "D&ynamic sensitivity"
+#~ msgstr "능동적 감도(&D)"
+
+#~ msgid "&Smart match level"
+#~ msgstr "똑똑한 비교 단계(&S)"
+
+#~ msgid "Sa&ve period (sec)"
+#~ msgstr "저장 간격, 초(&v)"
+
+#~ msgid "Save user data in binary &format"
+#~ msgstr "사용자 데이타를 바이너리 형식으로 저장(&f)"
+
+#~ msgid "&Advanced"
+#~ msgstr "고급(&A)"
+
+#~ msgid "&Use tone"
+#~ msgstr "사용자 톤(&U)"
+
+#~ msgid "Allow incomplete &pinyin"
+#~ msgstr "완성되지 않은 평음 허용(&p)"
+
+#, fuzzy
+#~ msgid "Enable A&mbiguities"
+#~ msgstr "모호함"
+
+#~ msgid "Ambiguities"
+#~ msgstr "모호함"
+
+#~ msgid "&N and L"
+#~ msgstr "N 과 L(&N)"
+
+#~ msgid "&L and R"
+#~ msgstr "L 과 R(&L)"
+
+#~ msgid "&F and H"
+#~ msgstr "F 과 H(&F)"
+
+#~ msgid "&Zh and Z"
+#~ msgstr "Zh·과·Z(&Z)"
+
+#~ msgid "&Ch and C"
+#~ msgstr "Ch·과·C(&C)"
+
+#~ msgid "&Sh and S"
+#~ msgstr "Sh·과·S(&S)"
+
+#~ msgid "&In and Ing"
+#~ msgstr "In·과·Ing(&l)"
+
+#~ msgid "&An and Ang"
+#~ msgstr "An·과·Ang(&A)"
+
+#~ msgid "&En and Eng"
+#~ msgstr "En·과·Eng(&E)"
+
+#~ msgid "Pinyin"
+#~ msgstr "평음"
+
+#~ msgid "&Chinese mode switch"
+#~ msgstr "중국어 모드 전환(&C)"
+
+#~ msgid "&Disable phrase"
+#~ msgstr "문절 기능 끄기(&D)"
+
+#~ msgid "Page &up"
+#~ msgstr "이전 페이지(&u)"
+
+#~ msgid "Page dow&n"
+#~ msgstr "다음페이지(&n)"
+
+#, fuzzy
+#~ msgid "Alt+E"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+O"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+D"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+H"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+U"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+P"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+M"
+#~ msgstr "Alt"
+
+#~ msgid "Qt Immodule"
+#~ msgstr "Qt Immodule"
+
+#~ msgid "Use Qt built-in Preedit Area"
+#~ msgstr "Qt 의 내장 미리수정(preedit) 영역 사용"
+
+#~ msgid "Left/Right Modifier"
+#~ msgstr "좌/우측 수정"
+
+#~ msgid ""
+#~ "Applied to the last key if it is a modifer key. If left modifier is "
+#~ "intended, please leave this unchecked."
+#~ msgstr ""
+#~ "만약 수정 키라면 마지막 키를 적용합니다. 왼쪽 수정키를 의도한다면 이 설정"
+#~ "을 건드리지 마세요."
+
+#~ msgid "&Add"
+#~ msgstr "더하기(&A)"
+
+#~ msgid "&Delete"
+#~ msgstr "삭제(&D)"

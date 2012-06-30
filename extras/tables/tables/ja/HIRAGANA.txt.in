@@ -1,0 +1,216 @@
+### File header must not be modified
+### This file must be encoded into UTF-8.
+### This file comes from unicon module.
+SCIM_Generic_Table_Phrase_Library_TEXT
+VERSION_1_0
+
+### Begin Table definition.
+BEGIN_DEFINITION
+
+### An unique id to distinguish this table among others.
+### Use uuidgen to generate this kind of id.
+UUID = 61ea7bfd-d62a-4dd6-842a-c7f91db5d6ff
+
+### A unique number indicates the version of this file.
+### For example the last modified date of this file.
+### This number must be less than 2^32.
+SERIAL_NUMBER = 20040227
+
+ICON = @SCIM_ICONDIR@/HIRAGANA.png
+
+### The default name of this table
+NAME = HIRAGANA
+
+### The local names of this table 
+### NAME.ja = 
+
+### Supported languages of this table
+LANGUAGES = ja_JP
+
+### Prompt string to be displayed in the status area.
+STATUS_PROMPT = JP
+
+### If true then the first candidate phrase
+### will be selected automatically during inputing.
+AUTO_SELECT = TRUE
+
+### If true then a multi wildcard will be appended
+### at the end of inputing string automatically.
+AUTO_WILDCARD = TRUE
+
+### If true then the result string will be committed to client automatically.
+### This should be used with AUTO_SELECT = TRUE.
+AUTO_COMMIT = FALSE
+
+### If true then the inputted string will be automatically splitted during inputing.
+AUTO_SPLIT = TRUE
+
+### If true then the phrases' frequencies will be adjusted dynamically.
+DYNAMIC_ADJUST = FALSE
+
+### If true then the preedit area will be filled up by the current candidate phrase automatically.
+AUTO_FILL = TRUE
+
+### If true then the lookup table will always be shown if there is any candidate phrase.
+### Otherwise the lookup table won't be shown unless the user requires it by moving the preedit caret left.
+ALWAYS_SHOW_LOOKUP = FALSE
+
+### Use full width punctuation by default
+DEF_FULL_WIDTH_PUNCT = TRUE
+
+### Use full width letter by default
+DEF_FULL_WIDTH_LETTER = FALSE
+
+### The maxmium length of a key.
+MAX_KEY_LENGTH = 4
+
+### Valid input chars.
+VALID_INPUT_CHARS = _abcdefghijklmnopqrstuvwxyz-
+
+### Single wildcard char, can have multiple chars.
+### SINGLE_WILDCARD_CHAR = ?
+
+### Multi wildcard char.
+### MULTI_WILDCARD_CHAR = *
+
+### The key strokes to split inputted string.
+SPLIT_KEYS = quoteright
+
+### The key strokes to commit the convert result to client.
+COMMIT_KEYS = space
+
+### The key strokes to forward the inputted string to client.
+FORWARD_KEYS = Return
+
+### The key strokes to select candidiate phrases.
+SELECT_KEYS = 1,2,3,4,5,6,7,8,9,0
+
+### The key strokes to page up the lookup table.
+PAGE_UP_KEYS = Page_Up,comma,minus
+
+### The key strokes to page down the lookup table.
+PAGE_DOWN_KEYS = Page_Down,period,equal
+
+END_DEFINITION
+
+### Begin Table data.
+BEGIN_TABLE
+_a	ぁ
+a	あ
+_i	ぃ
+i	い
+_u	ぅ
+u	う
+_e	ぇ
+e	え
+_o	ぉ
+o	お
+ka	か
+ga	が
+ki	き
+gi	ぎ
+ku	く
+gu	ぐ
+ke	け
+ge	げ
+ko	こ
+go	ご
+sa	さ
+za	ざ
+si	し
+shi	し
+ji	じ
+su	す
+zu	ず
+se	せ
+ze	ぜ
+so	そ
+zo	ぞ
+ta	た
+da	だ
+chi	ち
+zi	ぢ
+_tsu	っ
+tsu	つ
+zu	づ
+te	て
+de	で
+to	と
+do	ど
+na	な
+ni	に
+nu	ぬ
+ne	ね
+no	の
+ha	は
+ba	ば
+pa	ぱ
+hi	ひ
+bi	び
+pi	ぴ
+hu	ふ
+fu	ふ
+bu	ぶ
+pu	ぷ
+he	へ
+be	べ
+pe	ぺ
+ho	ほ
+bo	ぼ
+po	ぽ
+ma	ま
+mi	み
+mu	む
+me	め
+mo	も
+_ya	ゃ
+ya	や
+_yu	ゅ
+yu	ゆ
+_yo	ょ
+yo	よ
+ra	ら
+ri	り
+ru	る
+re	れ
+ro	ろ
+_wa	ゎ
+wa	わ
+wo	を
+n	ん
+m	ん
+kya	きゃ
+kyu	きゅ
+kyo	きょ
+sha	しゃ
+shu	しゅ
+sho	しょ
+cha	ちゃ
+chu	ちゅ
+cho	ちょ
+nya	にゃ
+nyu	にゅ
+nyo	にょ
+hya	ひゃ
+hyu	ひゅ
+hyo	ひょ
+mya	みゃ
+myu	みゅ
+myo	みょ
+rya	りゃ
+ryu	りゅ
+ryo	りょ
+gya	ぎゃ
+gyu	ぎゅ
+gyo	ぎょ
+ja	じゃ
+ju	じゅ
+jo	じょ
+bya	びゃ
+byu	びゅ
+byo	びょ
+pya	ぴゃ
+pyu	ぴゅ
+pyo	ぴょ
+-	ー
+END_TABLE

@@ -1,0 +1,206 @@
+### File header must not be modified
+### This file must be encoded into UTF-8.
+### This file is derived from iiimf unitLE's Gujarati inscript layout.
+### Copyright (c) 2003 Sun Microsystems, Inc. All Rights Reserved.
+SCIM_Generic_Table_Phrase_Library_TEXT
+VERSION_1_0
+
+### Begin Table definition.
+BEGIN_DEFINITION
+
+### An unique id to distinguish this table among others.
+### Use uuidgen to generate this kind of id.
+UUID = 424467b4-f967-4173-adac-805b215c2048
+
+### A unique number indicates the version of this file.
+### For example the last modified date of this file.
+### This number must be less than 2^32.
+SERIAL_NUMBER = 20050901
+
+ICON = @SCIM_ICONDIR@/Gujarati-inscript.png
+
+### The default name of this table
+NAME = Inscript
+
+### The local names of this table 
+NAME.gu_IN = ઇંસ્ક્રિપ્ટ
+
+### Supported languages of this table
+LANGUAGES = gu
+
+### The author of this table
+AUTHOR = Jens Petersen <petersen@redhat.com>
+
+### Prompt string to be displayed in the status area.
+STATUS_PROMPT = Gu
+
+### If true then the first candidate phrase
+### will be selected automatically during inputing.
+AUTO_SELECT = TRUE
+
+### If true then a multi wildcard will be appended
+### at the end of inputing string automatically.
+AUTO_WILDCARD = FALSE
+
+### If true then the result string will be committed to client automatically.
+### This should be used with AUTO_SELECT = TRUE.
+AUTO_COMMIT = TRUE
+
+### If true then the inputted string will be automatically splitted during inputing.
+AUTO_SPLIT = TRUE
+
+### If true then the phrases' frequencies will be adjusted dynamically.
+DYNAMIC_ADJUST = FALSE
+
+### If true then the preedit area will be filled up by the current candidate phrase automatically.
+AUTO_FILL = TRUE
+
+### Whether to discard invalid key automatically.
+### This takes effact only when AUTO_FILL and AUTO_COMMIT is true.
+DISCARD_INVALID_KEY = TRUE
+
+### If true then the lookup table will always be shown if there is any candidate phrase.
+### Otherwise the lookup table won't be shown unless the user requires it by moving the preedit caret left.
+ALWAYS_SHOW_LOOKUP = FALSE
+
+### Enable full width punctuation property
+USE_FULL_WIDTH_PUNCT = FALSE
+
+### Use full width punctuation by default
+DEF_FULL_WIDTH_PUNCT = FALSE
+
+### Enable full width letter property
+USE_FULL_WIDTH_LETTER = FALSE
+
+### Use full width letter by default
+DEF_FULL_WIDTH_LETTER = FALSE
+
+### The maxmium length of a key.
+MAX_KEY_LENGTH = 1
+
+### Valid input chars.
+VALID_INPUT_CHARS = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_-+=|\~`:;"'{[}]<,>.?/
+
+### Single wildcard char, can have multiple chars.
+###SINGLE_WILDCARD_CHAR = ?
+
+### Multi wildcard char.
+###MULTI_WILDCARD_CHAR = *
+
+### The key strokes to split inputted string.
+###SPLIT_KEYS = quoteright
+
+### The key strokes to commit the convert result to client.
+COMMIT_KEYS = space
+
+### The key strokes to forward the inputted string to client.
+FORWARD_KEYS = VoidSymbol
+
+### The key strokes to select candidiate phrases.
+SELECT_KEYS = VoidSymbol
+
+### The key strokes to page up the lookup table.
+PAGE_UP_KEYS = VoidSymbol
+
+### The key strokes to page down the lookup table.
+PAGE_DOWN_KEYS = VoidSymbol
+
+END_DEFINITION
+
+### Begin Table data.
+BEGIN_TABLE
+! ઍ
+1 ૧
+@ ૅ
+2 ૨
+# ૠ
+3 ૩
+$ ૄ
+4 ૪
+5 ૫
+6 ૬
+7 ૭
+8 ૮
+( (
+9 ૯
+) )
+0 ૦
+_ ઃ
+- -
++ ઋ
+= ૃ
+Q ઔ
+q ૌ
+W ઐ
+w ૈ
+E આ
+e ા
+R ઈ
+r ી
+T ઊ
+t ૂ
+Y ભ
+y બ
+U ઙ
+u હ
+I ઘ
+i ગ
+O ધ
+o દ
+P ઝ
+p જ
+{ ઢ
+[ ડ
+} ઞ
+] ઼
+A ઓ
+a ો
+S એ
+s ે
+D અ
+d ્
+F ઇ
+f િ
+G ઉ
+g ુ
+H ફ
+h પ
+J ઽ
+j ર
+K ખ
+k ક
+L થ
+l ત
+: છ
+; ચ
+" ઠ
+' ટ
+| ઑ
+\ ૉ
+~ ~
+` `
+Z ૐ
+z ૱
+X ઁ
+x ં
+C ણ
+c મ
+V "
+v ન
+B '
+b વ
+N ળ
+n લ
+M શ
+m સ
+< ષ
+, ,
+> ।
+. .
+? ?
+/ ય
+% જ્ઞ
+^ ત્ર
+& ક્ષ
+* શ્ર
+END_TABLE

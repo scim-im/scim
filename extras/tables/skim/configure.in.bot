@@ -1,0 +1,10 @@
+AC_MSG_RESULT([
+skim Support Build options:
+  Version                $VERSION
+  Version of libscim     $SCIM_VERSION
+  Version of libskim     $SKIM_VERSION
+  Install prefix         $prefix
+  Build shared libs      $enable_shared
+  Build static libs      $enable_static
+  Enable debug           $scim_debug
+])

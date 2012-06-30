@@ -1,0 +1,500 @@
+# translation of skim to Japanese
+# This file is distributed under the same license as the skim package.
+# Copyright (C) 2004 LiuCougar <liuspider@users.sourceforge.net>
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ja\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-05-10 23:35+0000\n"
+"PO-Revision-Date: 2005-03-01 20:00+0900\n"
+"Last-Translator: Yukiko Bando <ybando@k6.dion.ne.jp>\n"
+"Language-Team: Japanese <ja@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../setupui/generictableui.cpp:166
+msgid "Generic Table"
+msgstr "一般テーブル"
+
+#: ../setupui/generictableui.cpp:167
+msgid "Show &prompt"
+msgstr "プロンプトを表示(&P)"
+
+#: ../setupui/generictableui.cpp:168
+msgid "Show key &hint"
+msgstr "キーヒントを表示(&H)"
+
+#: ../setupui/generictableui.cpp:169
+msgid "Save &user table in binary format"
+msgstr "ユーザーテーブルをバイナリ形式で保存(&U)"
+
+#: ../setupui/generictableui.cpp:170
+msgid "Show the u&ser defined phrases first"
+msgstr "ユーザー定義フレーズを優先的に表示(&S)"
+
+#: ../setupui/generictableui.cpp:171
+msgid "Show &longer phrases first"
+msgstr "長いフレーズを優先的に表示(&L)"
+
+#: ../setupui/generictableui.cpp:172
+msgid "General"
+msgstr "全般"
+
+#: ../setupui/generictableui.cpp:173
+msgid "Full width &letter"
+msgstr "全角/半角文字切替(&L)"
+
+#: ../setupui/generictableui.cpp:174
+msgid "&Mode switch"
+msgstr "モード切替(&M)"
+
+#: ../setupui/generictableui.cpp:175
+msgid "Full width &punctuation"
+msgstr "全角/半角句読点切替(&P)"
+
+#: ../setupui/generictableui.cpp:176
+msgid "&Add phrase"
+msgstr "フレーズ追加(&A)"
+
+#: ../setupui/generictableui.cpp:177
+msgid "&Delete phrase"
+msgstr "フレーズ削除(&D)"
+
+#: ../setupui/generictableui.cpp:178
+msgid "Keyboard"
+msgstr "キーボード"
+
+#~ msgid "Reload all modules"
+#~ msgstr "全てのモジュールをリロード"
+
+#~ msgid "SCIM Help"
+#~ msgstr "SCIM ヘルプ"
+
+#~ msgid "Input Method"
+#~ msgstr "入力メソッド"
+
+#~ msgid "KDE Frontend for SCIM Input Method Platform"
+#~ msgstr "SCIM IMプラットフォームのKDEフロントエンド"
+
+#~ msgid "Start as daemon."
+#~ msgstr "デーモンとして起動"
+
+#~ msgid "List all availabe skim plugins."
+#~ msgstr "使用可能なプラグインを表示"
+
+#~ msgid "Uses specified Config module."
+#~ msgstr "指定した設定モジュールを使用"
+
+#~ msgid ""
+#~ "A comma separated list of plugin names. All of these plugins will be "
+#~ "loaded no matter whether they are enabled in the setting file."
+#~ msgstr ""
+#~ "カンマで区切ったプラグイン名のリスト。これらのプラグインは設定ファイルの内"
+#~ "容にかかわらず全てロードされます。"
+
+#~ msgid ""
+#~ "A comma separated list of plugin names. All of these plugins will be "
+#~ "disabled no matter whether they are disabled in the setting file."
+#~ msgstr ""
+#~ "カンマで区切ったプラグイン名のリスト。これらのプラグインは設定ファイルの内"
+#~ "容にかかわらず全て無効になります。"
+
+#~ msgid "Quit if no connected client."
+#~ msgstr "クライアントの接続がなければ終了する"
+
+#~ msgid " Enable debug info, to specific LEVEL.."
+#~ msgstr "デバッグ情報を特定のLEVELで有効にする"
+
+#~ msgid "Current version of skim"
+#~ msgstr "現在のバージョン"
+
+#~ msgid "Output debug file.(No effort, always use none)"
+#~ msgstr "デバッグ出力ファイル(使用できません)"
+
+#~ msgid "Force start even if scim panel socket can not be established."
+#~ msgstr "パネルソケットが確立されなくても強制的に起動する"
+
+#~ msgid "Core Developer"
+#~ msgstr "主要開発者"
+
+#~ msgid "SCIM Core Author"
+#~ msgstr "SCIMの主な作者"
+
+#~ msgid "Doc writer and German translator"
+#~ msgstr "ドキュメントライタ/ドイツ語翻訳者"
+
+#~ msgid "Art designer and Korean translator"
+#~ msgstr "アートデザイナー/ハングル翻訳者"
+
+#~ msgid "Japanese translator"
+#~ msgstr "日本語翻訳者"
+
+#~ msgid "_: NAME OF TRANSLATORS\\nYour names"
+#~ msgstr "Yukiko Bando"
+
+#~ msgid "_: EMAIL OF TRANSLATORS\\nYour emails"
+#~ msgstr "ybando@k6.dion.ne.jp"
+
+#~ msgid ""
+#~ "Installed skim Plugins:\n"
+#~ "\tName\t\t\tComment\n"
+#~ msgstr ""
+#~ "インストール済のskimプラグイン:\n"
+#~ "\t名称\t\t\t説明\n"
+
+#~ msgid "SKIM: KDE frontend for SCIM %1\n"
+#~ msgstr "SKIM: SCIM %1 のためのKDEフロントエンド\n"
+
+#~ msgid "(C) 2003-2005 LiuCougar <liuspider@users.sourceforge.net>"
+#~ msgstr "(C) 2003-2005 LiuCougar <liuspider@users.sourceforge.net>"
+
+#~ msgid "&General"
+#~ msgstr "全般(&G)"
+
+#~ msgid "Grab Key"
+#~ msgstr "キー選択"
+
+#~ msgid ""
+#~ "<center>Please press shortcut...</center><p>When you release a key this "
+#~ "dialog will be closed automatically.</p>"
+#~ msgstr ""
+#~ "<center>ショートカットキーを押して下さい...</center><p>キーをリリースする"
+#~ "とこのダイアログは自動的に閉じます。"
+
+#~ msgid "Control"
+#~ msgstr "Ctrl"
+
+#~ msgid "Alt"
+#~ msgstr "Alt"
+
+#~ msgid "Shift"
+#~ msgstr "Shift"
+
+#~ msgid "Release"
+#~ msgstr "リリース"
+
+#~ msgid "Edit Shortcut List"
+#~ msgstr "ショートカットを編集"
+
+#~ msgid "Edit Shortcuts"
+#~ msgstr "ショートカットを編集"
+
+#~ msgid "Warning"
+#~ msgstr "警告"
+
+#~ msgid "\"%1\" is not a valid shortcut!"
+#~ msgstr "\"%1\"は有効なショートカットではありません"
+
+#~ msgid "Always Show"
+#~ msgstr "常に表示"
+
+#~ msgid "Auto Snap"
+#~ msgstr "オートスナップ"
+
+#~ msgid "Show input method name"
+#~ msgstr "入力メソッドの名称を表示"
+
+#~ msgid "Main Window"
+#~ msgstr "メインウィンドウ"
+
+#~ msgid "Reload"
+#~ msgstr "リロード"
+
+#~ msgid "Enable Quit Action in Right Click Menu"
+#~ msgstr "右クリックメニューの\"終了\"を有効にする"
+
+#~ msgid "SCIM Global Settings"
+#~ msgstr "SCIM 全体設定"
+
+#~ msgid "&Panel Program"
+#~ msgstr "パネルプログラム(&P)"
+
+#~ msgid "scim-panel-kde"
+#~ msgstr "scim-panel-kde"
+
+#~ msgid "scim-panel-gtk"
+#~ msgstr "scim-panel-gtk"
+
+#~ msgid "&Config Module"
+#~ msgstr "モジュール設定(&C)"
+
+#~ msgid "Advanced"
+#~ msgstr "詳細"
+
+#~ msgid "Advanced Settings"
+#~ msgstr "詳細設定"
+
+#~ msgid "&Supported Unicode Locales"
+#~ msgstr "サポートするユニコードロケール(&S)"
+
+#~ msgid "&Edit"
+#~ msgstr "編集(&E)"
+
+#~ msgid "&FrontEnd Socket Address"
+#~ msgstr "フロントエンドソケットアドレス(&F)"
+
+#~ msgid "&IMEngine Socket Address"
+#~ msgstr "IMエンジンソケットアドレス(&I)"
+
+#~ msgid "C&onfig Socket Address"
+#~ msgstr "コンフィグソケットアドレス(&O)"
+
+#~ msgid "P&anel Socket Address"
+#~ msgstr "パネルソケットアドレス(&A)"
+
+#~ msgid "Socket &Timeout"
+#~ msgstr "ソケットタイムアウト(&T)"
+
+#~ msgid "X Window (XIM)"
+#~ msgstr "Xウィンドウ (XIM)"
+
+#~ msgid "S&tart skim automatically when KDE starts"
+#~ msgstr "KDEの起動時にskimを開始する(&T)"
+
+#~ msgid "XIM Settings"
+#~ msgstr "XIMの設定"
+
+#~ msgid "&On the Spot"
+#~ msgstr "On the Spot(&O)"
+
+#~ msgid "&Dynamic Event Flow"
+#~ msgstr "&Dynamic Event Flow"
+
+#~ msgid "Keyboard Shortcuts"
+#~ msgstr "キーボードショートカット"
+
+#~ msgid "Trigger:"
+#~ msgstr "開始:"
+
+#~ msgid "Next Input Method:"
+#~ msgstr "次の入力メソッド:"
+
+#~ msgid "Previous Input Method:"
+#~ msgstr "前の入力メソッド:"
+
+#~ msgid "&Show input method menu:"
+#~ msgstr "入力メソッドメニューを表示(&S):"
+
+#~ msgid "Configure skim"
+#~ msgstr "skimを設定"
+
+#~ msgid "Name"
+#~ msgstr "名称"
+
+#~ msgid "Hotkeys"
+#~ msgstr "ホットキー"
+
+#~ msgid "&Enable All"
+#~ msgstr "すべて有効に(&E)"
+
+#~ msgid "&Disable All"
+#~ msgstr "すべて無効に(&D)"
+
+#~ msgid "Edit &Hotkeys"
+#~ msgstr "ホットキーを編集(&H)"
+
+#~ msgid "Options"
+#~ msgstr "オプション"
+
+#~ msgid "Use &Capslock"
+#~ msgstr "CapsLockを使用(&C)"
+
+#~ msgid "Use &Dvorak keyboard"
+#~ msgstr "ドボラックキーボードを使用(&D)"
+
+#~ msgid "&Show candidate comment"
+#~ msgstr "候補に注釈を表示(&S)"
+
+#~ msgid "Trigger Keys:"
+#~ msgstr "開始キー:"
+
+#~ msgid "Hangul to Hanja keys:"
+#~ msgstr "漢字(Hanja)変換キー:"
+
+#~ msgid "Manual mode keys:"
+#~ msgstr "マニュアルモードキー:"
+
+#~ msgid "Comment"
+#~ msgstr "説明"
+
+#~ msgid "Edit Supported Locales"
+#~ msgstr "サポートするロケールを編集"
+
+#~ msgid ""
+#~ "If you want to use skim (scim-panel-kde) or scim-qtimm (Qt immodule "
+#~ "support for SCIM), please select kconfig as the config module."
+#~ msgstr ""
+#~ "skim(scim-panel-kde)もしくはscim-qtimm(SCIMのQt immoduleサポート)を使用す"
+#~ "る場合はモジュールをkconfigに指定して下さい。"
+
+#~ msgid "Specify Hotkeys for IME \"%1\""
+#~ msgstr "IME \"%1\" のホットキーを指定"
+
+#~ msgid "Input Window Settings"
+#~ msgstr "入力ウィンドウの設定"
+
+#~ msgid "Highlight Selected Candidate"
+#~ msgstr "選択された候補を強調表示する"
+
+#~ msgid "Enable Mouse Support"
+#~ msgstr "マウスサポートを有効にする"
+
+#~ msgid "Sticky"
+#~ msgstr "入力ウィンドウを固定する"
+
+#~ msgid "Lookup Table is Vertical"
+#~ msgstr "候補ウィンドウを縦に表示する"
+
+#~ msgid "Font"
+#~ msgstr "フォント"
+
+#~ msgid "Smart Pinyin"
+#~ msgstr "智能ピンイン"
+
+#~ msgid "Auto &combin phrase"
+#~ msgstr "フレーズ自動連結(&C)"
+
+#~ msgid "Auto &fill preedit"
+#~ msgstr "プリエディット自動補完(&F)"
+
+#~ msgid "&Match longer phrase"
+#~ msgstr "長いフレーズを検索(&M)"
+
+#~ msgid "Always show lookup &table"
+#~ msgstr "候補ウィンドウを常に表示(&T)"
+
+#~ msgid "Show all &keys"
+#~ msgstr "入力文字をすべて表示(&K)"
+
+#~ msgid "&Dynamic adjust"
+#~ msgstr "動的アップデート(&D)"
+
+#~ msgid "&Burst stack size"
+#~ msgstr "バーストスタックサイズ(&B)"
+
+#~ msgid "Max &user phrase length"
+#~ msgstr "ユーザーフレーズの最大文字数(&U)"
+
+#~ msgid "Max &preedit length"
+#~ msgstr "プリエディットの最大文字数(&P)"
+
+#~ msgid "D&ynamic sensitivity"
+#~ msgstr "動的アップデート感度(&Y)"
+
+#~ msgid "&Smart match level"
+#~ msgstr "検索精度(&S)"
+
+#~ msgid "Sa&ve period (sec)"
+#~ msgstr "保存頻度(秒)(&V)"
+
+#~ msgid "Save user data in binary &format"
+#~ msgstr "ユーザーデータをバイナリ形式で保存(&F)"
+
+#~ msgid "&Advanced"
+#~ msgstr "詳細(&A)"
+
+#~ msgid "&Use tone"
+#~ msgstr "声調を使用(&U)"
+
+#~ msgid "Allow incomplete &pinyin"
+#~ msgstr "不完全ピンインを許可(&P)"
+
+#~ msgid "Enable A&mbiguities"
+#~ msgstr "あいまい検索を有効にする(&M)"
+
+#~ msgid "Ambiguities"
+#~ msgstr "あいまい検索"
+
+#~ msgid "&N and L"
+#~ msgstr "&NとL"
+
+#~ msgid "&L and R"
+#~ msgstr "&LとR"
+
+#~ msgid "&F and H"
+#~ msgstr "&FとH"
+
+#~ msgid "&Zh and Z"
+#~ msgstr "&ZhとZ"
+
+#~ msgid "&Ch and C"
+#~ msgstr "&ChとC"
+
+#~ msgid "&Sh and S"
+#~ msgstr "&ShとS"
+
+#~ msgid "&In and Ing"
+#~ msgstr "&InとIng"
+
+#~ msgid "&An and Ang"
+#~ msgstr "&AnとAng"
+
+#~ msgid "&En and Eng"
+#~ msgstr "&EnとEng"
+
+#~ msgid "Pinyin"
+#~ msgstr "ピンイン"
+
+#~ msgid "&Chinese mode switch"
+#~ msgstr "中国語モード切替(&C)"
+
+#~ msgid "&Disable phrase"
+#~ msgstr "フレーズ取消(&D)"
+
+#~ msgid "Page &up"
+#~ msgstr "前ページ(&U)"
+
+#~ msgid "Page dow&n"
+#~ msgstr "次ページ(&N)"
+
+#, fuzzy
+#~ msgid "Alt+E"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+O"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+D"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+H"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+U"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+P"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+M"
+#~ msgstr "Alt"
+
+#~ msgid "Qt Immodule"
+#~ msgstr "Qt-Immodule"
+
+#~ msgid "Use Qt built-in Preedit Area"
+#~ msgstr "Qtのプリエディットスタイルを使用"
+
+#~ msgid "Left/Right Modifier"
+#~ msgstr "左/右モディファイア"
+
+#~ msgid ""
+#~ "Applied to the last key if it is a modifer key. If left modifier is "
+#~ "intended, please leave this unchecked."
+#~ msgstr ""
+#~ "モディファイアの場合は最後のキーに適応されます。左モディファイアを使用する"
+#~ "場合はチェックをはずしたままにしておいて下さい。"
+
+#~ msgid "&Add"
+#~ msgstr "追加(&A)"
+
+#~ msgid "&Delete"
+#~ msgstr "削除(&D)"

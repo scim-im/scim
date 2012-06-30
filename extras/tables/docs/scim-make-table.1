@@ -1,0 +1,47 @@
+\" Copyright 2005 Ming Hua <minghua@rice.edu>.
+\" This man page is distributed under the same license as scim-tables
+\" package.
+.TH scim\-make\-table 1 "November 2005" "scim-tables 0.5.4"
+.SH NAME
+scim\-make\-table \(em generate data file for SCIM generic table module
+.SH SYNOPSIS
+.B scim\-make\-table
+.I table
+.RI [ "option" ]...
+.SH DESCRIPTION
+The
+.B scim\-make\-table
+program reads human-readable text files that describe the input method
+table, and generates the data file used by SCIM generic table module.
+.TP
+.I table
+The text table file describes the input method in human-readable format,
+usually with comments.
+.SH OPTIONS
+.TP
+.BI \-o " outputfile"
+Save new table to file.
+.TP
+.B \-b
+Convert to binary format, otherwise to text format.
+.TP
+.B \-no
+Do not save new phrase table.
+.TP
+.BI \-if " ifreqfile"
+Load phrase frequencies from file.
+.TP
+.BI \-of " ofreqfile"
+Save phrase frequencies to file.
+.TP
+.BI \-s " file"
+Specify the source file to count phrase ages.
+.SH "SEE ALSO"
+.BR scim (1)
+.SH AUTHOR
+This manual page is written by Ming Hua <minghua@rice.edu> for
+.B Debian
+system, but hopefully also useful for others.
+It is distributed under the same license as the scim-tables package.
+\" vim:textwidth=78:
+

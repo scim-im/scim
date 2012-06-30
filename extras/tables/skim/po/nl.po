@@ -1,0 +1,70 @@
+# translation of nl.po to Nederlands
+# Ronald Stroethoff <stroet43@zonnet.nl>, 2007.
+# Copyright (C) Ronald Stroethoffi <stroet43@zonnet.nl>, 2007.
+# This file is distributed under the same license as the scim-tables package.
+msgid ""
+msgstr ""
+"Project-Id-Version: nl\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-03-11 01:32+0000\n"
+"PO-Revision-Date: 2007-06-04 21:31+0200\n"
+"Last-Translator: Ronald Stroethoff <stroet43@zonnet.nl>\n"
+"Language-Team: Nederlands\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#: ../config/generictableui.cpp:165
+msgid "Generic Table"
+msgstr "Algemene tabel"
+
+#: ../config/generictableui.cpp:166
+msgid "Show &prompt"
+msgstr "Toon &prompt"
+
+#: ../config/generictableui.cpp:167
+msgid "Show key &hint"
+msgstr "Toon toets &aanwijzing"
+
+#: ../config/generictableui.cpp:168
+msgid "Save &user table in binary format"
+msgstr "Toegevoegde woorden in binair formaat opslaan"
+
+#: ../config/generictableui.cpp:169
+msgid "Show the u&ser defined phrases first"
+msgstr "Toon de door de gebruiker opgegeven uitdrukkingen eerst."
+
+#: ../config/generictableui.cpp:170
+msgid "Show &longer phrases first"
+msgstr "&Lange uitdrukkingen eerst tonen"
+
+#: ../config/generictableui.cpp:171
+msgid "General"
+msgstr "Algemeen"
+
+#: ../config/generictableui.cpp:172
+msgid "Full width &letter"
+msgstr "&Letters in volledige breedte"
+
+#: ../config/generictableui.cpp:173
+msgid "&Mode switch"
+msgstr "&Mode wisselen"
+
+#: ../config/generictableui.cpp:174
+msgid "Full width &punctuation"
+msgstr "Volledige breedte &leestekens"
+
+#: ../config/generictableui.cpp:175
+msgid "&Add phrase"
+msgstr "Uitdrukking toevoegen (Ctrl V)"
+
+#: ../config/generictableui.cpp:176
+msgid "&Delete phrase"
+msgstr "Uitdrukking verwijderen (Ctrl X)"
+
+#: ../config/generictableui.cpp:177
+msgid "Keyboard"
+msgstr "Toetsenbord"
+
