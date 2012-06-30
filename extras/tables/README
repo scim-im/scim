@@ -1,0 +1,47 @@
+Data files for SCIM Generic Table Input Method module
+=====================================================
+
+This package includes many data files for SCIM Generic Table 
+Input Method module (table).
+
+the directory structure is:
+
+zh/		data files for Chinese (Simplified and Traditional).
+ja/		data files for Japanese.
+ko/		data files for Korean.
+additional/	data files for some other languages, such as Russian etc.
+
+The data files will be converted to binary format and installed to
+${prefix}/share/scim/tables/. SCIM table im module will load them
+automatically.
+
+The format of table file
+=========================
+
+A table file has three part: Header, table definition and table data.
+The header must have two line, like:
+
+SCIM_Generic_Table_Phrase_Library_TEXT
+VERSION_1_0
+
+The first line is a magic line to indicate it's a table file in text format.
+The second line is the table format version, currently it's VERSION_1_0.
+
+A binary table should have a header like:
+
+SCIM_Generic_Table_Phrase_Library_BINARY
+VERSION_1_0
+
+The table definition defines the attributes of of this table.
+This section must start with BEGIN_DEFINITION and end with END_DEFINITION.
+Please refer to the tables included in this package about the format.
+
+The table data section includes all data of this table.
+This section must start with BEGIN_TABLE and end with END_TABLE.
+each line in this section refer to a table entry.
+Each entry has three part separated by a white space (tab or space).
+The first part is a key string, the second is the corresponding phrase string,
+the third part is the frequency number of this entry.
+Please refer to the tables included in this package about the format.
+
+The lines started with "###" will be treated as comment and will be ignored.

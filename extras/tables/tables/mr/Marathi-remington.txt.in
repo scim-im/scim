@@ -1,0 +1,205 @@
+### File header must not be modified
+### This file must be encoded into UTF-8.
+### Copyright (c) 2006 CDAC-chenai, Inc. All rights reserved.
+SCIM_Generic_Table_Phrase_Library_TEXT
+VERSION_1_0
+
+### Begin Table definition.
+BEGIN_DEFINITION
+
+### An unique id to distinguish this table among others.
+### Use uuidgen to generate this kind of id.
+UUID = c6ff4215-19b8-4fdf-b7af-c7e90b373551
+
+### A unique number indicates the version of this file.
+### For example the last modified date of this file.
+### This number must be less than 2^32.
+SERIAL_NUMBER = 20061020
+
+ICON = /usr/share/scim/icons/Marathi-remington.png
+
+### The default name of this table
+NAME = Remington
+
+### The local names of this table 
+NAME.mr_IN = रेमिगंटन
+
+### Supported languages of this table
+LANGUAGES = mr
+
+### The author of this table
+AUTHOR = Mohammad Umar -NRCFOSS(BOSS Team),C-DAC <omarm@cdac.in>
+
+### Prompt string to be displayed in the status area.
+STATUS_PROMPT = Mr
+
+### If true then the first candidate phrase
+### will be selected automatically during inputing.
+AUTO_SELECT = TRUE
+
+### If true then a multi wildcard will be appended
+### at the end of inputting string automatically.
+AUTO_WILDCARD = FALSE
+
+### If true then the result string will be committed to client automatically.
+### This should be used with AUTO_SELECT = TRUE.
+AUTO_COMMIT = TRUE
+
+### If true then the inputted string will be automatically splitted during inputing.
+AUTO_SPLIT = TRUE
+
+### If true then the phrases' frequencies will be adjusted dynamically.
+DYNAMIC_ADJUST = FALSE
+
+### If true then the preedit area will be filled up by the current candidate phrase automatically.
+AUTO_FILL = TRUE
+
+### Whether to discard invalid key automatically.
+### This takes effact only when AUTO_FILL and AUTO_COMMIT is true.
+DISCARD_INVALID_KEY = TRUE
+
+### If true then the lookup table will always be shown if there is any candidate phrase.
+### Otherwise the lookup table won't be shown unless the user requires it by moving the preedit caret left.
+ALWAYS_SHOW_LOOKUP = FALSE
+
+### Enable full width punctuation property
+USE_FULL_WIDTH_PUNCT = FALSE
+
+### Use full width punctuation by default
+DEF_FULL_WIDTH_PUNCT = FALSE
+
+### Enable full width letter property
+USE_FULL_WIDTH_LETTER = FALSE
+
+### Use full width letter by default
+DEF_FULL_WIDTH_LETTER = FALSE
+
+### The maxmium length of a key.
+MAX_KEY_LENGTH = 1
+
+### Valid input chars.
+VALID_INPUT_CHARS = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_-+=|\~`:;"'{[}]<,>.?/
+
+### Single wildcard char, can have multiple chars.
+###SINGLE_WILDCARD_CHAR = ?
+
+### Multi wildcard char.
+###MULTI_WILDCARD_CHAR = *
+
+### The key strokes to split inputted string.
+###SPLIT_KEYS = quoteright
+
+### The key strokes to commit the convert result to client.
+COMMIT_KEYS = space
+
+### The key strokes to forward the inputted string to client.
+FORWARD_KEYS = VoidSymbol
+
+### The key strokes to select candidiate phrases.
+SELECT_KEYS = VoidSymbol
+
+### The key strokes to page up the lookup table.
+PAGE_UP_KEYS = VoidSymbol
+
+### The key strokes to page down the lookup table.
+PAGE_DOWN_KEYS = VoidSymbol
+
+END_DEFINITION
+
+### Begin Table data.
+BEGIN_TABLE
+~  र	0
+` ृ	0
+! ड	0
+1 १	0
+@ /	0
+2 २	0
+# :	0
+3 ३	0
+$ =	0
+4 ४	0
+% -	0
+5  ५	0
+^ "     0
+6 ६	0
+& (     0
+7 ७	0
+* )	0
+8 ८	0
+( ;	0
+9 ९	0
+) ऋ 	0
+0 ०	0
+_ '	0
+- ञ	0
++ घ	0
+=  ़	0
+Q फ	0
+q ु  	0
+W  ॅ	0
+w  ू	0
+E म्	0
+e म	0
+R त्	0
+r त	0
+T ज्	0
+t ज	0
+Y ल्	0
+y ल	0
+U न्	0
+u न 	0
+I प्	0
+i प	0
+O व्	0
+o व	0
+P च्	0
+p च	0
+{ क्ष्	0
+[  ख्	0
+} व्द	0
+] ,	0
+|  ्	0
+\  ृ	0
+A |	0
+a  ं	0
+S ै 	0
+s े 	0
+D क्	0                                            
+d क	0
+F थ्	0
+f ि	0
+G ळ	0
+g ह	0
+H भ्	0
+h ी	0
+J श्र	0
+j र	0
+K ज्ञ	0
+k ा	0
+L स्	0
+l स	0
+: य्	0
+; य	0
+" ष्	0
+' श् 	 0
+Z र्	0
+z ्र	0
+X ग्      0
+x ग	0
+C ब्	0
+c ब	0
+V ट	0
+v अ	0
+B ठ	0
+b इ	0
+N छ	0
+n द	0
+M ड	0
+m उ	0
+< ढ	0
+,  ए	0 
+> झ	0
+. ण्	0
+? घ्	0
+/ ध्	0
+END_TABLE

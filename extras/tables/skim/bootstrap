@@ -1,0 +1,28 @@
+#~/bin/bash
+PROJECT_FILES="ABOUT-NLS COPYING INSTALL NEWS ChangeLog"
+for file in $PROJECT_FILES
+do
+  if [ ! -f $file ]; then
+    cp ../$file .
+  fi
+done
+if [ ! -d "admin" ]; then
+  svn co svn://anonsvn.kde.org/home/kde/branches/KDE/3.5/kde-common/admin admin
+fi
+
+if [ ! -d "admin" ]; then
+  echo -e "ERROR: missing admin directory\n       please see README on how to bootstrap from SVN"
+  exit
+fi
+
+cp ../config.rpath admin/
+
+gmake -f admin/Makefile.common cvs
+#gmake -f Makefile.cvs
+if test "$1" = "release"; then
+  echo "Cleaning files"
+  find . -name .cvsignore | xargs rm -fr
+  rm templates/ -fr
+  find -name \CVS | xargs rm -rf
+  rm autom4te.cache scim_panel_kde.kdevelop stamp*.in -fr
+fi

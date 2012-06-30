@@ -1,0 +1,198 @@
+### File header must not be modified
+### This file must be encoded into UTF-8.
+### Derived from th-kesmanee.mim table in m17n-db.
+SCIM_Generic_Table_Phrase_Library_TEXT
+VERSION_1_0
+
+### Begin Table definition.
+BEGIN_DEFINITION
+
+### An unique id to distinguish this table among others.
+### Use uuidgen to generate this kind of id.
+UUID = d63402a2-2268-44fc-b415-99eb2276ff7b
+
+### A unique number indicates the version of this file.
+### For example the last modified date of this file.
+### This number must be less than 2^32.
+SERIAL_NUMBER = 20050908
+
+ICON = @SCIM_ICONDIR@/Thai.png
+
+### The default name of this table
+NAME = Thai
+
+### Author of this table
+AUTHOR = Jens Petersen <petersen@redhat.com>
+
+### Supported locales of this table
+LANGUAGES = th
+
+### Prompt string to be displayed in the status area.
+STATUS_PROMPT = Th
+
+### If true then the first candidate phrase
+### will be selected automatically during inputing.
+AUTO_SELECT = TRUE
+
+### If true then a multi wildcard will be appended
+### at the end of inputting string automatically.
+AUTO_WILDCARD = FALSE
+
+### If true then the result string will be committed to client automatically.
+### This should be used with AUTO_SELECT = TRUE.
+AUTO_COMMIT = TRUE
+
+### If true then the inputted string will be automatically splitted during inputing.
+AUTO_SPLIT = TRUE
+
+### If true then the phrases' frequencies will be adjusted dynamically.
+DYNAMIC_ADJUST = FALSE
+
+### If true then the preedit area will be filled up by the current candidate phrase automatically.
+AUTO_FILL = TRUE
+
+### If true then the lookup table will always be shown if there is any candidate phrase.
+### Otherwise the lookup table won't be shown unless the user requires it by moving the preedit caret left.
+ALWAYS_SHOW_LOOKUP = FALSE
+
+### Enable full width punctuation property
+USE_FULL_WIDTH_PUNCT = FALSE
+
+### Use full width punctuation by default
+DEF_FULL_WIDTH_PUNCT = FALSE
+
+### Enable full width letter property
+USE_FULL_WIDTH_LETTER = FALSE
+
+### Use full width letter by default
+DEF_FULL_WIDTH_LETTER = FALSE
+
+### The maxmium length of a key.
+MAX_KEY_LENGTH = 1
+
+### Valid input chars.
+VALID_INPUT_CHARS = !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+
+### Single wildcard char, can have multiple chars.
+###SINGLE_WILDCARD_CHAR = ?
+
+### Multi wildcard char.
+###MULTI_WILDCARD_CHAR = *
+
+### The key strokes to split inputted string.
+### SPLIT_KEYS = quoteright
+
+### The key strokes to commit the convert result to client.
+COMMIT_KEYS = VoidSymbol
+
+### The key strokes to forward the inputted string to client.
+FORWARD_KEYS = VoidSymbol
+
+### The key strokes to select candidiate phrases.
+SELECT_KEYS = VoidSymbol
+
+### The key strokes to page up the lookup table.
+PAGE_UP_KEYS = VoidSymbol
+
+### The key strokes to page down the lookup table.
+PAGE_DOWN_KEYS = VoidSymbol
+
+END_DEFINITION
+
+### Begin Table data.
+BEGIN_TABLE
+! +
+" .
+# ๒
+$ ๓
+% ๔
+& ฿
+' ง
+( ๖
+) ๗
+* ๕
++ ๙
+, ม
+- ข
+. ใ
+/ ฝ
+0 จ
+1 ๅ
+2 /
+3 -
+4 ภ
+5 ถ
+6 ุ
+7 ึ
+8 ค
+9 ต
+: ซ
+; ว
+< ฒ
+= ช
+> ฬ
+? ฦ
+@ ๑
+A ฤ
+B ฺ
+C ฉ
+D ฏ
+E ฎ
+F โ
+G ฌ
+H ็
+I ณ
+J ๋
+K ษ
+L ศ
+M ?
+N ์
+O ฯ
+P ญ
+Q ๐
+R ฑ
+S ฆ
+T ธ
+U ๊
+V ฮ
+W "
+X )
+Y ํ
+Z (
+[ บ
+\ ฃ
+] ล
+^ ู
+_ ๘
+` _
+a ฟ
+b ิ
+c แ
+d ก
+e ำ
+f ด
+g เ
+h ้
+i ร
+j ่
+k า
+l ส
+m ท
+n ื
+o น
+p ย
+q ๆ
+r พ
+s ห
+t ะ
+u ี
+v อ
+w ไ
+x ป
+y ั
+z ผ
+{ ฐ
+| ฅ
+} ,
+~ %
+END_TABLE

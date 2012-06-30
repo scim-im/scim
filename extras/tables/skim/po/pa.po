@@ -1,0 +1,71 @@
+# translation of skim-scim-tables.po to Punjabi
+# This file is distributed under the same license as the PACKAGE package.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+# Amanpreet Singh Brar <amanpreetalam@yahoo.com>, 2005.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: skim-scim-tables\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-03-11 01:34+0000\n"
+"PO-Revision-Date: 2005-09-07 11:50+0530\n"
+"Last-Translator: Amanpreet Singh Brar <amanpreetalam@yahoo.com>\n"
+"Language-Team: Punjabi <fedora-trans-pa@redhat.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.9.1\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../config/generictableui.cpp:165
+msgid "Generic Table"
+msgstr "ਸਧਾਰਨ ਸਾਰਣੀ"
+
+#: ../config/generictableui.cpp:166
+msgid "Show &prompt"
+msgstr "ਪਰਾਉਟ ਵੇਖਾਓ(&p)"
+
+#: ../config/generictableui.cpp:167
+msgid "Show key &hint"
+msgstr "ਸਵਿੱਚ ਸੰਕੇਤ ਵੇਖਾਓ(&h)"
+
+#: ../config/generictableui.cpp:168
+msgid "Save &user table in binary format"
+msgstr "ਬਾਈਨਰੀ ਫਾਰਮਿਟ ਵਿੱਚ ਉਪਭੋਗੀ ਸਾਰਣੀ ਸੰਭਾਲੋ(&u)"
+
+#: ../config/generictableui.cpp:169
+msgid "Show the u&ser defined phrases first"
+msgstr "ਉਪਭੋਗੀ ਪਰਭਾਸ਼ਿਤ ਪੈਰਾ ਪਹਿਲਾਂ ਵਰਤੋਂ(&s)"
+
+#: ../config/generictableui.cpp:170
+msgid "Show &longer phrases first"
+msgstr "ਲੰਮੇ ਪੈਰਾ ਪਹਿਲਾਂ ਵਰਤੋਂ(&l)"
+
+#: ../config/generictableui.cpp:171
+msgid "General"
+msgstr "ਸਧਾਰਨ"
+
+#: ../config/generictableui.cpp:172
+msgid "Full width &letter"
+msgstr "ਪੂਰਾ ਚੌੜਾਈ ਅੱਖਰ(&l)"
+
+#: ../config/generictableui.cpp:173
+msgid "&Mode switch"
+msgstr "ਢੰਗ ਤਬਦੀਲ(&M)"
+
+#: ../config/generictableui.cpp:174
+msgid "Full width &punctuation"
+msgstr "ਵਿਸ਼ਰਾਮ ਚਿੰਨ ਨਾਲ ਪੂਰਾ(&p)"
+
+#: ../config/generictableui.cpp:175
+msgid "&Add phrase"
+msgstr "ਪੈਰਾ ਸ਼ਾਮਲ(&A)"
+
+#: ../config/generictableui.cpp:176
+msgid "&Delete phrase"
+msgstr "ਪੈਰਾ ਹਟਾਓ(&D)"
+
+#: ../config/generictableui.cpp:177
+msgid "Keyboard"
+msgstr "ਕੀ-ਬੋਰਡ"
+

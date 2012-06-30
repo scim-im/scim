@@ -1,0 +1,585 @@
+### File header must not be modified
+### This file must be encoded into UTF-8.
+### Copyright (c) 2004-2005 Red Hat, Inc. All rights reserved.
+SCIM_Generic_Table_Phrase_Library_TEXT
+VERSION_1_0
+
+### Begin Table definition.
+BEGIN_DEFINITION
+
+### An unique id to distinguish this table among others.
+### Use uuidgen to generate this kind of id.
+UUID = b3a54a8c-c2ce-4891-b941-703ef6cf2f66
+
+### A unique number indicates the version of this file.
+### For example the last modified date of this file.
+### This number must be less than 2^32.
+SERIAL_NUMBER = 20050901
+
+ICON = @SCIM_ICONDIR@/Tamil-phonetic.png
+
+### The default name of this table
+NAME = Phonetic
+
+### The local names of this table 
+NAME.ta_IN = ஷப்தலிபி
+
+### Supported languages of this table
+LANGUAGES = ta
+
+### The author of this table
+AUTHOR = Jatin Nansi <jnansi@redhat.com>
+
+### Prompt string to be displayed in the status area.
+STATUS_PROMPT = Ta
+
+### If true then the first candidate phrase
+### will be selected automatically during inputing.
+AUTO_SELECT = TRUE
+
+### If true then a multi wildcard will be appended
+### at the end of inputing string automatically.
+AUTO_WILDCARD = FALSE
+
+### If true then the result string will be committed to client automatically.
+### This should be used with AUTO_SELECT = TRUE.
+AUTO_COMMIT = TRUE
+
+### If true then the inputted string will be automatically splitted during inputing.
+AUTO_SPLIT = TRUE
+
+### If true then the phrases' frequencies will be adjusted dynamically.
+DYNAMIC_ADJUST = FALSE
+
+### If true then the preedit area will be filled up by the current candidate phrase automatically.
+AUTO_FILL = TRUE
+
+### Whether to discard invalid key automatically.
+### This takes effact only when AUTO_FILL and AUTO_COMMIT is true.
+DISCARD_INVALID_KEY = TRUE
+
+### If true then the lookup table will always be shown if there is any candidate phrase.
+### Otherwise the lookup table won't be shown unless the user requires it by moving the preedit caret left.
+ALWAYS_SHOW_LOOKUP = FALSE
+
+### Enable full width punctuation property
+USE_FULL_WIDTH_PUNCT = FALSE
+
+### Use full width punctuation by default
+DEF_FULL_WIDTH_PUNCT = FALSE
+
+### Enable full width letter property
+USE_FULL_WIDTH_LETTER = FALSE
+
+### Use full width letter by default
+DEF_FULL_WIDTH_LETTER = FALSE
+
+### The maxmium length of a key.
+MAX_KEY_LENGTH = 5
+
+### Valid input chars.
+VALID_INPUT_CHARS = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+
+### Single wildcard char, can have multiple chars.
+###SINGLE_WILDCARD_CHAR = ?
+
+### Multi wildcard char.
+###MULTI_WILDCARD_CHAR = *
+
+### The key strokes to split inputted string.
+###SPLIT_KEYS = quoteright
+
+### The key strokes to commit the convert result to client.
+COMMIT_KEYS = space
+
+### The key strokes to forward the inputted string to client.
+FORWARD_KEYS = VoidSymbol
+
+### The key strokes to select candidiate phrases.
+SELECT_KEYS = VoidSymbol
+
+### The key strokes to page up the lookup table.
+PAGE_UP_KEYS = VoidSymbol
+
+### The key strokes to page down the lookup table.
+PAGE_DOWN_KEYS = VoidSymbol
+
+END_DEFINITION
+
+### Begin Table data.
+BEGIN_TABLE
+a அ
+A ஆ
+i இ
+I ஈ
+u உ
+U ஊ
+e எ
+E ஏ
+o ஒ
+O ஓ
+q ஃ
+aa ஆ
+ii ஈ
+uu ஊ
+ee ஏ
+oo ஓ
+ai ஐ
+au ஔ
+k க்
+ka க
+kaa கா
+kA கா
+ki கி
+kii கீ
+kI கீ
+ku கு
+kuu கூ
+kU கூ
+ke கெ
+kee கே
+kE கே
+kai கை
+ko கொ
+koo கோ
+kO கோ
+kau கௌ
+ng ங்
+nga ங
+ngaa ஙா
+ngA ஙா
+ngi ஙி
+ngii ஙீ
+ngI ஙீ
+ngu ஙு
+nguu ஙூ
+ngU ஙூ
+nge ஙெ
+ngee ஙே
+ngE ஙே
+ngai ஙை
+ngo ஙொ
+ngoo ஙோ
+ngO ஙோ
+ngau ஙௌ
+c ச்
+ca ச
+caa சா
+cA சா
+ci சி
+cii சீ
+cI சீ
+cu சு
+cuu சூ
+cU சூ
+ce செ
+cee சே
+cE சே
+cai சை
+co சொ
+coo சோ
+cO சோ
+cau சௌ
+s ச்
+sa ச
+saa சா
+sA சா
+si சி
+sii சீ
+sI சீ
+su சு
+suu சூ
+sU சூ
+se செ
+see சே
+sE சே
+sai சை
+so சொ
+soo சோ
+sO சோ
+sau சௌ
+nj ஞ்
+nja ஞ
+njaa ஞா
+njA ஞா
+nji ஞி 
+njii ஞீ
+njI ஞீ
+nju ஞு
+njuu ஞூ
+njU ஞூ
+nje ஞெ
+njee ஞே
+njE ஞே
+njai ஞை
+njo ஞொ
+njoo ஞோ
+njO ஞோ
+njau ஞௌ
+t ட்
+ta ட
+taa டா
+tA டா
+ti டி
+tii டீ
+tI டீ
+tu டு
+tuu டூ
+tU டூ
+te டெ
+tee டே
+tE டே
+tai டை
+to டொ
+too டோ
+tO டோ
+tau டௌ
+d ட்
+da ட
+daa டா
+dA டா
+di டி
+dii டீ
+dI டீ
+du டு
+duu டூ
+dU டூ
+de டெ
+dee டே
+dE டே
+dai டை
+do டொ
+doo டோ
+dO டோ
+dau டௌ
+N ண்
+Na ண
+Naa ணா
+NA ணா
+Ni ணி
+Nii ணீ
+NI ணீ
+Nu ணு
+Nuu ணூ
+NU ணூ
+Ne ணெ
+Nee ணே
+NE ணே
+Nai ணை
+No ணொ
+Noo ணோ
+NO ணோ
+Nau ணௌ
+th த்
+tha த
+thaa தா
+thA தா
+thi தி
+thii தீ
+thI தீ
+thu து
+thuu தூ
+thU தூ
+the தெ
+thee தே
+thE தே
+thai தை
+tho தொ
+thoo தோ
+thO தோ
+thau தௌ
+w ந் 
+wa ந
+waa நா
+wA நா
+wi நி
+wii நீ
+wI நீ
+wu நு
+wuu நூ
+wU நூ
+we நெ
+wee நே
+wE நே
+wai நை
+wo நொ
+woo நோ
+wO நோ
+wau நௌ
+n- ந் 
+n-a ந
+n-aa நா
+n-A நா
+n-i நி
+n-ii நீ
+n-I நீ
+n-u நு
+n-uu நூ
+n-U நூ
+n-e நெ
+n-ee நே
+n-E நே
+n-ai நை
+n-o நொ
+n-oo நோ
+n-O நோ
+n-au நௌ
+p ப்
+pa ப
+paa பா
+pA பா
+pi பி
+pii பீ
+pI பீ
+pu பு
+puu பூ
+pU பூ
+pe பெ
+pee பே
+pE பே
+pai பை
+po பொ
+poo போ
+pO போ
+pau பௌ
+m ம்
+ma ம
+maa மா
+mA மா
+mi மி
+mii மீ
+mI மீ
+mu மு
+muu மூ
+mU மூ
+me மெ
+mee மே
+mE மே
+mai மை
+mo மொ
+moo மோ
+mO மோ
+mau மௌ
+y ய்
+ya ய
+yaa யா
+yA யா
+yi யி
+yii யீ
+yI யீ
+yu யு
+yuu யூ
+yU யூ
+ye யெ
+yee யே
+yE யே
+yai யை
+yo யொ
+yoo யோ
+yO யோ
+yau யௌ
+r ர்
+ra ர
+raa ரா
+rA ரா
+ri ரி
+rii ரீ
+rI ரீ
+ru ரு
+ruu ரூ
+rU ரூ
+re ரெ
+ree ரே
+rE ரே
+rai ரை
+ro ரொ
+roo ரோ
+rO ரோ
+rau ரௌ
+l ல்
+la ல
+laa லா
+lA லா
+li லி
+lii லீ
+lI லீ
+lu லு
+luu லூ
+lU லூ
+le லெ
+lee லே
+lE லே
+lai லை
+lo லொ
+loo லோ
+lO லோ
+lau லௌ
+v வ்
+va வ
+vaa வா
+vA வா
+vi வி
+vii வீ
+vI வீ
+vu வு
+vuu வூ
+vU வூ
+ve வெ
+vee வே
+vE வே
+vai வை
+vo வொ
+voo வோ
+vO வோ
+vau வௌ
+z ழ்
+za ழ
+zaa ழா
+zA ழா
+zi ழி
+zii ழீ
+zI ழீ
+zu ழு
+zuu ழூ
+zU ழூ
+ze ழெ
+zee ழே
+zE ழே
+zai ழை
+zo ழொ
+zoo ழோ
+zO ழோ
+zau ழௌ
+L ள்
+La ள
+Laa ளா
+LA ளா
+Li ளி
+Lii ளீ
+LI ளீ
+Lu ளு
+Luu ளூ
+LU ளூ
+Le ளெ
+Lee ளே
+LE ளே
+Lai ளை
+Lo ளொ
+Loo ளோ
+LO ளோ
+Lau ளௌ
+R ற்
+Ra ற
+Raa றா
+RA றா
+Ri றி
+Rii றீ
+RI றீ
+Ru று
+Ruu றூ
+RU றூ
+Re றெ
+Ree றே
+RE றே
+Rai றை
+Ro றொ
+Roo றோ
+RO றோ
+Rau றௌ
+n ன்
+na ன
+naa னா
+nA னா
+ni னி
+nii னீ
+nI னீ
+nu னு
+nuu னூ
+nU னூ
+ne னெ
+nee னே
+nE னே
+nai னை
+no னொ
+noo னோ
+nO னோ
+nau னௌ
+j ஜ்
+ja ஜ
+jaa ஜா
+jA ஜா
+ji ஜி
+jii ஜீ
+jI ஜீ
+ju ஜு
+juu ஜூ
+jU ஜூ
+je ஜெ
+jee ஜே
+jE ஜே
+jai ஜை
+jo ஜொ
+joo ஜோ
+jO ஜோ
+jau ஜௌ
+sh ஷ்
+sha ஷ
+shaa ஷா
+shA ஷா
+shi ஷி
+shii ஷீ
+shI ஷீ
+shu ஷு
+shuu ஷூ
+shU ஷூ
+she ஷெ
+shee ஷே
+shE ஷே
+shai ஷை
+sho ஷொ
+shoo ஷோ
+shO ஷோ
+shau ஷௌ
+S ஸ்
+Sa ஸ
+Saa ஸா
+SA ஸா
+Si ஸி
+Sii ஸீ
+SI ஸீ
+Su ஸு
+Suu ஸூ
+SU ஸூ
+Se ஸெ
+See ஸே
+SE ஸே
+Sai ஸை
+So ஸொ
+Soo ஸோ
+SO ஸோ
+Sau ஸௌ
+h ஹ்
+ha ஹ
+haa ஹா
+hA ஹா
+hi ஹி
+hii ஹீ
+hI ஹீ
+hu ஹு
+huu ஹூ
+hU ஹூ
+he ஹெ
+hee ஹே
+hE ஹே
+hai ஹை
+ho ஹொ
+hoo ஹோ
+hO ஹோ
+hau ஹௌ
+ksh க்ஷ்
+ksha க்ஷ
+kshaa க்ஷா
+kshA க்ஷா
+kshi க்ஷி
+sri ஸ்ரீ
+END_TABLE

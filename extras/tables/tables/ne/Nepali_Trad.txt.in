@@ -1,0 +1,203 @@
+### File header must not be modified
+### This file must be encoded into UTF-8.
+### This files tries to implement the Traditional
+### keyboard layout developed by MPP.
+SCIM_Generic_Table_Phrase_Library_TEXT
+VERSION_1_0
+
+### Begin Table definition.
+BEGIN_DEFINITION
+
+### An unique id to distinguish this table among others.
+### Use uuidgen to generate this kind of id.
+UUID = 16f49d28-677b-4ac7-a93c-9f714b070a5a
+
+### A unique number indicates the version of this file.
+### For example the last modified date of this file.
+### This number must be less than 2^32.
+SERIAL_NUMBER = 20051103
+
+ICON = @SCIM_ICONDIR@/Nepali.png
+
+### The default name of this table
+NAME = Traditional
+
+### The local names of this table 
+NAME.ne_NP = ट्रेडिस्नल
+
+### Supported languages of this table
+LANGUAGES = ne_NP
+
+### The author of this table
+AUTHOR = Suyash Shrestha <suyash.shr@gmail.com>
+
+### Prompt string to be displayed in the status area.
+STATUS_PROMPT = NP
+
+### If true then the first candidate phrase
+### will be selected automatically during inputing.
+AUTO_SELECT = TRUE
+
+### If true then a multi wildcard will be appended
+### at the end of inputing string automatically.
+AUTO_WILDCARD = FALSE
+
+### If true then the result string will be committed to client automatically.
+### This should be used with AUTO_SELECT = TRUE.
+AUTO_COMMIT = TRUE
+
+### If true then the inputed string will be automatically splitted during inputing.
+AUTO_SPLIT = FALSE
+
+### If true then the phrases' frequencies will be adjusted dynamically.
+DYNAMIC_ADJUST = FALSE
+
+### If true then the preedit area will be filled up by the current candidate phrase automatically.
+AUTO_FILL = FALSE
+
+### If true then the lookup table will always be shown if there is any candidate phrase.
+### Otherwise the lookup table won't be shown unless the user requires it by moving the preedit caret left.
+ALWAYS_SHOW_LOOKUP = FALSE
+
+### Enable full width punctuation property
+USE_FULL_WIDTH_PUNCT = FALSE
+
+### Use full width punctuation by default
+DEF_FULL_WIDTH_PUNCT = FALSE
+
+### Enable full width letter property
+USE_FULL_WIDTH_LETTER = FALSE
+
+### Use full width letter by default
+DEF_FULL_WIDTH_LETTER = FALSE
+
+### The maxmium length of a key.
+MAX_KEY_LENGTH = 1
+
+### Valid input chars.
+VALID_INPUT_CHARS = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_-+=|\~`:;"'{[}]<,>.?/
+
+### Single wildcard char, can have multiple chars.
+SINGLE_WILDCARD_CHAR = ?
+
+### Multi wildcard char.
+MULTI_WILDCARD_CHAR = *
+
+### The key strokes to split inputed string.
+SPLIT_KEYS = quoteright
+
+### The key strokes to commit the convert result to client.
+COMMIT_KEYS = space
+
+### The key strokes to forward the inputed string to client.
+FORWARD_KEYS = Return
+
+### The key strokes to select candidiate phrases.
+SELECT_KEYS = 1,2,3,4,5,6,7,8,9
+
+### The key strokes to page up the lookup table.
+PAGE_UP_KEYS = Page_Up
+
+### The key strokes to page down the lookup table.
+PAGE_DOWN_KEYS = Page_Down
+
+END_DEFINITION
+
+### Begin Table data.
+BEGIN_TABLE
+"	ू
+#	घ
+%	छ
+^	ट
+&	ठ
+*	ड
+'	ु
+(	ढ
+)	ण
++	ं
+=	0x200c
+,	ऽ
+-	औ
+.	।
+/	र
+0	०
+1	१
+2	२
+3	३
+4	४
+5	५
+6	६
+7	७
+8	८
+9	९
+;	स
+<	ङ
+?	रु
+@	ई
+A	आ
+B	ौ
+C	ऋ
+E	ऐ
+F	ँ
+H	झ
+J	ो
+K	फ
+L	ी
+O	इ
+P	ए
+U	ऊ
+V	ॐ
+\	्
+]	े
+_	ओ
+`	ञ
+a	ब
+b	द
+c	अ
+d	म
+e	भ
+f	ा
+g	न
+h	ज
+i	ष
+j	व
+k	प
+l	ि
+m	ः
+n	ल
+o	य
+p	उ
+r	च
+s	क
+t	त
+u	ग
+v	ख
+w	ध
+x	ह
+y	थ
+z	श
+{	ृ
+|	0x200d
+}	ै
+~	॥
+### PHRASES
+!	ज्ञ
+$	द्ध
+:	ट्ठ
+>	श्र
+D	ङ्ग
+G	द्द
+I	क्ष
+M	ड्ड
+N	द्य
+Q	त्त
+R	द्ब
+S	ङ्क
+T	ट्ट
+W	ड्ढ
+X	ह्य
+Y	ठ्ठ
+Z	क्क
+[	र्
+q	त्र
+END_TABLE
