@@ -33,7 +33,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <gtk/gtk.h>
-#include <gtk/scimkeyselection.h>
+#include <scimkeyselection.h>
 #include <scim.h>
 #include "scim_generic_table.h"
 #include "scim_table_private.h"
