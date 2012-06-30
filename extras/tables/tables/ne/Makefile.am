@@ -15,7 +15,7 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-SCIM_MAKE_TABLE	= $(top_builddir)/src/scim-make-table
+SCIM_MAKE_TABLE	= $(top_builddir)/extras/tables/src/scim-make-table
 
 scim_tables_source	= Nepali_Rom.txt.in\
 			Nepali_Trad.txt.in

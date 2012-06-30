@@ -442,6 +442,12 @@ AC_ARG_ENABLE([im-rawcode],
 	[], 
 	[enable_im_rawcode=yes])
 
+AC_ARG_ENABLE([im-table],
+	[AS_HELP_STRING([--disable-im-table],
+		[Do not build Table IMEngine module])],
+	[], 
+	[enable_im_table=yes])
+
 AC_ARG_ENABLE([im-socket],
 	[AS_HELP_STRING([--disable-im-socket],
 		[Do not build Socket IMEngine module])],
@@ -587,6 +593,13 @@ if test "$enable_im_rawcode" = "yes"; then
 else
   SCIM_BUILD_IMENGINE_RAWCODE=0
   enable_im_rawcode=no
+fi
+
+if test "$enable_im_table" = "yes"; then
+  SCIM_BUILD_IMENGINE_TABLE=1
+else
+  SCIM_BUILD_IMENGINE_TABLE=0
+  enable_im_table=no
 fi
 
 if test "$enable_im_socket" = "yes" -a "$socket_ok" = "yes"; then
@@ -802,6 +815,9 @@ AM_CONDITIONAL(SCIM_BUILD_IMENGINE_SOCKET,
 AM_CONDITIONAL(SCIM_BUILD_IMENGINE_RAWCODE,
 		[test "$enable_im_rawcode" = "yes"])
 
+AM_CONDITIONAL(SCIM_BUILD_IMENGINE_TABLE,
+		[test "$enable_im_table" = "yes"])
+
 AM_CONDITIONAL(SCIM_BUILD_ORIG_GTK2_IMMODULE,
 		[test "$enable_orig_gtk2_immodule" = "yes"])
 
@@ -877,22 +893,26 @@ AC_SUBST(SCIM_BUILD_IMMODULE)
 SCIM_DATADIR="$datadir/scim"
 SCIM_SYSCONFDIR="$sysconfdir"
 SCIM_ICONDIR="$datadir/scim/icons"
-SCIM_MODULE_PATH="$libdir/scim$SCIM_EPOCH"
+SCIM_MODULEDIR="$libdir/scim$SCIM_EPOCH"
+SCIM_MODULE_PATH=$SCIM_MODULEDIR
 SCIM_LIBEXECDIR="$libdir/scim$SCIM_EPOCH"
 SCIM_LOCALEDIR="$datadir/locale"
 SCIM_TEMPDIR="/tmp"
 SCIM_PREFIX="$prefix"
 SCIM_LIBDIR="$libdir"
+SCIM_TABLEDIR=$SCIM_DATADIR/tables
 
 AC_SUBST(SCIM_DATADIR)
 AC_SUBST(SCIM_SYSCONFDIR)
 AC_SUBST(SCIM_ICONDIR)
+AC_SUBST(SCIM_MODULEDIR)
 AC_SUBST(SCIM_MODULE_PATH)
 AC_SUBST(SCIM_LIBEXECDIR)
 AC_SUBST(SCIM_LOCALEDIR)
 AC_SUBST(SCIM_TEMPDIR)
 AC_SUBST(SCIM_PREFIX)
 AC_SUBST(SCIM_LIBDIR)
+AC_SUBST(SCIM_TABLEDIR)
 
 ###########################################################
 ##                      Output files.                    ##
@@ -933,6 +953,34 @@ AC_CONFIG_FILES([Makefile
 		 extras/immodules/client-qt/qt4/Makefile
 		 extras/immodules/client-clutter/Makefile
 		 extras/immodules/doc/Makefile
+		 extras/tables/Makefile
+		 extras/tables/src/Makefile
+		 extras/tables/icons/Makefile
+		 extras/tables/docs/Makefile
+		 extras/tables/tables/Makefile
+		 extras/tables/tables/ko/Makefile
+		 extras/tables/tables/ar/Makefile
+		 extras/tables/tables/ug/Makefile
+		 extras/tables/tables/ta/Makefile
+		 extras/tables/tables/bn/Makefile
+		 extras/tables/tables/vi/Makefile
+		 extras/tables/tables/he/Makefile
+		 extras/tables/tables/ru/Makefile
+		 extras/tables/tables/mr/Makefile
+		 extras/tables/tables/th/Makefile
+		 extras/tables/tables/pa/Makefile
+		 extras/tables/tables/ja/Makefile
+		 extras/tables/tables/gu/Makefile
+		 extras/tables/tables/ne/Makefile
+		 extras/tables/tables/uk/Makefile
+		 extras/tables/tables/zh/Makefile
+		 extras/tables/tables/ml/Makefile
+		 extras/tables/tables/te/Makefile
+		 extras/tables/tables/kn/Makefile
+		 extras/tables/tables/gr/Makefile
+		 extras/tables/tables/hi/Makefile
+		 extras/tables/tables/am/Makefile
+		 extras/tables/tables/additional/Makefile
 		 tests/Makefile
 		 scim.pc
 		 scim-gtkutils.pc
@@ -960,6 +1008,7 @@ Module options:
   Socket FrontEnd module   $enable_frontend_socket
 
   RawCode IMEngine module  $enable_im_rawcode
+  Table IMEngine module    $enable_im_table
   Socket IMEngine module   $enable_im_socket
 
   SCTC Filter module       $enable_filter_sctc
