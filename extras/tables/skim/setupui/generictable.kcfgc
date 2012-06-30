@@ -1,0 +1,4 @@
+File=generictable.kcfg
+ClassName=GenericTableConfig
+Singleton=true
+Mutators=false

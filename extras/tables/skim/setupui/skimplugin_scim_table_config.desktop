@@ -1,0 +1,29 @@
+[Desktop Entry]
+Encoding=UTF-8
+Icon=scim-tables
+Type=Service
+ServiceTypes=Skim/KCModule
+
+X-KDE-ModuleType=Library
+X-KDE-Library=skimplugin_scim_tables
+X-KDE-ParentApp=skimplugin_scim
+X-KDE-ParentComponents=skimplugin_scim
+X-KDE-PluginInfo-DisplayParent=skimsetupdir_imengines
+Name=Generic Tables
+Name[de]=Generische Tabellen
+Name[fr]=Tables Génériques
+Name[it]=Tavole generiche
+Name[ja]=一般テーブル
+Name[ko]=일반 테이블
+Name[pa]=ਆਮ ਸਾਰਣੀਆਂ
+Name[zh_CN]=通用码表
+Name[zh_TW]=通用表格
+Comment=Configuration of Generic Tables IMEngine
+Comment[de]=Eingabemethoden mit generischen Tabellen einrichten
+Comment[fr]=Configuration du Moteur de Tables Génériques
+Comment[it]=Configurazione del motore di inserimento con tavole generiche
+Comment[ja]=一般テーブルIMエンジンの設定
+Comment[ko]=일반 테이블 IM엔진 설정
+Comment[pa]=ਆਮ ਸਾਰਣੀ IMEngine ਲਈ ਸੰਰਚਨਾ
+Comment[zh_CN]=通用码表输入法引擎配置界面
+Comment[zh_TW]=通用表格輸入法引擎的設定介面

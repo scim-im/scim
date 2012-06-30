@@ -1,0 +1,420 @@
+# translation of zh_TW.po to 
+# This file is distributed under the same license as the PACKAGE package.
+# Jim Huang <jserv@kaffe.org>, 2004.
+# LiuCougar <liuspider@users.sourceforge.net>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: skim 0.9.7\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-05-10 23:35+0000\n"
+"PO-Revision-Date: 2004-09-08 12:30+0000\n"
+"Last-Translator: Jim Huang <jserv@kaffe.org>\n"
+"Language-Team:  <en@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.9\n"
+
+#: ../setupui/generictableui.cpp:166
+msgid "Generic Table"
+msgstr "通用表格"
+
+#: ../setupui/generictableui.cpp:167
+msgid "Show &prompt"
+msgstr "顯示提示(&p)"
+
+#: ../setupui/generictableui.cpp:168
+msgid "Show key &hint"
+msgstr "顯示按鍵提示 (&h)"
+
+#: ../setupui/generictableui.cpp:169
+msgid "Save &user table in binary format"
+msgstr "以二進位格式儲存使用者表格 (&u)"
+
+#: ../setupui/generictableui.cpp:170
+msgid "Show the u&ser defined phrases first"
+msgstr "優先顯示使用者自訂詞組 (&s)"
+
+#: ../setupui/generictableui.cpp:171
+msgid "Show &longer phrases first"
+msgstr "優先顯示較長的詞組 (&L)"
+
+#: ../setupui/generictableui.cpp:172
+msgid "General"
+msgstr "一般"
+
+#: ../setupui/generictableui.cpp:173
+msgid "Full width &letter"
+msgstr "全半形字母切換 (&L)"
+
+#: ../setupui/generictableui.cpp:174
+msgid "&Mode switch"
+msgstr "輸入法模式切換 (&M)"
+
+#: ../setupui/generictableui.cpp:175
+msgid "Full width &punctuation"
+msgstr "全半角切換 (&P)"
+
+#: ../setupui/generictableui.cpp:176
+msgid "&Add phrase"
+msgstr "新增詞組 (&A)"
+
+#: ../setupui/generictableui.cpp:177
+msgid "&Delete phrase"
+msgstr "刪除詞組 (&D)"
+
+#: ../setupui/generictableui.cpp:178
+msgid "Keyboard"
+msgstr "鍵盤"
+
+#~ msgid "Reload all modules"
+#~ msgstr "重新載入所有模組"
+
+#~ msgid "SCIM Help"
+#~ msgstr "SCIM 輔助"
+
+#~ msgid "Input Method"
+#~ msgstr "輸入法"
+
+#~ msgid "KDE Frontend for SCIM Input Method Platform"
+#~ msgstr "SCIM 輸入法平台的 KDE 前端"
+
+#~ msgid "Start as daemon."
+#~ msgstr "以背景程式執行"
+
+#~ msgid "List all availabe skim plugins."
+#~ msgstr "列出所有 skim 的 plugins"
+
+#~ msgid "Uses specified Config module."
+#~ msgstr "使用者指定設定模組"
+
+#~ msgid ""
+#~ "A comma separated list of plugin names. All of these plugins will be "
+#~ "loaded no matter whether they are enabled in the setting file."
+#~ msgstr ""
+#~ "以逗號分隔 plugin 名稱。無論是否在設定檔已被使用，所有這些 plugin 將會被載"
+#~ "入。"
+
+#~ msgid ""
+#~ "A comma separated list of plugin names. All of these plugins will be "
+#~ "disabled no matter whether they are disabled in the setting file."
+#~ msgstr ""
+#~ "以逗號分隔 plugin 名稱。無論是否在設定檔已被停用，所有這些 plugin 將會被停"
+#~ "用。"
+
+#~ msgid "Quit if no connected client."
+#~ msgstr "如果沒有連線客戶端時自動離開。"
+
+#, fuzzy
+#~ msgid " Enable debug info, to specific LEVEL.."
+#~ msgstr "啟動除錯訊息，多個 -v 選項可以顯示更多。"
+
+#~ msgid "Current version of skim"
+#~ msgstr "目前 skim 的版本"
+
+#~ msgid "Output debug file.(No effort, always use none)"
+#~ msgstr "輸出除錯檔案 (沒有作用，永遠不使用)"
+
+#~ msgid "Force start even if scim panel socket can not be established."
+#~ msgstr "當 scim panel 的 socket 連線無法建立時，強制啟動。"
+
+#~ msgid "Core Developer"
+#~ msgstr "核心開發者"
+
+#~ msgid "SCIM Core Author"
+#~ msgstr "SCIM 核心作者"
+
+#~ msgid "Doc writer and German translator"
+#~ msgstr "文件撰寫與德文翻譯"
+
+#~ msgid "Art designer and Korean translator"
+#~ msgstr "美工設計與韓文翻譯"
+
+#~ msgid "Japanese translator"
+#~ msgstr "日文翻譯"
+
+#~ msgid "_: NAME OF TRANSLATORS\\nYour names"
+#~ msgstr "Jim Huang"
+
+#~ msgid "_: EMAIL OF TRANSLATORS\\nYour emails"
+#~ msgstr "jserv@kaffe.org"
+
+#~ msgid ""
+#~ "Installed skim Plugins:\n"
+#~ "\tName\t\t\tComment\n"
+#~ msgstr ""
+#~ "已安裝的 skim Plugins 列表：\n"
+#~ "\t名稱\t\t\t註解\n"
+
+#~ msgid "&General"
+#~ msgstr "一般 (&G)"
+
+#~ msgid "Grab Key"
+#~ msgstr "捕捉按鍵"
+
+#~ msgid ""
+#~ "<center>Please press shortcut...</center><p>When you release a key this "
+#~ "dialog will be closed automatically.</p>"
+#~ msgstr ""
+#~ "<center>請按下捷徑...</center><p>當按鍵釋放時，本對話框會自動關閉。</p>"
+
+#~ msgid "Release"
+#~ msgstr "釋放"
+
+#~ msgid "Edit Shortcut List"
+#~ msgstr "編輯捷徑列表"
+
+#~ msgid "Edit Shortcuts"
+#~ msgstr "編輯捷徑"
+
+#~ msgid "Warning"
+#~ msgstr "警告"
+
+#~ msgid "\"%1\" is not a valid shortcut!"
+#~ msgstr "\"%1\" 並非有效的捷徑！"
+
+#~ msgid "Always Show"
+#~ msgstr "永遠顯示"
+
+#~ msgid "Show input method name"
+#~ msgstr "顯示輸入法名稱"
+
+#~ msgid "Main Window"
+#~ msgstr "主視窗"
+
+#~ msgid "Reload"
+#~ msgstr "重新載入"
+
+#~ msgid "Enable Quit Action in Right Click Menu"
+#~ msgstr "在右鍵的快顯選單中提供關閉功能"
+
+#~ msgid "SCIM Global Settings"
+#~ msgstr "SCIM 全域設定"
+
+#~ msgid "&Panel Program"
+#~ msgstr "Panel 程式 (&P)"
+
+#~ msgid "&Config Module"
+#~ msgstr "設定模組 (&C)"
+
+#~ msgid "Advanced"
+#~ msgstr "進階"
+
+#~ msgid "Advanced Settings"
+#~ msgstr "進階設定"
+
+#~ msgid "&Supported Unicode Locales"
+#~ msgstr "支援 Unicode 語系 (&S)"
+
+#~ msgid "&FrontEnd Socket Address"
+#~ msgstr "FrontEnd Socket 連線位址 (&F)"
+
+#~ msgid "&IMEngine Socket Address"
+#~ msgstr "IMEngine Socket 連線位址 (&I)"
+
+#~ msgid "C&onfig Socket Address"
+#~ msgstr "Config Socket 連線位址 (&O)"
+
+#~ msgid "P&anel Socket Address"
+#~ msgstr "Panel Socket 連線位址 (&A)"
+
+#~ msgid "Socket &Timeout"
+#~ msgstr "Socket 連線逾期時間 (&T)"
+
+#~ msgid "XIM Settings"
+#~ msgstr "XIM 設定"
+
+#~ msgid "Keyboard Shortcuts"
+#~ msgstr "鍵盤捷徑"
+
+#~ msgid "Trigger:"
+#~ msgstr "切換輸入法按鍵："
+
+#~ msgid "Next Input Method:"
+#~ msgstr "下一個輸入法："
+
+#~ msgid "Previous Input Method:"
+#~ msgstr "前一個輸入法："
+
+#~ msgid "&Show input method menu:"
+#~ msgstr "顯示輸入法選單："
+
+#~ msgid "Configure skim"
+#~ msgstr "設定 skim"
+
+#~ msgid "Name"
+#~ msgstr "名稱"
+
+#, fuzzy
+#~ msgid "&Disable All"
+#~ msgstr "關閉詞組功能 (&D)"
+
+#~ msgid "Options"
+#~ msgstr "選項"
+
+#~ msgid "Use &Capslock"
+#~ msgstr "使用 Capslock (&C)"
+
+#~ msgid "Use &Dvorak keyboard"
+#~ msgstr "使用 Dvorak 鍵盤排列 (&D)"
+
+#~ msgid "&Show candidate comment"
+#~ msgstr "顯示候選字詞 (&S)"
+
+#~ msgid "Trigger Keys:"
+#~ msgstr "輸入法切換鍵："
+
+#~ msgid "Hangul to Hanja keys:"
+#~ msgstr "韓文拼音/漢字切換鍵："
+
+#~ msgid "Manual mode keys:"
+#~ msgstr "手動模式切換鍵："
+
+#~ msgid "Comment"
+#~ msgstr "註解"
+
+#, fuzzy
+#~ msgid "Edit Supported Locales"
+#~ msgstr "支援 Unicode 語系 (&S)"
+
+#~ msgid ""
+#~ "If you want to use skim (scim-panel-kde) or scim-qtimm (Qt immodule "
+#~ "support for SCIM), please select kconfig as the config module."
+#~ msgstr ""
+#~ "若想使用 skim (scim-panel-kde) 或 scim-qtimm (SCIM 的Qt 輸入法模組支援)，"
+#~ "請選擇 kconfig 作為設定模組。"
+
+#~ msgid "Input Window Settings"
+#~ msgstr "輸入法視窗設定"
+
+#~ msgid "Highlight Selected Candidate"
+#~ msgstr "凸顯選擇的候選字詞"
+
+#~ msgid "Enable Mouse Support"
+#~ msgstr "啟用滑鼠支援"
+
+#~ msgid "Lookup Table is Vertical"
+#~ msgstr "垂直顯示查詢表格"
+
+#~ msgid "Font"
+#~ msgstr "字型"
+
+#~ msgid "Smart Pinyin"
+#~ msgstr "智能拼音"
+
+#~ msgid "Auto &combin phrase"
+#~ msgstr "自動合併詞組 (&c)"
+
+#~ msgid "Auto &fill preedit"
+#~ msgstr "自動填充預先編輯區 (&f)"
+
+#~ msgid "&Match longer phrase"
+#~ msgstr "優先比對較長的詞組 (&m)"
+
+#~ msgid "Always show lookup &table"
+#~ msgstr "永遠顯示查詢表格 (&t)"
+
+#~ msgid "Show all &keys"
+#~ msgstr "顯示所有按鍵 (&k)"
+
+#~ msgid "&Dynamic adjust"
+#~ msgstr "動態調整 (&D)"
+
+#~ msgid "Max &user phrase length"
+#~ msgstr "最大使用者自訂詞組長度 (&U)"
+
+#~ msgid "Max &preedit length"
+#~ msgstr "最大預先編輯區長度 (&P)"
+
+#~ msgid "D&ynamic sensitivity"
+#~ msgstr "動態調整敏感度 (&Y)"
+
+#~ msgid "&Smart match level"
+#~ msgstr "智慧比對程度 (&S)"
+
+#~ msgid "Sa&ve period (sec)"
+#~ msgstr "儲存周期（秒）(&V)"
+
+#~ msgid "Save user data in binary &format"
+#~ msgstr "以二進位格式儲存使用者資料 (&f)"
+
+#~ msgid "&Advanced"
+#~ msgstr "進階 (&A)"
+
+#~ msgid "&Use tone"
+#~ msgstr "使用拼音 (&U)"
+
+#~ msgid "Allow incomplete &pinyin"
+#~ msgstr "允許不完整拼音 (&P)"
+
+#, fuzzy
+#~ msgid "Enable A&mbiguities"
+#~ msgstr "模糊音"
+
+#~ msgid "Ambiguities"
+#~ msgstr "模糊音"
+
+#~ msgid "&N and L"
+#~ msgstr "&N 和 L"
+
+#~ msgid "&L and R"
+#~ msgstr "&L 和 R"
+
+#~ msgid "&F and H"
+#~ msgstr "&F 和 H"
+
+#~ msgid "&Zh and Z"
+#~ msgstr "&Zh 和 Z"
+
+#~ msgid "&Ch and C"
+#~ msgstr "&Ch 和 C"
+
+#~ msgid "&Sh and S"
+#~ msgstr "&Sh 和 S"
+
+#~ msgid "&In and Ing"
+#~ msgstr "&In 和 Ing"
+
+#~ msgid "&An and Ang"
+#~ msgstr "&An 和 Ang"
+
+#~ msgid "&En and Eng"
+#~ msgstr "&En 和 Eng"
+
+#~ msgid "Pinyin"
+#~ msgstr "拼音"
+
+#~ msgid "&Chinese mode switch"
+#~ msgstr "中文輸入模式切換 (&C)"
+
+#~ msgid "&Disable phrase"
+#~ msgstr "關閉詞組功能 (&D)"
+
+#~ msgid "Page &up"
+#~ msgstr "上一頁 (&u)"
+
+#~ msgid "Page dow&n"
+#~ msgstr "下一頁 (&n)"
+
+#~ msgid "Qt Immodule"
+#~ msgstr "Qt 輸入法模組"
+
+#~ msgid "Use Qt built-in Preedit Area"
+#~ msgstr "使用 Qt 內建預先編輯區"
+
+#~ msgid "Left/Right Modifier"
+#~ msgstr "左/右 Modifier 鍵"
+
+#~ msgid ""
+#~ "Applied to the last key if it is a modifer key. If left modifier is "
+#~ "intended, please leave this unchecked."
+#~ msgstr ""
+#~ "只有在最後的按鍵為 modifier 鍵才會生效。如希望使用左邊的 modifier 鍵，請保"
+#~ "持未選擇的狀態"
+
+#~ msgid "&Add"
+#~ msgstr "新增 (&A)"
+
+#~ msgid "&Delete"
+#~ msgstr "刪除 (&D)"

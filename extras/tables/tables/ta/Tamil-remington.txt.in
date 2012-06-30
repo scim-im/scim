@@ -1,0 +1,440 @@
+### File header must not be modified
+### This file must be encoded into UTF-8.
+### Copyright (c) 2004-2005 Red Hat, Inc. All rights reserved.
+SCIM_Generic_Table_Phrase_Library_TEXT
+VERSION_1_0
+
+### Begin Table definition.
+BEGIN_DEFINITION
+
+### An unique id to distinguish this table among others.
+### Use uuidgen to generate this kind of id.
+UUID = 1d6a69a7-05ab-42e9-807a-caa9b04e6587
+
+### A unique number indicates the version of this file.
+### For example the last modified date of this file.
+### This number must be less than 2^32.
+SERIAL_NUMBER = 20060719
+
+ICON = @SCIM_ICONDIR@/Tamil-remington.png
+
+### The default name of this table
+NAME = Remington
+
+### The local names of this table 
+NAME.ta_IN = ரெமிங்டன்
+
+### Supported languages of this table
+LANGUAGES = ta
+
+### The author of this table
+AUTHOR = H Parimala <nhk_mala(at)rediffmail(dot)com> R Hariram Aatreya <rhariram(at)gmail(dot)com>
+
+### Prompt string to be displayed in the status area.
+STATUS_PROMPT = Ta
+
+### If true then the first candidate phrase
+### will be selected automatically during inputing.
+AUTO_SELECT = TRUE
+
+### If true then a multi wildcard will be appended
+### at the end of inputing string automatically.
+AUTO_WILDCARD = FALSE
+
+### If true then the result string will be committed to client automatically.
+### This should be used with AUTO_SELECT = TRUE.
+AUTO_COMMIT = TRUE
+
+### If true then the inputted string will be automatically splitted during inputing.
+AUTO_SPLIT = TRUE
+
+### If true then the phrases' frequencies will be adjusted dynamically.
+DYNAMIC_ADJUST = FALSE
+
+### If true then the preedit area will be filled up by the current candidate phrase automatically.
+AUTO_FILL = TRUE
+
+### Whether to discard invalid key automatically.
+### This takes effact only when AUTO_FILL and AUTO_COMMIT is true.
+DISCARD_INVALID_KEY = TRUE
+
+### If true then the lookup table will always be shown if there is any candidate phrase.
+### Otherwise the lookup table won't be shown unless the user requires it by moving the preedit caret left.
+ALWAYS_SHOW_LOOKUP = FALSE
+
+### Enable full width punctuation property
+USE_FULL_WIDTH_PUNCT = FALSE
+
+### Use full width punctuation by default
+DEF_FULL_WIDTH_PUNCT = FALSE
+
+### Enable full width letter property
+USE_FULL_WIDTH_LETTER = FALSE
+
+### Use full width letter by default
+DEF_FULL_WIDTH_LETTER = FALSE
+
+### The maxmium length of a key.
+MAX_KEY_LENGTH = 3
+
+### Valid input chars.
+VALID_INPUT_CHARS = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`1234567890-=~!@#$%^&*()_+[]{}|\;':"<>?,./
+
+### Single wildcard char, can have multiple chars.
+###SINGLE_WILDCARD_CHAR = ?
+
+### Multi wildcard char.
+###MULTI_WILDCARD_CHAR = *
+
+### The key strokes to split inputted string.
+###SPLIT_KEYS = quoteright
+
+### The key strokes to commit the convert result to client.
+COMMIT_KEYS = VoidSymbol
+
+### The key strokes to forward the inputted string to client.
+FORWARD_KEYS = VoidSymbol
+
+### The key strokes to select candidiate phrases.
+SELECT_KEYS = VoidSymbol
+
+### The key strokes to page up the lookup table.
+PAGE_UP_KEYS = VoidSymbol
+
+### The key strokes to page down the lookup table.
+PAGE_DOWN_KEYS = VoidSymbol
+
+END_DEFINITION
+
+### Begin Table data.
+BEGIN_TABLE
+m அ
+M ஆ
+, இ
+< ஈ
+c உ
+C ஊ
+v எ
+V ஏ
+I ஐ
+x ஒ
+X ஓ
+xs ஔ
+` ஃ
+f க
+fh கா
+pf கி
+Pf கீ
+F கு
+T கூ
+bf கெ
+nf கே
+if கை
+bfh கொ
+nfh கோ
+bfs கௌ
+;f க்
+' ங
+'h ஙா
+p' ஙி
+P' ஙீ
+[' ஙு
+{' ஙூ
+b' ஙெ
+n' ஙே
+i' ஙை
+b'h ஙொ
+n'h ஙோ
+b's ஙௌ
+;' ங்
+r ச
+rh சா
+pr சி
+Pr சீ
+R சு
+N சூ
+br செ
+nr சே
+ir சை
+brh சொ
+nrh சோ
+brs சௌ
+;r ச்
+" ஞ
+"h ஞா
+p" ஞி
+P" ஞீ
+Q ஞு
+Q} ஞூ
+b" ஞெ
+n" ஞே
+i" ஞை
+b"h ஞொ
+n"h ஞோ
+b"s ஞௌ
+;" ஞ்
+l ட
+lh டா
+o டி
+O டீ
+L டு
+:L டூ
+bl டெ
+nl டே
+il டை
+blh டொ
+nlh டோ
+bls டௌ
+;l ட்
+z ண
+Z ணா
+zh ணா
+pz ணி
+Pz ணீ
+q ணு
+q} ணூ
+bz ணெ
+nz ணே
+iz ணை
+]z ணை
+bzh ணொ
+nzh ணோ
+bzs ணௌ
+;z ண்
+j த
+jh தா
+pj தி
+Pj தீ
+J து
+J} தூ
+bj தெ
+nj தே
+ij தை
+bjh தொ
+njh தோ
+bjs தௌ
+;j த்
+e ந
+eh நா
+pe நி
+Pe நீ
+E நு
+E} நூ
+be நெ
+ne நே
+ie நை
+beh நொ
+neh நோ
+bes நௌ
+;e ந்
+g ப
+gh பா
+pg பி
+Pg பீ
+[g பு
+{g பூ
+bg பெ
+ng பே
+ig பை
+bgh பொ
+ngh போ
+bgs பௌ
+;g ப்
+k ம
+kh மா
+pk மி
+Pk மீ
+K மு
+:K மூ
+bk மெ
+nk மே
+ik மை
+bkh மொ
+nkh மோ
+bks மௌ
+;k ம்
+a ய
+ah யா
+pa யி
+Pa யீ
+[a யு
+{a யூ
+ba யெ
+na யே
+ia யை
+bah யொ
+nah யோ
+bas யௌ
+;a ய்
+u ர
+uh ரா
+pu ரி
+Pu ரீ
+U ரு
+:U ரூ
+bu ரெ
+nu ரே
+iu ரை
+buh ரொ
+nuh ரோ
+bns ரௌ
+;u ர்
+y ல
+yh லா
+py லி
+Py லீ
+Y லு
+Y} லூ
+by லெ
+ny லே
+iy லை
+]y லை
+byh லொ
+nyh லோ
+bys லௌ
+;y ல்
+t வ
+th வா
+pt வி
+Pt வீ
+[t வு
+{t வூ
+bt வெ
+nt வே
+it வை
+bth வொ
+nth வோ
+bts வௌ
+;t வ்
+H ழ
+Hh ழா
+pH ழி
+PH ழீ
+G ழு
+:G ழூ
+bH ழெ
+nH ழே
+iH ழை
+bHh ழொ
+nHh ழோ
+bHs ழௌ
+;H ழ்
+s ள
+sh ளா
+ps ளி
+Ps ளீ
+S ளு
+:S ளூ
+bs ளெ
+ns ளே
+is ளை
+]s ளை
+bsh ளொ
+nsh ளோ
+bss ளௌ
+;s ள்
+w ற
+A றா
+wh றா
+pw றி
+Pw றீ
+W று
+W} றூ
+bw றெ
+nw றே
+iw றை
+bwh றொ
+nwh றோ
+bws றௌ
+;w ற்
+d ன
+B னா
+dh னா
+pd னி
+Pd னீ
+D னு
+D} னூ
+bd னெ
+nd னே
+id னை
+]d னை
+bdh னொ
+ndh னோ
+bds னௌ
+;d ன்
+& ஷ
+&h ஷா
+p& ஷி
+P& ஷீ
+&% ஷு
+&^ ஷூ
+b& ஷெ
+n& ஷே
+i& ஷை
+b&h ஷொ
+n&h ஷோ
+b&s ஷௌ
+;& ஷ்
+! ஸ
+!h ஸா
+p! ஸி
+P! ஸீ
+!% ஸு
+!^ ஸூ
+b! ஸெ
+n! ஸே
+i! ஸை
+b!h ஸொ
+n!h ஸோ
+b!s ஸௌ
+;! ஸ்
+$ ஜ
+$h ஜா
+p$ ஜி
+P$ ஜீ
+$% ஜு
+$^ ஜூ
+b$ ஜெ
+n$ ஜே
+i$ ஜை
+b$h ஜொ
+n$h ஜோ
+b$s ஜௌ
+;$ ஜ்
++ ஹ
++h ஹா
+p+ ஹி
+P+ ஹீ
++% ஹு
++^ ஹூ
+b+ ஹெ
+n+ ஹே
+i+ ஹை
+b+h ஹொ
+n+h ஹோ
+b+s ஹௌ
+;+ ஹ்
+\ க்ஷ
+\h க்ஷா
+p\ க்ஷி
+P\ க்ஷீ
+\% க்ஷு
+\^ க்ஷூ
+b\ க்ஷெ
+n\ க்ஷே
+i\ க்ஷை
+b\h க்ஷொ
+n\h க்ஷோ
+b\s க்ஷௌ
+;\ க்ஷ்
+_ ஸ்ரீ
+~ *
+@ "
+# %
+* '
+- /
+. ,
+/ .
+> ?
+? -
+END_TABLE

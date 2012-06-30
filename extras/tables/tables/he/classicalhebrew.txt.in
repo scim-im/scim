@@ -1,0 +1,89 @@
+SCIM_Generic_Table_Phrase_Library_TEXT
+VERSION_1_0
+### Begin Table definition.
+BEGIN_DEFINITION
+UUID = 2a36ef6f-d405-4888-9752-ba457f473b4a
+SERIAL_NUMBER = 20040503
+ICON = @SCIM_ICONDIR@/table.png
+NAME = pointedheb
+LANGUAGES = he
+AUTHOR = Michael Jay <jaymichael@hotmail.com>
+STATUS_PROMPT = ש
+VALID_INPUT_CHARS = "'*-.;<>ACEKMNOPU[]^_abcdeghijklmnopqrstuvwxyz|
+### SINGLE_WILDCARD_CHAR =
+### MULTI_WILDCARD_CHAR =
+### SPLIT_KEYS =
+### COMMIT_KEYS =
+FORWARD_KEYS = Return
+SELECT_KEYS = 1,2,3,4,5,6,7,8,9
+PAGE_UP_KEYS = Page_Up
+PAGE_DOWN_KEYS = Page_Down
+MAX_KEY_LENGTH = 3
+SHOW_KEY_PROMPT = FALSE
+AUTO_SELECT = TRUE
+AUTO_WILDCARD = FALSE
+AUTO_COMMIT = TRUE
+AUTO_SPLIT = TRUE
+AUTO_FILL = TRUE
+DISCARD_INVALID_KEY = FALSE
+DYNAMIC_ADJUST = FALSE
+ALWAYS_SHOW_LOOKUP = FALSE
+USE_FULL_WIDTH_PUNCT = FALSE
+DEF_FULL_WIDTH_PUNCT = FALSE
+USE_FULL_WIDTH_LETTER = FALSE
+DEF_FULL_WIDTH_LETTER = FALSE
+END_DEFINITION
+
+### Begin Table data.
+BEGIN_TABLE
+"	״	0
+'	׳	0
+*	ּ	0
+-	־	0
+.	׃	0
+;	ְ	0
+<	ע	0
+>	א	0
+A	ָ	0
+C	ץ	0
+E	ֵ	0
+K	ך	0
+M	ם	0
+N	ן	0
+P	ף	0
+[	ׂ	0
+]	ׁ	0
+^	֯	0
+a	ַ	0
+b	ב	0
+c	צ	0
+d	ד	0
+e	ֶ	0
+g	ג	0
+h	ה	0
+i	ִ	0
+j	ט	0
+k	כ	0
+l	ל	0
+m	מ	0
+n	נ	0
+o	ֹ	0
+p	פ	0
+q	ק	0
+r	ר	0
+s	ס	0
+t	ת	0
+u	ֻ	0
+v	ו	0
+w	ש	0
+x	ח	0
+y	י	0
+z	ז	0
+|	׀	0
+;A	ֳ	0
+;a	ֲ	0
+;e	ֱ	0
+vv	װ	0
+vy	ױ	0
+yy	ײ	0
+END_TABLE

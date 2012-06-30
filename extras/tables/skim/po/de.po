@@ -1,0 +1,492 @@
+# translation of de.po to Deutsch
+# translation of skim.po to Deutsch
+# This file is distributed under the same license as the PACKAGE package.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+# Jan Hefti <j.hefti@hamburg.de>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: de\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-03-11 01:32+0000\n"
+"PO-Revision-Date: 2004-09-25 21:12+0200\n"
+"Last-Translator: Jan Hefti <j.hefti@hamburg.de>\n"
+"Language-Team: Deutsch <skim@chinaboard.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.9\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+
+#: ../config/generictableui.cpp:165
+msgid "Generic Table"
+msgstr "Generische Tabelle"
+
+#: ../config/generictableui.cpp:166
+msgid "Show &prompt"
+msgstr "Zeige &Eingabeaufforderung"
+
+#: ../config/generictableui.cpp:167
+msgid "Show key &hint"
+msgstr "&Zeige Tastenkürzel"
+
+#: ../config/generictableui.cpp:168
+msgid "Save &user table in binary format"
+msgstr "Benutzerdaten im Binär&format speichern"
+
+#: ../config/generictableui.cpp:169
+msgid "Show the u&ser defined phrases first"
+msgstr "Zeige ben&utzerdefinierte Ausdrücke zuerst"
+
+#: ../config/generictableui.cpp:170
+msgid "Show &longer phrases first"
+msgstr "&Lange Einträge zuerst anzeigen"
+
+#: ../config/generictableui.cpp:171
+msgid "General"
+msgstr "Allgemein"
+
+#: ../config/generictableui.cpp:172
+msgid "Full width &letter"
+msgstr "B&uchstaben in voller Breite"
+
+#: ../config/generictableui.cpp:173
+msgid "&Mode switch"
+msgstr "&Modus ändern"
+
+#: ../config/generictableui.cpp:174
+msgid "Full width &punctuation"
+msgstr "Satz&zeichen in voller Breite"
+
+#: ../config/generictableui.cpp:175
+msgid "&Add phrase"
+msgstr "Ausdruck &hinzufügen"
+
+#: ../config/generictableui.cpp:176
+msgid "&Delete phrase"
+msgstr "Ausdruck &löschen"
+
+#: ../config/generictableui.cpp:177
+msgid "Keyboard"
+msgstr "Tastatur"
+
+#~ msgid "Reload all modules"
+#~ msgstr "Alle Module neu laden"
+
+#~ msgid "SCIM Help"
+#~ msgstr "Hilfe zu SCIM"
+
+#~ msgid "Input Method"
+#~ msgstr "Eingabemethode"
+
+#~ msgid "KDE Frontend for SCIM Input Method Platform"
+#~ msgstr "KDE-Benutzeroberfläche für SCIM"
+
+#~ msgid "Start as daemon."
+#~ msgstr "Als Hintergrunddienst starten."
+
+#~ msgid "List all availabe skim plugins."
+#~ msgstr "Alle verfügbaren Komponenten von skim auflisten."
+
+#~ msgid "Uses specified Config module."
+#~ msgstr "Verwendet das angegebene Einstellungsmodul."
+
+#~ msgid ""
+#~ "A comma separated list of plugin names. All of these plugins will be "
+#~ "loaded no matter whether they are enabled in the setting file."
+#~ msgstr ""
+#~ "Eine kommagetrennte Liste der Komponentennamen. Diese Komponenten werden "
+#~ "alle geladen, unabhängig davon, ob sie in der Einstellungsdatei aktiviert "
+#~ "sind."
+
+#~ msgid ""
+#~ "A comma separated list of plugin names. All of these plugins will be "
+#~ "disabled no matter whether they are disabled in the setting file."
+#~ msgstr ""
+#~ "Eine kommagetrennte Liste der Komponentennamen. Diese Komponenten werden "
+#~ "alle deaktiviert, unabhängig davon, ob sie in der Einstellungsdatei "
+#~ "deaktiviert sind."
+
+#~ msgid "Quit if no connected client."
+#~ msgstr "Beenden, falls von keinem Programm benutzt."
+
+#, fuzzy
+#~ msgid " Enable debug info, to specific LEVEL.."
+#~ msgstr ""
+#~ "Debug-Informationen aktivieren. Bei mehrfachem \"-v\" werden mehr "
+#~ "Informationen angezeigt."
+
+#~ msgid "Current version of skim"
+#~ msgstr "Aktuelle Version von skim"
+
+#~ msgid "Output debug file.(No effort, always use none)"
+#~ msgstr "Debug-Datei erzeugen. (Kein Effekt, nie verwenden.)"
+
+#~ msgid "Force start even if scim panel socket can not be established."
+#~ msgstr ""
+#~ "Start erzwingen, selbst wenn der Sockel für scim nicht erstellt werden "
+#~ "kann."
+
+#~ msgid "Core Developer"
+#~ msgstr "Hauptentwickler"
+
+#~ msgid "SCIM Core Author"
+#~ msgstr "Hauptautor von SCIM"
+
+#~ msgid "Doc writer and German translator"
+#~ msgstr "Dokumentationsschreiber und deutscher Übersetzer"
+
+#~ msgid "Art designer and Korean translator"
+#~ msgstr "Grafikdesigner und koreanischer Übersetzer"
+
+#~ msgid "Japanese translator"
+#~ msgstr "Japanische Übersetzerin"
+
+#~ msgid "_: NAME OF TRANSLATORS\\nYour names"
+#~ msgstr "Jan Hefti"
+
+#~ msgid "_: EMAIL OF TRANSLATORS\\nYour emails"
+#~ msgstr "j.hefti@hamburg.de"
+
+#~ msgid ""
+#~ "Installed skim Plugins:\n"
+#~ "\tName\t\t\tComment\n"
+#~ msgstr ""
+#~ "Installierte Plugins für skim:\n"
+#~ "\tName\t\t\tKommentar\n"
+
+#~ msgid "&General"
+#~ msgstr "&Allgemein"
+
+#~ msgid "Grab Key"
+#~ msgstr "Tastenkombination übernehmen"
+
+#~ msgid ""
+#~ "<center>Please press shortcut...</center><p>When you release a key this "
+#~ "dialog will be closed automatically.</p>"
+#~ msgstr ""
+#~ "<center>Bitte drücken Sie die gewünschte Tastenkombination...</"
+#~ "center><p>Wenn Sie eine Taste loslassen, wird dieser Dialog automatisch "
+#~ "geschlossen.</p>"
+
+#~ msgid "Control"
+#~ msgstr "Strg"
+
+#~ msgid "Alt"
+#~ msgstr "Alt"
+
+#~ msgid "Shift"
+#~ msgstr "Umschalt"
+
+#~ msgid "Release"
+#~ msgstr "Loslassen"
+
+#~ msgid "Edit Shortcut List"
+#~ msgstr "Liste von Tastenkürzeln bearbeiten"
+
+#~ msgid "Edit Shortcuts"
+#~ msgstr "Tastenkürzel bearbeiten"
+
+#~ msgid "Warning"
+#~ msgstr "Warnung"
+
+#~ msgid "\"%1\" is not a valid shortcut!"
+#~ msgstr "\"%1\" ist kein gültiges Tastenkürzel!"
+
+#~ msgid "Always Show"
+#~ msgstr "Immer anzeigen"
+
+#~ msgid "Auto Snap"
+#~ msgstr "Automatisch andocken"
+
+#~ msgid "Show input method name"
+#~ msgstr "Namen der Eingabemethode anzeigen"
+
+#~ msgid "Main Window"
+#~ msgstr "Hauptfenster"
+
+#~ msgid "Reload"
+#~ msgstr "Erneut laden"
+
+#~ msgid "Enable Quit Action in Right Click Menu"
+#~ msgstr "Aktion \"Beenden\" im Kontextmenü aktivieren"
+
+#~ msgid "SCIM Global Settings"
+#~ msgstr "Globale Einstellungen von SCIM"
+
+#~ msgid "&Panel Program"
+#~ msgstr "&Programm für die Kontrollleiste"
+
+#~ msgid "scim-panel-kde"
+#~ msgstr "scim-panel-kde"
+
+#~ msgid "scim-panel-gtk"
+#~ msgstr "scim-panel-gtk"
+
+#~ msgid "&Config Module"
+#~ msgstr "&Einrichtungsmodul"
+
+#~ msgid "Advanced"
+#~ msgstr "Erweitert"
+
+#~ msgid "Advanced Settings"
+#~ msgstr "Erweiterte Einstellungen"
+
+#~ msgid "&Supported Unicode Locales"
+#~ msgstr "&Unterstützte Unicode-Regionaleinstellungen"
+
+#~ msgid "&FrontEnd Socket Address"
+#~ msgstr "Sockel für die Benutzer&oberfläche"
+
+#~ msgid "&IMEngine Socket Address"
+#~ msgstr "Sockel für die Eingabe&methode"
+
+#~ msgid "C&onfig Socket Address"
+#~ msgstr "Sockel&einstellungen"
+
+#~ msgid "P&anel Socket Address"
+#~ msgstr "Sockel für die &Kontrollleiste"
+
+#~ msgid "Socket &Timeout"
+#~ msgstr "Zei&tlimit"
+
+#~ msgid "X Window (XIM)"
+#~ msgstr "X Windows (XIM)"
+
+#~ msgid "S&tart skim automatically when KDE starts"
+#~ msgstr "Beim Start von KDE skim au&tomatisch laden"
+
+#~ msgid "XIM Settings"
+#~ msgstr "Einstellungen für XIM"
+
+#~ msgid "&On the Spot"
+#~ msgstr "Eingabe direkt &am Cursor (\"on the spot\")"
+
+#~ msgid "Keyboard Shortcuts"
+#~ msgstr "Tastenzuordnung"
+
+#~ msgid "Trigger:"
+#~ msgstr "Tastenkombination zur Aktivierung:"
+
+#~ msgid "Next Input Method:"
+#~ msgstr "Nächste Eingabemethode:"
+
+#~ msgid "Previous Input Method:"
+#~ msgstr "Vorige Eingabemethode:"
+
+#~ msgid "&Show input method menu:"
+#~ msgstr "&Menü für Eingabemethoden anzeigen:"
+
+#~ msgid "Configure skim"
+#~ msgstr "Skim einrichten"
+
+#~ msgid "Name"
+#~ msgstr "Name"
+
+#, fuzzy
+#~ msgid "&Disable All"
+#~ msgstr "Ausdruck &deaktivieren"
+
+#~ msgid "Options"
+#~ msgstr "Optionen"
+
+#~ msgid "Use &Capslock"
+#~ msgstr "&Feststelltaste benutzen"
+
+#~ msgid "Use &Dvorak keyboard"
+#~ msgstr "&Dvorak-Tastaturschema verwenden"
+
+#~ msgid "&Show candidate comment"
+#~ msgstr "&Zeige Erläuterungen zu den Kandidaten"
+
+#~ msgid "Trigger Keys:"
+#~ msgstr "Aktivierung:"
+
+#~ msgid "Hangul to Hanja keys:"
+#~ msgstr "Umwandlung von Hangul nach Hanja:"
+
+#~ msgid "Manual mode keys:"
+#~ msgstr "Manueller Modus:"
+
+#~ msgid "Comment"
+#~ msgstr "Kommentar"
+
+#, fuzzy
+#~ msgid "Edit Supported Locales"
+#~ msgstr "&Unterstützte Unicode-Regionaleinstellungen"
+
+#~ msgid ""
+#~ "If you want to use skim (scim-panel-kde) or scim-qtimm (Qt immodule "
+#~ "support for SCIM), please select kconfig as the config module."
+#~ msgstr ""
+#~ "Wenn Sie skim (scim-panel-kde) oder scim-qtimm (Unterstützung von SCIM "
+#~ "für Qt immodule) verwenden möchten, wählen Sie bitte kconfig als Modul "
+#~ "für die Einstellung."
+
+#~ msgid "Input Window Settings"
+#~ msgstr "Einstellungen des Eingabefensters"
+
+#~ msgid "Highlight Selected Candidate"
+#~ msgstr "Gewählten Ausdruck hervorheben"
+
+#~ msgid "Enable Mouse Support"
+#~ msgstr "Mausunterstützung aktivieren"
+
+#~ msgid "Sticky"
+#~ msgstr "Festsetzen"
+
+#~ msgid "Lookup Table is Vertical"
+#~ msgstr "Senkrechte Auswahlliste"
+
+#~ msgid "Font"
+#~ msgstr "Schriftart"
+
+#~ msgid "Smart Pinyin"
+#~ msgstr "Intelligentes Pinyin"
+
+#~ msgid "Auto &combin phrase"
+#~ msgstr "Ausdrücke automatisch z&usammenziehen"
+
+#~ msgid "Auto &fill preedit"
+#~ msgstr "Automatisch vervo&llständigen"
+
+#~ msgid "&Match longer phrase"
+#~ msgstr "&Längere Ausdrücke wählen"
+
+#~ msgid "Always show lookup &table"
+#~ msgstr "&Auswahlliste immer anzeigen"
+
+#~ msgid "Show all &keys"
+#~ msgstr "Alle &Tasten anzeigen"
+
+#~ msgid "&Dynamic adjust"
+#~ msgstr "&Dynamische Anpassung"
+
+#~ msgid "&Burst stack size"
+#~ msgstr "Größe des &Zwischenspeichers"
+
+#~ msgid "Max &user phrase length"
+#~ msgstr "&Max. Länge eigener Ausdrücke"
+
+#~ msgid "Max &preedit length"
+#~ msgstr "Maximale Länge im &Eingabefenster"
+
+#~ msgid "D&ynamic sensitivity"
+#~ msgstr "D&ynamische Empfindlichkeit"
+
+#~ msgid "&Smart match level"
+#~ msgstr "Grad des &intelligenten Vergleichs"
+
+#~ msgid "Sa&ve period (sec)"
+#~ msgstr "&Speicherintervall (sek)"
+
+#~ msgid "Save user data in binary &format"
+#~ msgstr "Benutzerdaten im Binär&format speichern"
+
+#~ msgid "&Advanced"
+#~ msgstr "Er&weitert"
+
+#~ msgid "&Use tone"
+#~ msgstr "&Töne verwenden"
+
+#~ msgid "Allow incomplete &pinyin"
+#~ msgstr "&Unvollständiges Pinyin erlauben"
+
+#, fuzzy
+#~ msgid "Enable A&mbiguities"
+#~ msgstr "Folgende Laute gleich behandeln"
+
+#~ msgid "Ambiguities"
+#~ msgstr "Folgende Laute gleich behandeln"
+
+#~ msgid "&N and L"
+#~ msgstr "&N- und L-"
+
+#~ msgid "&L and R"
+#~ msgstr "&L- und R-"
+
+#~ msgid "&F and H"
+#~ msgstr "&F- und H-"
+
+#~ msgid "&Zh and Z"
+#~ msgstr "&Zh- und Z-"
+
+#~ msgid "&Ch and C"
+#~ msgstr "&Ch- und C-"
+
+#~ msgid "&Sh and S"
+#~ msgstr "&Sh- und S-"
+
+#~ msgid "&In and Ing"
+#~ msgstr "-&in und -ing"
+
+#~ msgid "&An and Ang"
+#~ msgstr "-&an und -ang"
+
+#~ msgid "&En and Eng"
+#~ msgstr "-&en und -eng"
+
+#~ msgid "Pinyin"
+#~ msgstr "Pinyin"
+
+#~ msgid "&Chinese mode switch"
+#~ msgstr "Umschalten des &chinesischen Modus"
+
+#~ msgid "&Disable phrase"
+#~ msgstr "Ausdruck &deaktivieren"
+
+#~ msgid "Page &up"
+#~ msgstr "Auswahlliste &zurück"
+
+#~ msgid "Page dow&n"
+#~ msgstr "Auswahlliste &vor"
+
+#, fuzzy
+#~ msgid "Alt+E"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+O"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+D"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+H"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+U"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+P"
+#~ msgstr "Alt"
+
+#, fuzzy
+#~ msgid "Alt+M"
+#~ msgstr "Alt"
+
+#~ msgid "Qt Immodule"
+#~ msgstr "Eingabemodul für Qt"
+
+#~ msgid "Use Qt built-in Preedit Area"
+#~ msgstr "In Qt eingebauten Eingabebereich verwenden"
+
+#~ msgid "Left/Right Modifier"
+#~ msgstr "linke/rechte Sondertaste"
+
+#~ msgid ""
+#~ "Applied to the last key if it is a modifer key. If left modifier is "
+#~ "intended, please leave this unchecked."
+#~ msgstr ""
+#~ "Wird auf die letzte Taste angewandt, wenn sie eine Sondertaste ist. Bitte "
+#~ "nicht ankreuzen, wenn die jeweils linke Sondertaste gemeint ist."
+
+#~ msgid "&Add"
+#~ msgstr "&Hinzufügen"
+
+#~ msgid "&Delete"
+#~ msgstr "&Löschen"
