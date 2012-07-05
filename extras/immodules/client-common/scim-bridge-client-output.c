@@ -20,6 +20,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "scim-bridge-debug.h"
 #include "scim-bridge-output.h"
@@ -29,13 +30,14 @@ void scim_bridge_println (const char *string,...)
 {
     va_list ap;
     const size_t str_length = strlen (string);
-    char *format = alloca (sizeof (char) * (str_length + 2));
+    char *format = malloc (sizeof (char) * (str_length + 2));
     strcpy (format, string);
     format[str_length] = '\n';
     format[str_length + 1] = '\0';
     va_start (ap, string);
     vfprintf (stdout, format, ap);
     va_end (ap);
+	free (format);
 }
 
 
@@ -43,13 +45,14 @@ void scim_bridge_perrorln (const char *string,...)
 {
     va_list ap;
     const size_t str_length = strlen (string);
-    char *format = alloca (sizeof (char) * (str_length + 2));
+    char *format = malloc (sizeof (char) * (str_length + 2));
     strcpy (format, string);
     format[str_length] = '\n';
     format[str_length + 1] = '\0';
     va_start (ap, string);
     vfprintf (stderr, format, ap);
     va_end (ap);
+	free (format);
 }
 
 
@@ -59,12 +62,13 @@ void scim_bridge_pdebugln (scim_bridge_debug_level_t level, const char *string,.
         va_list ap;
         va_start (ap, string);
         const size_t str_length = strlen (string);
-        char *format = alloca (sizeof (char) * (str_length + 2));
+        char *format = malloc (sizeof (char) * (str_length + 2));
         strcpy (format, string);
         format[str_length] = '\n';
         format[str_length + 1] = '\0';
         vfprintf (stdout, format, ap);
         va_end (ap);
+		free (format);
     }
 }
 
