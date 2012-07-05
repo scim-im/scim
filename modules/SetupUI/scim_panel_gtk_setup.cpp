@@ -208,7 +208,11 @@ create_setup_window ()
 #endif
 
         // Create the vbox for the first page.
+#if GTK_CHECK_VERSION(3, 0, 0)
+        page = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+#else
         page = gtk_vbox_new (FALSE, 0);
+#endif
         gtk_widget_show (page);
 
         vbox = page;
@@ -225,7 +229,11 @@ create_setup_window ()
         gtk_table_set_row_spacings (GTK_TABLE (table), 4);
         gtk_table_set_col_spacings (GTK_TABLE (table), 8);
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+        hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+#else
         hbox = gtk_hbox_new (FALSE, 0);
+#endif
         gtk_widget_show (hbox);
 
         gtk_table_attach (GTK_TABLE (table), hbox, 0, 1, 0, 1,
@@ -276,7 +284,11 @@ create_setup_window ()
                           (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                           (GtkAttachOptions) (GTK_EXPAND), 4, 0);
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+        hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+#else
         hbox = gtk_hbox_new (FALSE, 0);
+#endif
         gtk_widget_show (hbox);
         gtk_table_attach (GTK_TABLE (table), hbox, 1, 2, 0, 1,
                           (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
@@ -319,7 +331,11 @@ create_setup_window ()
                           (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                           (GtkAttachOptions) (GTK_EXPAND), 4, 0);
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+        hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
+#else
         hbox = gtk_hbox_new (FALSE, 8);
+#endif
         gtk_widget_show (hbox);
         gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
 
@@ -329,7 +345,11 @@ create_setup_window ()
         gtk_container_set_border_width (GTK_CONTAINER (frame), 4);
         gtk_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 0);
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+        vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 4);
+#else
         vbox = gtk_vbox_new (FALSE, 4);
+#endif
         gtk_widget_show (vbox);
         gtk_container_add (GTK_CONTAINER (frame), vbox);
 
@@ -346,7 +366,11 @@ create_setup_window ()
         gtk_container_set_border_width (GTK_CONTAINER (frame), 4);
         gtk_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 0);
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+        vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 4);
+#else
         vbox = gtk_vbox_new (FALSE, 4);
+#endif
         gtk_widget_show (vbox);
         gtk_container_add (GTK_CONTAINER (frame), vbox);
 
@@ -358,7 +382,11 @@ create_setup_window ()
         gtk_widget_show (__widget_default_sticked);
         gtk_box_pack_start (GTK_BOX (vbox), __widget_default_sticked, FALSE, FALSE, 0);
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+        hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+#else
         hbox = gtk_hbox_new (FALSE, 0);
+#endif
         gtk_widget_show (hbox);
         gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 0);
 
@@ -886,6 +914,32 @@ static void
 on_font_selection_clicked (GtkButton *button,
                            gpointer   user_data)
 {
+#if GTK_CHECK_VERSION(3, 2, 0)
+    GtkWidget *font_selection = gtk_font_chooser_dialog_new (_("Select Interface Font"), NULL);
+    gint result;
+
+    if (__config_font != "default") {
+        gtk_font_chooser_set_font(
+            GTK_FONT_CHOOSER (font_selection),
+            __config_font.c_str ());
+    }
+
+    result = gtk_dialog_run (GTK_DIALOG (font_selection));
+
+    if (result == GTK_RESPONSE_OK) {
+        gchar *fontname = gtk_font_chooser_get_font ( GTK_FONT_CHOOSER (font_selection));
+        __config_font = String (fontname);
+        g_free(fontname);
+
+        gtk_button_set_label (
+            GTK_BUTTON (__widget_font),
+            __config_font.c_str ());
+
+        __have_changed = true;
+    }
+
+    gtk_widget_destroy (font_selection);
+#else
     GtkWidget *font_selection = gtk_font_selection_dialog_new (_("Select Interface Font"));
     gint result;
 
@@ -910,6 +964,7 @@ on_font_selection_clicked (GtkButton *button,
     }
 
     gtk_widget_destroy (font_selection);
+#endif
 }
 
 /*

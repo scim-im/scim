@@ -249,7 +249,11 @@ SetupUI::create_main_ui ()
     gtk_container_add (GTK_CONTAINER (m_main_window), vbox1);
 
     // Create paned window.
+#if GTK_CHECK_VERSION(3, 2, 0)
+    hpaned1 = gtk_paned_new (GTK_ORIENTATION_HORIZONTAL);
+#else
     hpaned1 = gtk_hpaned_new ();
+#endif
     gtk_widget_show (hpaned1);
     gtk_box_pack_start (GTK_BOX (vbox1), hpaned1, TRUE, TRUE, 0);
     gtk_container_set_border_width (GTK_CONTAINER (hpaned1), 4);
@@ -330,7 +334,11 @@ SetupUI::create_main_ui ()
     gtk_widget_show (exit_button);
     gtk_box_pack_end (GTK_BOX (hbox1), exit_button, FALSE, FALSE, 4);
 
+#if GTK_CHECK_VERSION(3, 2, 0)
+    vseparator1 = gtk_separator_new (GTK_ORIENTATION_VERTICAL);
+#else
     vseparator1 = gtk_vseparator_new ();
+#endif
     gtk_widget_show (vseparator1);
     gtk_box_pack_end (GTK_BOX (hbox1), vseparator1, FALSE, FALSE, 4);
 
@@ -399,7 +407,11 @@ SetupUI::create_splash_view ()
                 "<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org.cn&gt;</span>"));
     gtk_box_pack_start (GTK_BOX (vbox), view, TRUE, TRUE, 4);
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+    gtk_widget_get_preferred_size(vbox, &size, NULL);
+#else
     gtk_widget_size_request (vbox, &size);
+#endif
 
     if (size.width  < 320) size.width = 320;
     if (size.height < 240) size.height = 240;
@@ -429,7 +441,11 @@ SetupUI::create_setup_cover (const char *category)
 
     gtk_widget_show (cover);
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+    gtk_widget_get_preferred_size(cover, &size, NULL);
+#else
     gtk_widget_size_request (cover, &size);
+#endif
 
     if (size.width  < 320) size.width = 320;
     if (size.height < 240) size.height = 240;

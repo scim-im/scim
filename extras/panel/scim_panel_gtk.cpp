@@ -2108,6 +2108,15 @@ ui_input_window_click_cb (GtkWidget *window,
     static gulong motion_handler;
     GdkCursor *cursor;
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+    GdkDisplay    *display;
+    GdkDevice     *pointer;
+    GdkDeviceManager *device_manager;
+    display = gdk_window_get_display (gtk_widget_get_window (window));
+    device_manager = gdk_display_get_device_manager (display);
+    pointer = gdk_device_manager_get_client_pointer (device_manager);
+#endif
+
     if (click_type == 0) {
         if (_input_window_draging)
             return FALSE;
@@ -2125,12 +2134,6 @@ ui_input_window_click_cb (GtkWidget *window,
     
         // Grab the cursor to prevent losing events.
 #if GTK_CHECK_VERSION(3, 0, 0)
-        GdkDisplay    *display;
-        GdkDevice     *pointer;
-        GdkDeviceManager *device_manager;
-        display = gdk_window_get_display (gtk_widget_get_window (window));
-        device_manager = gdk_display_get_device_manager (display);
-        pointer = gdk_device_manager_get_client_pointer (device_manager);
 
         /* FIXME Not sure if report to GDK_OWNERSHIP_WINDOW
            or GDK_OWNERSHIP_APPLICATION */
@@ -2138,19 +2141,24 @@ ui_input_window_click_cb (GtkWidget *window,
                          GDK_OWNERSHIP_WINDOW, TRUE,
                          GdkEventMask (GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK),
                          cursor, event->time);
+        g_object_unref (cursor);
 #else
         gdk_pointer_grab (window->window, TRUE,
                           (GdkEventMask) (GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK),
                           NULL, cursor, event->time);
-#endif
         gdk_cursor_unref (cursor);
+#endif
         return TRUE;
     } else if (click_type == 1) {
         if (!_input_window_draging)
             return FALSE;
 
         g_signal_handler_disconnect (G_OBJECT (window), motion_handler);
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gdk_device_ungrab (pointer, event->time);
+#else
         gdk_pointer_ungrab (event->time);
+#endif
         _input_window_draging = FALSE;
 
         gtk_window_get_position (GTK_WINDOW (window), &_input_window_x, &_input_window_y);
@@ -2230,6 +2238,15 @@ ui_toolbar_window_click_cb (GtkWidget *window,
     static gulong motion_handler;
     GdkCursor *cursor;
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+    GdkDisplay    *display;
+    GdkDevice     *pointer;
+    GdkDeviceManager *device_manager;
+    display = gdk_window_get_display (gtk_widget_get_window (window));
+    device_manager = gdk_display_get_device_manager (display);
+    pointer = gdk_device_manager_get_client_pointer (device_manager);
+#endif
+
     if (click_type == 0 && event->button <= 1) {
         if (_toolbar_window_draging)
             return FALSE;
@@ -2247,12 +2264,6 @@ ui_toolbar_window_click_cb (GtkWidget *window,
 
         // Grab the cursor to prevent losing events.
 #if GTK_CHECK_VERSION(3, 0, 0)
-        GdkDisplay    *display;
-        GdkDevice     *pointer;
-        GdkDeviceManager *device_manager;
-        display = gdk_window_get_display (gtk_widget_get_window (window));
-        device_manager = gdk_display_get_device_manager (display);
-        pointer = gdk_device_manager_get_client_pointer (device_manager);
 
         /* FIXME Not sure if report to GDK_OWNERSHIP_WINDOW
            or GDK_OWNERSHIP_APPLICATION */
@@ -2260,19 +2271,24 @@ ui_toolbar_window_click_cb (GtkWidget *window,
                          GDK_OWNERSHIP_WINDOW, TRUE,
                          GdkEventMask (GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK),
                          cursor, event->time);
+        g_object_unref (cursor);
 #else
         gdk_pointer_grab (window->window, TRUE,
                           (GdkEventMask) (GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK),
                           NULL, cursor, event->time);
-#endif
         gdk_cursor_unref (cursor);
+#endif
         return TRUE;
     } else if (click_type == 1 && event->button <= 1) {
         if (!_toolbar_window_draging)
             return FALSE;
 
         g_signal_handler_disconnect (G_OBJECT (window), motion_handler);
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gdk_device_ungrab (pointer, event->time);
+#else
         gdk_pointer_ungrab (event->time);
+#endif
         _toolbar_window_draging = FALSE;
 
         gint pos_x, pos_y;
@@ -2332,6 +2348,15 @@ ui_lookup_table_window_click_cb (GtkWidget *window,
     static gulong motion_handler;
     GdkCursor *cursor;
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+    GdkDisplay    *display;
+    GdkDevice     *pointer;
+    GdkDeviceManager *device_manager;
+    display = gdk_window_get_display (gtk_widget_get_window (window));
+    device_manager = gdk_display_get_device_manager (display);
+    pointer = gdk_device_manager_get_client_pointer (device_manager);
+#endif
+
     if (click_type == 0) {
         if (_lookup_table_window_draging)
             return FALSE;
@@ -2349,12 +2374,6 @@ ui_lookup_table_window_click_cb (GtkWidget *window,
     
         // Grab the cursor to prevent losing events.
 #if GTK_CHECK_VERSION(3, 0, 0)
-        GdkDisplay    *display;
-        GdkDevice     *pointer;
-        GdkDeviceManager *device_manager;
-        display = gdk_window_get_display (gtk_widget_get_window (window));
-        device_manager = gdk_display_get_device_manager (display);
-        pointer = gdk_device_manager_get_client_pointer (device_manager);
 
         /* FIXME Not sure if report to GDK_OWNERSHIP_WINDOW
            or GDK_OWNERSHIP_APPLICATION */
@@ -2362,19 +2381,24 @@ ui_lookup_table_window_click_cb (GtkWidget *window,
                          GDK_OWNERSHIP_WINDOW, TRUE,
                          GdkEventMask (GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK),
                          cursor, event->time);
+        g_object_unref (cursor);
 #else
         gdk_pointer_grab (window->window, TRUE,
                           (GdkEventMask) (GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK),
                           NULL, cursor, event->time);
-#endif
         gdk_cursor_unref (cursor);
+#endif
         return TRUE;
     } else if (click_type == 1) {
         if (!_lookup_table_window_draging)
             return FALSE;
 
         g_signal_handler_disconnect (G_OBJECT (window), motion_handler);
+#if GTK_CHECK_VERSION(3, 0, 0)
+        gdk_device_ungrab (pointer, event->time);
+#else
         gdk_pointer_ungrab (event->time);
+#endif
         _lookup_table_window_draging = FALSE;
 
         gtk_window_get_position (GTK_WINDOW (window), &_lookup_table_window_x, &_lookup_table_window_y);
