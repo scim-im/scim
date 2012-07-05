@@ -33,13 +33,13 @@ im_scim_la_SOURCES = im-scim-bridge-clutter.c \
 							scim-bridge-client-imcontext-clutter.c \
 							scim-bridge-client-key-event-utility-clutter.c
 
-im_scim_la_CXXFLAGS=@CLUTTER_CFLAGS@
-im_scim_la_CFLAGS  =@CLUTTER_CFLAGS@
+im_scim_la_CXXFLAGS=@CLUTTER_CFLAGS@ @CLUTTERIMCONTEXT_CFLAGS@
+im_scim_la_CFLAGS  =@CLUTTER_CFLAGS@ @CLUTTERIMCONTEXT_CFLAGS@
 
 im_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     -avoid-version -no-undefined \
 		     -module \
-		     @CLUTTER_LIBS@
+		     @CLUTTER_LIBS@ @CLUTTERIMCONTEXT_LIBS@
 
 im_scim_la_LIBADD  = $(top_builddir)/extras/immodules/common/libscimbridgecommon.la \
 							$(top_builddir)/extras/immodules/client-common/libscimbridgeclientcommon.la

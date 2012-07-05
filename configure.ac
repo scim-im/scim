@@ -303,18 +303,18 @@ if test "$SCIM_HAS_QT4" = "yes"; then
 fi
 
 # Check if we should build scim-bridge-clutter-immodule
-PKG_CHECK_MODULES(CLUTTER, clutter-1.0 clutter-imcontext-0.1,
+PKG_CHECK_MODULES(CLUTTER, clutter-1.0,
            [SCIM_HAS_CLUTTER=yes],
            [SCIM_HAS_CLUTTER=no])
 
-if test "$SCIM_HAS_CLUTTER" = "yes"; then
-  CLUTTER_IMCONTEXT_LIBDIR=`$PKG_CONFIG --variable=libdir clutter-imcontext-0.1`
-  CLUTTER_IM_MODULEDIR=$CLUTTER_IMCONTEXT_LIBDIR/clutter-imcontext/immodules
+PKG_CHECK_MODULES(CLUTTERIMCONTEXT, clutter-imcontext-0.1,
+           [SCIM_HAS_CLUTTERIMCONTEXT=yes],
+           [SCIM_HAS_CLUTTERIMCONTEXT=no])
+
+if test "$SCIM_HAS_CLUTTER" = "yes" -a "$SCIM_HAS_CLUTTERIMCONTEXT" = "yes"; then
+  CLUTTERIMCONTEXT_LIBDIR=`$PKG_CONFIG --variable=libdir clutter-imcontext-0.1`
+  CLUTTER_IM_MODULEDIR=$CLUTTERIMCONTEXT_LIBDIR/clutter-imcontext/immodules
   AC_SUBST(CLUTTER_IM_MODULEDIR)
-  AC_SUBST(CLUTTER_LIBDIR)
-  AC_SUBST(CLUTTER_VERSION)
-  AC_SUBST(CLUTTER_BINARY_VERSION)
-  AC_SUBST(CLUTTER_IMCONTEXT_LIBDIR)
   enable_clutter_immodule="yes";
 fi
 
@@ -680,7 +680,9 @@ else
   enable_qt4_immodule=no
 fi
 
-if test "$enable_clutter_immodule" = "yes" -a "$SCIM_HAS_CLUTTER" = "yes"; then
+if test "$enable_clutter_immodule" = "yes" -a \
+	"$SCIM_HAS_CLUTTER" = "yes" -a \
+	"$SCIM_HAS_CLUTTERIMCONTEXT" = "yes" ; then
   SCIM_BUILD_CLUTTER_IMMODULE=1
   SCIM_BUILD_IMMODULE=1
   enable_immodule=yes

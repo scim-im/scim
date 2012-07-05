@@ -71,9 +71,10 @@ static void vxsyslog (int priority, const char *format, va_list ap)
     if (!initialized) static_initialize ();
     
     char *expanded_format;
-    vasprintf (&expanded_format, format, ap);
-    syslog (priority, "%s", expanded_format);
-    free (expanded_format);
+    if (vasprintf (&expanded_format, format, ap) >= 0) {
+		syslog (priority, "%s", expanded_format);
+		free (expanded_format);
+	}
 }
 
 

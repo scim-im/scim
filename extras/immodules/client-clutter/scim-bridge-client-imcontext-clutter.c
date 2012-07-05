@@ -26,6 +26,7 @@
 #include <X11/Xlib.h>
 #include <clutter/clutter.h>
 #include <clutter/x11/clutter-x11.h>
+#include <clutter-imcontext/clutter-imcontextsimple.h>
 
 #include "scim-bridge-attribute.h"
 #include "scim-bridge-client.h"
@@ -600,10 +601,16 @@ gboolean scim_bridge_client_imcontext_filter_key_event (ClutterIMContext *contex
 	    unsigned int nchild;
 	    XWindowAttributes winattr;
 	    Display *xdpy;
-            int new_window_x;
-            int new_window_y;
+		gfloat new_window_x_float;
+		gfloat new_window_y_float;
+		int new_window_x;
+		int new_window_y;
 
-            clutter_actor_get_transformed_position (context->actor, &new_window_x, &new_window_y);
+		clutter_actor_get_transformed_position (
+			context->actor, &new_window_x_float, &new_window_y_float);
+		new_window_x = (int)new_window_x_float;
+		new_window_y = (int)new_window_y_float;
+
 	    xdpy = clutter_x11_get_default_display ();
 	    current_window = clutter_x11_get_stage_window(CLUTTER_STAGE(stage));
 
