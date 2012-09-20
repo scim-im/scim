@@ -315,7 +315,6 @@ if test "$SCIM_HAS_CLUTTER" = "yes" -a "$SCIM_HAS_CLUTTERIMCONTEXT" = "yes"; the
   CLUTTERIMCONTEXT_LIBDIR=`$PKG_CONFIG --variable=libdir clutter-imcontext-0.1`
   CLUTTER_IM_MODULEDIR=$CLUTTERIMCONTEXT_LIBDIR/clutter-imcontext/immodules
   AC_SUBST(CLUTTER_IM_MODULEDIR)
-  enable_clutter_immodule="yes";
 fi
 
 
@@ -497,10 +496,10 @@ AC_ARG_ENABLE([qt4-immodule],
 	[enable_qt4_immodule=yes])
 
 AC_ARG_ENABLE([clutter-immodule],
-	[AS_HELP_STRING([--disable-clutter-immodule],
+	[AS_HELP_STRING([--enable-clutter-immodule],
 		[Do not build CLUTTER IMModule])],
 	[], 
-	[enable_clutter_immodule=yes])
+	[enable_clutter_immodule=no])
 
 AC_ARG_ENABLE([panel-gtk],
 	[AS_HELP_STRING([--disable-panel-gtk],
