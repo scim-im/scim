@@ -684,6 +684,7 @@ void scim_bridge_client_imcontext_register_type (GTypeModule *type_module)
 #else
         (GtkObjectInitFunc) scim_bridge_client_imcontext_initialize,
 #endif
+		0
     };
 
     class_type = g_type_module_register_type (type_module, GTK_TYPE_IM_CONTEXT, "ScimBridgeClientIMContext", &klass_info, 0);
