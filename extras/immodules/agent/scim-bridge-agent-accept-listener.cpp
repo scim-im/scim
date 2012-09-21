@@ -37,11 +37,6 @@
 #include "scim-bridge-agent-accept-listener.h"
 #include "scim-bridge-agent-client-listener.h"
 
-#ifndef SUN_LEN
-#define SUN_LEN(su) \
-	    (sizeof(*(su)) - sizeof((su)->sun_path) + strlen((su)->sun_path))
-#endif
-
 /* Class definition */
 class ScimBridgeAgentAcceptListenerImpl: public ScimBridgeAgentAcceptListener
 {

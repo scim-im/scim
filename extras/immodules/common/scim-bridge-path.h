@@ -27,6 +27,11 @@
 
 #include "scim-bridge.h"
 
+#ifndef SUN_LEN
+#define SUN_LEN(su) \
+	    (sizeof(*(su)) - sizeof((su)->sun_path) + strlen((su)->sun_path))
+#endif
+
 #ifdef __cplusplus
 extern "C"
 {

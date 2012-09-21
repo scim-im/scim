@@ -1080,7 +1080,7 @@ retval_t scim_bridge_client_open_messenger ()
         socket_addr.sun_family = AF_UNIX;
         strcpy (socket_addr.sun_path, scim_bridge_path_get_socket ());
 
-        if (connect (socket_fd, (struct sockaddr*)&socket_addr, sizeof (socket_addr.sun_family) + strlen (socket_addr.sun_path))) {
+        if (connect (socket_fd, (struct sockaddr*)&socket_addr, SUN_LEN(&socket_addr))) {
             if (i == 5 && launch_agent ()) {
                 scim_bridge_perrorln ("Cannot launch the agent");
                 return RETVAL_FAILED;
