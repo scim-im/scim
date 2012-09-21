@@ -33,6 +33,8 @@
  */
 typedef struct _ScimBridgeMessenger ScimBridgeMessenger;
 
+struct timeval;
+
 #ifdef __cplusplus
 extern "C"
 {
