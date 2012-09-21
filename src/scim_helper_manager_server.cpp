@@ -95,9 +95,9 @@ void load_helper_modules (void)
     //      so I added a workaround: have an array of modules and unload them all together in the end only.
     //      TODO Need to figure out what's going on with this issue.
 
-    HelperModule module[mod_list.size ()];
-
     if (mod_list.size ()) {
+
+        HelperModule *module = new HelperModule[mod_list.size ()];
 
         for (size_t i = 0; i < mod_list.size (); ++i) {
 
@@ -120,6 +120,7 @@ void load_helper_modules (void)
         for (size_t i = 0; i < mod_list.size (); ++i) {
             module[i].unload ();
         }
+        delete[] module;
     }
 }
 
