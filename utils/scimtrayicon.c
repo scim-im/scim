@@ -72,7 +72,8 @@ scim_tray_icon_get_type (void)
             NULL, /* class_data */
             sizeof (ScimTrayIcon),
             0,    /* n_preallocs */
-            (GInstanceInitFunc) scim_tray_icon_init
+            (GInstanceInitFunc) scim_tray_icon_init,
+            0
         };
         our_type = g_type_register_static (GTK_TYPE_PLUG, "ScimTrayIcon", &our_info, 0);
     }

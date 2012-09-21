@@ -153,6 +153,7 @@ scim_string_view_register_type (GTypeModule *type_module)
     sizeof (ScimStringView),
     0,
     (GInstanceInitFunc) scim_string_view_init,
+    0
   };
 
   if (!string_view_type)

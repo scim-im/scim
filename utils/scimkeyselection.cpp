@@ -79,6 +79,7 @@ scim_key_selection_register_type (GTypeModule *type_module)
         sizeof (ScimKeySelection),
         0,
         (GInstanceInitFunc) scim_key_selection_init,
+        0
     };
 
     if (!key_selection_type) {
@@ -641,6 +642,7 @@ scim_key_selection_dialog_register_type (GTypeModule *type_module)
         sizeof (ScimKeySelectionDialog),
         0,
         (GInstanceInitFunc) scim_key_selection_dialog_init,
+        0
     };
 
     if (!key_selection_dialog_type) {
