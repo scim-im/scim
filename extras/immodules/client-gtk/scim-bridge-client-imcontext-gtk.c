@@ -213,6 +213,11 @@ static gboolean key_snooper (GtkWidget *widget, GdkEventKey *event, gpointer dat
             gdk_window_get_origin (focused_imcontext->client_window, &new_window_x, &new_window_y);
 
             if (focused_imcontext->window_x != new_window_x || focused_imcontext->window_y != new_window_y) {
+
+                scim_bridge_pdebugln (1,
+                    "The cursor location is changed: x = %d + %d\ty = %d + %d",
+                    new_window_x, focused_imcontext->cursor_x, new_window_y, focused_imcontext->cursor_y);
+
                 if (set_cursor_location (focused_imcontext, new_window_x, new_window_y, focused_imcontext->cursor_x, focused_imcontext->cursor_y)) {
                     scim_bridge_perrorln ("An IOException at key_snooper ()");
                     return FALSE;
@@ -772,47 +777,42 @@ gboolean scim_bridge_client_imcontext_filter_key_event (GtkIMContext *context, G
     scim_bridge_pdebugln (8, "scim_bridge_client_imcontext_filter_key_event ()");
 
     ScimBridgeClientIMContext *imcontext = SCIM_BRIDGE_CLIENT_IMCONTEXT (context);
-    
-    if (!(event->send_event & SEND_EVENT_MASK) && scim_bridge_client_is_messenger_opened () && imcontext != NULL && !key_snooper_used) {
 
-        if (imcontext->client_window != NULL) {
-            int new_window_x;
-            int new_window_y;
-            gdk_window_get_origin (imcontext->client_window, &new_window_x, &new_window_y);
+	if (imcontext && !key_snooper_used)
+		if (key_snooper(0, event, 0) == TRUE)
+			return TRUE;
 
-            if (imcontext->window_x != new_window_x || imcontext->window_y != new_window_y) {
-                imcontext->window_x = new_window_x;
-                imcontext->window_y = new_window_y;
+	if (fallback_imcontext)
+		if (gtk_im_context_filter_keypress (fallback_imcontext, event) == TRUE)
+			return TRUE;
 
-                scim_bridge_pdebugln (1,
-                    "The cursor location is changed: x = %d + %d\ty = %d + %d",
-                    imcontext->window_x, imcontext->cursor_x, imcontext->window_y, imcontext->cursor_y);
+	unsigned int accelerator_mask = (gtk_accelerator_get_default_mod_mask () & ~GDK_SHIFT_MASK);
+	if (event->type == GDK_KEY_PRESS && (event->state & accelerator_mask) == 0) {
+		guint32 wchar = gdk_keyval_to_unicode (event->keyval);
+		if (wchar != 0) {
+			gchar buffer[10];
+			const int buffer_length = g_unichar_to_utf8 (wchar, buffer);
+			buffer[buffer_length] = '\0';
+			g_signal_emit_by_name (focused_imcontext, "commit", &buffer);
+			return TRUE;
+		}
+	}
 
-                if (set_cursor_location (imcontext, new_window_x, new_window_y, imcontext->cursor_x, imcontext->cursor_y)) {
-                    scim_bridge_perrorln ("An IOException occurred at scim_bridge_client_imcontext_filter_key_event ()");
-                    return gtk_im_context_filter_keypress (fallback_imcontext, event);
-                }
-            }
-        }
-
-        boolean consumed = FALSE;
-        if (filter_key_event (imcontext, event, &consumed)) {
-            scim_bridge_perrorln ("An IOException occurred at scim_bridge_client_imcontext_filter_key_event ()");
-        } else if (consumed) {
-            return TRUE;
-        }
-    }
-
-    unsigned int accelerator_mask = (gtk_accelerator_get_default_mod_mask () & ~GDK_SHIFT_MASK);
-    if (imcontext == NULL || !imcontext->enabled) {
-        return gtk_im_context_filter_keypress (fallback_imcontext, event);
-    } else if (event->type == GDK_KEY_PRESS && (event->state & accelerator_mask) == 0) {
-        guint32 wchar = gdk_keyval_to_unicode (event->keyval);        if (wchar != 0) {            gchar buffer[10];            const int buffer_length = g_unichar_to_utf8 (wchar, buffer);
-            buffer[buffer_length] = '\0';
-            g_signal_emit_by_name (focused_imcontext, "commit", &buffer);
-            return TRUE;
-        }
-    }
+	/*
+	unsigned int accelerator_mask = (gtk_accelerator_get_default_mod_mask () & ~GDK_SHIFT_MASK);
+	if (fallback_imcontext && (imcontext == NULL || !imcontext->enabled)) {
+		return gtk_im_context_filter_keypress (fallback_imcontext, event);
+	} else if (event->type == GDK_KEY_PRESS && (event->state & accelerator_mask) == 0) {
+		guint32 wchar = gdk_keyval_to_unicode (event->keyval);
+		if (wchar != 0) {
+			gchar buffer[10];
+			const int buffer_length = g_unichar_to_utf8 (wchar, buffer);
+			buffer[buffer_length] = '\0';
+			g_signal_emit_by_name (focused_imcontext, "commit", &buffer);
+			return TRUE;
+		}
+	}
+	*/
     
     return FALSE;
 }
