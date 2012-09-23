@@ -26,6 +26,12 @@
 #include <gtk/gtk.h>
 
 #if GTK_CHECK_VERSION(3, 0, 0)
+#include <gdk/gdk.h>
+#else
+#include <gdk/gdkkeysyms.h>
+#endif
+
+#if GTK_CHECK_VERSION(3, 0, 0)
 #else
 #include <gtk/gtkimcontext.h>
 #endif
@@ -785,6 +791,26 @@ gboolean scim_bridge_client_imcontext_filter_key_event (GtkIMContext *context, G
 	if (fallback_imcontext)
 		if (gtk_im_context_filter_keypress (fallback_imcontext, event) == TRUE)
 			return TRUE;
+
+#if GTK_CHECK_VERSION(3, 0, 0)
+	if (event->keyval == GDK_KEY_BackSpace ||
+		event->keyval == GDK_KEY_Escape ||
+		event->keyval == GDK_KEY_Return ||
+		event->keyval == GDK_KEY_ISO_Enter ||
+		event->keyval == GDK_KEY_KP_Enter ||
+		event->keyval == GDK_KEY_Delete ||
+		event->keyval == GDK_KEY_KP_Delete)
+		return FALSE;
+#else
+	if (event->keyval == GDK_BackSpace ||
+		event->keyval == GDK_Escape ||
+		event->keyval == GDK_Return ||
+		event->keyval == GDK_ISO_Enter ||
+		event->keyval == GDK_KP_Enter ||
+		event->keyval == GDK_Delete ||
+		event->keyval == GDK_KP_Delete)
+		return FALSE;
+#endif
 
 	unsigned int accelerator_mask = (gtk_accelerator_get_default_mod_mask () & ~GDK_SHIFT_MASK);
 	if (event->type == GDK_KEY_PRESS && (event->state & accelerator_mask) == 0) {
