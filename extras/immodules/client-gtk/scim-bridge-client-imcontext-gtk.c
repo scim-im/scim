@@ -237,7 +237,7 @@ static gboolean key_snooper (GtkWidget *widget, GdkEventKey *event, gpointer dat
 static boolean is_key_snooper_enabled ()
 {
     static boolean first_time = TRUE;
-    static boolean key_snooper_enabled = TRUE;
+    static boolean key_snooper_enabled = FALSE;
 
     if (first_time) {
         char *env_key_snooper_enabled = getenv ("SCIM_BRIDGE_KEY_SNOOPER_ENABLED");
