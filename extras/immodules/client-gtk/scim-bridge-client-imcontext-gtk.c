@@ -236,8 +236,10 @@ static gboolean key_snooper (GtkWidget *widget, GdkEventKey *event, gpointer dat
             scim_bridge_perrorln ("An IOException at key_snooper ()");
             return FALSE;
         } else {
-            if (consumed)
+            if (consumed) {
+				g_signal_emit_by_name (focused_imcontext, "preedit-changed");
                 return TRUE;
+			}
         }
     }
 
