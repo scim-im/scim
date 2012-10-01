@@ -73,7 +73,7 @@ public:
     //!< Unblock the slot so signal emmissions can be received.
 
     virtual void disconnect();
-    //!< Disconnect the slot. The slot will no longer recieve signal emissions.
+    //!< Disconnect the slot. The slot will no longer receive signal emissions.
 };
 
 // DefaultMarshal class (from marshal.h, libsigc++)

@@ -163,7 +163,7 @@ static retval_t received_message_preedit_mode_changed (const ScimBridgeMessage *
     if (pending_response.status == RESPONSE_PENDING && strcmp (pending_response.header, header) == 0) {
         pending_response.status = RESPONSE_SUCCEEDED;
     } else {
-        scim_bridge_perrorln ("The message is recieved in a wrong context: %s", header);
+        scim_bridge_perrorln ("The message is received in a wrong context: %s", header);
     }
 
     return RETVAL_SUCCEEDED;
@@ -190,7 +190,7 @@ static retval_t received_message_imcontext_registered (const ScimBridgeMessage *
             }
         }
     } else {
-        scim_bridge_perrorln ("The message is recieved in a wrong context: %s", header);
+        scim_bridge_perrorln ("The message is received in a wrong context: %s", header);
     }
 
     return RETVAL_SUCCEEDED;
@@ -204,7 +204,7 @@ static retval_t received_message_imcontext_deregistered (const ScimBridgeMessage
     if (pending_response.status == RESPONSE_PENDING && strcmp (pending_response.header, header) == 0) {
         pending_response.status = RESPONSE_SUCCEEDED;
     } else {
-        scim_bridge_perrorln ("The message is recieved in a wrong context: %s", header);
+        scim_bridge_perrorln ("The message is received in a wrong context: %s", header);
     }
 
     return RETVAL_SUCCEEDED;
@@ -218,7 +218,7 @@ static retval_t received_message_imcontext_reseted (const ScimBridgeMessage *mes
     if (pending_response.status == RESPONSE_PENDING && strcmp (pending_response.header, header) == 0) {
         pending_response.status = RESPONSE_SUCCEEDED;
     } else {
-        scim_bridge_perrorln ("The message is recieved in a wrong context: %s", header);
+        scim_bridge_perrorln ("The message is received in a wrong context: %s", header);
     }
     
     return RETVAL_SUCCEEDED;
@@ -232,7 +232,7 @@ static retval_t received_message_imcontext_enabled (const ScimBridgeMessage *mes
     if (pending_response.status == RESPONSE_PENDING && strcmp (pending_response.header, header) == 0) {
         pending_response.status = RESPONSE_SUCCEEDED;
     } else {
-        scim_bridge_perrorln ("The message is recieved in a wrong context: %s", header);
+        scim_bridge_perrorln ("The message is received in a wrong context: %s", header);
     }
 
     return RETVAL_SUCCEEDED;
@@ -246,7 +246,7 @@ static retval_t received_message_imcontext_disabled (const ScimBridgeMessage *me
     if (pending_response.status == RESPONSE_PENDING && strcmp (pending_response.header, header) == 0) {
         pending_response.status = RESPONSE_SUCCEEDED;
     } else {
-        scim_bridge_perrorln ("The message is recieved in a wrong context: %s", header);
+        scim_bridge_perrorln ("The message is received in a wrong context: %s", header);
     }
 
     return RETVAL_SUCCEEDED;
@@ -269,7 +269,7 @@ static retval_t received_message_key_event_handled (const ScimBridgeMessage *mes
             pending_response.status = RESPONSE_SUCCEEDED;
         }
     } else {
-        scim_bridge_perrorln ("The message is recieved in a wrong context: %s", header);
+        scim_bridge_perrorln ("The message is received in a wrong context: %s", header);
     }
 
     return RETVAL_SUCCEEDED;
@@ -283,7 +283,7 @@ static retval_t received_message_focus_changed (const ScimBridgeMessage *message
     if (pending_response.status == RESPONSE_PENDING && strcmp (pending_response.header, header) == 0) {
         pending_response.status = RESPONSE_SUCCEEDED;
     } else {
-        scim_bridge_perrorln ("The message is recieved in a wrong context: %s", header);
+        scim_bridge_perrorln ("The message is received in a wrong context: %s", header);
     }
 
     return RETVAL_SUCCEEDED;
