@@ -2,13 +2,14 @@
 
 set -x
 
-INTLTOOLIZE=`which intltoolize`
+AUTOPOINT=`which autopoint`
 AUTORECONF=`which autoreconf`
+INTLTOOLIZE=`which intltoolize`
 
-if test -z $INTLTOOLIZE -o -z $AUTORECONF; then
-	echo "Error: no intltoolize or autoreconf found, please install them" >&2
+if test -z $AUTOPOINT -o -z $INTLTOOLIZE -o -z $AUTORECONF; then
+	echo "Error: no autopoint, intltoolize, or autoreconf found, please install them" >&2
 	exit 1
 fi
 
-$INTLTOOLIZE --copy --force --automake
-$AUTORECONF --force --install --verbose
+$AUTOPOINT --force
+AUTOPOINT="$INTLTOOLIZE --automake --copy" $AUTORECONF --force --install --verbose
