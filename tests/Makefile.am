@@ -1,9 +1,9 @@
 MAINTAINERCLEANFILES 	= Makefile.in
 
-INCLUDES		= -I$(top_builddir) \
+AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_builddir)/src \
-	    		  -I$(top_srcdir) \
-	    		  -I$(top_srcdir)/intl \
+	    	  -I$(top_srcdir) \
+	    	  -I$(top_srcdir)/intl \
 			  -I$(top_srcdir)/src \
 			  -DSCIM_DATADIR=\"@SCIM_DATADIR@\" \
 			  -DSCIM_LOCALEDIR=\"@SCIM_LOCALEDIR@\" \

@@ -17,7 +17,7 @@
 
 if SCIM_BUILD_GTK2_IMMODULE
 
-INCLUDES		= -I$(top_builddir) \
+AM_CPPFLAGS		= -I$(top_builddir) \
 	    		  -I$(top_srcdir) \
 			  -I$(top_srcdir)/extras/immodules/common \
 			  -I$(top_srcdir)/extras/immodules/client-common
