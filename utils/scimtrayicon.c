@@ -365,7 +365,9 @@ make_transparent (GtkWidget *widget, gpointer user_data)
         return;
 
     gtk_widget_set_app_paintable (widget, TRUE);
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     gtk_widget_set_double_buffered (widget, FALSE);
+    G_GNUC_END_IGNORE_DEPRECATIONS
 #if GTK_CHECK_VERSION(3, 0, 0)
 #elif GTK_CHECK_VERSION(2, 14, 0)
     gdk_window_set_back_pixmap (gtk_widget_get_window (widget), NULL, TRUE);
