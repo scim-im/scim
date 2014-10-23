@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script
-AC_INIT([scim],[1.4.14],[http://sf.net/tracker/?atid=650539&group_id=108454])
+AC_INIT([scim],[1.4.14],[https://github.com/scim-im/scim])
 AC_CONFIG_SRCDIR([src/scim.h])
 
 
@@ -78,7 +78,7 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [The gettext domain])
 ###########################################################
 
 # Init automake stuff
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 AM_CONFIG_HEADER([config.h])
 
 # Init libtool

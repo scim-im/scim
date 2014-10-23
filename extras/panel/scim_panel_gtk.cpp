@@ -1,9 +1,9 @@
 /** @file scim_panel_gtk.cpp
  */
 
-/* 
+/*
  * Smart Common Input Method
- * 
+ *
  * Copyright (c) 2002-2005 James Su <suzhe@tsinghua.org.cn>
  *
  *
@@ -110,7 +110,7 @@ using namespace scim;
 #define SCIM_PIN_UP_ICON_FILE       (SCIM_ICONDIR "/pin-up.png")
 #define SCIM_PIN_DOWN_ICON_FILE     (SCIM_ICONDIR "/pin-down.png")
 
-#define TOOLBAR_ICON_SIZE                     16 
+#define TOOLBAR_ICON_SIZE                     16
 #define TRAY_ICON_SIZE                        11
 #define LOOKUP_ICON_SIZE                      12
 
@@ -284,7 +284,7 @@ static void       ui_tray_icon_destroy_cb              (GtkObject      *object,
 #endif
                                                         gpointer        user_data);
 static void       ui_tray_icon_popup_menu_cb           (GtkStatusIcon  *status_icon,
-                                                        guint           button, 
+                                                        guint           button,
                                                         guint           activate_time,
                                                         gpointer        user_data);
 
@@ -318,7 +318,7 @@ static bool       initialize_panel_agent               (const String &config, co
 static bool       run_panel_agent                      (void);
 static gpointer   panel_agent_thread_func              (gpointer data);
 static void       start_auto_start_helpers             (void);
-                  
+
 static void       slot_transaction_start               (void);
 static void       slot_transaction_end                 (void);
 static void       slot_reload_config                   (void);
@@ -329,7 +329,7 @@ static void       slot_update_spot_location            (int x, int y);
 static void       slot_update_factory_info             (const PanelFactoryInfo &info);
 static void       slot_show_help                       (const String &help);
 static void       slot_show_factory_menu               (const std::vector <PanelFactoryInfo> &menu);
-                  
+
 static void       slot_show_preedit_string             (void);
 static void       slot_show_aux_string                 (void);
 static void       slot_show_lookup_table               (void);
@@ -342,7 +342,7 @@ static void       slot_update_aux_string               (const String &str, const
 static void       slot_update_lookup_table             (const LookupTable &table);
 static void       slot_register_properties             (const PropertyList &props);
 static void       slot_update_property                 (const Property &prop);
-                  
+
 static void       slot_register_helper_properties      (int id, const PropertyList &props);
 static void       slot_update_helper_property          (int id, const Property &prop);
 static void       slot_register_helper                 (int id, const HelperInfo &helper);
@@ -1145,30 +1145,30 @@ ui_initialize (void)
         _help_dialog = gtk_dialog_new_with_buttons (_("SCIM Help"),
                                 NULL,
                                 GtkDialogFlags (0),
-                                GTK_STOCK_OK,
+                                _("_OK"),
                                 GTK_RESPONSE_OK,
                                 NULL);
 
 #if GTK_CHECK_VERSION(3, 0, 0)
-        g_signal_connect_swapped (GTK_WIDGET (_help_dialog), 
-                                  "response", 
+        g_signal_connect_swapped (GTK_WIDGET (_help_dialog),
+                                  "response",
                                   G_CALLBACK (gtk_widget_hide),
                                   GTK_WIDGET (_help_dialog));
 #else
-        g_signal_connect_swapped (GTK_OBJECT (_help_dialog), 
-                                  "response", 
+        g_signal_connect_swapped (GTK_OBJECT (_help_dialog),
+                                  "response",
                                   G_CALLBACK (gtk_widget_hide),
                                   GTK_OBJECT (_help_dialog));
 #endif
 
 #if GTK_CHECK_VERSION(3, 0, 0)
-        g_signal_connect_swapped (GTK_WIDGET (_help_dialog), 
-                                  "delete_event", 
+        g_signal_connect_swapped (GTK_WIDGET (_help_dialog),
+                                  "delete_event",
                                   G_CALLBACK (gtk_widget_hide_on_delete),
                                   GTK_WIDGET (_help_dialog));
 #else
-        g_signal_connect_swapped (GTK_OBJECT (_help_dialog), 
-                                  "delete_event", 
+        g_signal_connect_swapped (GTK_OBJECT (_help_dialog),
+                                  "delete_event",
                                   G_CALLBACK (gtk_widget_hide_on_delete),
                                   GTK_OBJECT (_help_dialog));
 #endif
@@ -1180,7 +1180,11 @@ ui_initialize (void)
 
         _help_area = gtk_label_new ("");
         gtk_label_set_justify (GTK_LABEL (_help_area), GTK_JUSTIFY_LEFT);
+#if GTK_CHECK_VERSION(3, 8, 0)
+        gtk_container_add (GTK_CONTAINER (_help_scroll), _help_area);
+#else
         gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (_help_scroll), _help_area);
+#endif
         gtk_widget_show (_help_area);
     }
 
@@ -1211,7 +1215,13 @@ ui_initialize (void)
 
     }
     if (_toolbar_always_show && _toolbar_hide_timeout_max > 0) {
-        _toolbar_hide_timeout = g_timeout_add (1000, ui_hide_window_timeout_cb, NULL);
+        _toolbar_hide_timeout =
+#if GTK_CHECK_VERSION(2, 12, 0)
+        gdk_threads_add_timeout
+#else
+        g_timeout_add
+#endif
+            (1000, ui_hide_window_timeout_cb, NULL);
         g_signal_connect (G_OBJECT (_toolbar_window), "enter-notify-event",
                           G_CALLBACK (ui_toolbar_window_crossing_cb),
                           GINT_TO_POINTER (0));
@@ -1296,10 +1306,10 @@ ui_settle_input_window (bool relative, bool force)
 #endif
 
     if (!relative) {
-        spot_x = _spot_location_x; 
-        spot_y = _spot_location_y; 
+        spot_x = _spot_location_x;
+        spot_y = _spot_location_y;
     } else {
-        spot_x = _input_window_x; 
+        spot_x = _input_window_x;
         spot_y = _input_window_y;
     }
 
@@ -1454,7 +1464,7 @@ ui_multi_monitor_width ()
 {
 #if GTK_CHECK_VERSION(2, 2, 0)
 	GdkRectangle rect;
-    
+
     if (_current_screen)
     {
         if ( ui_get_screen_rect (rect) )
@@ -1473,7 +1483,7 @@ ui_multi_monitor_height ()
 {
 #if GTK_CHECK_VERSION(2, 2, 0)
 	GdkRectangle rect;
-    
+
     if (_current_screen)
     {
         if ( ui_get_screen_rect (rect) )
@@ -1615,13 +1625,13 @@ ui_switch_screen (GdkScreen *screen)
 //                            event->area.width, event->area.height);
 //     return FALSE;
 // }
-// 
+//
 // static void
 // ui_tray_icon_style_set_cb (GtkWidget *widget, GtkStyle *previous_style)
 // {
 //     gdk_window_set_back_pixmap (widget->window, NULL, TRUE);
 // }
-// 
+//
 // static void
 // ui_tray_icon_realize_cb (GtkWidget *widget)
 // {
@@ -1631,7 +1641,7 @@ ui_switch_screen (GdkScreen *screen)
 //     if (GTK_WIDGET_NO_WINDOW (widget) || GTK_WIDGET_APP_PAINTABLE (widget))
 // #endif
 //         return;
-// 
+//
 //     gtk_widget_set_app_paintable (widget, TRUE);
 //     gtk_widget_set_double_buffered (widget, FALSE);
 //     gdk_window_set_back_pixmap (widget->window, NULL, TRUE);
@@ -1646,11 +1656,14 @@ ui_create_tray_icon_when_idle (gpointer data)
 {
     GtkWidget *image;
 
+    // TODO use GtkNotification?
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     _tray_icon = gtk_status_icon_new_from_file (SCIM_KEYBOARD_ICON_FILE);
+    G_GNUC_END_IGNORE_DEPRECATIONS
     // g_signal_connect (G_OBJECT (_tray_icon), "realize",
     //                   G_CALLBACK (ui_tray_icon_realize_cb), NULL);
 
-    // _tray_icon_destroy_signal_id = 
+    // _tray_icon_destroy_signal_id =
     // g_signal_connect (G_OBJECT (_tray_icon), "destroy",
     //                   G_CALLBACK (ui_tray_icon_destroy_cb),
     //                   0);
@@ -1667,20 +1680,22 @@ ui_create_tray_icon_when_idle (gpointer data)
     // gtk_container_add (GTK_CONTAINER (_tray_icon_factory_button), image);
     // gtk_container_add (GTK_CONTAINER (_tray_icon), _tray_icon_factory_button);
 
-    
+
     // g_signal_connect (G_OBJECT (_tray_icon_factory_button), "button-release-event",
     //                   G_CALLBACK (ui_factory_button_click_cb),
     //                   0);
-    
+
     g_signal_connect (G_OBJECT (_tray_icon), "popup-menu",
                       G_CALLBACK (ui_tray_icon_popup_menu_cb),
                       0);
-    
+
     g_signal_connect (G_OBJECT (_tray_icon), "activate",
                       G_CALLBACK (ui_tray_icon_activate_cb),
                       0);
 
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     gtk_status_icon_set_visible (_tray_icon, TRUE);
+    G_GNUC_END_IGNORE_DEPRECATIONS
 
     return FALSE;
 }
@@ -1894,11 +1909,19 @@ ui_create_factory_menu_entry (const PanelFactoryInfo &info,
         tooltip = "";
     }
 
-    menu_item = gtk_image_menu_item_new_with_label (text.c_str ());
+    menu_item =
+#if GTK_CHECK_VERSION(3, 10, 0)
+        gtk_menu_item_new_with_label
+#else
+        gtk_image_menu_item_new_with_label
+#endif
+            (text.c_str ());
     gtk_icon_size_lookup (GTK_ICON_SIZE_MENU, &width, &height);
+#if !GTK_CHECK_VERSION(3, 10, 0)
     icon_image = ui_create_icon (info.icon, NULL, width, height, false);
     if (icon_image)
         gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), icon_image);
+#endif
 
     g_signal_connect (G_OBJECT (menu_item), "activate",
                       G_CALLBACK (ui_factory_menu_activate_cb),
@@ -1987,7 +2010,7 @@ ui_factory_button_click_cb (GtkWidget *button,
 }
 
 static void
-ui_tray_icon_popup_menu_cb (GtkStatusIcon *status_icon, guint button, 
+ui_tray_icon_popup_menu_cb (GtkStatusIcon *status_icon, guint button,
     guint activate_time, gpointer user_data)
 {
     _tray_icon_clicked = true;
@@ -2087,7 +2110,7 @@ ui_input_window_motion_cb (GtkWidget *window,
     if ((event->state & (GDK_BUTTON1_MASK | GDK_BUTTON2_MASK | GDK_BUTTON3_MASK)) != 0 &&
         _input_window_draging) {
         gtk_window_get_position (GTK_WINDOW (window), &pos_x, &pos_y);
-        gtk_window_move (GTK_WINDOW (window), 
+        gtk_window_move (GTK_WINDOW (window),
             pos_x + ((gint) event->x_root - _input_window_drag_x),
             pos_y + ((gint) event->y_root - _input_window_drag_y));
 
@@ -2131,7 +2154,7 @@ ui_input_window_click_cb (GtkWidget *window,
         _input_window_drag_y = (gint) event->y_root;
 
         cursor = gdk_cursor_new (GDK_TOP_LEFT_ARROW);
-    
+
         // Grab the cursor to prevent losing events.
 #if GTK_CHECK_VERSION(3, 0, 0)
 
@@ -2179,7 +2202,7 @@ ui_toolbar_window_crossing_cb (GtkWidget        *window,
 
     int crossing_type = GPOINTER_TO_INT (user_data);
 
-    // 0 == enter, otherwise leave 
+    // 0 == enter, otherwise leave
     if (crossing_type == 0) {
         if (_toolbar_hidden) {
             if (_window_stick_button)
@@ -2217,7 +2240,7 @@ ui_toolbar_window_motion_cb (GtkWidget *window,
     if ((event->state & (GDK_BUTTON1_MASK | GDK_BUTTON2_MASK | GDK_BUTTON3_MASK)) != 0 &&
         _toolbar_window_draging) {
         gtk_window_get_position (GTK_WINDOW (window), &pos_x, &pos_y);
-        gtk_window_move (GTK_WINDOW (window), 
+        gtk_window_move (GTK_WINDOW (window),
             pos_x + ((gint) event->x_root - _toolbar_window_drag_x),
             pos_y + ((gint) event->y_root - _toolbar_window_drag_y));
 
@@ -2327,7 +2350,7 @@ ui_lookup_table_window_motion_cb (GtkWidget      *window,
     if ((event->state & (GDK_BUTTON1_MASK | GDK_BUTTON2_MASK | GDK_BUTTON3_MASK)) != 0 &&
         _lookup_table_window_draging) {
         gtk_window_get_position (GTK_WINDOW (window), &pos_x, &pos_y);
-        gtk_window_move (GTK_WINDOW (window), 
+        gtk_window_move (GTK_WINDOW (window),
             pos_x + ((gint) event->x_root - _lookup_table_window_drag_x),
             pos_y + ((gint) event->y_root - _lookup_table_window_drag_y));
 
@@ -2371,7 +2394,7 @@ ui_lookup_table_window_click_cb (GtkWidget *window,
         _lookup_table_window_drag_y = (gint) event->y_root;
 
         cursor = gdk_cursor_new (GDK_TOP_LEFT_ARROW);
-    
+
         // Grab the cursor to prevent losing events.
 #if GTK_CHECK_VERSION(3, 0, 0)
 
@@ -2412,10 +2435,14 @@ ui_lookup_table_window_click_cb (GtkWidget *window,
 static gboolean
 ui_hide_window_timeout_cb (gpointer data)
 {
+#if !GTK_CHECK_VERSION(2, 12, 0)
     gdk_threads_enter ();
+#endif
 
     if (!_toolbar_always_show) {
+#if !GTK_CHECK_VERSION(2, 12, 0)
         gdk_threads_leave ();
+#endif
         return TRUE;
     }
 
@@ -2423,7 +2450,9 @@ ui_hide_window_timeout_cb (gpointer data)
         _toolbar_window_draging || _toolbar_hidden ||
         ui_any_menu_activated ()) {
         _toolbar_hide_timeout_count = 0;
+#if !GTK_CHECK_VERSION(2, 12, 0)
         gdk_threads_leave ();
+#endif
         return TRUE;
     }
 
@@ -2451,7 +2480,9 @@ ui_hide_window_timeout_cb (gpointer data)
         ui_settle_toolbar_window ();
     }
 
+#if !GTK_CHECK_VERSION(2, 12, 0)
     gdk_threads_leave ();
+#endif
     return TRUE;
 }
 
@@ -2660,12 +2691,12 @@ ui_command_menu_deactivate_cb (GtkWidget   *item,
 //                          gpointer        user_data)
 // {
 //     SCIM_DEBUG_MAIN (1) << "Tray Icon destroyed!\n";
-// 
+//
 //     gtk_widget_destroy (GTK_WIDGET (object));
-// 
+//
 //     _tray_icon = 0;
 //     _tray_icon_factory_button = 0;
-// 
+//
 //     g_idle_add (ui_create_tray_icon_when_idle, NULL);
 // }
 #endif
@@ -2770,16 +2801,24 @@ action_show_command_menu (void)
     for (size_t i = 0; i < _helper_list.size (); ++i) {
         if ((_helper_list [i].option & SCIM_HELPER_STAND_ALONE) != 0 &&
             (_helper_list [i].option & SCIM_HELPER_AUTO_START) == 0) {
-            menu_item = gtk_image_menu_item_new_with_label (_helper_list [i].name.c_str ());
+            menu_item =
+#if GTK_CHECK_VERSION(3, 10, 0)
+                gtk_menu_item_new_with_label
+#else
+                gtk_image_menu_item_new_with_label
+#endif
+                    (_helper_list [i].name.c_str ());
 #if GTK_CHECK_VERSION(2, 12, 0)
             gtk_widget_set_tooltip_text (menu_item, _helper_list [i].description.c_str ());
 #else
             gtk_tooltips_set_tip (_tooltips, menu_item, _helper_list [i].description.c_str (), NULL);
 #endif
-            icon = ui_create_icon (_helper_list [i].icon, NULL, width, height, false);
 
+#if !GTK_CHECK_VERSION(3, 10, 0)
+            icon = ui_create_icon (_helper_list [i].icon, NULL, width, height, false);
             if (icon)
                 gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item), icon);
+#endif
 
             gtk_menu_shell_append (GTK_MENU_SHELL (_command_menu), menu_item);
 
@@ -2798,9 +2837,18 @@ action_show_command_menu (void)
     }
 
     //Reload Configuration.
-    menu_item = gtk_image_menu_item_new_with_label (_("Reload Configuration"));
+    menu_item =
+#if GTK_CHECK_VERSION(3, 10, 0)
+        gtk_menu_item_new_with_label
+#else
+        gtk_image_menu_item_new_with_label
+#endif
+            (_("Reload Configuration"));
+
+#if !GTK_CHECK_VERSION(3, 10, 0)
     gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item),
                                    gtk_image_new_from_stock (GTK_STOCK_REFRESH, GTK_ICON_SIZE_MENU));
+#endif
     gtk_menu_shell_append (GTK_MENU_SHELL (_command_menu), menu_item);
     g_signal_connect (G_OBJECT (menu_item), "activate",
                       G_CALLBACK (ui_command_menu_reload_activate_cb),
@@ -2826,9 +2874,18 @@ action_show_command_menu (void)
     gtk_widget_show_all (menu_item);
 
     //Help
-    menu_item = gtk_image_menu_item_new_with_label (_("Help ..."));
+    menu_item =
+#if GTK_CHECK_VERSION(3, 10, 0)
+        gtk_menu_item_new_with_label
+#else
+        gtk_image_menu_item_new_with_label
+#endif
+             (_("Help ..."));
+
+#if !GTK_CHECK_VERSION(3, 10, 0)
     gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item),
                                    gtk_image_new_from_stock (GTK_STOCK_HELP, GTK_ICON_SIZE_MENU));
+#endif
     gtk_menu_shell_append (GTK_MENU_SHELL (_command_menu), menu_item);
     g_signal_connect (G_OBJECT (menu_item), "activate",
                       G_CALLBACK (ui_command_menu_help_activate_cb),
@@ -2844,16 +2901,27 @@ action_show_command_menu (void)
     gtk_widget_show (menu_item);
 
     //Clients exit.
-    menu_item = gtk_image_menu_item_new_with_label (_("Exit"));
+    menu_item =
+#if GTK_CHECK_VERSION(3, 10, 0)
+        gtk_menu_item_new_with_label
+#else
+        gtk_image_menu_item_new_with_label
+#endif
+             (_("Exit"));
+
+#if !GTK_CHECK_VERSION(3, 10, 0)
     gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (menu_item),
                                    gtk_image_new_from_stock (GTK_STOCK_QUIT, GTK_ICON_SIZE_MENU));
+#endif
     gtk_menu_shell_append (GTK_MENU_SHELL (_command_menu), menu_item);
     g_signal_connect (G_OBJECT (menu_item), "activate",
                       G_CALLBACK (ui_command_menu_exit_activate_cb),
                       0);
     gtk_widget_show_all (menu_item);
     if (_tray_icon_clicked && _tray_icon) {
+        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
         gtk_menu_popup (GTK_MENU (_command_menu), 0, 0, gtk_status_icon_position_menu, _tray_icon, 2, _tray_icon_clicked_time);
+        G_GNUC_END_IGNORE_DEPRECATIONS
     }
     else
         gtk_menu_popup (GTK_MENU (_command_menu), 0, 0, 0, 0, 2, activate_time);
@@ -2912,8 +2980,13 @@ run_panel_agent (void)
 
     _panel_agent_thread = NULL;
 
-    if (_panel_agent && _panel_agent->valid ())
+    if (_panel_agent && _panel_agent->valid ()) {
+#if GTK_CHECK_VERSION(2, 32, 0)
+        _panel_agent_thread = g_thread_new ("panel_agent", panel_agent_thread_func, NULL);
+#else
         _panel_agent_thread = g_thread_create (panel_agent_thread_func, NULL, TRUE, NULL);
+#endif
+    }
 
     return (_panel_agent_thread != NULL);
 }
@@ -2930,10 +3003,14 @@ panel_agent_thread_func (gpointer data)
     _should_exit = true;
     G_UNLOCK (_global_resource_lock);
 */
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     gdk_threads_enter ();
+    G_GNUC_END_IGNORE_DEPRECATIONS
     gtk_main_quit ();
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     gdk_threads_leave ();
     g_thread_exit (NULL);
+    G_GNUC_END_IGNORE_DEPRECATIONS
     return ((gpointer) NULL);
 }
 
@@ -2953,13 +3030,17 @@ start_auto_start_helpers (void)
 static void
 slot_transaction_start (void)
 {
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     gdk_threads_enter ();
+    G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 static void
 slot_transaction_end (void)
 {
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     gdk_threads_leave ();
+    G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 static void
@@ -3053,7 +3134,14 @@ static void
 slot_update_screen (int num)
 {
 #if GTK_CHECK_VERSION(2, 2, 0)
-    if (gdk_display_get_n_screens (gdk_display_get_default ()) > num) {
+    gint n_screens =
+#if GTK_CHECK_VERSION(3, 10, 0)
+        1
+#else
+        gdk_display_get_n_screens (gdk_display_get_default ())
+#endif
+        ;
+    if (n_screens > num) {
 
         GdkScreen *screen = gdk_display_get_screen (gdk_display_get_default (), num);
 
@@ -3133,7 +3221,9 @@ slot_update_factory_info (const PanelFactoryInfo &info)
     //     gtk_widget_set_tooltip_text (_tray_icon_factory_button, info.name.c_str ());
     // }
     if (_tray_icon) {
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
         gtk_status_icon_set_from_file (_tray_icon, info.icon.c_str());
+    G_GNUC_END_IGNORE_DEPRECATIONS
     }
 #endif
 
@@ -3204,7 +3294,7 @@ slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
         // recently used factories
         if (show_recent && recents.size ()) {
             for (std::list<String>::iterator it = _recent_factory_uuids.begin (); it != _recent_factory_uuids.end (); ++it) {
-	
+
                 id = recents [*it];
                 info = factories [id];
 
@@ -3254,17 +3344,19 @@ slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
         g_signal_connect (G_OBJECT (_factory_menu), "deactivate",
                           G_CALLBACK (ui_factory_menu_deactivate_cb),
                           NULL);
-        
+
         if (_tray_icon_clicked && _tray_icon) {
             while (gtk_main_iteration_do (FALSE));
+            G_GNUC_BEGIN_IGNORE_DEPRECATIONS
             gtk_menu_popup (GTK_MENU (_factory_menu), 0, 0, gtk_status_icon_position_menu, _tray_icon, 1, _tray_icon_clicked_time);
+            G_GNUC_END_IGNORE_DEPRECATIONS
         }
         else {
             gtk_menu_popup (GTK_MENU (_factory_menu), 0, 0, 0, 0, 1, gtk_get_current_event_time ());
         }
 
         _tray_icon_clicked = false;
-        
+
     }
 }
 
@@ -3632,12 +3724,20 @@ create_properties_node (PropertyRepository           &repository,
         gtk_container_add (GTK_CONTAINER (node), label);
         gtk_button_set_relief (GTK_BUTTON (node), GTK_RELIEF_NONE);
     } else {
+        node =
+#if GTK_CHECK_VERSION(3, 10, 0)
+            gtk_menu_item_new_with_label
+#else
+            gtk_image_menu_item_new_with_label
+#endif
+                (begin->get_label ().c_str ());
+#if !GTK_CHECK_VERSION(3, 10, 0)
         gint width, height;
         gtk_icon_size_lookup (GTK_ICON_SIZE_MENU, &width, &height);
         GtkWidget * icon = ui_create_icon (begin->get_icon (), NULL, width, height, false);
-        node = gtk_image_menu_item_new_with_label (begin->get_label ().c_str ());
         if (icon)
             gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (node), icon);
+#endif
     }
 
     if (begin->visible ())
@@ -3893,9 +3993,17 @@ update_property (PropertyRepository &repository,
                     int menu_item_idx = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (it->widget), "menu_item_idx"));
 
                     GtkWidget * icon = ui_create_icon (property.get_icon (), NULL, width, height, false);
-                    GtkWidget * new_item = gtk_image_menu_item_new_with_label (property.get_label ().c_str ());
+                    GtkWidget * new_item =
+#if GTK_CHECK_VERSION(3, 10, 0)
+                        gtk_menu_item_new_with_label
+#else
+                        gtk_image_menu_item_new_with_label
+#endif
+                            (property.get_label ().c_str ());
 
+#if !GTK_CHECK_VERSION(3, 10, 0)
                     gtk_image_menu_item_set_image (GTK_IMAGE_MENU_ITEM (new_item), icon);
+#endif
 
                     GtkWidget * submenu = gtk_menu_item_get_submenu (GTK_MENU_ITEM (it->widget));
 
@@ -3972,9 +4080,13 @@ check_exit_timeout_cb (gpointer data)
 {
     G_LOCK (_global_resource_lock);
     if (_should_exit) {
+        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
         gdk_threads_enter ();
+        G_GNUC_END_IGNORE_DEPRECATIONS
         gtk_main_quit ();
+        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
         gdk_threads_leave ();
+        G_GNUC_END_IGNORE_DEPRECATIONS
     }
     G_UNLOCK (_global_resource_lock);
 
@@ -4106,7 +4218,7 @@ int main (int argc, char *argv [])
                 std::cerr << "No argument for option " << argv [i-1] << "\n";
                 return -1;
             }
-            display_name = argv [i]; 
+            display_name = argv [i];
             continue;
         }
 
@@ -4160,9 +4272,13 @@ int main (int argc, char *argv [])
         return -1;
     }
 
+#if !GTK_CHECK_VERSION(2, 32, 0)
     /* init threads */
     g_thread_init (NULL);
+#endif
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     gdk_threads_init ();
+    G_GNUC_END_IGNORE_DEPRECATIONS
 
     signal(SIGQUIT, signalhandler);
     signal(SIGTERM, signalhandler);
@@ -4187,7 +4303,7 @@ int main (int argc, char *argv [])
         std::cerr << "Failed to initialize Panel Agent!\n";
         return -1;
     }
- 
+
     if (daemon)
         scim_daemon ();
 
@@ -4203,9 +4319,13 @@ int main (int argc, char *argv [])
 
     // _check_exit_timeout = g_timeout_add (500, check_exit_timeout_cb, NULL);
 
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     gdk_threads_enter ();
+    G_GNUC_END_IGNORE_DEPRECATIONS
     gtk_main ();
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     gdk_threads_leave ();
+    G_GNUC_END_IGNORE_DEPRECATIONS
 
     // Exiting...
     g_thread_join (_panel_agent_thread);

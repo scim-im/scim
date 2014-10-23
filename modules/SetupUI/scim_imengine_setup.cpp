@@ -4,7 +4,7 @@
 
 /*
  * Smart Common Input Method
- * 
+ *
  * Copyright (c) 2005 James Su <suzhe@tsinghua.org.cn>
  *
  *
@@ -56,7 +56,7 @@ using namespace scim;
 #define scim_setup_module_save_config     aaa_imengine_setup_LTX_scim_setup_module_save_config
 #define scim_setup_module_query_changed   aaa_imengine_setup_LTX_scim_setup_module_query_changed
 
-#define LIST_ICON_SIZE 20 
+#define LIST_ICON_SIZE 20
 
 static GtkWidget * create_setup_window ();
 static void        load_config (const ConfigPointer &config);
@@ -201,7 +201,7 @@ load_filter_settings (const ConfigPointer &config);
 static void
 save_filter_settings (const ConfigPointer &config);
 
-static void 
+static void
 factory_list_update_inconsistent(void);
 
 static void
@@ -304,7 +304,12 @@ create_setup_window ()
         gtk_widget_show (window);
 
         label = gtk_label_new (_("The installed input method services:"));
+#if GTK_CHECK_VERSION(3, 14, 0)
+        gtk_widget_set_halign (label, GTK_ALIGN_START);
+        gtk_widget_set_valign (label, GTK_ALIGN_CENTER);
+#else
         gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
+#endif
         gtk_widget_show (label);
         gtk_box_pack_start (GTK_BOX (window), label, FALSE, FALSE, 0);
 
@@ -313,9 +318,9 @@ create_setup_window ()
         gtk_box_pack_start (GTK_BOX (window), scrolledwindow, TRUE, TRUE, 4);
         gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow),
                                         GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-        gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow), 
+        gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow),
                                              GTK_SHADOW_NONE);
- 
+
         // Create hotkey and filter button before factory list view, because
         // factory_list_selection_changed_callback may access these two buttons.
         __hotkey_button = gtk_button_new_with_mnemonic (_("Edit _Hotkeys"));
@@ -372,11 +377,11 @@ create_setup_window ()
 
         gtk_box_pack_end (GTK_BOX (hbox), __hotkey_button, FALSE, FALSE, 4);
         gtk_box_pack_end (GTK_BOX (hbox), __filter_button, FALSE, FALSE, 4);
- 
+
         button = gtk_button_new_with_mnemonic (_("_Expand"));
         gtk_widget_show (button);
         gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 4);
- 
+
         g_signal_connect ((gpointer) button, "clicked",
                           G_CALLBACK (on_expand_button_clicked),
                           (gpointer) view);
@@ -392,7 +397,7 @@ create_setup_window ()
         button = gtk_button_new_with_mnemonic (_("_Collapse"));
         gtk_widget_show (button);
         gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 4);
- 
+
         g_signal_connect ((gpointer) button, "clicked",
                           G_CALLBACK (on_collapse_button_clicked),
                           (gpointer) view);
@@ -408,7 +413,7 @@ create_setup_window ()
         button = gtk_button_new_with_mnemonic (_("E_nable All"));
         gtk_widget_show (button);
         gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 4);
- 
+
         g_signal_connect ((gpointer) button, "clicked",
                           G_CALLBACK (on_toggle_all_button_clicked),
                           (gpointer) (1));
@@ -424,7 +429,7 @@ create_setup_window ()
         button = gtk_button_new_with_mnemonic (_("_Disable All"));
         gtk_widget_show (button);
         gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 4);
- 
+
         g_signal_connect ((gpointer) button, "clicked",
                           G_CALLBACK (on_toggle_all_button_clicked),
                           (gpointer) (0));
@@ -452,7 +457,9 @@ create_factory_list_view ()
     view = gtk_tree_view_new ();
     gtk_widget_show (view);
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), TRUE);
+#if !GTK_CHECK_VERSION(3, 14, 0)
     gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (view), TRUE);
+#endif
 
     // Name column
     column = gtk_tree_view_column_new ();
@@ -561,7 +568,9 @@ create_filter_list_view ()
     view = gtk_tree_view_new ();
     gtk_widget_show (view);
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), TRUE);
+#if !GTK_CHECK_VERSION(3, 14, 0)
     gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (view), TRUE);
+#endif
 
     // Enable column
     column = gtk_tree_view_column_new ();
@@ -1125,7 +1134,7 @@ query_changed ()
     return __have_changed;
 }
 
-static void 
+static void
 factory_list_update_inconsistent(void)
 {
     GtkTreeIter iter;
@@ -1195,7 +1204,7 @@ on_factory_enable_box_clicked (GtkCellRendererToggle *cell, gchar *arg1, gpointe
         }
     }
     gtk_tree_path_free (path);
- 
+
     __have_changed = true;
 }
 
@@ -1455,7 +1464,7 @@ on_filter_button_clicked (GtkButton *button, gpointer user_data)
         GtkWidget *separator;
         GtkWidget *hbox;
         GtkWidget *button;
- 
+
         std::vector <String> enabled_filters;
 
         if (filter_uuids)
@@ -1463,26 +1472,26 @@ on_filter_button_clicked (GtkButton *button, gpointer user_data)
 
         char buf [256];
         snprintf (buf, 256, _("Select Filters for %s"), name);
- 
+
         dialog = gtk_dialog_new_with_buttons (buf,
                                               NULL,
                                               GTK_DIALOG_MODAL,
-                                              GTK_STOCK_OK,GTK_RESPONSE_OK,
-                                              GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
+                                              _("_OK"), GTK_RESPONSE_OK,
+                                              _("_Cancel"), GTK_RESPONSE_CANCEL,
                                               NULL);
 
 #if GTK_CHECK_VERSION(2, 22, 0)
 #else
         gtk_dialog_set_has_separator (GTK_DIALOG (dialog), TRUE);
 #endif
- 
+
         scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
         gtk_widget_show (scrolledwindow);
         gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow),
                                         GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-        gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow), 
+        gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow),
                                              GTK_SHADOW_NONE);
-  
+
 #if GTK_CHECK_VERSION(3, 0, 0)
         gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), scrolledwindow, TRUE, TRUE, 2);
 #else
@@ -1491,9 +1500,9 @@ on_filter_button_clicked (GtkButton *button, gpointer user_data)
 
         view = create_filter_list_view ();
         set_filter_list_view_content (GTK_TREE_VIEW (view), __filter_infos, enabled_filters);
- 
+
         gtk_container_add (GTK_CONTAINER (scrolledwindow), view);
- 
+
 #if GTK_CHECK_VERSION(3, 2, 0)
         separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
 #else
@@ -1533,7 +1542,7 @@ on_filter_button_clicked (GtkButton *button, gpointer user_data)
                           (gpointer) view);
 
         gtk_window_set_default_size (GTK_WINDOW (dialog), 320, 240);
- 
+
         gint result = gtk_dialog_run (GTK_DIALOG (dialog));
 
         if (result == GTK_RESPONSE_OK) {
@@ -1551,7 +1560,7 @@ on_filter_button_clicked (GtkButton *button, gpointer user_data)
                 __have_changed = true;
             }
         }
- 
+
         gtk_widget_destroy (dialog);
     }
 

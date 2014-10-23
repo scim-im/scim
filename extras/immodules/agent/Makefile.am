@@ -17,7 +17,7 @@
 
 if SCIM_BUILD_IM_AGENT
 
-INCLUDES		= -I$(top_srcdir) \
+AM_CPPFLAGS		= -I$(top_srcdir) \
                   -I$(top_srcdir)/src \
                   -I$(top_srcdir)/extras/immodules/common \
                   -DSCIM_LOCALEDIR=\"@SCIM_LOCALEDIR@\" \

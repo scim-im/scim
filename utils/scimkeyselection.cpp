@@ -12,7 +12,7 @@
 #include "scim.h"
 #include "scimkeyselection.h"
 
-#ifdef GDK_WINDOWING_X11 
+#ifdef GDK_WINDOWING_X11
 #include <X11/Xlib.h>
 #include <gdk/gdkx.h>
 #include "scim_x11_utils.h"
@@ -86,16 +86,24 @@ scim_key_selection_register_type (GTypeModule *type_module)
         if (type_module)
             key_selection_type = g_type_module_register_type (
                                     type_module,
+#if GTK_CHECK_VERSION(3, 0, 0)
+                                    GTK_TYPE_BOX,
+#else
                                     GTK_TYPE_VBOX,
+#endif
                                     "SCIM_ScimKeySelection",
                                     &key_selection_info,
                                     (GTypeFlags) 0);
         else
             key_selection_type = g_type_register_static (
+#if GTK_CHECK_VERSION(3, 0, 0)
+                                    GTK_TYPE_BOX,
+#else
                                     GTK_TYPE_VBOX,
+#endif
                                     "SCIM_ScimKeySelection",
                                     &key_selection_info,
-                                    (GTypeFlags) 0); 
+                                    (GTypeFlags) 0);
     }
 }
 
@@ -201,16 +209,32 @@ scim_key_selection_init (ScimKeySelection *keyselection)
     gtk_tree_view_set_model (GTK_TREE_VIEW (keyselection->list_view),
                              GTK_TREE_MODEL (keyselection->list_model));
 
+#if GTK_CHECK_VERSION(3, 4, 0)
+    table = gtk_grid_new ();
+    gtk_grid_set_row_spacing (GTK_GRID(table), 4);
+    gtk_grid_set_column_spacing (GTK_GRID(table), 4);
+#else
     table = gtk_table_new (2, 3, FALSE);
+#endif
     gtk_widget_show (table);
     gtk_box_pack_start (GTK_BOX (keyselection), table, FALSE, FALSE, 0);
 
     label = gtk_label_new (_("Key Code:"));
     gtk_widget_show (label);
+#if GTK_CHECK_VERSION(3, 4, 0)
+    gtk_widget_set_halign (label, GTK_ALIGN_FILL);
+    gtk_grid_attach (GTK_GRID (table), label, 0, 1, 1, 1);
+#else
     gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 4, 4);
+#endif
+#if GTK_CHECK_VERSION(3, 14, 0)
+    gtk_widget_set_halign (label, GTK_ALIGN_END);
+    gtk_widget_set_valign (label, GTK_ALIGN_CENTER);
+#else
     gtk_misc_set_alignment (GTK_MISC (label), 1, 0.5);
+#endif
 
 #if GTK_CHECK_VERSION(3, 2, 0)
     hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
@@ -218,9 +242,14 @@ scim_key_selection_init (ScimKeySelection *keyselection)
     hbox = gtk_hbox_new (FALSE, 0);
 #endif
     gtk_widget_show (hbox);
+#if GTK_CHECK_VERSION(3, 4, 0)
+    gtk_widget_set_halign (hbox, GTK_ALIGN_FILL);
+    gtk_grid_attach (GTK_GRID (table), hbox, 1, 0, 1, 1);
+#else
     gtk_table_attach (GTK_TABLE (table), hbox, 1, 2, 0, 1,
                       (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
                       (GtkAttachOptions) (0), 4, 4);
+#endif
 
     keyselection->key_code = gtk_entry_new ();
     gtk_widget_show (keyselection->key_code);
@@ -234,10 +263,20 @@ scim_key_selection_init (ScimKeySelection *keyselection)
 
     label = gtk_label_new (_("Modifiers:"));
     gtk_widget_show (label);
+#if GTK_CHECK_VERSION(3, 4, 0)
+    gtk_widget_set_halign (label, GTK_ALIGN_FILL);
+    gtk_grid_attach (GTK_GRID (table), label, 0, 1, 1, 1);
+#else
     gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2,
                       (GtkAttachOptions) (GTK_FILL),
                       (GtkAttachOptions) (0), 4, 4);
+#endif
+#if GTK_CHECK_VERSION(3, 14, 0)
+    gtk_widget_set_halign (label, GTK_ALIGN_END);
+    gtk_widget_set_valign (label, GTK_ALIGN_CENTER);
+#else
     gtk_misc_set_alignment (GTK_MISC (label), 1, 0.5);
+#endif
 
 #if GTK_CHECK_VERSION(3, 2, 0)
     hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
@@ -245,23 +284,28 @@ scim_key_selection_init (ScimKeySelection *keyselection)
     hbox = gtk_hbox_new (FALSE, 0);
 #endif
     gtk_widget_show (hbox);
+#if GTK_CHECK_VERSION(3, 2, 0)
+    gtk_widget_set_halign (hbox, GTK_ALIGN_FILL);
+    gtk_grid_attach (GTK_GRID (table), hbox, 1, 1, 1, 1);
+#else
     gtk_table_attach (GTK_TABLE (table), hbox, 1, 2, 1, 2,
                       (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
                       (GtkAttachOptions) (0), 4, 4);
+#endif
 
-    keyselection->toggle_ctrl = gtk_check_button_new_with_mnemonic (_("_Ctrl")); 
+    keyselection->toggle_ctrl = gtk_check_button_new_with_mnemonic (_("_Ctrl"));
     gtk_widget_show (keyselection->toggle_ctrl);
     gtk_box_pack_start (GTK_BOX (hbox), keyselection->toggle_ctrl, TRUE, TRUE, 2);
 
-    keyselection->toggle_alt = gtk_check_button_new_with_mnemonic (_("A_lt")); 
+    keyselection->toggle_alt = gtk_check_button_new_with_mnemonic (_("A_lt"));
     gtk_widget_show (keyselection->toggle_alt);
     gtk_box_pack_start (GTK_BOX (hbox), keyselection->toggle_alt, TRUE, TRUE, 2);
 
-    keyselection->toggle_shift = gtk_check_button_new_with_mnemonic (_("_Shift")); 
+    keyselection->toggle_shift = gtk_check_button_new_with_mnemonic (_("_Shift"));
     gtk_widget_show (keyselection->toggle_shift);
     gtk_box_pack_start (GTK_BOX (hbox), keyselection->toggle_shift, TRUE, TRUE, 2);
 
-    keyselection->toggle_release = gtk_check_button_new_with_mnemonic (_("_Release")); 
+    keyselection->toggle_release = gtk_check_button_new_with_mnemonic (_("_Release"));
     gtk_widget_show (keyselection->toggle_release);
     gtk_box_pack_start (GTK_BOX (hbox), keyselection->toggle_release, TRUE, TRUE, 2);
 
@@ -271,27 +315,32 @@ scim_key_selection_init (ScimKeySelection *keyselection)
     hbox = gtk_hbox_new (FALSE, 0);
 #endif
     gtk_widget_show (hbox);
+#if GTK_CHECK_VERSION(3, 4, 0)
+    gtk_widget_set_halign (hbox, GTK_ALIGN_FILL);
+    gtk_grid_attach (GTK_GRID (table), hbox, 1, 2, 1, 1);
+#else
     gtk_table_attach (GTK_TABLE (table), hbox, 1, 2, 2, 3,
                       (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
                       (GtkAttachOptions) (0), 4, 4);
+#endif
 
-    keyselection->toggle_meta = gtk_check_button_new_with_mnemonic (_("_Meta")); 
+    keyselection->toggle_meta = gtk_check_button_new_with_mnemonic (_("_Meta"));
     gtk_widget_show (keyselection->toggle_meta);
     gtk_box_pack_start (GTK_BOX (hbox), keyselection->toggle_meta, TRUE, TRUE, 2);
 
-    keyselection->toggle_super = gtk_check_button_new_with_mnemonic (_("S_uper")); 
+    keyselection->toggle_super = gtk_check_button_new_with_mnemonic (_("S_uper"));
     gtk_widget_show (keyselection->toggle_super);
     gtk_box_pack_start (GTK_BOX (hbox), keyselection->toggle_super, TRUE, TRUE, 2);
 
-    keyselection->toggle_hyper = gtk_check_button_new_with_mnemonic (_("_Hyper")); 
+    keyselection->toggle_hyper = gtk_check_button_new_with_mnemonic (_("_Hyper"));
     gtk_widget_show (keyselection->toggle_hyper);
     gtk_box_pack_start (GTK_BOX (hbox), keyselection->toggle_hyper, TRUE, TRUE, 2);
 
 
-    keyselection->toggle_capslock = gtk_check_button_new_with_mnemonic (_("Ca_psLock")); 
+    keyselection->toggle_capslock = gtk_check_button_new_with_mnemonic (_("Ca_psLock"));
     gtk_widget_show (keyselection->toggle_capslock);
     gtk_box_pack_start (GTK_BOX (hbox), keyselection->toggle_capslock, TRUE, TRUE, 2);
-    
+
 #if GTK_CHECK_VERSION(3, 2, 0)
     hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
 #else
@@ -300,14 +349,22 @@ scim_key_selection_init (ScimKeySelection *keyselection)
     gtk_widget_show (hbox);
     gtk_box_pack_start (GTK_BOX (keyselection), hbox, FALSE, FALSE, 4);
 
+#if GTK_CHECK_VERSION(3, 14, 0)
+    button = gtk_button_new_from_icon_name ("list-add", GTK_ICON_SIZE_BUTTON);
+#else
     button = gtk_button_new_from_stock ("gtk-add");
+#endif
     gtk_widget_show (button);
     gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 4);
     g_signal_connect ((gpointer) button, "clicked",
                       G_CALLBACK (scim_key_selection_add_key_button_callback),
                       keyselection);
 
+#if GTK_CHECK_VERSION(3, 14, 0)
+    button = gtk_button_new_from_icon_name ("list-delete", GTK_ICON_SIZE_BUTTON);
+#else
     button = gtk_button_new_from_stock ("gtk-delete");
+#endif
     gtk_widget_show (button);
     gtk_box_pack_start (GTK_BOX (hbox), button, TRUE, TRUE, 4);
     g_signal_connect ((gpointer) button, "clicked",
@@ -439,7 +496,7 @@ keyevent_gdk_to_scim (const GdkEventKey &gdkevent)
     // Use Key Symbole provided by gtk.
     key.code = gdkevent.keyval;
 
-#ifdef GDK_WINDOWING_X11 
+#ifdef GDK_WINDOWING_X11
     key.mask = scim_x11_keymask_x11_to_scim (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), gdkevent.state);
 #else
     if (gdkevent.state & GDK_SHIFT_MASK) key.mask |=SCIM_KEY_ShiftMask;
@@ -491,7 +548,11 @@ scim_key_grab_release_callback (GtkDialog   *dialog,
 GtkWidget*
 scim_key_selection_new (void)
 {
-  return GTK_WIDGET (g_object_new (SCIM_TYPE_KEY_SELECTION, NULL));
+  return GTK_WIDGET (g_object_new (SCIM_TYPE_KEY_SELECTION,
+#if GTK_CHECK_VERSION(3, 0, 0)
+                                   "orientation", GTK_ORIENTATION_VERTICAL,
+#endif
+                                   NULL));
 }
 
 void
@@ -658,7 +719,7 @@ scim_key_selection_dialog_register_type (GTypeModule *type_module)
                                     GTK_TYPE_DIALOG,
                                     "SCIM_ScimKeySelectionDialog",
                                     &key_selection_dialog_info,
-                                    (GTypeFlags) 0); 
+                                    (GTypeFlags) 0);
     }
 }
 
@@ -682,7 +743,9 @@ scim_key_selection_dialog_init (ScimKeySelectionDialog *keyseldialog)
 {
     GtkDialog *dialog;
 
+#if !GTK_CHECK_VERSION(3, 10, 0)
     gtk_widget_push_composite_child ();
+#endif
 
     dialog = GTK_DIALOG (keyseldialog);
 
@@ -707,17 +770,27 @@ scim_key_selection_dialog_init (ScimKeySelectionDialog *keyseldialog)
 
     /* Create the action area */
 #if GTK_CHECK_VERSION(3, 0, 0)
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     keyseldialog->action_area = gtk_dialog_get_action_area (GTK_DIALOG (dialog));
+    G_GNUC_END_IGNORE_DEPRECATIONS
 #else
     keyseldialog->action_area = dialog->action_area;
 #endif
 
     keyseldialog->cancel_button = gtk_dialog_add_button (dialog,
+#if GTK_CHECK_VERSION(3, 10, 0)
+                                                        _("_Cancel"),
+#else
                                                         GTK_STOCK_CANCEL,
+#endif
                                                         GTK_RESPONSE_CANCEL);
 
     keyseldialog->ok_button = gtk_dialog_add_button (dialog,
+#if GTK_CHECK_VERSION(3, 10, 0)
+                                                    _("_OK"),
+#else
                                                     GTK_STOCK_OK,
+#endif
                                                     GTK_RESPONSE_OK);
     gtk_widget_grab_default (keyseldialog->ok_button);
 
@@ -729,14 +802,16 @@ scim_key_selection_dialog_init (ScimKeySelectionDialog *keyseldialog)
     gtk_dialog_set_has_separator (GTK_DIALOG (dialog), TRUE);
 #endif
 
+#if !GTK_CHECK_VERSION(3, 10, 0)
     gtk_widget_pop_composite_child ();
+#endif
 }
 
 GtkWidget*
 scim_key_selection_dialog_new (const gchar *title)
 {
     ScimKeySelectionDialog *keyseldialog;
-  
+
     keyseldialog= (ScimKeySelectionDialog *) g_object_new (SCIM_TYPE_KEY_SELECTION_DIALOG, NULL);
 
     if (title)

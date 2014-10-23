@@ -7,9 +7,9 @@
  * issues.
  */
 
-/* 
+/*
  * Smart Common Input Method
- * 
+ *
  * Copyright (c) 2004-2005 James Su <suzhe@tsinghua.org.cn>
  *
  *
@@ -98,7 +98,7 @@ typedef Slot2<void, const String &, const AttributeList &>
  * Note that, there are two special signals: lock(void) and unlock(void). These
  * two signals are used to provide a thread lock to PanelAgent, so that PanelAgent
  * can run correctly within a multi-threading Panel program.
- */ 
+ */
 class PanelAgent
 {
     class PanelAgentImpl;
@@ -263,7 +263,7 @@ public:
 
 public:
     /**
-     * @brief Signal: Reload configuration. 
+     * @brief Signal: Reload configuration.
      *
      * When a Helper object send a RELOAD_CONFIG event to this Panel,
      * this signal will be emitted. Panel should reload all configuration here.

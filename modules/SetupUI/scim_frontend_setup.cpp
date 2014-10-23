@@ -4,7 +4,7 @@
 
 /*
  * Smart Common Input Method
- * 
+ *
  * Copyright (c) 2005 James Su <suzhe@tsinghua.org.cn>
  *
  *
@@ -335,7 +335,7 @@ create_setup_window ()
 #endif
         gtk_widget_show (hbox);
         gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
- 
+
         label = gtk_label_new_with_mnemonic (_("_Keyboard Layout:"));
         gtk_widget_show (label);
         gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
@@ -421,34 +421,69 @@ create_setup_window ()
         gtk_container_set_border_width (GTK_CONTAINER (frame), 4);
         gtk_box_pack_start (GTK_BOX (window), frame, TRUE, TRUE, 0);
 
+#if GTK_CHECK_VERSION(3, 4, 0)
+        table = gtk_grid_new();
+#else
         table = gtk_table_new (3, 3, FALSE);
+#endif
         gtk_widget_show (table);
         gtk_container_add (GTK_CONTAINER (frame), table);
+#if GTK_CHECK_VERSION(3, 4, 0)
+        gtk_grid_set_row_spacing (GTK_GRID (table), 0);
+        gtk_grid_set_column_spacing (GTK_GRID (table), 8);
+#else
         gtk_table_set_row_spacings (GTK_TABLE (table), 0);
         gtk_table_set_col_spacings (GTK_TABLE (table), 8);
+#endif
 
         for (i = 0; __config_keyboards [i].key; ++ i) {
             label = gtk_label_new (NULL);
             gtk_label_set_text_with_mnemonic (GTK_LABEL (label), _(__config_keyboards[i].label));
             gtk_widget_show (label);
+#if GTK_CHECK_VERSION(3, 14, 0)
+            gtk_widget_set_halign (label, GTK_ALIGN_END);
+            gtk_widget_set_valign (label, GTK_ALIGN_CENTER);
+            gtk_widget_set_margin_start (label, 4);
+            gtk_widget_set_margin_end (label, 4);
+#else
             gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
             gtk_misc_set_padding (GTK_MISC (label), 4, 0);
+#endif
+#if GTK_CHECK_VERSION(3, 4, 0)
+            gtk_widget_set_halign (label, GTK_ALIGN_FILL);
+            gtk_widget_set_valign (label, GTK_ALIGN_FILL);
+            gtk_grid_attach (GTK_GRID (table), label, 0, i, 1, 1);
+#else
             gtk_table_attach (GTK_TABLE (table), label, 0, 1, i, i+1,
                               (GtkAttachOptions) (GTK_FILL),
                               (GtkAttachOptions) (GTK_FILL), 4, 2);
+#endif
 
             __config_keyboards [i].entry = gtk_entry_new ();
             gtk_widget_show (__config_keyboards [i].entry);
+#if GTK_CHECK_VERSION(3, 4, 0)
+            gtk_widget_set_halign (__config_keyboards [i].entry, GTK_ALIGN_FILL);
+            gtk_widget_set_valign (__config_keyboards [i].entry, GTK_ALIGN_FILL);
+            gtk_grid_attach (GTK_GRID (table), __config_keyboards [i].entry,
+                              1, i, 1, 1);
+#else
             gtk_table_attach (GTK_TABLE (table), __config_keyboards [i].entry, 1, 2, i, i+1,
                               (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
                               (GtkAttachOptions) (GTK_FILL), 4, 2);
+#endif
             gtk_editable_set_editable (GTK_EDITABLE (__config_keyboards[i].entry), FALSE);
 
             __config_keyboards[i].button = gtk_button_new_with_label ("...");
             gtk_widget_show (__config_keyboards[i].button);
+#if GTK_CHECK_VERSION(3, 4, 0)
+            gtk_widget_set_halign (__config_keyboards [i].button, GTK_ALIGN_FILL);
+            gtk_widget_set_valign (__config_keyboards [i].button, GTK_ALIGN_FILL);
+            gtk_grid_attach (GTK_GRID (table), __config_keyboards[i].button, 2, i, 1, 1);
+#else
             gtk_table_attach (GTK_TABLE (table), __config_keyboards[i].button, 2, 3, i, i+1,
                               (GtkAttachOptions) (GTK_FILL),
                               (GtkAttachOptions) (GTK_FILL), 4, 2);
+#endif
             gtk_label_set_mnemonic_widget (GTK_LABEL (label), __config_keyboards[i].button);
         }
 
@@ -513,11 +548,11 @@ load_config (const ConfigPointer &config)
                               __config_keyboards [i].data);
         }
 
-        __config_on_the_spot = 
+        __config_on_the_spot =
             config->read (String (SCIM_CONFIG_FRONTEND_ON_THE_SPOT),
                           __config_on_the_spot);
 
-        __config_shared_input_method = 
+        __config_shared_input_method =
             config->read (String (SCIM_CONFIG_FRONTEND_SHARED_INPUT_METHOD),
                           __config_shared_input_method);
 
