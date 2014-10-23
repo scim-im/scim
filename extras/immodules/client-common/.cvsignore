@@ -1,8 +1,0 @@
-Makefile.in
-.deps
-.libs
-libscimbridgeclientcommon.la
-libscimbridgeclientcommon_la-scim-bridge-client-debug.lo
-libscimbridgeclientcommon_la-scim-bridge-client-output.lo
-libscimbridgeclientcommon_la-scim-bridge-client.lo
-Makefile
