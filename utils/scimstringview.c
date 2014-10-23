@@ -1587,6 +1587,7 @@ scim_string_view_draw_insertion_cursor (GtkWidget        *widget,
 {
 #if GTK_CHECK_VERSION(3, 0, 0)
     cairo_t *cr = gdk_cairo_create (drawable);
+/*
 #if GTK_CHECK_VERSION(3, 4, 0)
     GtkStyleContext *context = gtk_widget_get_style_context (widget);
     gtk_render_insertion_cursor (
@@ -1597,8 +1598,13 @@ scim_string_view_draw_insertion_cursor (GtkWidget        *widget,
         direction == GTK_TEXT_DIR_LTR ? PANGO_DIRECTION_LTR : PANGO_DIRECTION_RTL
     );
 #else
+*/
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     gtk_draw_insertion_cursor (widget, cr, location, is_primary, direction, draw_arrow);
+    G_GNUC_END_IGNORE_DEPRECATIONS
+/*
 #endif
+*/
     cairo_destroy (cr);
 #else
     gtk_draw_insertion_cursor (widget, drawable, area, location, is_primary, direction, draw_arrow);
