@@ -1,0 +1,161 @@
+.\" Copyright 2004 Osamu Aoki <osamu@debian.org>,
+.\"           2004,2006 Ming Hua <minghua@rice.edu>.
+.\" This man page is distributed under the same license as scim package.
+.\"
+.TH scim 1 "January 2006" "scim: 1.4.4" "scim manuals"
+.
+.SH NAME
+scim \(em smart common input method
+.
+.SH SYNOPSIS
+.B scim \-l
+.br
+.BR scim " [" \-c " \fIconfig\fR]"
+.RB [ \-e | \-ne " \fIengine\fR]"
+.RB [ \-f " \fIfrontend\fR]"
+.RB [ \-\-no\-socket ]
+.RB [ \-d ]
+.br
+.B scim \-h
+.
+.SH DESCRIPTION
+Smart common input method (SCIM) is a platform for input methods.
+Input methods are useful for users who need to input characters that can't be
+represented by the keys or key combinations on the keyboard, and it's
+essential for languages that use ideograms, such as Chinese, Japanese and
+Korean (CJK), as their alphabets contain hundreds or thousands of characters.
+.PP
+This is the main program of SCIM platform.
+It can be used to invoke the input method as well as list available input
+method modules.
+.
+.SH OPTIONS
+Most options have both a short version and a long version, and they take the
+same arguments.
+.TP
+.BR \-c " | " \-\-config " \fImodule\fR"
+Use specified Config module.
+.TP
+.BR \-d " | " \-\-daemon
+Run as a daemon.
+The program will exit and leave a daemon in the background if invoked with
+this option.
+.TP
+.BR \-e " | " \-\-engines " \fImodule\fR[,\fImodule\fR]..."
+Use specified IMEngine modules.
+Only the named module(s) will be loaded, separate module names with comma.
+.TP
+.BR \-ne " | " \-\-no-engines " \fImodule\fR[,\fImodule\fR]..."
+Use all IMEngine modules except specified ones.
+All modules except the named one(s) will be loaded, separate module names with
+comma.
+.TP
+.BR \-f " | " \-\-frontend " \fImodule\fR"
+Use specified FrontEnd module.
+.TP
+.BR \-h " | " \-\-help
+Show summary of options.
+.TP
+.BR \-l " | " \-\-list
+Print the version number and list all the available modules, categorized in
+three groups \(em FrontEnd, Config and IMEngine.
+.TP
+.B \-\-no\-socket
+Do not start a socket FrondEnd module.
+.
+.SH ENVIRONMENT
+.TP
+.B XMODIFIERS
+Should be set to "@im=SCIM".
+Note that \fBXMODIFIERS\fR is case sensitive, and \fBscim\fR need uppercase.
+If you set it to lowercase, there will be no error message but \fBscim\fR
+won't work.
+.TP
+.B GTK_IM_MODULE
+GTK+ applications can use many different modules to connect with input
+methods, and SCIM can work in two different modes to provide input methods to
+GTK+ with two different modules.
+One is XIM mode, using the "xim" GTK IM module from GTK+ itself.
+The other is GTK IM mode, using the "scim" GTK IM module provided by SCIM
+platform.
+The environment variable \fBGTK_IM_MODULE\fR is used by GTK+ to specify which
+GTK IM module the application should use, to use SCIM's two modes, set
+\fBGTK_IM_MODULE\fR to "xim" or "scim" accordingly.
+.
+.SH EXAMPLES
+To use \fBscim\fR in XIM mode, execute the following commands in an X terminal
+(assuming Bourne style shell):
+.RS
+.B XMODIFIERS="@im=SCIM"
+.br
+.B export XMODIFIERS
+.br
+.B GTK_IM_MODULE="xim"
+.br
+.B export GTK_IM_MODULE
+.br
+.B scim \-d
+.br
+.RI < program >
+.br
+.RE
+Now you can press Ctrl\-space to activate \fBscim\fR in the program you just
+started from X terminal.
+To avoid the inconvenience of having to start the program from X terminal,
+make sure you set \fBXMODIFIERS\fR and \fBGTK_IM_MODULE\fR before starting
+your X session.
+.PP
+To use \fBscim\fR in GTK IM mode, just start any GTK+ application, then right
+click in the application, choose "Input Methods \-> SCIM Input Method" in the
+pop\-up menu, and scim should automatically start.
+Alternatively, you can use the following commands to set scim as the default
+GTK IM module (again assuming Bourne style shell):
+.RS
+.B GTK_IM_MODULE="scim"
+.br
+.B export GTK_IM_MODULE
+.br
+.RI < gtk\-program >
+.RE
+Here \fBscim\fR will also automatically start when you start your GTK+
+program.
+However, it's still a good idea to start \fBscim\fR explicitly even if you use
+GTK IM mode, because if only one application is using GTK IM mode, \fBscim\fR
+will automatically stop when you quit this application.
+Then when you start a new application, \fBscim\fR will start again, this can
+cause quite long delay for application start and quit, giving people the
+impression of "everything slows down when using scim".
+.PP
+The following command starts \fBscim\fR in daemon mode, using the simple
+configure module, Pinyin IM engine module, X11 frontend module:
+.RS
+.B scim \-c simple \-e pinyin \-f x11 \-\-no\-socket \-d
+.RE
+.
+.SH FILES
+.TP
+.IR /etc/scim/global ", " /etc/scim/config
+Configuration file for system wide settings
+.TP
+.IR ~/.scim/global ", " ~/.scim/config
+User specific settings
+.
+.SH "SEE ALSO"
+There is a brief English README giving some introduction and tips about SCIM,
+in \fBDebian\fR system it's installed in \fI/usr/share/doc/scim/\fR and
+gzipped.
+.PP
+\fBDebian\fR users should also read the \fINEWS.Debian\fR and
+\fIREADME.Debian\fR files in \fI/usr/share/doc/scim/\fR.
+There are also other README files in the same directory about using SCIM on a
+\fBDebian\fR system.
+.
+.SH AUTHOR
+SCIM platform is written by James Su and many other contributors.
+.PP
+This manual page is written by Osamu Aoki and Ming Hua for the \fBDebian\fR
+system, but hopefully it's also useful for other users.
+This document is distributed under the same license as the scim software
+package.
+.\"
+.\" vim:textwidth=78:

@@ -1,0 +1,45 @@
+.\" Copyright 2006 ZhengPeng Hou <zhengpeng.hou@gmail.com>,
+.\" This man page is distributed under the same license as scim-bridge package.
+.\"
+.TH "SCIM-IM-AGENT AKA SCIM-BRIDGE" "1"
+.SH "NAME"
+scim-im-agent \(em scim-im-agent was previously known as scim-bridge and is yet another IM client of SCIM. The im-module of scim-im-agent communicates with scim via socket.
+.SH "SYNOPSIS"
+.PP
+\fBscim-im-agent;\fR [\fB-h \fI\-\-help\fR\fP]  [\fB-v\fI\-\-verbose\fR\fP]  [\fB-q\fI\-\-quiet\fR\fP]  [\fB-b\fI\-\-debugflags\fR\fP]  [\fB-l\fI\-\-debuglevel\fR\fP]  [\fB-standalone\fI\-\-standalone\fR\fP]  [\fB-n\fI\-\-noexit\fR\fP]
+.SH "DESCRIPTION"
+.PP
+This manual page documents briefly the
+\fBscim-im-agent\fR command.
+.PP
+This manual page was written for the \fBDebian\fP distribution
+because the original program does not have a manual page.
+.SH "OPTIONS"
+.PP
+The program follow the usual GNU command line syntax,
+with long options starting with two dashes (`\-').  A summary of
+options is included below.
+.IP "\fB-h\fP           \fB\-\-help\fP         " 10
+Give this help list.
+.IP "\fB-v\fP           \fB\-\-verbose\fP         " 10
+Verbosely print out the debug message into standard output.This option equals to '\-\-debuglevel=9 \-\-debugflags=all'.
+.IP "\fB-q\fP           \fB\-\-quiet\fP         " 10
+Make it print no debug message at all.This option equals to '\-\-debuglevel=0 \-\-debugflags=none'.
+.IP "\fB-b\fP           \fB\-\-debugflags\fP         " 10
+Set which category of debug output do you need.Select one or more from 'all', 'none', 'agent', 'messenger', 'imcontext', and 'scim'.
+.IP "\fB-l\fP           \fB\-\-debuglevel\fP         " 10
+Set how verbosely should it print debug output.'\-\-debuglevel=0' equals to '\-\-quiet', and '\-\-debuglevel=9' equals to '\-\-verbose'.
+.IP "\fB-standalone\fP           \fB\-\-standalone\fP         " 10
+Given this, scim-brige-agent won't daemonize itself.
+.IP "\fB-n\fP           \fB\-\-noexit\fP         " 10
+Given this, scim-brige-agent won't exit when there is no client.
+.SH "AUTHOR"
+scim-bridge was originally written by Ryo Dairiki.
+.PP
+This manual page was written by Zhengpeng Hou zhengpeng-hou@ubuntu.com for
+the \fBDebian\fP system (but may be used by others).  Permission is
+granted to copy, distribute and/or modify this document under
+the terms of the GNU General Public License, Version 2 any
+later version published by the Free Software Foundation.
+
+.\" created by instant / docbook-to-man, Mon 03 Apr 2006, 10:00
