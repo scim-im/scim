@@ -2,7 +2,7 @@ Source-derived documentation for developers is provided separately, courtesy
 of doxygen.  Look for scim-doc-$(VERSION).tar.gz on our website for download
 or browse online at http://oss.leggewie.org/scim/
 
-To compile scim from svn, be sure to run the bootstrap script in the toplevel
+To compile scim from VCS, be sure to run the bootstrap script in the toplevel
 directory first.  To prepare a new tarball for release, adjust the values of
 the AC_INIT, SCIM_*_VERSION, SCIM_CURRENT and SCIM_REVISION variables in
 configure.ac as necessary.  Then run
@@ -121,7 +121,6 @@ will first be sent to X11 FrontEnd, then transfered to Socket FrontEnd via
 Socket IMEngine IM Module, then those requests will be proceeded by the real
 IMEngine Modules (1 to n), all reply will be sent back to application via
 the same route.
-
 
 Have fun!
 
