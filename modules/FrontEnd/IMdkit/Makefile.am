@@ -38,6 +38,7 @@ libXimd_la_SOURCES 	= FrameMgr.c \
 			  IMConn.c \
 			  i18nClbk.c \
 			  i18nMethod.c \
+			  i18nOffsetCache.c \
 			  i18nUtil.c \
 			  IMMethod.c 
 
