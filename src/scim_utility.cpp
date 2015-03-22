@@ -552,9 +552,9 @@ scim_get_home_dir ()
         return String (home_dir);
     }
 
-    setpwent ();
+    // setpwent ();
     pw = getpwuid (getuid ());
-    endpwent ();
+    // endpwent ();
 
     if (pw) {
         home_dir = pw->pw_dir;
@@ -578,9 +578,9 @@ scim_get_user_name ()
         return String (user_name);
     }
 
-    setpwent ();
+    // setpwent ();
     pw = getpwuid (getuid ());
-    endpwent ();
+    // endpwent ();
 
     if (pw && pw->pw_name)
         return String (pw->pw_name);
