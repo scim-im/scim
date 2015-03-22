@@ -1,5 +1,6 @@
 # This file is encoded in UTF-8 encoding.
 /FrontEnd/OnTheSpot = true
+/FrontEnd/SharedInputMethod = true
 /FrontEnd/ChangeFactoryGlobally = false
 /FrontEnd/Socket/ConfigReadOnly = false
 /FrontEnd/Socket/MaxClients = 512
