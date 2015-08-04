@@ -84,7 +84,7 @@ public:
     //!<
     //!< <BR>Initialize a new Pointer with any dumb pointer.
 
-    Pointer(Pointer& src) : t(0)
+    Pointer(const Pointer& src) : t(0)
     {
         set(src.get());
     }
