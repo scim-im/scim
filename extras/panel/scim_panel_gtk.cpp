@@ -1269,6 +1269,7 @@ ui_initialize (void)
 #endif
     }
 
+    /*
 #ifdef GDK_WINDOWING_X11
     // Add an event filter function to observe X root window's properties.
     GdkWindow *root_window = gdk_get_default_root_window ();
@@ -1281,6 +1282,7 @@ ui_initialize (void)
     gdk_window_set_events (root_window, event_mask);
     gdk_window_add_filter (root_window, ui_event_filter, NULL);
 #endif
+    */
 
     _ui_initialized = true;
 }
@@ -1600,6 +1602,7 @@ ui_switch_screen (GdkScreen *screen)
             gtk_window_set_screen (GTK_WINDOW (_help_dialog), screen);
         }
 
+        /*
 #ifdef GDK_WINDOWING_X11
         GdkWindow *root_window = gdk_get_default_root_window ();
         GdkEventMask event_mask;
@@ -1609,6 +1612,7 @@ ui_switch_screen (GdkScreen *screen)
         gdk_window_set_events (root_window, event_mask);
         gdk_window_add_filter (root_window, ui_event_filter, NULL);
 #endif
+        */
 
         ui_settle_input_window ();
         ui_settle_lookup_table_window ();
@@ -3146,12 +3150,14 @@ slot_update_screen (int num)
         GdkScreen *screen = gdk_display_get_screen (gdk_display_get_default (), num);
 
         if (screen) {
+            /*
 #ifdef GDK_WINDOWING_X11
             GdkWindow *root_window = gdk_get_default_root_window ();
             if (_current_screen)
                 root_window = gdk_screen_get_root_window (_current_screen);
             gdk_window_remove_filter (root_window, ui_event_filter, NULL);
 #endif
+            */
 
             _current_screen = screen;
             ui_switch_screen (screen);
