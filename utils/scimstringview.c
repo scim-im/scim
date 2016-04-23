@@ -941,7 +941,7 @@ scim_string_view_expose (GtkWidget      *widget,
 #if GTK_CHECK_VERSION(3, 0, 0)
   if (gtk_cairo_should_draw_window (cr, gtk_widget_get_window (widget)))
     scim_string_view_draw_frame (widget, cr);
-  else if (gtk_cairo_should_draw_window (cr, string_view->text_area))
+  if (gtk_cairo_should_draw_window (cr, string_view->text_area))
 #else
 #if GTK_CHECK_VERSION(2, 14, 0)
   if (gtk_widget_get_window (widget) == event->window)
