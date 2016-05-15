@@ -5,465 +5,190 @@
 # Leah Liu <lliu@redhat.com>, 2008.
 msgid ""
 msgstr ""
-"Project-Id-Version: zh_CN\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-07-20 09:50+0800\n"
-"PO-Revision-Date: 2008-03-26 10:32+1000\n"
-"Last-Translator: Leah Liu <lliu@redhat.com>\n"
-"Language-Team: Simplified Chinese <zh@li.org>\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: http://sourceforge.net/projects/scim\n"
+"POT-Creation-Date: 2014-11-20 00:09+0400\n"
+"PO-Revision-Date: 2015-02-11 17:05+0100\n"
+"Last-Translator: test2\n"
+"Language-Team: Dutch <kde-i18n-doc@kde.org>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 1.5\n"
 
-#: ../src/scim_compose_key.cpp:126
-msgid "English/European"
-msgstr "英语/欧洲语言"
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1311
+#: ../extras/panel/scim_panel_gtk.cpp:2692
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1849
+msgid "Smart Common Input Method platform "
+msgstr "智能通用输入法平台"
+
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1313
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
+msgid ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
+"\n"
+msgstr ""
+"\n"
+"(C) 2002-2005 詹姆斯 · 苏 <suzhe@tsinghua.org.cn>\n"
+"\n"
+
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1318
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1855
+msgid ""
+":\n"
+"\n"
+msgstr ""
+":\n"
+"\n"
+
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1321
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1324
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1858
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1861
+msgid ""
+"\n"
+"\n"
+msgstr ""
+"\n"
+"\n"
 
 #. Append an entry for forward mode.
-#: ../src/scim_imengine.cpp:638 ../src/scim_utility.cpp:693
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1897
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1281
-#: ../extras/panel/scim_panel_gtk.cpp:2814
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1361
+#: ../extras/panel/scim_panel_gtk.cpp:3227
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1901 ../src/scim_imengine.cpp:638
+#: ../src/scim_panel_agent.cpp:217 ../src/scim_panel_agent.cpp:218
+#: ../src/scim_utility.cpp:703
 msgid "English/Keyboard"
 msgstr "英语键盘"
 
-#: ../src/scim_utility.cpp:694
-msgid "Amharic"
-msgstr "阿姆哈拉语"
-
-#: ../src/scim_utility.cpp:695
-msgid "Arabic"
-msgstr "阿拉伯语"
-
-#: ../src/scim_utility.cpp:696
-msgid "Arabic (Egypt)"
-msgstr "阿拉伯语(埃及)"
-
-#: ../src/scim_utility.cpp:697
-msgid "Arabic (Lebanon)"
-msgstr "阿拉伯语(黎巴嫩)"
-
-#: ../src/scim_utility.cpp:698
-msgid "Assamese"
-msgstr "阿萨姆语"
-
-#: ../src/scim_utility.cpp:699
-msgid "Azerbaijani"
-msgstr "阿塞拜疆语"
-
-#: ../src/scim_utility.cpp:700
-msgid "Belarusian"
-msgstr "白俄罗斯语"
-
-#: ../src/scim_utility.cpp:701
-msgid "Bulgarian"
-msgstr "保加利亚语"
-
-#: ../src/scim_utility.cpp:702 ../src/scim_utility.cpp:703
-msgid "Bengali"
-msgstr "孟加拉语"
-
-#: ../src/scim_utility.cpp:704
-msgid "Bengali (India)"
-msgstr "孟加拉语(印度)"
-
-#: ../src/scim_utility.cpp:705
-msgid "Tibetan"
-msgstr "西藏语"
-
-#: ../src/scim_utility.cpp:706
-msgid "Bosnian"
-msgstr "波斯尼亚语"
-
-#: ../src/scim_utility.cpp:707
-msgid "Catalan"
-msgstr "加泰罗尼亚语"
-
-#: ../src/scim_utility.cpp:708 ../src/scim_keyboard_layout_data.h:4595
-msgid "Czech"
-msgstr "捷克语"
-
-#: ../src/scim_utility.cpp:709
-msgid "Welsh"
-msgstr "威尔士语"
-
-#: ../src/scim_utility.cpp:710 ../src/scim_keyboard_layout_data.h:4597
-msgid "Danish"
-msgstr "丹麦语"
-
-#: ../src/scim_utility.cpp:711 ../src/scim_keyboard_layout_data.h:4605
-msgid "German"
-msgstr "德语"
-
-#: ../src/scim_utility.cpp:712
-msgid "Divehi"
-msgstr "迪维希语"
-
-#: ../src/scim_utility.cpp:713 ../src/scim_keyboard_layout_data.h:4608
-msgid "Greek"
-msgstr "希腊语"
-
-#: ../src/scim_utility.cpp:714
-msgid "English"
-msgstr "英语"
-
-#: ../src/scim_utility.cpp:715
-msgid "English (Australian)"
-msgstr "英语(澳大利亚)"
-
-#: ../src/scim_utility.cpp:716
-msgid "English (Canadian)"
-msgstr "英语(加拿大)"
-
-#: ../src/scim_utility.cpp:717
-msgid "English (British)"
-msgstr "英语(不列颠)"
-
-#: ../src/scim_utility.cpp:718
-msgid "English (Ireland)"
-msgstr "英语(爱尔兰)"
-
-#: ../src/scim_utility.cpp:719
-msgid "English (American)"
-msgstr "英语(美国)"
-
-#: ../src/scim_utility.cpp:720 ../src/scim_utility.cpp:721
-#: ../src/scim_keyboard_layout_data.h:4621
-msgid "Spanish"
-msgstr "西班牙语"
-
-#: ../src/scim_utility.cpp:722
-msgid "Spanish (Mexico)"
-msgstr "西班牙语(墨西哥)"
-
-#: ../src/scim_utility.cpp:723 ../src/scim_keyboard_layout_data.h:4600
-msgid "Estonian"
-msgstr "爱沙尼亚语"
-
-#: ../src/scim_utility.cpp:724
-msgid "Basque"
-msgstr "巴斯克语"
-
-#: ../src/scim_utility.cpp:725
-msgid "Persian"
-msgstr "波斯语"
-
-#: ../src/scim_utility.cpp:726 ../src/scim_keyboard_layout_data.h:4601
-msgid "Finnish"
-msgstr "芬兰语"
-
-#: ../src/scim_utility.cpp:727 ../src/scim_keyboard_layout_data.h:4602
-msgid "French"
-msgstr "法语"
-
-#: ../src/scim_utility.cpp:728
-msgid "Irish"
-msgstr "爱尔兰语"
-
-#: ../src/scim_utility.cpp:729
-msgid "Galician"
-msgstr "加利西亚语"
-
-#: ../src/scim_utility.cpp:730
-msgid "Gujarati"
-msgstr "古吉拉特语"
-
-#: ../src/scim_utility.cpp:731 ../src/scim_utility.cpp:740
-msgid "Hebrew"
-msgstr "希伯来语"
-
-#: ../src/scim_utility.cpp:732
-msgid "Hindi"
-msgstr "印地语"
-
-#: ../src/scim_utility.cpp:733 ../src/scim_keyboard_layout_data.h:4594
-msgid "Croatian"
-msgstr "克罗地亚语"
-
-#: ../src/scim_utility.cpp:734 ../src/scim_keyboard_layout_data.h:4609
-msgid "Hungarian"
-msgstr "匈牙利语"
-
-#: ../src/scim_utility.cpp:735
-msgid "Armenian"
-msgstr "亚美尼亚语"
-
-#: ../src/scim_utility.cpp:736
-msgid "Interlingua"
-msgstr "拉丁国际语"
-
-#: ../src/scim_utility.cpp:737
-msgid "Indonesian"
-msgstr "印度尼西亚语"
-
-#: ../src/scim_utility.cpp:738 ../src/scim_keyboard_layout_data.h:4627
-msgid "Icelandic"
-msgstr "冰岛语"
-
-#: ../src/scim_utility.cpp:739 ../src/scim_keyboard_layout_data.h:4610
-msgid "Italian"
-msgstr "意大利语"
-
-#: ../src/scim_utility.cpp:741 ../src/scim_keyboard_layout_data.h:4611
-msgid "Japanese"
-msgstr "日语"
-
-#: ../src/scim_utility.cpp:742
-msgid "Georgian"
-msgstr "乔治亚语"
-
-#: ../src/scim_utility.cpp:743
-msgid "Kazakh"
-msgstr "哈萨克语"
-
-#: ../src/scim_utility.cpp:744
-msgid "Cambodian"
-msgstr "柬埔寨语"
-
-#: ../src/scim_utility.cpp:745
-msgid "Kannada"
-msgstr "卡纳达语"
-
-#: ../src/scim_utility.cpp:746
-msgid "Korean"
-msgstr "韩语"
-
-#: ../src/scim_utility.cpp:747
-msgid "Laothian"
-msgstr "老挝语"
-
-#: ../src/scim_utility.cpp:748 ../src/scim_keyboard_layout_data.h:4628
-msgid "Lithuanian"
-msgstr "立陶宛语"
-
-#: ../src/scim_utility.cpp:749
-msgid "Latvian"
-msgstr "拉脱维亚语"
-
-#: ../src/scim_utility.cpp:750
-msgid "Macedonian"
-msgstr "马其顿语"
-
-#: ../src/scim_utility.cpp:751
-msgid "Malayalam"
-msgstr "马拉雅拉姆语"
-
-#: ../src/scim_utility.cpp:752
-msgid "Mongolian"
-msgstr "蒙古语"
-
-#: ../src/scim_utility.cpp:753
-msgid "Marathi"
-msgstr "马拉地语"
-
-#: ../src/scim_utility.cpp:754
-msgid "Malay"
-msgstr "马来语"
-
-#: ../src/scim_utility.cpp:755
-msgid "Burmese"
-msgstr "缅甸语"
-
-#: ../src/scim_utility.cpp:756
-msgid "Nepali"
-msgstr "尼泊尔语"
-
-#: ../src/scim_utility.cpp:757 ../src/scim_keyboard_layout_data.h:4598
-msgid "Dutch"
-msgstr "荷兰语"
-
-#: ../src/scim_utility.cpp:758
-msgid "Norwegian (nynorsk)"
-msgstr "挪威语(尼诺斯克语)"
-
-#: ../src/scim_utility.cpp:759
-msgid "Norwegian (bokmal)"
-msgstr "挪威语(博克马尔语)"
-
-#: ../src/scim_utility.cpp:760
-msgid "Oriya"
-msgstr "奥里雅语"
-
-#: ../src/scim_utility.cpp:761
-msgid "Punjabi"
-msgstr "旁遮普语"
-
-#: ../src/scim_utility.cpp:762 ../src/scim_keyboard_layout_data.h:4613
-msgid "Polish"
-msgstr "波兰语"
-
-#: ../src/scim_utility.cpp:763 ../src/scim_utility.cpp:765
-#: ../src/scim_keyboard_layout_data.h:4614
-msgid "Portuguese"
-msgstr "葡萄牙语"
-
-#: ../src/scim_utility.cpp:764 ../src/scim_keyboard_layout_data.h:4615
-msgid "Portuguese (Brazil)"
-msgstr "葡萄牙语(巴西)"
-
-#: ../src/scim_utility.cpp:766
-msgid "Romanian"
-msgstr "罗马尼亚语"
-
-#: ../src/scim_utility.cpp:767 ../src/scim_keyboard_layout_data.h:4617
-msgid "Russian"
-msgstr "俄语"
-
-#: ../src/scim_utility.cpp:768
-msgid "Sinhala"
-msgstr "僧伽罗语"
-
-#: ../src/scim_utility.cpp:769 ../src/scim_keyboard_layout_data.h:4618
-msgid "Slovak"
-msgstr "斯洛伐克语"
-
-#: ../src/scim_utility.cpp:770 ../src/scim_keyboard_layout_data.h:4620
-msgid "Slovenian"
-msgstr "斯洛文尼亚语"
-
-#: ../src/scim_utility.cpp:771
-msgid "Albanian"
-msgstr "阿尔巴尼亚语"
-
-#: ../src/scim_utility.cpp:772 ../src/scim_utility.cpp:773
-#: ../src/scim_utility.cpp:774
-msgid "Serbian"
-msgstr "塞尔维亚语"
-
-#: ../src/scim_utility.cpp:775 ../src/scim_utility.cpp:777
-#: ../src/scim_keyboard_layout_data.h:4624
-msgid "Swedish"
-msgstr "瑞典语"
-
-#: ../src/scim_utility.cpp:776
-msgid "Swedish (Finland)"
-msgstr "瑞典语(芬兰)"
-
-#: ../src/scim_utility.cpp:778
-msgid "Tamil"
-msgstr "泰米尔语"
-
-#: ../src/scim_utility.cpp:779
-msgid "Telugu"
-msgstr "泰卢固语"
-
-#: ../src/scim_utility.cpp:780
-msgid "Thai"
-msgstr "泰语"
-
-#: ../src/scim_utility.cpp:781 ../src/scim_keyboard_layout_data.h:4625
-msgid "Turkish"
-msgstr "土耳其语"
-
-#: ../src/scim_utility.cpp:782
-msgid "Uighur"
-msgstr "维吾尔语"
-
-#: ../src/scim_utility.cpp:783 ../src/scim_keyboard_layout_data.h:4629
-msgid "Ukrainian"
-msgstr "乌克兰语"
-
-#: ../src/scim_utility.cpp:784
-msgid "Urdu"
-msgstr "乌尔都语"
-
-#: ../src/scim_utility.cpp:785
-msgid "Uzbek"
-msgstr "乌兹别克语"
-
-#: ../src/scim_utility.cpp:786
-msgid "Vietnamese"
-msgstr "越南语"
-
-#: ../src/scim_utility.cpp:787
-msgid "Walloon"
-msgstr "瓦龙语"
-
-#: ../src/scim_utility.cpp:788 ../src/scim_utility.cpp:789
-msgid "Yiddish"
-msgstr "意第绪语"
-
-#: ../src/scim_utility.cpp:790
-msgid "Chinese"
-msgstr "中文"
-
-#: ../src/scim_utility.cpp:791 ../src/scim_utility.cpp:793
-msgid "Chinese (simplified)"
-msgstr "简体中文"
-
-#: ../src/scim_utility.cpp:792 ../src/scim_utility.cpp:794
-msgid "Chinese (traditional)"
-msgstr "繁体中文"
-
-#: ../src/scim_utility.cpp:876
-msgid "Other"
-msgstr "其它语言"
-
-#: ../src/scim_keyboard_layout_data.h:4591
-#: ../modules/IMEngine/scim_socket_imengine.cpp:386
-#: ../modules/IMEngine/scim_socket_imengine.cpp:416
-#: ../modules/IMEngine/scim_socket_imengine.cpp:501
-#: ../modules/IMEngine/scim_socket_imengine.cpp:531
-#: ../modules/IMEngine/scim_socket_imengine.cpp:561
-msgid "Unknown"
-msgstr "未知"
-
-#: ../src/scim_keyboard_layout_data.h:4592
-msgid "English (US)"
-msgstr "英语(美国)"
-
-#: ../src/scim_keyboard_layout_data.h:4593
-msgid "Belgian"
-msgstr "比利时语"
-
-#: ../src/scim_keyboard_layout_data.h:4596
-msgid "Czech (qwerty)"
-msgstr "捷克语(标准键盘)"
-
-#: ../src/scim_keyboard_layout_data.h:4599
-msgid "Dvorak"
-msgstr "Dvorak键盘"
-
-#: ../src/scim_keyboard_layout_data.h:4603
-msgid "French (Canadian)"
-msgstr "法语(加拿大)"
-
-#: ../src/scim_keyboard_layout_data.h:4604
-msgid "French (Switzerland)"
-msgstr "法语(瑞士)"
-
-#: ../src/scim_keyboard_layout_data.h:4606
-msgid "German (with deadkeys)"
-msgstr "德语(有deadkeys)"
-
-#: ../src/scim_keyboard_layout_data.h:4607
-msgid "German (Swiss)"
-msgstr "德语(瑞士)"
-
-#: ../src/scim_keyboard_layout_data.h:4612
-msgid "Norwegian"
-msgstr "挪威语"
-
-#: ../src/scim_keyboard_layout_data.h:4616
-msgid "Portuguese (Brazil US accents)"
-msgstr "葡萄牙语(巴西 美国发音)"
-
-#: ../src/scim_keyboard_layout_data.h:4619
-msgid "Slovak (qwerty)"
-msgstr "斯洛伐克(标准键盘)"
-
-#: ../src/scim_keyboard_layout_data.h:4622
-msgid "Spanish (CP 850)"
-msgstr "西班牙语(CP 850)"
-
-#: ../src/scim_keyboard_layout_data.h:4623
-msgid "Spanish (Latin America)"
-msgstr "西班牙语(拉丁美洲)"
-
-#: ../src/scim_keyboard_layout_data.h:4626
-msgid "English (UK)"
-msgstr "英语(英国)"
+#: ../extras/panel/scim_panel_gtk.cpp:1145
+msgid "SCIM Help"
+msgstr "SCIM 帮助"
+
+#: ../extras/panel/scim_panel_gtk.cpp:1235
+#: ../extras/panel/scim_panel_gtk.cpp:1238
+msgid "Stick/unstick the input window and the toolbar."
+msgstr "粘住/放开 输入窗口和工具条."
+
+#: ../extras/panel/scim_panel_gtk.cpp:1245
+#: ../extras/panel/scim_panel_gtk.cpp:1248
+msgid "Show a brief help about SCIM and the current input method."
+msgstr "显示关于 SCIM 和当前输入法的简单帮助."
+
+#: ../extras/panel/scim_panel_gtk.cpp:1254
+#: ../extras/panel/scim_panel_gtk.cpp:1257
+msgid "Show command menu."
+msgstr "显示命令菜单."
+
+#: ../extras/panel/scim_panel_gtk.cpp:2694
+msgid ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
+msgstr ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
+
+#. Reload Configuration.
+#: ../extras/panel/scim_panel_gtk.cpp:2777
+msgid "Reload Configuration"
+msgstr "重新加载配置"
+
+#. Stick
+#: ../extras/panel/scim_panel_gtk.cpp:2787
+msgid "Stick Windows"
+msgstr "粘住窗口"
+
+#. Toolbar
+#: ../extras/panel/scim_panel_gtk.cpp:2796
+msgid "Hide Toolbar"
+msgstr "隱藏工具条"
+
+#. Help
+#: ../extras/panel/scim_panel_gtk.cpp:2805
+msgid "Help ..."
+msgstr "帮助 ..."
+
+#. Clients exit.
+#: ../extras/panel/scim_panel_gtk.cpp:2823
+msgid "Exit"
+msgstr "退出"
+
+#.
+#. vi:ts=4:nowrap:expandtab
+#.
+#: ../extras/setup/scim-setup.desktop.in.h:1
+msgid "SCIM Input Method"
+msgstr ""
+
+#: ../extras/setup/scim-setup.desktop.in.h:2
+msgid "Configure the Smart Common Input Method platform"
+msgstr ""
+
+#: ../extras/setup/scim_setup_helper.cpp:49
+msgid "SCIM Setup"
+msgstr "SCIM 设置"
+
+#: ../extras/setup/scim_setup_helper.cpp:51
+msgid "Integrated Setup Utility based on GTK Widget library."
+msgstr "基于 GTK 控件库的集成设置工具."
+
+#: ../extras/setup/scim_setup_ui.cpp:47
+msgid "SCIM"
+msgstr "SCIM"
+
+#: ../extras/setup/scim_setup_ui.cpp:48
+msgid "FrontEnd"
+msgstr "前端"
+
+#: ../extras/setup/scim_setup_ui.cpp:49
+msgid "IMEngine"
+msgstr "输入法引擎"
+
+#: ../extras/setup/scim_setup_ui.cpp:50
+msgid "Panel"
+msgstr "面板"
+
+#: ../extras/setup/scim_setup_ui.cpp:51
+msgid "Extra"
+msgstr "附加"
+
+#: ../extras/setup/scim_setup_ui.cpp:230
+msgid "SCIM Input Method Setup"
+msgstr "SCIM 输入法设置"
+
+#: ../extras/setup/scim_setup_ui.cpp:397
+msgid ""
+" <span size=\"20000\">Smart Common Input Method platform</span> \n"
+"\n"
+"<span size=\"16000\" style=\"italic\">GUI Setup Utility</span>\n"
+"\n"
+"\n"
+"\n"
+"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
+"cn&gt;</span>"
+msgstr ""
+" <span size=\"20000\">智能通用输入法平台</span> \n"
+"\n"
+"<span size=\"16000\" style=\"italic\">图形设置工具</span>\n"
+"\n"
+"\n"
+"\n"
+"<span size=\"12000\">版权所有 2002-2004, 苏  哲&lt;suzhe@tsinghua.org.cn&gt;"
+"</span>"
+
+#: ../extras/setup/scim_setup_ui.cpp:422
+#, c-format
+msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
+msgstr "<span size=\"x-large\">%s模块的设置.</span>"
+
+#: ../extras/setup/scim_setup_ui.cpp:698
+msgid ""
+"Not all configuration can be reloaded on the fly. Don't forget to restart "
+"SCIM in order to let all of the new configuration take effect."
+msgstr "不是所有配置都能够直接重新加载. 别忘了重新启动 SCIM 以使所有新的配置生效."
 
 #: ../modules/Filter/scim_sctc_filter.cpp:57
 msgid "Simplified-Traditional Chinese Conversion"
@@ -518,43 +243,6 @@ msgstr "简->繁"
 msgid "TC->SC"
 msgstr "繁->简"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1845
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1231
-#: ../extras/panel/scim_panel_gtk.cpp:2304
-msgid "Smart Common Input Method platform "
-msgstr "智能通用输入法平台"
-
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1847
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1233
-msgid ""
-"\n"
-"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
-"\n"
-msgstr ""
-"\n"
-"(C) 2002-2005 詹姆斯 · 苏 <suzhe@tsinghua.org.cn>\n"
-"\n"
-
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1238
-msgid ""
-":\n"
-"\n"
-msgstr ""
-":\n"
-"\n"
-
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1857
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1241
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1244
-msgid ""
-"\n"
-"\n"
-msgstr ""
-"\n"
-"\n"
-
 #: ../modules/IMEngine/scim_rawcode_imengine.cpp:120
 msgid "RAW CODE"
 msgstr "内码输入"
@@ -590,6 +278,15 @@ msgstr "当前输入法的状态, 点击切换状态."
 msgid "Unicode"
 msgstr "统一码"
 
+#: ../modules/IMEngine/scim_socket_imengine.cpp:386
+#: ../modules/IMEngine/scim_socket_imengine.cpp:416
+#: ../modules/IMEngine/scim_socket_imengine.cpp:501
+#: ../modules/IMEngine/scim_socket_imengine.cpp:531
+#: ../modules/IMEngine/scim_socket_imengine.cpp:561
+#: ../src/scim_keyboard_layout_data.h:4591
+msgid "Unknown"
+msgstr "未知"
+
 #: ../modules/SetupUI/scim_frontend_setup.cpp:82
 #: ../modules/SetupUI/scim_imengine_setup.cpp:88
 msgid "Global Setup"
@@ -604,116 +301,117 @@ msgstr ""
 "等."
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:143
+#: ../modules/SetupUI/scim_frontend_setup.cpp:146
 msgid "_Trigger:"
 msgstr "开关键(_T):"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:145
+#: ../modules/SetupUI/scim_frontend_setup.cpp:148
 msgid "Select the trigger keys"
 msgstr "选择输入法开关键"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:147
+#: ../modules/SetupUI/scim_frontend_setup.cpp:150
 msgid ""
 "The key events to turn on/off SCIM input method. Click on the button on the "
 "right to edit it."
 msgstr "用以打开/关闭 SCIM 输入法的按键. 点击右边的按钮进行编辑."
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:160
+#: ../modules/SetupUI/scim_frontend_setup.cpp:163
 msgid "Turn _On:"
 msgstr "打开键(_O):"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:162
+#: ../modules/SetupUI/scim_frontend_setup.cpp:165
 msgid "Select the Turn On keys"
 msgstr "选择输入法打开键"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:164
+#: ../modules/SetupUI/scim_frontend_setup.cpp:167
 msgid ""
 "The key events to turn on SCIM input method. Click on the button on the "
 "right to edit it."
 msgstr "用以打开 SCIM 输入法的按键. 点击右边的按钮进行编辑."
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:177
+#: ../modules/SetupUI/scim_frontend_setup.cpp:180
 msgid "Turn O_ff:"
 msgstr "关闭键(_F):"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:179
+#: ../modules/SetupUI/scim_frontend_setup.cpp:182
 msgid "Select the Turn Off keys"
 msgstr "选择输入法关闭键"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:181
+#: ../modules/SetupUI/scim_frontend_setup.cpp:184
 msgid ""
 "The key events to turn off SCIM input method. Click on the button on the "
 "right to edit it."
 msgstr "用以关闭 SCIM 输入法的按键. 点击右边的按钮进行编辑."
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:194
+#: ../modules/SetupUI/scim_frontend_setup.cpp:197
 msgid "_Next input method:"
 msgstr "后一个输入法(_N):"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:196
+#: ../modules/SetupUI/scim_frontend_setup.cpp:199
 msgid "Select the next input method keys"
 msgstr "选择后一个输入法按键"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:198
+#: ../modules/SetupUI/scim_frontend_setup.cpp:201
 msgid ""
 "The key events to switch to the next input method. Click on the button on "
 "the right to edit it."
 msgstr "用以切换到后一个输入法的按键. 点击右边的按钮进行编辑."
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:213
+#: ../modules/SetupUI/scim_frontend_setup.cpp:216
 msgid "_Previous input method:"
 msgstr "前一个输入法(_P):"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:215
+#: ../modules/SetupUI/scim_frontend_setup.cpp:218
 msgid "Select the previous input method keys"
 msgstr "选择前一个输入法按键"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:217
+#: ../modules/SetupUI/scim_frontend_setup.cpp:220
 msgid ""
 "The key events to switch to the previous input method. Click on the button "
 "on the right to edit it."
 msgstr "用以切换到前一个输入法的按键. 点击右边的按钮进行编辑."
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:232
+#: ../modules/SetupUI/scim_frontend_setup.cpp:235
 msgid "Show input method _menu:"
 msgstr "显示输入法菜单(_M):"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:234
+#: ../modules/SetupUI/scim_frontend_setup.cpp:237
 msgid "Select the show input method menu keys"
 msgstr "选择显式输入法菜单按键"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:236
+#: ../modules/SetupUI/scim_frontend_setup.cpp:239
 msgid ""
 "The key events to show the input method menu. Click on the button on the "
 "right to edit it."
 msgstr "用以显式输入法菜单的按键. 点击右边的按钮进行编辑."
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:306
+#: ../modules/SetupUI/scim_frontend_setup.cpp:316
 msgid "Options"
 msgstr "选项"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:321
+#: ../modules/SetupUI/scim_frontend_setup.cpp:339
 msgid "_Keyboard Layout:"
 msgstr "键盘布局(_K):"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:342
+#: ../modules/SetupUI/scim_frontend_setup.cpp:369
+#: ../modules/SetupUI/scim_frontend_setup.cpp:373
 msgid ""
 "You should choose your currently used keyboard layout here so that input "
 "methods, who care about keyboard layout, could work correctly."
@@ -722,11 +420,12 @@ msgstr ""
 "确的运行."
 
 #. On The Spot.
-#: ../modules/SetupUI/scim_frontend_setup.cpp:346
+#: ../modules/SetupUI/scim_frontend_setup.cpp:378
 msgid "_Embed Preedit String into client window"
 msgstr "将预编辑字符串嵌入到客户窗口中(_E)"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:351
+#: ../modules/SetupUI/scim_frontend_setup.cpp:384
+#: ../modules/SetupUI/scim_frontend_setup.cpp:389
 msgid ""
 "If this option is checked, the preedit string will be displayed directly in "
 "the client input window, rather than in a independent float window."
@@ -735,11 +434,12 @@ msgstr ""
 "动窗口中."
 
 #. Shared input method.
-#: ../modules/SetupUI/scim_frontend_setup.cpp:360
+#: ../modules/SetupUI/scim_frontend_setup.cpp:399
 msgid "_Share the same input method among all applications"
 msgstr "在所有应用程序中共享同一个输入法(_S)"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:365
+#: ../modules/SetupUI/scim_frontend_setup.cpp:405
+#: ../modules/SetupUI/scim_frontend_setup.cpp:410
 msgid ""
 "If this option is checked, then only one input method could be used by all "
 "applications at the same time.Otherwise different input method could be used "
@@ -748,106 +448,113 @@ msgstr ""
 "如果选中这个选项, 则同一时刻仅能在所有应用程序中使用同一个输入法. 否则各个应"
 "用程序可以使用不同的输入法."
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:373
-#: ../modules/SetupUI/scim_imengine_setup.cpp:453
+#: ../modules/SetupUI/scim_frontend_setup.cpp:419
+#: ../modules/SetupUI/scim_imengine_setup.cpp:501
 msgid "Hotkeys"
 msgstr "热键"
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:93
-msgid "You can enable/disable input methods and set hotkeys for input methods here."
+msgid ""
+"You can enable/disable input methods and set hotkeys for input methods here."
 msgstr "你可以在这里激活／禁止输入法, 并为输入法设置热键."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:296
+#: ../modules/SetupUI/scim_imengine_setup.cpp:306
 msgid "The installed input method services:"
 msgstr "已安装的输入法服务:"
 
 #. Create hotkey and filter button before factory list view, because
 #. factory_list_selection_changed_callback may access these two buttons.
-#: ../modules/SetupUI/scim_imengine_setup.cpp:311
+#: ../modules/SetupUI/scim_imengine_setup.cpp:321
 msgid "Edit _Hotkeys"
 msgstr "编辑热键(_H)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:320
+#: ../modules/SetupUI/scim_imengine_setup.cpp:331
+#: ../modules/SetupUI/scim_imengine_setup.cpp:334
 msgid "Edit Hotkeys associated with the selected input method."
 msgstr "编辑与选中的输入法相关联的热键."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:322
+#: ../modules/SetupUI/scim_imengine_setup.cpp:337
 msgid "Select _Filters"
 msgstr "选择过滤器(_F)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:331
+#: ../modules/SetupUI/scim_imengine_setup.cpp:347
+#: ../modules/SetupUI/scim_imengine_setup.cpp:350
 msgid "Select the Filters which will be attached to this input method."
 msgstr "选择要附加到这个输入法上的过滤器."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:348
+#: ../modules/SetupUI/scim_imengine_setup.cpp:376
 msgid "_Expand"
 msgstr "展开(_E)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:357
+#: ../modules/SetupUI/scim_imengine_setup.cpp:386
+#: ../modules/SetupUI/scim_imengine_setup.cpp:389
 msgid "Expand all language categories."
 msgstr "展开所有语言分类."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:359
+#: ../modules/SetupUI/scim_imengine_setup.cpp:392
 msgid "_Collapse"
 msgstr "折叠(_C)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:368
+#: ../modules/SetupUI/scim_imengine_setup.cpp:402
+#: ../modules/SetupUI/scim_imengine_setup.cpp:405
 msgid "Collapse all language categories."
 msgstr "折叠所有语言分类."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:370
+#: ../modules/SetupUI/scim_imengine_setup.cpp:408
 msgid "E_nable All"
 msgstr "激活所有(_N)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:379
+#: ../modules/SetupUI/scim_imengine_setup.cpp:418
+#: ../modules/SetupUI/scim_imengine_setup.cpp:421
 msgid "Enable all input methods."
 msgstr "激活所有输入法."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:381
+#: ../modules/SetupUI/scim_imengine_setup.cpp:424
 msgid "_Disable All"
 msgstr "禁止所有(_D)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:390
+#: ../modules/SetupUI/scim_imengine_setup.cpp:434
+#: ../modules/SetupUI/scim_imengine_setup.cpp:437
 msgid "Disable all input methods."
 msgstr "禁止所有输入法."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:414
-#: ../modules/SetupUI/scim_imengine_setup.cpp:541
+#: ../modules/SetupUI/scim_imengine_setup.cpp:462
+#: ../modules/SetupUI/scim_imengine_setup.cpp:589
 msgid "Name"
 msgstr "名称"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:432
-#: ../modules/SetupUI/scim_imengine_setup.cpp:522
+#: ../modules/SetupUI/scim_imengine_setup.cpp:480
+#: ../modules/SetupUI/scim_imengine_setup.cpp:570
 msgid "Enable"
 msgstr "激活"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:467
+#: ../modules/SetupUI/scim_imengine_setup.cpp:515
 msgid "Filters"
 msgstr "过滤器"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:560
+#: ../modules/SetupUI/scim_imengine_setup.cpp:608
 msgid "Languages"
 msgstr "语言"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:574
+#: ../modules/SetupUI/scim_imengine_setup.cpp:622
 msgid "Description"
 msgstr "描述"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:1190
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1238
 #, c-format
 msgid "Edit Hotkeys for %s"
 msgstr "编辑 %s 的热键"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:1417
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1465
 #, c-format
 msgid "Select Filters for %s"
 msgstr "为 %s 选择过滤器"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:1450
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1521
 msgid "Move _Up"
 msgstr "向上移动(_U)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:1457
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1528
 msgid "Move _Down"
 msgstr "向下移动(_D)"
 
@@ -859,89 +566,90 @@ msgstr "GTK"
 msgid "A panel daemon based on GTK+-2.x library."
 msgstr "一个基于 GTK+-2.x 库的面板服务程序."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:163
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:166
 msgid "Always"
 msgstr "永远"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:164
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:167
 msgid "On demand"
 msgstr "需要时"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:165
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:168
 msgid "Never"
 msgstr "从不"
 
 #. Create the ToolBar setup block.
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:211
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:217
 msgid "ToolBar"
 msgstr "工具条"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:229
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:235
 msgid "_Show:"
 msgstr "显示(_S):"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:245
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:261
 msgid "Auto s_nap"
 msgstr "自动靠边(_N)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:251
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:267
 msgid "Show _input method icon"
 msgstr "显示输入法图标(_I)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:257
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:273
 msgid "Show inp_ut method name"
 msgstr "显示输入法名称(_U)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:269
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:285
 msgid "Hide time_out:"
 msgstr "隐藏超时(_O):"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:282
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:298
 msgid "Show s_tick icon"
 msgstr "显示粘住图标(_T)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:288
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:304
 msgid "Show m_enu icon"
 msgstr "显示菜单图标(_E)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:294
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:310
 msgid "Show _help icon"
 msgstr "显示帮助图标(_H)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:300
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:316
 msgid "Show _property label"
 msgstr "显示属性标签(_P)"
 
 #. Create the Input Window setup block
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:311
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:327
 msgid "Input window"
 msgstr "输入窗口"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:320
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:336
 msgid "E_mbedded lookup table"
 msgstr "嵌入式候选词表(_M)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:324
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:340
 msgid "_Vertical lookup table"
 msgstr "垂直式候选词表(_V)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:328
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:344
 msgid "Misc"
 msgstr "其它"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:337
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:353
 msgid "Show tra_y icon"
 msgstr "显示托盘图标(_Y)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:341
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:357
 msgid "Stick _windows"
 msgstr "粘住窗口(_W)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:349
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:365
 msgid "_Font:"
 msgstr "字体(_F):"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:419
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:436
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:504
 msgid ""
 "If option \"Always\" is selected, the toolbar will always be shown on the "
 "screen. If option \"On demand\" is selected, it will only be shown when SCIM "
@@ -951,11 +659,14 @@ msgstr ""
 "项, 则只有当SCIM被激活时才会显示工具条. 如果选中 \"从不\" 选项, 则工具条永远"
 "不会被显示."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:426
-msgid "If this option is checked, the toolbar will be snapped to the screen border."
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:443
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:511
+msgid ""
+"If this option is checked, the toolbar will be snapped to the screen border."
 msgstr "如果选中这个选项, 工具条将粘附在屏幕边缘上."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:431
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:449
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:517
 msgid ""
 "The toolbar will be hidden out after this timeout is elapsed. This option is "
 "only valid when \"Always show\" is selected. Set to zero to disable this "
@@ -964,330 +675,667 @@ msgstr ""
 "当超时过后, 工具条将被隐藏起来. 该选项只在 \"永远显示\" 被选中时才生效. 设置"
 "成 0 则禁止此功能."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:438
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:456
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:524
 msgid ""
 "If this option is checked, the input method icon will be showed on the "
 "toolbar."
 msgstr "如果选中这个选项, 输入法图标将显示在工具条上."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:442
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:460
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:528
 msgid ""
 "If this option is checked, the input method name will be showed on the "
 "toolbar."
 msgstr "如果选中这个选项, 输入法名称将显示在工具条上."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:446
-msgid "If this option is checked, the stick icon will be showed on the toolbar."
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:464
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:532
+msgid ""
+"If this option is checked, the stick icon will be showed on the toolbar."
 msgstr "如果选中这个选项, 粘住图标将显示在工具条上."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:450
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:468
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:536
 msgid "If this option is checked, the menu icon will be showed on the toolbar."
 msgstr "如果选中这个选项, 菜单图标将显示在工具条上."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:454
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:472
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:540
 msgid "If this option is checked, the help icon will be showed on the toolbar."
 msgstr "如果选中这个选项, 帮助图标将显示在工具条上."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:458
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:476
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:544
 msgid ""
 "If this option is checked, the text label of input method properties will be "
 "showed on the toolbar."
 msgstr "如果选中这个选项, 则输入法屬性的文字标签将显示在工具条上."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:462
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:480
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:548
 msgid ""
 "If this option is checked, the lookup table will be embedded into the input "
 "window."
 msgstr "如果选中这个选项, 候选词表将被嵌入到输入窗口中."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:467
-msgid "If this option is checked, the lookup table will be displayed vertically."
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:485
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:553
+msgid ""
+"If this option is checked, the lookup table will be displayed vertically."
 msgstr "如果选中这个选项, 将垂直显示候选词表."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:472
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:490
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:558
 msgid ""
 "If this option is checked, the tray icon will be showed on the desktop's "
 "taskbar."
 msgstr "如果选中这个选项, 托盘图标将显示在桌面的任务栏上."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:476
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:494
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:562
 msgid ""
 "If this option is checked, the toolbar, input and lookup table windows will "
 "be sticked to its original position."
 msgstr "如果选中这个选项, 则输入和候选词表窗口将停在它们的原始位置."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:482
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:500
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:568
 msgid "The font setting will be used in the input and lookup table windows."
 msgstr "该字体设置将用于输入和候选词表窗口."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:801
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:889
 msgid "Select Interface Font"
 msgstr "选择界面字体"
 
-#: ../extras/setup/scim_setup_ui.cpp:47
-msgid "SCIM"
-msgstr "SCIM"
+#: ../src/scim_compose_key.cpp:128
+msgid "English/European"
+msgstr "英语/欧洲语言"
 
-#: ../extras/setup/scim_setup_ui.cpp:48
-msgid "FrontEnd"
-msgstr "前端"
-
-#: ../extras/setup/scim_setup_ui.cpp:49
-msgid "IMEngine"
-msgstr "输入法引擎"
-
-#: ../extras/setup/scim_setup_ui.cpp:50
-msgid "Panel"
-msgstr "面板"
-
-#: ../extras/setup/scim_setup_ui.cpp:51
-msgid "Extra"
-msgstr "附加"
-
-#.
-#. vi:ts=4:nowrap:ai:expandtab
-#.
-#: ../extras/setup/scim_setup_ui.cpp:230
-#: ../extras/setup/scim-setup.desktop.in.h:1
-msgid "SCIM Input Method Setup"
-msgstr "SCIM 输入法设置"
-
-#: ../extras/setup/scim_setup_ui.cpp:369
-msgid ""
-" <span size=\"20000\">Smart Common Input Method platform</span> \n"
-"\n"
-"<span size=\"16000\" style=\"italic\">GUI Setup Utility</span>\n"
-"\n"
-"\n"
-"\n"
-"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
-"cn&gt;</span>"
+#. bail out: can't continue without the helper
+#: ../src/scim_helper_manager.cpp:134
+msgid "Failed to launch HelperManager: exiting..."
 msgstr ""
-" <span size=\"20000\">智能通用输入法平台</span> \n"
-"\n"
-"<span size=\"16000\" style=\"italic\">图形设置工具</span>\n"
-"\n"
-"\n"
-"\n"
-"<span size=\"12000\">版权所有 2002-2004, 苏  哲&lt;suzhe@tsinghua.org.cn&gt;"
-"</span>"
 
-#: ../extras/setup/scim_setup_ui.cpp:394
-#, c-format
-msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
-msgstr "<span size=\"x-large\">%s模块的设置.</span>"
-
-#msgid "Are you sure you want to quit SCIM Setup?"
-#msgstr "你确定要退出 SCIM 设置程序么?"
-
-#: ../extras/setup/scim_setup_ui.cpp:661
-msgid ""
-"Not all configuration can be reloaded on the fly. Don't forget to restart "
-"SCIM in order to let all of the new configuration take effect."
-msgstr "不是所有配置都能够直接重新加载. 别忘了重新启动 SCIM 以使所有新的配置生效."
-
-#: ../extras/setup/scim_setup_helper.cpp:49
-msgid "SCIM Setup"
-msgstr "SCIM 设置"
-
-#: ../extras/setup/scim_setup_helper.cpp:51
-msgid "Integrated Setup Utility based on GTK Widget library."
-msgstr "基于 GTK 控件库的集成设置工具."
-
-#: ../extras/setup/scim-setup.desktop.in.h:2
-msgid "Setup utility for Smart Common Input Method platform"
-msgstr "智能通用输入法平台的设置工具"
-
-#: ../extras/panel/scim_panel_gtk.cpp:982
-msgid "SCIM Help"
-msgstr "SCIM 帮助"
-
-#: ../extras/panel/scim_panel_gtk.cpp:999
-msgid "Smart Common Input Method"
-msgstr "智能通用输入法平台"
-
-#: ../extras/panel/scim_panel_gtk.cpp:1058
-msgid "Stick/unstick the input window and the toolbar."
-msgstr "粘住/放开 输入窗口和工具条."
-
-#: ../extras/panel/scim_panel_gtk.cpp:1063
-msgid "Show a brief help about SCIM and the current input method."
-msgstr "显示关于 SCIM 和当前输入法的简单帮助."
-
-#: ../extras/panel/scim_panel_gtk.cpp:1068
-msgid "Show command menu."
-msgstr "显示命令菜单."
-
-#: ../extras/panel/scim_panel_gtk.cpp:2306
-msgid ""
-"\n"
-"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
+#: ../src/scim_helper_manager.cpp:162 ../src/scim_helper_manager.cpp:178
+#: ../src/scim_helper_manager.cpp:184 ../src/scim_helper_manager.cpp:189
+#: ../src/scim_helper_manager.cpp:194
+msgid "Error launching HelperManager"
 msgstr ""
-"\n"
-"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
 
-#. Reload Configuration.
-#: ../extras/panel/scim_panel_gtk.cpp:2385
-msgid "Reload Configuration"
-msgstr "重新加载配置"
+#: ../src/scim_helper_manager.cpp:162 ../src/scim_helper_manager.cpp:178
+#: ../src/scim_socket.cpp:476 ../src/scim_socket.cpp:510
+msgid "failed"
+msgstr ""
 
-#. Stick
-#: ../extras/panel/scim_panel_gtk.cpp:2395
-msgid "Stick Windows"
-msgstr "粘住窗口"
+#: ../src/scim_helper_manager.cpp:184
+msgid "abnormal process termination"
+msgstr ""
 
-#. Toolbar
-#: ../extras/panel/scim_panel_gtk.cpp:2404
-msgid "Hide Toolbar"
-msgstr "隱藏工具条"
+#: ../src/scim_helper_manager.cpp:190
+msgid "it exited with signal"
+msgstr ""
 
-#. Help
-#: ../extras/panel/scim_panel_gtk.cpp:2413
-msgid "Help ..."
-msgstr "帮助 ..."
+#: ../src/scim_helper_manager.cpp:194
+msgid "unknown process launch error"
+msgstr ""
 
-#. Clients exit.
-#: ../extras/panel/scim_panel_gtk.cpp:2431
-msgid "Exit"
-msgstr "退出"
+#: ../src/scim_keyboard_layout_data.h:4592
+msgid "English (US)"
+msgstr "英语(美国)"
 
-#: ../utils/scimstringview.c:196
-msgid "Cursor Position"
-msgstr "光标位置"
+#: ../src/scim_keyboard_layout_data.h:4593
+msgid "Belgian"
+msgstr "比利时语"
 
-#: ../utils/scimstringview.c:197
-msgid "The current position of the insertion cursor in chars."
-msgstr "字符中嵌入光标的当前位置。"
+#: ../src/scim_keyboard_layout_data.h:4594 ../src/scim_utility.cpp:744
+msgid "Croatian"
+msgstr "克罗地亚语"
 
-#: ../utils/scimstringview.c:206
-msgid "Maximum length"
-msgstr "最大长度"
+#: ../src/scim_keyboard_layout_data.h:4595 ../src/scim_utility.cpp:718
+msgid "Czech"
+msgstr "捷克语"
 
-#: ../utils/scimstringview.c:207
-msgid "Maximum number of characters for this string view. Zero if no maximum."
-msgstr "这个字符串视图的最大字符数。如果没有最大字符数，那就是零。"
+#: ../src/scim_keyboard_layout_data.h:4596
+msgid "Czech (qwerty)"
+msgstr "捷克语(标准键盘)"
 
-#: ../utils/scimstringview.c:216
-msgid "Maximum width"
-msgstr "最大宽度"
+#: ../src/scim_keyboard_layout_data.h:4597 ../src/scim_utility.cpp:720
+msgid "Danish"
+msgstr "丹麦语"
 
-#: ../utils/scimstringview.c:217
-msgid "Maximum width of this string view."
-msgstr "这个字符串视图的最大宽度。"
+#: ../src/scim_keyboard_layout_data.h:4598 ../src/scim_utility.cpp:768
+msgid "Dutch"
+msgstr "荷兰语"
 
-#: ../utils/scimstringview.c:226
-msgid "Has Frame"
-msgstr "有框架"
+#: ../src/scim_keyboard_layout_data.h:4599
+msgid "Dvorak"
+msgstr "Dvorak键盘"
 
-#: ../utils/scimstringview.c:227
-msgid "FALSE removes outside bevel from string view."
-msgstr "错误，删除字符串视图的外斜面"
+#: ../src/scim_keyboard_layout_data.h:4600 ../src/scim_utility.cpp:734
+msgid "Estonian"
+msgstr "爱沙尼亚语"
 
-#: ../utils/scimstringview.c:234
-msgid "Draw cursor"
-msgstr "绘制光标"
+#: ../src/scim_keyboard_layout_data.h:4601 ../src/scim_utility.cpp:737
+msgid "Finnish"
+msgstr "芬兰语"
 
-#: ../utils/scimstringview.c:235
-msgid "TRUE draw blinking cursor."
-msgstr "正确，绘制闪烁光标。"
+#: ../src/scim_keyboard_layout_data.h:4602 ../src/scim_utility.cpp:738
+msgid "French"
+msgstr "法语"
 
-#: ../utils/scimstringview.c:242
-msgid "Auto move cursor"
-msgstr "自动移动光标"
+#: ../src/scim_keyboard_layout_data.h:4603
+msgid "French (Canadian)"
+msgstr "法语(加拿大)"
 
-#: ../utils/scimstringview.c:243
-msgid "TRUE auto move cursor position when mouse clicking."
-msgstr "正确，点击鼠标时自动移动光标位置。"
+#: ../src/scim_keyboard_layout_data.h:4604
+msgid "French (Switzerland)"
+msgstr "法语(瑞士)"
 
-#: ../utils/scimstringview.c:250
-msgid "Forward button press event"
-msgstr "传送按钮事件"
+#: ../src/scim_keyboard_layout_data.h:4605 ../src/scim_utility.cpp:721
+msgid "German"
+msgstr "德语"
 
-#: ../utils/scimstringview.c:251
-msgid "TRUE forward button press event to user program."
-msgstr "正确，将按钮事件传送给用户程序。"
+#: ../src/scim_keyboard_layout_data.h:4606
+msgid "German (with deadkeys)"
+msgstr "德语(有deadkeys)"
 
-#: ../utils/scimstringview.c:258
-msgid "Auto resize the widget to fit the string"
-msgstr "自动调整边框以适应字符串"
+#: ../src/scim_keyboard_layout_data.h:4607
+msgid "German (Swiss)"
+msgstr "德语(瑞士)"
 
-#: ../utils/scimstringview.c:259
-msgid "TRUE Auto resize on."
-msgstr "正确，打开自动调整。"
+#: ../src/scim_keyboard_layout_data.h:4608 ../src/scim_utility.cpp:723
+msgid "Greek"
+msgstr "希腊语"
 
-#: ../utils/scimstringview.c:266
-msgid "Width in chars"
-msgstr "字符宽度"
+#: ../src/scim_keyboard_layout_data.h:4609 ../src/scim_utility.cpp:745
+msgid "Hungarian"
+msgstr "匈牙利语"
 
-#: ../utils/scimstringview.c:267
-msgid "Number of characters to leave space for in the string view."
-msgstr "为字符串视图中保留的空白的字符数。"
+#: ../src/scim_keyboard_layout_data.h:4610 ../src/scim_utility.cpp:750
+msgid "Italian"
+msgstr "意大利语"
 
-#: ../utils/scimstringview.c:276
-msgid "Scroll offset"
-msgstr "滚动偏移"
+#: ../src/scim_keyboard_layout_data.h:4611 ../src/scim_utility.cpp:752
+msgid "Japanese"
+msgstr "日语"
 
-#: ../utils/scimstringview.c:277
-msgid "Number of pixels of the string view scrolled off the screen to the left"
-msgstr "字符串视图距屏幕左边的像素数"
+#: ../src/scim_keyboard_layout_data.h:4612
+msgid "Norwegian"
+msgstr "挪威语"
 
-#: ../utils/scimstringview.c:286
-msgid "Text"
-msgstr "文本"
+#: ../src/scim_keyboard_layout_data.h:4613 ../src/scim_utility.cpp:773
+msgid "Polish"
+msgstr "波兰语"
 
-#: ../utils/scimstringview.c:287
-msgid "The contents of the string view"
-msgstr "字符串视图的内容"
+#: ../src/scim_keyboard_layout_data.h:4614 ../src/scim_utility.cpp:774
+#: ../src/scim_utility.cpp:776
+msgid "Portuguese"
+msgstr "葡萄牙语"
 
-#: ../utils/scimkeyselection.cpp:155
+#: ../src/scim_keyboard_layout_data.h:4615 ../src/scim_utility.cpp:775
+msgid "Portuguese (Brazil)"
+msgstr "葡萄牙语(巴西)"
+
+#: ../src/scim_keyboard_layout_data.h:4616
+msgid "Portuguese (Brazil US accents)"
+msgstr "葡萄牙语(巴西 美国发音)"
+
+#: ../src/scim_keyboard_layout_data.h:4617 ../src/scim_utility.cpp:778
+msgid "Russian"
+msgstr "俄语"
+
+#: ../src/scim_keyboard_layout_data.h:4618 ../src/scim_utility.cpp:782
+msgid "Slovak"
+msgstr "斯洛伐克语"
+
+#: ../src/scim_keyboard_layout_data.h:4619
+msgid "Slovak (qwerty)"
+msgstr "斯洛伐克(标准键盘)"
+
+#: ../src/scim_keyboard_layout_data.h:4620 ../src/scim_utility.cpp:783
+msgid "Slovenian"
+msgstr "斯洛文尼亚语"
+
+#: ../src/scim_keyboard_layout_data.h:4621 ../src/scim_utility.cpp:731
+#: ../src/scim_utility.cpp:732
+msgid "Spanish"
+msgstr "西班牙语"
+
+#: ../src/scim_keyboard_layout_data.h:4622
+msgid "Spanish (CP 850)"
+msgstr "西班牙语(CP 850)"
+
+#: ../src/scim_keyboard_layout_data.h:4623
+msgid "Spanish (Latin America)"
+msgstr "西班牙语(拉丁美洲)"
+
+#: ../src/scim_keyboard_layout_data.h:4624 ../src/scim_utility.cpp:788
+#: ../src/scim_utility.cpp:790
+msgid "Swedish"
+msgstr "瑞典语"
+
+#: ../src/scim_keyboard_layout_data.h:4625 ../src/scim_utility.cpp:794
+msgid "Turkish"
+msgstr "土耳其语"
+
+#: ../src/scim_keyboard_layout_data.h:4626
+msgid "English (UK)"
+msgstr "英语(英国)"
+
+#: ../src/scim_keyboard_layout_data.h:4627 ../src/scim_utility.cpp:749
+msgid "Icelandic"
+msgstr "冰岛语"
+
+#: ../src/scim_keyboard_layout_data.h:4628 ../src/scim_utility.cpp:759
+msgid "Lithuanian"
+msgstr "立陶宛语"
+
+#: ../src/scim_keyboard_layout_data.h:4629 ../src/scim_utility.cpp:796
+msgid "Ukrainian"
+msgstr "乌克兰语"
+
+#. NOTE another instance of the server is running: we can't just keep running like this
+#. if we attempt to bind anyway there may be more than one servers listening on this socket.
+#. In addition on FreeBSD bind will get EADDRINUSE, not clear why Linux doesn;t produce this same error.
+#: ../src/scim_socket.cpp:475 ../src/scim_socket.cpp:483
+#: ../src/scim_socket.cpp:491 ../src/scim_socket.cpp:509
+msgid "Creating socket"
+msgstr ""
+
+#: ../src/scim_socket.cpp:476
+msgid "file exists and we were unable to delete it"
+msgstr ""
+
+#: ../src/scim_socket.cpp:476 ../src/scim_socket.cpp:510
+msgid "syscall"
+msgstr ""
+
+#: ../src/scim_socket.cpp:478 ../src/scim_socket.cpp:484
+#: ../src/scim_socket.cpp:492
+msgid "exiting"
+msgstr ""
+
+#: ../src/scim_socket.cpp:484
+msgid "file exists and is not a socket"
+msgstr ""
+
+#: ../src/scim_socket.cpp:492
+msgid "another instance of the server is already listening on this socket"
+msgstr ""
+
+#: ../src/scim_socket.cpp:510
+msgid "unable to change the mode of this file"
+msgstr ""
+
+#: ../src/scim_socket.cpp:511
+msgid "continuing"
+msgstr ""
+
+#: ../src/scim_socket.cpp:519 ../src/scim_socket.cpp:535
+#: ../src/scim_socket.cpp:589
+msgid "Error creating socket"
+msgstr ""
+
+#: ../src/scim_socket.cpp:519 ../src/scim_socket.cpp:535
+#: ../src/scim_socket.cpp:589
+msgid "syscall failed"
+msgstr ""
+
+#: ../src/scim_utility.cpp:704
+msgid "Amharic"
+msgstr "阿姆哈拉语"
+
+#: ../src/scim_utility.cpp:705
+msgid "Arabic"
+msgstr "阿拉伯语"
+
+#: ../src/scim_utility.cpp:706
+msgid "Arabic (Egypt)"
+msgstr "阿拉伯语(埃及)"
+
+#: ../src/scim_utility.cpp:707
+msgid "Arabic (Lebanon)"
+msgstr "阿拉伯语(黎巴嫩)"
+
+#: ../src/scim_utility.cpp:708
+msgid "Assamese"
+msgstr "阿萨姆语"
+
+#: ../src/scim_utility.cpp:709
+msgid "Azerbaijani"
+msgstr "阿塞拜疆语"
+
+#: ../src/scim_utility.cpp:710
+msgid "Belarusian"
+msgstr "白俄罗斯语"
+
+#: ../src/scim_utility.cpp:711
+msgid "Bulgarian"
+msgstr "保加利亚语"
+
+#: ../src/scim_utility.cpp:712 ../src/scim_utility.cpp:713
+msgid "Bengali"
+msgstr "孟加拉语"
+
+#: ../src/scim_utility.cpp:714
+msgid "Bengali (India)"
+msgstr "孟加拉语(印度)"
+
+#: ../src/scim_utility.cpp:715
+msgid "Tibetan"
+msgstr "西藏语"
+
+#: ../src/scim_utility.cpp:716
+msgid "Bosnian"
+msgstr "波斯尼亚语"
+
+#: ../src/scim_utility.cpp:717
+msgid "Catalan"
+msgstr "加泰罗尼亚语"
+
+#: ../src/scim_utility.cpp:719
+msgid "Welsh"
+msgstr "威尔士语"
+
+#: ../src/scim_utility.cpp:722
+msgid "Divehi"
+msgstr "迪维希语"
+
+#: ../src/scim_utility.cpp:724
+msgid "English"
+msgstr "英语"
+
+#: ../src/scim_utility.cpp:725
+msgid "English (Australian)"
+msgstr "英语(澳大利亚)"
+
+#: ../src/scim_utility.cpp:726
+msgid "English (Canadian)"
+msgstr "英语(加拿大)"
+
+#: ../src/scim_utility.cpp:727
+msgid "English (British)"
+msgstr "英语(不列颠)"
+
+#: ../src/scim_utility.cpp:728
+msgid "English (Ireland)"
+msgstr "英语(爱尔兰)"
+
+#: ../src/scim_utility.cpp:729
+msgid "English (American)"
+msgstr "英语(美国)"
+
+#: ../src/scim_utility.cpp:730
+msgid "Esperanto"
+msgstr ""
+
+#: ../src/scim_utility.cpp:733
+msgid "Spanish (Mexico)"
+msgstr "西班牙语(墨西哥)"
+
+#: ../src/scim_utility.cpp:735
+msgid "Basque"
+msgstr "巴斯克语"
+
+#: ../src/scim_utility.cpp:736
+msgid "Persian"
+msgstr "波斯语"
+
+#: ../src/scim_utility.cpp:739
+msgid "Irish"
+msgstr "爱尔兰语"
+
+#: ../src/scim_utility.cpp:740
+msgid "Galician"
+msgstr "加利西亚语"
+
+#: ../src/scim_utility.cpp:741
+msgid "Gujarati"
+msgstr "古吉拉特语"
+
+#: ../src/scim_utility.cpp:742 ../src/scim_utility.cpp:751
+msgid "Hebrew"
+msgstr "希伯来语"
+
+#: ../src/scim_utility.cpp:743
+msgid "Hindi"
+msgstr "印地语"
+
+#: ../src/scim_utility.cpp:746
+msgid "Armenian"
+msgstr "亚美尼亚语"
+
+#: ../src/scim_utility.cpp:747
+msgid "Interlingua"
+msgstr "拉丁国际语"
+
+#: ../src/scim_utility.cpp:748
+msgid "Indonesian"
+msgstr "印度尼西亚语"
+
+#: ../src/scim_utility.cpp:753
+msgid "Georgian"
+msgstr "乔治亚语"
+
+#: ../src/scim_utility.cpp:754
+msgid "Kazakh"
+msgstr "哈萨克语"
+
+#: ../src/scim_utility.cpp:755
+msgid "Cambodian"
+msgstr "柬埔寨语"
+
+#: ../src/scim_utility.cpp:756
+msgid "Kannada"
+msgstr "卡纳达语"
+
+#: ../src/scim_utility.cpp:757
+msgid "Korean"
+msgstr "韩语"
+
+#: ../src/scim_utility.cpp:758
+msgid "Laothian"
+msgstr "老挝语"
+
+#: ../src/scim_utility.cpp:760
+msgid "Latvian"
+msgstr "拉脱维亚语"
+
+#: ../src/scim_utility.cpp:761
+msgid "Macedonian"
+msgstr "马其顿语"
+
+#: ../src/scim_utility.cpp:762
+msgid "Malayalam"
+msgstr "马拉雅拉姆语"
+
+#: ../src/scim_utility.cpp:763
+msgid "Mongolian"
+msgstr "蒙古语"
+
+#: ../src/scim_utility.cpp:764
+msgid "Marathi"
+msgstr "马拉地语"
+
+#: ../src/scim_utility.cpp:765
+msgid "Malay"
+msgstr "马来语"
+
+#: ../src/scim_utility.cpp:766
+msgid "Burmese"
+msgstr "缅甸语"
+
+#: ../src/scim_utility.cpp:767
+msgid "Nepali"
+msgstr "尼泊尔语"
+
+#: ../src/scim_utility.cpp:769
+msgid "Norwegian (nynorsk)"
+msgstr "挪威语(尼诺斯克语)"
+
+#: ../src/scim_utility.cpp:770
+msgid "Norwegian (bokmal)"
+msgstr "挪威语(博克马尔语)"
+
+#: ../src/scim_utility.cpp:771
+msgid "Oriya"
+msgstr "奥里雅语"
+
+#: ../src/scim_utility.cpp:772
+msgid "Punjabi"
+msgstr "旁遮普语"
+
+#: ../src/scim_utility.cpp:777
+msgid "Romanian"
+msgstr "罗马尼亚语"
+
+#: ../src/scim_utility.cpp:779 ../src/scim_utility.cpp:780
+msgid "Sindhi"
+msgstr ""
+
+#: ../src/scim_utility.cpp:781
+msgid "Sinhala"
+msgstr "僧伽罗语"
+
+#: ../src/scim_utility.cpp:784
+msgid "Albanian"
+msgstr "阿尔巴尼亚语"
+
+#: ../src/scim_utility.cpp:785 ../src/scim_utility.cpp:786
+#: ../src/scim_utility.cpp:787
+msgid "Serbian"
+msgstr "塞尔维亚语"
+
+#: ../src/scim_utility.cpp:789
+msgid "Swedish (Finland)"
+msgstr "瑞典语(芬兰)"
+
+#: ../src/scim_utility.cpp:791
+msgid "Tamil"
+msgstr "泰米尔语"
+
+#: ../src/scim_utility.cpp:792
+msgid "Telugu"
+msgstr "泰卢固语"
+
+#: ../src/scim_utility.cpp:793
+msgid "Thai"
+msgstr "泰语"
+
+#: ../src/scim_utility.cpp:795
+msgid "Uighur"
+msgstr "维吾尔语"
+
+#: ../src/scim_utility.cpp:797
+msgid "Urdu"
+msgstr "乌尔都语"
+
+#: ../src/scim_utility.cpp:798
+msgid "Uzbek"
+msgstr "乌兹别克语"
+
+#: ../src/scim_utility.cpp:799
+msgid "Vietnamese"
+msgstr "越南语"
+
+#: ../src/scim_utility.cpp:800
+msgid "Walloon"
+msgstr "瓦龙语"
+
+#: ../src/scim_utility.cpp:801 ../src/scim_utility.cpp:802
+msgid "Yiddish"
+msgstr "意第绪语"
+
+#: ../src/scim_utility.cpp:803
+msgid "Chinese"
+msgstr "中文"
+
+#: ../src/scim_utility.cpp:804 ../src/scim_utility.cpp:806
+msgid "Chinese (simplified)"
+msgstr "简体中文"
+
+#: ../src/scim_utility.cpp:805 ../src/scim_utility.cpp:807
+msgid "Chinese (traditional)"
+msgstr "繁体中文"
+
+#: ../src/scim_utility.cpp:889
+msgid "Other"
+msgstr "其它语言"
+
+#: ../tests/scim_test_helper.cpp:49
+msgid "Test"
+msgstr ""
+
+#: ../tests/scim_test_helper.cpp:51
+msgid "A test helper."
+msgstr ""
+
+#: ../tests/scim_test_imengine.cpp:56
+msgid "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
+msgstr ""
+
+#: ../tests/scim_test_imengine.cpp:102
+msgid "TEST"
+msgstr ""
+
+#: ../tests/scim_test_imengine.cpp:109
+msgid "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>"
+msgstr ""
+
+#: ../utils/scimkeyselection.cpp:162
 msgid "Selected _Keys:"
 msgstr "选中的按键（_K）："
 
-#: ../utils/scimkeyselection.cpp:200
+#: ../utils/scimkeyselection.cpp:207
 msgid "Key Code:"
 msgstr "键码："
 
-#: ../utils/scimkeyselection.cpp:218
+#: ../utils/scimkeyselection.cpp:229
 msgid "..."
 msgstr "..."
 
-#: ../utils/scimkeyselection.cpp:223
+#: ../utils/scimkeyselection.cpp:234
 msgid "Modifiers:"
 msgstr "修正符："
 
-#: ../utils/scimkeyselection.cpp:236
+#: ../utils/scimkeyselection.cpp:251
 msgid "_Ctrl"
 msgstr "_Ctrl（_C）"
 
-#: ../utils/scimkeyselection.cpp:240
+#: ../utils/scimkeyselection.cpp:255
 msgid "A_lt"
 msgstr "A_lt（_l）"
 
-#: ../utils/scimkeyselection.cpp:244
+#: ../utils/scimkeyselection.cpp:259
 msgid "_Shift"
 msgstr "_Shift（_S）"
 
-#: ../utils/scimkeyselection.cpp:248
+#: ../utils/scimkeyselection.cpp:263
 msgid "_Release"
 msgstr "释放（_R）"
 
-#: ../utils/scimkeyselection.cpp:258
+#: ../utils/scimkeyselection.cpp:277
 msgid "_Meta"
 msgstr "_Meta（_M）"
 
-#: ../utils/scimkeyselection.cpp:262
+#: ../utils/scimkeyselection.cpp:281
 msgid "S_uper"
 msgstr "S_uper（_u）"
 
-#: ../utils/scimkeyselection.cpp:266
+#: ../utils/scimkeyselection.cpp:285
 msgid "_Hyper"
 msgstr "_Hyper（_H）"
 
-#: ../utils/scimkeyselection.cpp:331
+#: ../utils/scimkeyselection.cpp:290
+msgid "Ca_psLock"
+msgstr ""
+
+#: ../utils/scimkeyselection.cpp:361
 msgid "Please enter a Key Code first."
 msgstr "请先输入一个键码。"
 
-#: ../utils/scimkeyselection.cpp:385
+#: ../utils/scimkeyselection.cpp:415
 msgid ""
 "Press a key (or a key combination).\n"
 "This dialog will be closed when the key is released."
@@ -1295,13 +1343,101 @@ msgstr ""
 "请按一个键或组合键。\n"
 "本对话窗会在按键释放时关闭。"
 
-#: ../utils/scimkeyselection.cpp:388
+#: ../utils/scimkeyselection.cpp:418
 msgid "Grabbing a key."
 msgstr "捕捉按键"
 
-#: ../utils/scimkeyselection.cpp:678
+#: ../utils/scimkeyselection.cpp:723
 msgid "Key Selection"
 msgstr "按键选择"
+
+#: ../utils/scimstringview.c:231
+msgid "Cursor Position"
+msgstr "光标位置"
+
+#: ../utils/scimstringview.c:232
+msgid "The current position of the insertion cursor in chars."
+msgstr "字符中嵌入光标的当前位置。"
+
+#: ../utils/scimstringview.c:241
+msgid "Maximum length"
+msgstr "最大长度"
+
+#: ../utils/scimstringview.c:242
+msgid "Maximum number of characters for this string view. Zero if no maximum."
+msgstr "这个字符串视图的最大字符数。如果没有最大字符数，那就是零。"
+
+#: ../utils/scimstringview.c:251
+msgid "Maximum width"
+msgstr "最大宽度"
+
+#: ../utils/scimstringview.c:252
+msgid "Maximum width of this string view."
+msgstr "这个字符串视图的最大宽度。"
+
+#: ../utils/scimstringview.c:261
+msgid "Has Frame"
+msgstr "有框架"
+
+#: ../utils/scimstringview.c:262
+msgid "FALSE removes outside bevel from string view."
+msgstr "错误，删除字符串视图的外斜面"
+
+#: ../utils/scimstringview.c:269
+msgid "Draw cursor"
+msgstr "绘制光标"
+
+#: ../utils/scimstringview.c:270
+msgid "TRUE draw blinking cursor."
+msgstr "正确，绘制闪烁光标。"
+
+#: ../utils/scimstringview.c:277
+msgid "Auto move cursor"
+msgstr "自动移动光标"
+
+#: ../utils/scimstringview.c:278
+msgid "TRUE auto move cursor position when mouse clicking."
+msgstr "正确，点击鼠标时自动移动光标位置。"
+
+#: ../utils/scimstringview.c:285
+msgid "Forward button press event"
+msgstr "传送按钮事件"
+
+#: ../utils/scimstringview.c:286
+msgid "TRUE forward button press event to user program."
+msgstr "正确，将按钮事件传送给用户程序。"
+
+#: ../utils/scimstringview.c:293
+msgid "Auto resize the widget to fit the string"
+msgstr "自动调整边框以适应字符串"
+
+#: ../utils/scimstringview.c:294
+msgid "TRUE Auto resize on."
+msgstr "正确，打开自动调整。"
+
+#: ../utils/scimstringview.c:301
+msgid "Width in chars"
+msgstr "字符宽度"
+
+#: ../utils/scimstringview.c:302
+msgid "Number of characters to leave space for in the string view."
+msgstr "为字符串视图中保留的空白的字符数。"
+
+#: ../utils/scimstringview.c:311
+msgid "Scroll offset"
+msgstr "滚动偏移"
+
+#: ../utils/scimstringview.c:312
+msgid "Number of pixels of the string view scrolled off the screen to the left"
+msgstr "字符串视图距屏幕左边的像素数"
+
+#: ../utils/scimstringview.c:321
+msgid "Text"
+msgstr "文本"
+
+#: ../utils/scimstringview.c:322
+msgid "The contents of the string view"
+msgstr "字符串视图的内容"
 
 #: ../utils/scimtrayicon.c:108
 msgid "Orientation"
@@ -1311,676 +1447,3 @@ msgstr "定位"
 msgid "The orientation of the tray."
 msgstr "托盘定位。"
 
-#~ msgid "Are you sure you want to quit SCIM Setup?"
-#~ msgstr "你确定要退出 SCIM 设置程序么?"
-
-#~ msgid "En"
-#~ msgstr "英"
-
-#, fuzzy
-#~ msgid "_Switch input method globally"
-#~ msgstr "显示输入法图标(_I)"
-
-#~ msgid "Preedit String mode"
-#~ msgstr "预编辑字符串模式"
-
-#~ msgid "X Window"
-#~ msgstr "X 窗口"
-
-#~ msgid "A FrontEnd module for X11R6 Window System, using XIM Protocol."
-#~ msgstr "一个用于 X11R6 窗口系统的前端模块, 使用 XIM 协议."
-
-#~ msgid "XIM Settings"
-#~ msgstr "XIM 设置"
-
-#~ msgid "_On The Spot"
-#~ msgstr "在光标处预编辑(_O)"
-
-#~ msgid "_Dynamic Event Flow"
-#~ msgstr "动态事件流(_D)"
-
-#~ msgid ""
-#~ "If this option is checked, the OnTheSpot input style will be used when "
-#~ "the client supports it."
-#~ msgstr ""
-#~ "如果选中这个选项, 当客户端支持时, 预编辑字符串将显示在光标位置上, 即 On "
-#~ "The Spot 模式."
-
-#~ msgid ""
-#~ "If this option is checked, then dynamic event flow will be used.This can "
-#~ "speed up the key event response, especially in remote X11 environment.But "
-#~ "SCIM may become unstable."
-#~ msgstr ""
-#~ "如果选中这个选项, 则会使用动态事件流. 这可以加快按键事件的响应速度, 特别是"
-#~ "在远程 X11 环境中. 但 SCIM 可能会变得不稳定."
-
-#~ msgid "Portuguese (Brazilian)"
-#~ msgstr "葡萄牙语(巴西)"
-
-#~ msgid "Slovene"
-#~ msgstr "斯洛文尼亚语"
-
-#, fuzzy
-#~ msgid "Global"
-#~ msgstr "全局设置"
-
-#, fuzzy
-#~ msgid ""
-#~ "\n"
-#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>\n"
-#~ "\n"
-#~ msgstr "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>"
-
-#~ msgid "Hot Keys"
-#~ msgstr "热键"
-
-#~ msgid ""
-#~ "\n"
-#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>\n"
-#~ "\n"
-#~ "Hot keys:\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "\n"
-#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>\n"
-#~ "\n"
-#~ "热键:\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ ":\n"
-#~ "    open/close the input method.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ ":\n"
-#~ "    打开/关闭输入法.\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ ":\n"
-#~ "    switch to the next input method.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ ":\n"
-#~ "    切换到下一个输入法.\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ ":\n"
-#~ "    switch to the previous input method.\n"
-#~ "\n"
-#~ "\n"
-#~ msgstr ""
-#~ ":\n"
-#~ "    切换到前一个输入法.\n"
-#~ "\n"
-#~ "\n"
-
-#~ msgid "Full/Half Letter"
-#~ msgstr "全/半角字符"
-
-#~ msgid "Full/Half Punct"
-#~ msgstr "全/半角标点"
-
-#~ msgid ""
-#~ "The input mode of the letters. Click to toggle between half and full."
-#~ msgstr "字母输入模式. 点击以切换全角/半角模式."
-
-#~ msgid ""
-#~ "The input mode of the puncutations. Click to toggle between half and full."
-#~ msgstr "标点输入模式. 点击以切换全角/半角模式."
-
-#~ msgid ""
-#~ "    Switch between full/half width letter mode.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "    切换全角和半角字符状态.\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ "    Switch between full/half width punctuation mode.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "    切换全角和半角标点符号状态.\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ "    Switch between Forward/Input mode.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "    切换 转发/输入 模式.\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ "    Add a new phrase.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "    添加一个新词.\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ "    Delete the selected phrase.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "    删除选中的词语.\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "  Control+Down:\n"
-#~ "    Move lookup cursor to next shorter phrase\n"
-#~ "    Only available when LongPhraseFirst option is set.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  Control+Down:\n"
-#~ "    将候选词表的光标移动到下一个更短的词\n"
-#~ "    只在打开 LongPhraseFirst 选项的时候才生效.\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "  Control+Up:\n"
-#~ "    Move lookup cursor to previous longer phrase\n"
-#~ "    Only available when LongPhraseFirst option is set.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  Control+Up:\n"
-#~ "    将候选词表的光标移动到前一个更长的词\n"
-#~ "    只在打开 LongPhraseFirst 选项的时候才生效.\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "  Esc:\n"
-#~ "    reset the input method.\n"
-#~ "\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  Esc:\n"
-#~ "    复位输入法.\n"
-#~ "\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "How to add a phrase:\n"
-#~ "    Input the new phrase as normal, then press the\n"
-#~ "  hot key. A hint will be shown to let you input a key\n"
-#~ "  for this phrase.\n"
-#~ "    Input a key then press the space bar.\n"
-#~ "  A hint will be shown to indicate whether\n"
-#~ "  the phrase was added sucessfully.\n"
-#~ msgstr ""
-#~ "怎样添加一个词语:\n"
-#~ "    首先在正常状态下输入新词, 然后按添加词语快捷键.\n"
-#~ "  将会显示一个提示让你为这个词语输入一个键串.\n"
-#~ "    输入键串后按空格键. 会有一个提示说明加词\n"
-#~ "  是否成功.\n"
-
-#~ msgid "Input a key string for phrase: "
-#~ msgstr "为这个词输入一个键串: "
-
-#~ msgid "Success."
-#~ msgstr "成功."
-
-#~ msgid "Failed."
-#~ msgstr "失败."
-
-#~ msgid "Generic Table"
-#~ msgstr "通用码表"
-
-#~ msgid "An IMEngine Module which uses generic table input method file."
-#~ msgstr "一个使用通用码表输入法文件的输入法引擎模块."
-
-#~ msgid "Full width _punctuation:"
-#~ msgstr "全/半角标点切换(_P):"
-
-#~ msgid "Select full width puncutation keys"
-#~ msgstr "选择全/半角标点状态切换键"
-
-#~ msgid ""
-#~ "The key events to switch full/half width punctuation input mode. Click on "
-#~ "the button on the right to edit it."
-#~ msgstr "用以切换全/半角标点输入模式的按键. 点击右边的按钮进行编辑."
-
-#~ msgid "Full width _letter:"
-#~ msgstr "全/半角字母切换(_L):"
-
-#~ msgid "Select full width letter keys"
-#~ msgstr "选择全/半角字母状态切换键"
-
-#~ msgid ""
-#~ "The key events to switch full/half width letter input mode. Click on the "
-#~ "button on the right to edit it."
-#~ msgstr "用以切换全/半角字母输入模式的按键. 点击右边的按钮进行编辑."
-
-#~ msgid "_Mode switch:"
-#~ msgstr "输入模式切换(_M):"
-
-#~ msgid "Select mode switch keys"
-#~ msgstr "选择输入模式切换键"
-
-#~ msgid ""
-#~ "The key events to change current input mode. Click on the button on the "
-#~ "right to edit it."
-#~ msgstr "用以切换当前输入模式的按键. 点击右边的按钮进行编辑."
-
-#~ msgid "_Add phrase:"
-#~ msgstr "添加词语(_A):"
-
-#~ msgid "Select add phrase keys."
-#~ msgstr "选择添加词语键"
-
-#~ msgid ""
-#~ "The key events to add a new user defined phrase. Click on the button on "
-#~ "the right to edit it."
-#~ msgstr "用以添加用户自定义词语的按键. 点击右边的按钮进行编辑."
-
-#~ msgid "_Delete phrase:"
-#~ msgstr "删除词语(_D):"
-
-#~ msgid "Select delete phrase keys."
-#~ msgstr "选择删除词语键"
-
-#~ msgid ""
-#~ "The key events to delete a selected phrase. Click on the button on the "
-#~ "right to edit it."
-#~ msgstr "用以删除选中词语的按键. 点击右边的按钮进行编辑."
-
-#~ msgid "Show _prompt"
-#~ msgstr "显示提示(_P)"
-
-#~ msgid "Show key _hint"
-#~ msgstr "显示逐键提示(_H)"
-
-#~ msgid "Save _user table in binary format"
-#~ msgstr "以二进制格式保存用户码表(_U)"
-
-#~ msgid "Show the u_ser defined phrases first"
-#~ msgstr "优先显示用户自定义的词语(_S)"
-
-#~ msgid "Show the _longer phrases first"
-#~ msgstr "优先显示较长的词语(_L)"
-
-#~ msgid ""
-#~ "If this option is checked, the key prompt of the currently selected "
-#~ "phrase will be shown."
-#~ msgstr "如果选中这个选项, 则显示当前词语按键的提示信息."
-
-#~ msgid ""
-#~ "If this option is checked, the remaining keystrokes of the phraseswill be "
-#~ "shown on the lookup table."
-#~ msgstr "如果选中这个选项, 将在候选词表中显示每个词语剩下需要输入的按键."
-
-#~ msgid ""
-#~ "If this option is checked, the user table will be stored with binary "
-#~ "format, this will increase the loading speed."
-#~ msgstr "如果选中这个选项, 用户码表将以二进制格式存储, 这会提高调入速度."
-
-#~ msgid ""
-#~ "If this option is checked, the user defined phrases will be shown in "
-#~ "front of others. "
-#~ msgstr "如果选中这个选项, 将优先显示用户自定义的词语."
-
-#~ msgid ""
-#~ "If this option is checked, the longer phrase will be shown in front of "
-#~ "others. "
-#~ msgstr "如果选中这个选项, 将优先显示较长的词语."
-
-#~ msgid "The installed tables:"
-#~ msgstr "已安装的码表:"
-
-#~ msgid "_Install"
-#~ msgstr "安装(_I)"
-
-#~ msgid "Install a new table."
-#~ msgstr "安装一个新码表."
-
-#~ msgid "_Delete"
-#~ msgstr "删除(_D)"
-
-#~ msgid "Delete the selected table."
-#~ msgstr "删除选中的码表."
-
-#~ msgid "_Properties"
-#~ msgstr "属性(_P)"
-
-#~ msgid "Edit the properties of the selected table."
-#~ msgstr "编辑选中的码表的属性."
-
-#~ msgid "Generic"
-#~ msgstr "通用"
-
-#~ msgid "Table Management"
-#~ msgstr "码表管理"
-
-#~ msgid "Select an icon file"
-#~ msgstr "选择一个图标文件"
-
-#~ msgid "User"
-#~ msgstr "用户"
-
-#~ msgid "System"
-#~ msgstr "系统"
-
-#~ msgid "Please select the table file to be installed."
-#~ msgstr "请选择要安装的码表文件."
-
-#~ msgid "Failed to install the table! It's already in table file directory."
-#~ msgstr "码表安装失败! 它已经被安装到码表目录中了."
-
-#~ msgid "Failed to load the table file!"
-#~ msgstr "无法调入码表文件!"
-
-#~ msgid ""
-#~ "Failed to install the table! Another version of this table was already "
-#~ "installed."
-#~ msgstr "码表安装失败! 这个码表的另外一个版本已经被安装过了."
-
-#~ msgid ""
-#~ "Another version of this table was already installed. Do you want to "
-#~ "replace it with the new one?"
-#~ msgstr "已经安装了这个码表的另外一个版本. 你想用新码表替换原来那个么?"
-
-#~ msgid ""
-#~ "Failed to install the table! A table with the same file name was already "
-#~ "installed."
-#~ msgstr "码表安装失败! 一个有相同文件名的码表已经被安装."
-
-#~ msgid ""
-#~ "A table with the same file name was already installed. Do you want to "
-#~ "overwrite it?"
-#~ msgstr "一个有相同文件名的码表已经被安装. 你想覆盖它么?"
-
-#~ msgid "Failed to install the table to %s!"
-#~ msgstr "将码表安装到 %s 失败!"
-
-#~ msgid "Can not delete the file %s!"
-#~ msgstr "无法删除文件 %s!"
-
-#~ msgid "Are you sure to delete this table file?"
-#~ msgstr "你确认删除这个码表文件?"
-
-#~ msgid "Failed to delete the table file!"
-#~ msgstr "码表文件删除失败!"
-
-#~ msgid "True"
-#~ msgstr "真"
-
-#~ msgid "False"
-#~ msgstr "假"
-
-#~ msgid "Split Keys:"
-#~ msgstr "分隔键:"
-
-#~ msgid "The key strokes to split inputed string."
-#~ msgstr "用于分隔输入字符串的按键."
-
-#~ msgid "Commit Keys:"
-#~ msgstr "提交键:"
-
-#~ msgid "The key strokes to commit converted result to client."
-#~ msgstr "用于将转换结果提交给客户程序的按键."
-
-#~ msgid "Forward Keys:"
-#~ msgstr "转发键:"
-
-#~ msgid "The key strokes to forward inputed string to client."
-#~ msgstr "用于将已输入的字符串转发给客户程序的按键."
-
-#~ msgid "The key strokes to select candidate phrases in lookup table."
-#~ msgstr "在候选词表中选择候选词的按键."
-
-#~ msgid "Page Up Keys:"
-#~ msgstr "向上翻页键:"
-
-#~ msgid "The lookup table page up keys"
-#~ msgstr "候选词表向上翻页键"
-
-#~ msgid "Page Down Keys:"
-#~ msgstr "向下翻页键:"
-
-#~ msgid "The lookup table page down keys"
-#~ msgstr "候选词表向下翻页键"
-
-#~ msgid "Table Properties"
-#~ msgstr "码表属性"
-
-#~ msgid "Name:"
-#~ msgstr "名称:"
-
-#~ msgid "The name of this table."
-#~ msgstr "这个码表的名称."
-
-#~ msgid "Author:"
-#~ msgstr "作者:"
-
-#~ msgid "The author of this table."
-#~ msgstr "这个码表的作者."
-
-#~ msgid "UUID:"
-#~ msgstr "唯一号:"
-
-#~ msgid "The unique ID of this table."
-#~ msgstr "这个码表的唯一号."
-
-#~ msgid "Serial Number:"
-#~ msgstr "系列号:"
-
-#~ msgid "The serial number of this table."
-#~ msgstr "这个码表的系列号."
-
-#~ msgid "Icon File:"
-#~ msgstr "图标文件:"
-
-#~ msgid "The icon file of this table."
-#~ msgstr "这个码表的图标文件."
-
-#~ msgid "Supported Languages:"
-#~ msgstr "支持的语言:"
-
-#~ msgid "The languages supported by this table."
-#~ msgstr "这个码表支持的语言."
-
-#~ msgid "Status Prompt:"
-#~ msgstr "状态提示:"
-
-#~ msgid "A prompt string to be shown in status area."
-#~ msgstr "要显示在状态区中的提示字符串."
-
-#~ msgid "Valid Input Chars:"
-#~ msgstr "合法的输入字符:"
-
-#~ msgid "The valid input chars of this table."
-#~ msgstr "这个码表的合法的输入字符."
-
-#~ msgid "Multi Wildcard Char:"
-#~ msgstr "多重扩展字符:"
-
-#~ msgid ""
-#~ "The multi wildcard chars of this table. These chars can be used to match "
-#~ "one or more arbitrary chars."
-#~ msgstr "这个码表的多重扩展字符. 这些字符可以用来匹配一个或多个任意字符."
-
-#~ msgid "Single Wildcard Char:"
-#~ msgstr "单一扩展字符:"
-
-#~ msgid ""
-#~ "The single wildcard chars of this table.These chars can be used to match "
-#~ "one arbitrary char."
-#~ msgstr "这个码表的单一扩展字符. 这些字符可以用于匹配一个任意字符."
-
-#~ msgid "Max Key Length:"
-#~ msgstr "最大键长度:"
-
-#~ msgid "The maxmium length of key strings."
-#~ msgstr "键串的最大长度."
-
-#~ msgid "Show Key Prompt:"
-#~ msgstr "显示键提示:"
-
-#~ msgid "If true then the key prompts will be shown instead of the raw keys."
-#~ msgstr "如果选中这个选项, 则显式键的提示而不是原始的键."
-
-#~ msgid "Auto Select:"
-#~ msgstr "自动选择:"
-
-#~ msgid ""
-#~ "If true then the first candidate phrase will be selected automatically "
-#~ "when inputing the next key."
-#~ msgstr "如果为真, 则在输入下一个键的时候, 第一个候选词将被自动选择."
-
-#~ msgid "Auto Wildcard:"
-#~ msgstr "自动扩展:"
-
-#~ msgid ""
-#~ "If true then a multi wildcard char will be append to the end of inputed "
-#~ "key string when searching phrases."
-#~ msgstr ""
-#~ "如果为真, 则会在搜索词语的时候, 在已输入的键串后附加一个多重扩展字符."
-
-#~ msgid "Auto Commit:"
-#~ msgstr "自动提交:"
-
-#~ msgid ""
-#~ "If true then the converted result string will be committed to client "
-#~ "automatically."
-#~ msgstr "如果为真, 则转换结果字符串将被自动提交到客户程序."
-
-#~ msgid "Auto Split:"
-#~ msgstr "自动分隔:"
-
-#~ msgid ""
-#~ "If true then the inputed key string will be splitted automatically when "
-#~ "necessary."
-#~ msgstr "如果为真, 则当有需要的时候, 自动分隔输入的键串."
-
-#~ msgid "Discard Invalid Key:"
-#~ msgstr "丢弃无效键:"
-
-#~ msgid ""
-#~ "If true then the invalid key will be discarded automatically.This option "
-#~ "is only valid when Auto Select and Auto Commit is true."
-#~ msgstr ""
-#~ "如果为真, 则无效键将被自动丢弃. 此选项仅在自动选择和自动提交选项开启时有"
-#~ "效."
-
-#~ msgid "Dynamic Adjust:"
-#~ msgstr "动态调整:"
-
-#~ msgid "If true then the phrases' frequencies will be adjusted dynamically."
-#~ msgstr "如果为真, 则会动态调整词语的频率信息."
-
-#~ msgid "Auto Fill Preedit Area:"
-#~ msgstr "自动填充预编辑区:"
-
-#~ msgid ""
-#~ "If true then the preedit string will be filled up with the current "
-#~ "candiate phrase automatically.This option is only valid when Auto Select "
-#~ "is TRUE."
-#~ msgstr ""
-#~ "如果为真, 则预编辑字符串将自动被当前候选词填充. 此选项仅在自动选择选项开启"
-#~ "时有效."
-
-#~ msgid "Always Show Lookup Table:"
-#~ msgstr "一直显示候选词表:"
-
-#~ msgid ""
-#~ "If true then the lookup table will always be shown when any candidate "
-#~ "phrase is available. Otherwise the lookup table will only be shown when "
-#~ "necessary.\n"
-#~ "If Auto Fill is false, then this option will be no effect, and always be "
-#~ "true."
-#~ msgstr ""
-#~ "如果为真,则当有候选词的时候总是显示候选词表. 否则候选词表将只在需要的时候"
-#~ "才被显示.\n"
-#~ "如果自动填充为假, 则该选项不起作用, 该值将永远为真."
-
-#~ msgid "Default Full Width Punct:"
-#~ msgstr "缺省全角标点:"
-
-#~ msgid "If true then full width punctuations will be inputed by default."
-#~ msgstr "如果为真, 则在缺省状态下输入全角标点."
-
-#~ msgid "Default Full Width Letter:"
-#~ msgstr "缺省全角字母:"
-
-#~ msgid "If true then full width letters will be inputed by default."
-#~ msgstr "如果为真, 则在缺省状态下输入全角字符."
-
-#~ msgid "Invalid icon file."
-#~ msgstr "无效的图标文件."
-
-#~ msgid "Invalid languages."
-#~ msgstr "无效的语言."
-
-#~ msgid "Invalid status prompt."
-#~ msgstr "无效的状态提示."
-
-#~ msgid "Invalid multi wildcard chars."
-#~ msgstr "无效的多重扩展字符."
-
-#~ msgid "Invalid single wildcard chars."
-#~ msgstr "无效的单一扩展字符."
-
-#~ msgid "Invalid commit keys."
-#~ msgstr "无效的提交键."
-
-#~ msgid "Invalid select keys."
-#~ msgstr "无效的选择键."
-
-#~ msgid "Invalid page up keys."
-#~ msgstr "无效的向上翻页键."
-
-#~ msgid "Invalid page down keys."
-#~ msgstr "无效的向下翻页键."
-
-#~ msgid "Invalid max key length."
-#~ msgstr "无效的最大键长度."
-
-#~ msgid "Failed to save table %s!"
-#~ msgstr "保存码表 %s 失败!"
-
-#~ msgid "Failed to load any Config Modules!"
-#~ msgstr "无法调入任何配置模块!"
-
-#~ msgid "_Current Config Module:"
-#~ msgstr "当前配置模块(_C):"
-
-#~ msgid "<Not found>"
-#~ msgstr "<没有找到>"
-
-#~ msgid "Current Config Module has been changed to %s."
-#~ msgstr "当前配置模块已经变成 %s."
-
-#~ msgid "Start the SCIM Setup Utility."
-#~ msgstr "启动 SCIM 设置工具."
-
-#~ msgid "Setup ..."
-#~ msgstr "设置 ..."
-
-#~ msgid "Show status _box"
-#~ msgstr "显示状态栏(_B)"
-
-#~ msgid ""
-#~ "If this option is checked, a float status box will be displayed to show "
-#~ "the status of current input module."
-#~ msgstr "如果选中这个选项, 将显示一个浮动的状态栏用以显示当前输入模块的状态."
-
-#~ msgid ""
-#~ "If this option is checked, a status box will be displayed on the lower "
-#~ "left corner of the client window to show the status of the current input "
-#~ "method.This option needs the support of the client application."
-#~ msgstr ""
-#~ "如果选中这个选项, 将在客户程序窗口的左下角显示一个浮动的状态栏, 用以显示当"
-#~ "前输入法的状态. 这个选项需要客户应用程序的支持."

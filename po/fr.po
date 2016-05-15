@@ -1,4 +1,4 @@
-# translation of fr.po to Nederlands
+# translation of fr.po to French
 # This file is distributed under the same license as the scim package.
 # Copyright (C) 2004 James Su <suzhe@tsinghua.org.cn>.
 #
@@ -6,466 +6,193 @@
 # Ronald Stroethoff <stroet43@zonnet.nl>, 2009.
 msgid ""
 msgstr ""
-"Project-Id-Version: fr\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-07-20 09:50+0800\n"
-"PO-Revision-Date: 2009-06-21 21:54+0200\n"
-"Last-Translator: Ronald Stroethoff <stroet43@zonnet.nl>\n"
-"Language-Team: Nederlands\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: http://sourceforge.net/projects/scim\n"
+"POT-Creation-Date: 2014-11-20 00:09+0400\n"
+"PO-Revision-Date: 2015-02-11 16:39+0100\n"
+"Last-Translator: test2\n"
+"Language-Team: Dutch <kde-i18n-doc@kde.org>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 1.5\n"
 
-#: ../src/scim_compose_key.cpp:126
-msgid "English/European"
-msgstr "Français/Européen"
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1311
+#: ../extras/panel/scim_panel_gtk.cpp:2692
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1849
+msgid "Smart Common Input Method platform "
+msgstr "Plateforme Smart Common Input Method"
+
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1313
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
+msgid ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
+"\n"
+msgstr ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
+"\n"
+
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1318
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1855
+msgid ""
+":\n"
+"\n"
+msgstr ""
+" :\n"
+"\n"
+
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1321
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1324
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1858
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1861
+msgid ""
+"\n"
+"\n"
+msgstr ""
+"\n"
+"\n"
 
 #. Append an entry for forward mode.
-#: ../src/scim_imengine.cpp:638 ../src/scim_utility.cpp:693
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1897
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1281
-#: ../extras/panel/scim_panel_gtk.cpp:2814
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1361
+#: ../extras/panel/scim_panel_gtk.cpp:3227
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1901 ../src/scim_imengine.cpp:638
+#: ../src/scim_panel_agent.cpp:217 ../src/scim_panel_agent.cpp:218
+#: ../src/scim_utility.cpp:703
 msgid "English/Keyboard"
 msgstr "Français/Clavier"
 
-#: ../src/scim_utility.cpp:694
-msgid "Amharic"
-msgstr "Amharique"
-
-#: ../src/scim_utility.cpp:695
-msgid "Arabic"
-msgstr "Arabe"
-
-#: ../src/scim_utility.cpp:696
-msgid "Arabic (Egypt)"
-msgstr "Arabe (Egypte)"
-
-#: ../src/scim_utility.cpp:697
-msgid "Arabic (Lebanon)"
-msgstr "Arabe (Liban)"
-
-#: ../src/scim_utility.cpp:698
-msgid "Assamese"
-msgstr "Assamais"
-
-#: ../src/scim_utility.cpp:699
-msgid "Azerbaijani"
-msgstr "Azerbaïdjanais"
-
-#: ../src/scim_utility.cpp:700
-msgid "Belarusian"
-msgstr "Biélorusse"
-
-#: ../src/scim_utility.cpp:701
-msgid "Bulgarian"
-msgstr "Bulgare"
-
-#: ../src/scim_utility.cpp:702 ../src/scim_utility.cpp:703
-msgid "Bengali"
-msgstr "Bengali"
-
-#: ../src/scim_utility.cpp:704
-msgid "Bengali (India)"
-msgstr "Bengali (Inde)"
-
-#: ../src/scim_utility.cpp:705
-msgid "Tibetan"
-msgstr "Tibétain"
-
-#: ../src/scim_utility.cpp:706
-msgid "Bosnian"
-msgstr "Bosniaque"
-
-#: ../src/scim_utility.cpp:707
-msgid "Catalan"
-msgstr "Catalan"
-
-#: ../src/scim_utility.cpp:708 ../src/scim_keyboard_layout_data.h:4595
-msgid "Czech"
-msgstr "Tchèque"
-
-#: ../src/scim_utility.cpp:709
-msgid "Welsh"
-msgstr "Gallois"
-
-#: ../src/scim_utility.cpp:710 ../src/scim_keyboard_layout_data.h:4597
-msgid "Danish"
-msgstr "Danois"
-
-#: ../src/scim_utility.cpp:711 ../src/scim_keyboard_layout_data.h:4605
-msgid "German"
-msgstr "Allemand"
-
-#: ../src/scim_utility.cpp:712
-msgid "Divehi"
-msgstr "Maldivien"
-
-#: ../src/scim_utility.cpp:713 ../src/scim_keyboard_layout_data.h:4608
-msgid "Greek"
-msgstr "Grec"
-
-#: ../src/scim_utility.cpp:714
-msgid "English"
-msgstr "Anglais"
-
-#: ../src/scim_utility.cpp:715
-msgid "English (Australian)"
-msgstr "Anglais (Australie)"
-
-#: ../src/scim_utility.cpp:716
-msgid "English (Canadian)"
-msgstr "Anglais (Canada)"
-
-#: ../src/scim_utility.cpp:717
-msgid "English (British)"
-msgstr "Anglais (Royaume Uni)"
-
-#: ../src/scim_utility.cpp:718
-msgid "English (Ireland)"
-msgstr "Anglais (Irlande)"
-
-#: ../src/scim_utility.cpp:719
-msgid "English (American)"
-msgstr "Anglais (Etats-Unis)"
-
-#: ../src/scim_utility.cpp:720 ../src/scim_utility.cpp:721
-#: ../src/scim_keyboard_layout_data.h:4621
-msgid "Spanish"
-msgstr "Espagnol"
-
-#: ../src/scim_utility.cpp:722
-msgid "Spanish (Mexico)"
-msgstr "Espagnol (Mexique)"
-
-#: ../src/scim_utility.cpp:723 ../src/scim_keyboard_layout_data.h:4600
-msgid "Estonian"
-msgstr "Estonien"
-
-#: ../src/scim_utility.cpp:724
-msgid "Basque"
-msgstr "Basque"
-
-#: ../src/scim_utility.cpp:725
-msgid "Persian"
-msgstr "Perse"
-
-#: ../src/scim_utility.cpp:726 ../src/scim_keyboard_layout_data.h:4601
-msgid "Finnish"
-msgstr "Finnois"
-
-#: ../src/scim_utility.cpp:727 ../src/scim_keyboard_layout_data.h:4602
-msgid "French"
-msgstr "Français"
-
-#: ../src/scim_utility.cpp:728
-msgid "Irish"
-msgstr "Irlandais"
-
-#: ../src/scim_utility.cpp:729
-msgid "Galician"
-msgstr "Galicien"
-
-#: ../src/scim_utility.cpp:730
-msgid "Gujarati"
-msgstr "Gujarati"
-
-#: ../src/scim_utility.cpp:731 ../src/scim_utility.cpp:740
-msgid "Hebrew"
-msgstr "Hébreu"
-
-#: ../src/scim_utility.cpp:732
-msgid "Hindi"
-msgstr "Hindi"
-
-#: ../src/scim_utility.cpp:733 ../src/scim_keyboard_layout_data.h:4594
-msgid "Croatian"
-msgstr "Croate"
-
-#: ../src/scim_utility.cpp:734 ../src/scim_keyboard_layout_data.h:4609
-msgid "Hungarian"
-msgstr "Hongrois"
-
-#: ../src/scim_utility.cpp:735
-msgid "Armenian"
-msgstr "Arménien"
-
-#: ../src/scim_utility.cpp:736
-msgid "Interlingua"
-msgstr "Interlingua"
-
-#: ../src/scim_utility.cpp:737
-msgid "Indonesian"
-msgstr "Indonésien"
-
-#: ../src/scim_utility.cpp:738 ../src/scim_keyboard_layout_data.h:4627
-msgid "Icelandic"
-msgstr "Islandais"
-
-#: ../src/scim_utility.cpp:739 ../src/scim_keyboard_layout_data.h:4610
-msgid "Italian"
-msgstr "Italien"
-
-#: ../src/scim_utility.cpp:741 ../src/scim_keyboard_layout_data.h:4611
-msgid "Japanese"
-msgstr "Japonais"
-
-#: ../src/scim_utility.cpp:742
-msgid "Georgian"
-msgstr "Géorgien"
-
-#: ../src/scim_utility.cpp:743
-msgid "Kazakh"
-msgstr "Kazakh"
-
-#: ../src/scim_utility.cpp:744
-msgid "Cambodian"
-msgstr "Khmer"
-
-#: ../src/scim_utility.cpp:745
-msgid "Kannada"
-msgstr "Kannara"
-
-#: ../src/scim_utility.cpp:746
-msgid "Korean"
-msgstr "Coréen"
-
-#: ../src/scim_utility.cpp:747
-msgid "Laothian"
-msgstr "Laotien"
-
-#: ../src/scim_utility.cpp:748 ../src/scim_keyboard_layout_data.h:4628
-msgid "Lithuanian"
-msgstr "Lituanien"
-
-#: ../src/scim_utility.cpp:749
-msgid "Latvian"
-msgstr "Letton"
-
-#: ../src/scim_utility.cpp:750
-msgid "Macedonian"
-msgstr "Macédonien"
-
-#: ../src/scim_utility.cpp:751
-msgid "Malayalam"
-msgstr "Malayalam"
-
-#: ../src/scim_utility.cpp:752
-msgid "Mongolian"
-msgstr "Mongol"
-
-#: ../src/scim_utility.cpp:753
-msgid "Marathi"
-msgstr "Marathi"
-
-#: ../src/scim_utility.cpp:754
-msgid "Malay"
-msgstr "Malais"
-
-#: ../src/scim_utility.cpp:755
-msgid "Burmese"
-msgstr "Birman"
-
-#: ../src/scim_utility.cpp:756
-msgid "Nepali"
-msgstr "Népalais"
-
-#: ../src/scim_utility.cpp:757 ../src/scim_keyboard_layout_data.h:4598
-msgid "Dutch"
-msgstr "Néerlandais"
-
-#: ../src/scim_utility.cpp:758
-msgid "Norwegian (nynorsk)"
-msgstr "Norvégien (Nynorsk)"
-
-#: ../src/scim_utility.cpp:759
-msgid "Norwegian (bokmal)"
-msgstr "Norvégien (Bokmal)"
-
-#: ../src/scim_utility.cpp:760
-msgid "Oriya"
-msgstr "Oriya"
-
-#: ../src/scim_utility.cpp:761
-msgid "Punjabi"
-msgstr "Punjabi"
-
-#: ../src/scim_utility.cpp:762 ../src/scim_keyboard_layout_data.h:4613
-msgid "Polish"
-msgstr "Polonais"
-
-#: ../src/scim_utility.cpp:763 ../src/scim_utility.cpp:765
-#: ../src/scim_keyboard_layout_data.h:4614
-msgid "Portuguese"
-msgstr "Portugais"
-
-#: ../src/scim_utility.cpp:764 ../src/scim_keyboard_layout_data.h:4615
-msgid "Portuguese (Brazil)"
-msgstr "Portugais (Brésil)"
-
-#: ../src/scim_utility.cpp:766
-msgid "Romanian"
-msgstr "Roumain"
-
-#: ../src/scim_utility.cpp:767 ../src/scim_keyboard_layout_data.h:4617
-msgid "Russian"
-msgstr "Russe"
-
-#: ../src/scim_utility.cpp:768
-msgid "Sinhala"
-msgstr "Singhalais"
-
-#: ../src/scim_utility.cpp:769 ../src/scim_keyboard_layout_data.h:4618
-msgid "Slovak"
-msgstr "Slovaque"
-
-#: ../src/scim_utility.cpp:770 ../src/scim_keyboard_layout_data.h:4620
-msgid "Slovenian"
-msgstr "Slovène"
-
-#: ../src/scim_utility.cpp:771
-msgid "Albanian"
-msgstr "Albanais"
-
-#: ../src/scim_utility.cpp:772 ../src/scim_utility.cpp:773
-#: ../src/scim_utility.cpp:774
-msgid "Serbian"
-msgstr "Serbe"
-
-#: ../src/scim_utility.cpp:775 ../src/scim_utility.cpp:777
-#: ../src/scim_keyboard_layout_data.h:4624
-msgid "Swedish"
-msgstr "Suédois"
-
-#: ../src/scim_utility.cpp:776
-msgid "Swedish (Finland)"
-msgstr "Suédois (Finlande)"
-
-#: ../src/scim_utility.cpp:778
-msgid "Tamil"
-msgstr "Tamoul"
-
-#: ../src/scim_utility.cpp:779
-msgid "Telugu"
-msgstr "Telugu"
-
-#: ../src/scim_utility.cpp:780
-msgid "Thai"
-msgstr "Thaï"
-
-#: ../src/scim_utility.cpp:781 ../src/scim_keyboard_layout_data.h:4625
-msgid "Turkish"
-msgstr "Turc"
-
-#: ../src/scim_utility.cpp:782
-msgid "Uighur"
-msgstr "Uighur"
-
-#: ../src/scim_utility.cpp:783 ../src/scim_keyboard_layout_data.h:4629
-msgid "Ukrainian"
-msgstr "Ukrainien"
-
-#: ../src/scim_utility.cpp:784
-msgid "Urdu"
-msgstr "Ourdou"
-
-#: ../src/scim_utility.cpp:785
-msgid "Uzbek"
-msgstr "Ouzbèque"
-
-#: ../src/scim_utility.cpp:786
-msgid "Vietnamese"
-msgstr "Vietnamien"
-
-#: ../src/scim_utility.cpp:787
-msgid "Walloon"
-msgstr "Wallon"
-
-#: ../src/scim_utility.cpp:788 ../src/scim_utility.cpp:789
-msgid "Yiddish"
-msgstr "Yiddish"
-
-#: ../src/scim_utility.cpp:790
-msgid "Chinese"
-msgstr "Chinois"
-
-#: ../src/scim_utility.cpp:791 ../src/scim_utility.cpp:793
-msgid "Chinese (simplified)"
-msgstr "Chinois (simplifié)"
-
-#: ../src/scim_utility.cpp:792 ../src/scim_utility.cpp:794
-msgid "Chinese (traditional)"
-msgstr "Chinois (traditionnel)"
-
-#: ../src/scim_utility.cpp:876
-msgid "Other"
-msgstr "Autre"
-
-#: ../src/scim_keyboard_layout_data.h:4591
-#: ../modules/IMEngine/scim_socket_imengine.cpp:386
-#: ../modules/IMEngine/scim_socket_imengine.cpp:416
-#: ../modules/IMEngine/scim_socket_imengine.cpp:501
-#: ../modules/IMEngine/scim_socket_imengine.cpp:531
-#: ../modules/IMEngine/scim_socket_imengine.cpp:561
-msgid "Unknown"
-msgstr "Inconnu"
-
-#: ../src/scim_keyboard_layout_data.h:4592
-msgid "English (US)"
-msgstr "Anglais (US)"
-
-#: ../src/scim_keyboard_layout_data.h:4593
-msgid "Belgian"
-msgstr "Belge"
-
-#: ../src/scim_keyboard_layout_data.h:4596
-msgid "Czech (qwerty)"
-msgstr "Tchèque (qwerty)"
-
-#: ../src/scim_keyboard_layout_data.h:4599
-msgid "Dvorak"
-msgstr "Dvorak"
-
-#: ../src/scim_keyboard_layout_data.h:4603
-msgid "French (Canadian)"
-msgstr "Français (Canada)"
-
-#: ../src/scim_keyboard_layout_data.h:4604
-msgid "French (Switzerland)"
-msgstr "Français (Suisse)"
-
-#: ../src/scim_keyboard_layout_data.h:4606
-msgid "German (with deadkeys)"
-msgstr "Allemand (avec touches mortes)"
-
-#: ../src/scim_keyboard_layout_data.h:4607
-msgid "German (Swiss)"
-msgstr "Allemand (Suisse)"
-
-#: ../src/scim_keyboard_layout_data.h:4612
-msgid "Norwegian"
-msgstr "Norvégien"
-
-#: ../src/scim_keyboard_layout_data.h:4616
-msgid "Portuguese (Brazil US accents)"
-msgstr "Portugais (Brésil accents US)"
-
-#: ../src/scim_keyboard_layout_data.h:4619
-msgid "Slovak (qwerty)"
-msgstr "Slovaque (qwerty)"
-
-#: ../src/scim_keyboard_layout_data.h:4622
-msgid "Spanish (CP 850)"
-msgstr "Espagnol (CP 850)"
-
-#: ../src/scim_keyboard_layout_data.h:4623
-msgid "Spanish (Latin America)"
-msgstr "Espagnol (Amérique latine)"
-
-#: ../src/scim_keyboard_layout_data.h:4626
-msgid "English (UK)"
-msgstr "Anglais (GB)"
+#: ../extras/panel/scim_panel_gtk.cpp:1145
+msgid "SCIM Help"
+msgstr "Aide SCIM"
+
+#: ../extras/panel/scim_panel_gtk.cpp:1235
+#: ../extras/panel/scim_panel_gtk.cpp:1238
+msgid "Stick/unstick the input window and the toolbar."
+msgstr "Epingle la fenêtre de saisie et la barre d'outils."
+
+#: ../extras/panel/scim_panel_gtk.cpp:1245
+#: ../extras/panel/scim_panel_gtk.cpp:1248
+msgid "Show a brief help about SCIM and the current input method."
+msgstr "Affiche une aide succincte sur SCIM et la méthode de saisie courante."
+
+#: ../extras/panel/scim_panel_gtk.cpp:1254
+#: ../extras/panel/scim_panel_gtk.cpp:1257
+msgid "Show command menu."
+msgstr "Afficher le menu des commandes."
+
+#: ../extras/panel/scim_panel_gtk.cpp:2694
+msgid ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
+msgstr ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
+
+#. Reload Configuration.
+#: ../extras/panel/scim_panel_gtk.cpp:2777
+msgid "Reload Configuration"
+msgstr "Recharger la Configuration"
+
+#. Stick
+#: ../extras/panel/scim_panel_gtk.cpp:2787
+msgid "Stick Windows"
+msgstr "Epingler les Fenêtres"
+
+#. Toolbar
+#: ../extras/panel/scim_panel_gtk.cpp:2796
+msgid "Hide Toolbar"
+msgstr "Masquer la Barre d'Outils"
+
+#. Help
+#: ../extras/panel/scim_panel_gtk.cpp:2805
+msgid "Help ..."
+msgstr "Aide ..."
+
+#. Clients exit.
+#: ../extras/panel/scim_panel_gtk.cpp:2823
+msgid "Exit"
+msgstr "Quitter"
+
+#.
+#. vi:ts=4:nowrap:expandtab
+#.
+#: ../extras/setup/scim-setup.desktop.in.h:1
+msgid "SCIM Input Method"
+msgstr ""
+
+#: ../extras/setup/scim-setup.desktop.in.h:2
+msgid "Configure the Smart Common Input Method platform"
+msgstr ""
+
+#: ../extras/setup/scim_setup_helper.cpp:49
+msgid "SCIM Setup"
+msgstr "Configuration de SCIM"
+
+#: ../extras/setup/scim_setup_helper.cpp:51
+msgid "Integrated Setup Utility based on GTK Widget library."
+msgstr "Utilitaire de configuration intégré basé sur la librairie GTK Widget."
+
+#: ../extras/setup/scim_setup_ui.cpp:47
+msgid "SCIM"
+msgstr "SCIM"
+
+#: ../extras/setup/scim_setup_ui.cpp:48
+msgid "FrontEnd"
+msgstr "Interface"
+
+#: ../extras/setup/scim_setup_ui.cpp:49
+msgid "IMEngine"
+msgstr "Moteur de Saisie"
+
+#: ../extras/setup/scim_setup_ui.cpp:50
+msgid "Panel"
+msgstr "Panneau"
+
+#: ../extras/setup/scim_setup_ui.cpp:51
+msgid "Extra"
+msgstr "Extra"
+
+#: ../extras/setup/scim_setup_ui.cpp:230
+msgid "SCIM Input Method Setup"
+msgstr "Configuration de la Méthode de Saisie SCIM"
+
+#: ../extras/setup/scim_setup_ui.cpp:397
+msgid ""
+" <span size=\"20000\">Smart Common Input Method platform</span> \n"
+"\n"
+"<span size=\"16000\" style=\"italic\">GUI Setup Utility</span>\n"
+"\n"
+"\n"
+"\n"
+"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
+"cn&gt;</span>"
+msgstr ""
+" <span size=\"20000\">Plateforme Smart Common Input Method</span> \n"
+"\n"
+"<span size=\"16000\" style=\"italic\">Utilitaire de Configuration</span>\n"
+"\n"
+"\n"
+"\n"
+"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
+"cn&gt;</span>"
+
+#: ../extras/setup/scim_setup_ui.cpp:422
+#, c-format
+msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
+msgstr "<span size=\"x-large\">Configuration des modules %s.</span>"
+
+#: ../extras/setup/scim_setup_ui.cpp:698
+msgid ""
+"Not all configuration can be reloaded on the fly. Don't forget to restart "
+"SCIM in order to let all of the new configuration take effect."
+msgstr ""
+"Certains des paramètres de configuration ne peuvent pas être pris en compte "
+"automatiquement. N'oubliez pas de redémarrer SCIM afin que toutes les "
+"nouvelles valeurs de configuration soient prises en compte."
 
 #: ../modules/Filter/scim_sctc_filter.cpp:57
 msgid "Simplified-Traditional Chinese Conversion"
@@ -520,43 +247,6 @@ msgstr "CS->CT"
 msgid "TC->SC"
 msgstr "CT->CS"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1845
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1231
-#: ../extras/panel/scim_panel_gtk.cpp:2304
-msgid "Smart Common Input Method platform "
-msgstr "Plateforme Smart Common Input Method"
-
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1847
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1233
-msgid ""
-"\n"
-"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
-"\n"
-msgstr ""
-"\n"
-"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
-"\n"
-
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1238
-msgid ""
-":\n"
-"\n"
-msgstr ""
-" :\n"
-"\n"
-
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1857
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1241
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1244
-msgid ""
-"\n"
-"\n"
-msgstr ""
-"\n"
-"\n"
-
 #: ../modules/IMEngine/scim_rawcode_imengine.cpp:120
 msgid "RAW CODE"
 msgstr "CODE BRUT"
@@ -592,6 +282,15 @@ msgstr "Etat de la méthode de saisie courante. Cliquer pour la modifier."
 msgid "Unicode"
 msgstr "Unicode"
 
+#: ../modules/IMEngine/scim_socket_imengine.cpp:386
+#: ../modules/IMEngine/scim_socket_imengine.cpp:416
+#: ../modules/IMEngine/scim_socket_imengine.cpp:501
+#: ../modules/IMEngine/scim_socket_imengine.cpp:531
+#: ../modules/IMEngine/scim_socket_imengine.cpp:561
+#: ../src/scim_keyboard_layout_data.h:4591
+msgid "Unknown"
+msgstr "Inconnu"
+
 #: ../modules/SetupUI/scim_frontend_setup.cpp:82
 #: ../modules/SetupUI/scim_imengine_setup.cpp:88
 msgid "Global Setup"
@@ -606,17 +305,17 @@ msgstr ""
 "incluant le frontal X11, GTK IMModule, QT IMModule etc."
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:143
+#: ../modules/SetupUI/scim_frontend_setup.cpp:146
 msgid "_Trigger:"
 msgstr "_Déclencheur :"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:145
+#: ../modules/SetupUI/scim_frontend_setup.cpp:148
 msgid "Select the trigger keys"
 msgstr "Sélectionner les touches d'activation"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:147
+#: ../modules/SetupUI/scim_frontend_setup.cpp:150
 msgid ""
 "The key events to turn on/off SCIM input method. Click on the button on the "
 "right to edit it."
@@ -625,34 +324,35 @@ msgstr ""
 "les modifier."
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:160
+#: ../modules/SetupUI/scim_frontend_setup.cpp:163
 msgid "Turn _On:"
 msgstr "_Activer:"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:162
+#: ../modules/SetupUI/scim_frontend_setup.cpp:165
 msgid "Select the Turn On keys"
 msgstr "Sélectionner les touches d'activation"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:164
+#: ../modules/SetupUI/scim_frontend_setup.cpp:167
 msgid ""
 "The key events to turn on SCIM input method. Click on the button on the "
 "right to edit it."
-msgstr "Touches pour activer SCIM. Cliquer sur le bouton de droite pour les modifier."
+msgstr ""
+"Touches pour activer SCIM. Cliquer sur le bouton de droite pour les modifier."
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:177
+#: ../modules/SetupUI/scim_frontend_setup.cpp:180
 msgid "Turn O_ff:"
 msgstr "Désac_tiver:"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:179
+#: ../modules/SetupUI/scim_frontend_setup.cpp:182
 msgid "Select the Turn Off keys"
 msgstr "Sélectionner les touches de désactivation"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:181
+#: ../modules/SetupUI/scim_frontend_setup.cpp:184
 msgid ""
 "The key events to turn off SCIM input method. Click on the button on the "
 "right to edit it."
@@ -661,17 +361,17 @@ msgstr ""
 "modifier."
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:194
+#: ../modules/SetupUI/scim_frontend_setup.cpp:197
 msgid "_Next input method:"
 msgstr "Méthode de saisie _Suivante :"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:196
+#: ../modules/SetupUI/scim_frontend_setup.cpp:199
 msgid "Select the next input method keys"
 msgstr "Sélectionner les touches pour la méthode de saisie suivante"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:198
+#: ../modules/SetupUI/scim_frontend_setup.cpp:201
 msgid ""
 "The key events to switch to the next input method. Click on the button on "
 "the right to edit it."
@@ -680,17 +380,17 @@ msgstr ""
 "droite pour les modifier."
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:213
+#: ../modules/SetupUI/scim_frontend_setup.cpp:216
 msgid "_Previous input method:"
 msgstr "Méthode de saisie _Précédente :"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:215
+#: ../modules/SetupUI/scim_frontend_setup.cpp:218
 msgid "Select the previous input method keys"
 msgstr "Sélectionner les touches pour la méthode de saisie précédente"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:217
+#: ../modules/SetupUI/scim_frontend_setup.cpp:220
 msgid ""
 "The key events to switch to the previous input method. Click on the button "
 "on the right to edit it."
@@ -699,17 +399,17 @@ msgstr ""
 "bouton de droite pour les modifier."
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:232
+#: ../modules/SetupUI/scim_frontend_setup.cpp:235
 msgid "Show input method _menu:"
 msgstr "Accès au _Menu des méthodes de saisie :"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:234
+#: ../modules/SetupUI/scim_frontend_setup.cpp:237
 msgid "Select the show input method menu keys"
 msgstr "Sélectionner les touches pour accéder au menu des méthodes de saisie"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:236
+#: ../modules/SetupUI/scim_frontend_setup.cpp:239
 msgid ""
 "The key events to show the input method menu. Click on the button on the "
 "right to edit it."
@@ -717,15 +417,16 @@ msgstr ""
 "Touches pour accéder au menu des méthodes de saisie. Cliquer sur le bouton "
 "de droite pour les modifier."
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:306
+#: ../modules/SetupUI/scim_frontend_setup.cpp:316
 msgid "Options"
 msgstr "Options"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:321
+#: ../modules/SetupUI/scim_frontend_setup.cpp:339
 msgid "_Keyboard Layout:"
 msgstr "_Type de Clavier:"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:342
+#: ../modules/SetupUI/scim_frontend_setup.cpp:369
+#: ../modules/SetupUI/scim_frontend_setup.cpp:373
 msgid ""
 "You should choose your currently used keyboard layout here so that input "
 "methods, who care about keyboard layout, could work correctly."
@@ -734,11 +435,12 @@ msgstr ""
 "saisie qui dépendent du type de clavier puissent fonctionner correctement."
 
 #. On The Spot.
-#: ../modules/SetupUI/scim_frontend_setup.cpp:346
+#: ../modules/SetupUI/scim_frontend_setup.cpp:378
 msgid "_Embed Preedit String into client window"
 msgstr "Insérer les chaîne en préédition dans la fenêtre cliente"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:351
+#: ../modules/SetupUI/scim_frontend_setup.cpp:384
+#: ../modules/SetupUI/scim_frontend_setup.cpp:389
 msgid ""
 "If this option is checked, the preedit string will be displayed directly in "
 "the client input window, rather than in a independent float window."
@@ -748,11 +450,12 @@ msgstr ""
 "indépendante."
 
 #. Shared input method.
-#: ../modules/SetupUI/scim_frontend_setup.cpp:360
+#: ../modules/SetupUI/scim_frontend_setup.cpp:399
 msgid "_Share the same input method among all applications"
 msgstr "_Partage de la même méthode de saisie entre toutes les applications"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:365
+#: ../modules/SetupUI/scim_frontend_setup.cpp:405
+#: ../modules/SetupUI/scim_frontend_setup.cpp:410
 msgid ""
 "If this option is checked, then only one input method could be used by all "
 "applications at the same time.Otherwise different input method could be used "
@@ -762,108 +465,115 @@ msgstr ""
 "utilisée par toutes les applications en même temps. Dans le cas contraire, "
 "chaque application utilise sa propre méthode de saisie."
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:373
-#: ../modules/SetupUI/scim_imengine_setup.cpp:453
+#: ../modules/SetupUI/scim_frontend_setup.cpp:419
+#: ../modules/SetupUI/scim_imengine_setup.cpp:501
 msgid "Hotkeys"
 msgstr "Raccourcis"
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:93
-msgid "You can enable/disable input methods and set hotkeys for input methods here."
+msgid ""
+"You can enable/disable input methods and set hotkeys for input methods here."
 msgstr ""
 "Ici, vous pouvez activer/désactiver les méthodes de saisie et les jeux de "
 "raccourcis pour les méthodes de saisie."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:296
+#: ../modules/SetupUI/scim_imengine_setup.cpp:306
 msgid "The installed input method services:"
 msgstr "Services de méthode de saisie installés :"
 
 #. Create hotkey and filter button before factory list view, because
 #. factory_list_selection_changed_callback may access these two buttons.
-#: ../modules/SetupUI/scim_imengine_setup.cpp:311
+#: ../modules/SetupUI/scim_imengine_setup.cpp:321
 msgid "Edit _Hotkeys"
 msgstr "Editer les _Raccourcis"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:320
+#: ../modules/SetupUI/scim_imengine_setup.cpp:331
+#: ../modules/SetupUI/scim_imengine_setup.cpp:334
 msgid "Edit Hotkeys associated with the selected input method."
 msgstr "Editer les raccourcis associés à la méthode de saisie sélectionnée."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:322
+#: ../modules/SetupUI/scim_imengine_setup.cpp:337
 msgid "Select _Filters"
 msgstr "Sélectionner les _Filtres"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:331
+#: ../modules/SetupUI/scim_imengine_setup.cpp:347
+#: ../modules/SetupUI/scim_imengine_setup.cpp:350
 msgid "Select the Filters which will be attached to this input method."
 msgstr "Sélectionner les Filtres à associer à cette méthode de saisie."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:348
+#: ../modules/SetupUI/scim_imengine_setup.cpp:376
 msgid "_Expand"
 msgstr "_Ouvrir"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:357
+#: ../modules/SetupUI/scim_imengine_setup.cpp:386
+#: ../modules/SetupUI/scim_imengine_setup.cpp:389
 msgid "Expand all language categories."
 msgstr "Ouvrir toutes les catégories de langage."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:359
+#: ../modules/SetupUI/scim_imengine_setup.cpp:392
 msgid "_Collapse"
 msgstr "_Refermer"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:368
+#: ../modules/SetupUI/scim_imengine_setup.cpp:402
+#: ../modules/SetupUI/scim_imengine_setup.cpp:405
 msgid "Collapse all language categories."
 msgstr "Fermer toutes les catégories de langage."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:370
+#: ../modules/SetupUI/scim_imengine_setup.cpp:408
 msgid "E_nable All"
 msgstr "Tout Activer"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:379
+#: ../modules/SetupUI/scim_imengine_setup.cpp:418
+#: ../modules/SetupUI/scim_imengine_setup.cpp:421
 msgid "Enable all input methods."
 msgstr "Activer toutes les méthodes de saisie."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:381
+#: ../modules/SetupUI/scim_imengine_setup.cpp:424
 msgid "_Disable All"
 msgstr "Tout Désactiver"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:390
+#: ../modules/SetupUI/scim_imengine_setup.cpp:434
+#: ../modules/SetupUI/scim_imengine_setup.cpp:437
 msgid "Disable all input methods."
 msgstr "Désactiver toutes les méthodes de saisie."
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:414
-#: ../modules/SetupUI/scim_imengine_setup.cpp:541
+#: ../modules/SetupUI/scim_imengine_setup.cpp:462
+#: ../modules/SetupUI/scim_imengine_setup.cpp:589
 msgid "Name"
 msgstr "Nom"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:432
-#: ../modules/SetupUI/scim_imengine_setup.cpp:522
+#: ../modules/SetupUI/scim_imengine_setup.cpp:480
+#: ../modules/SetupUI/scim_imengine_setup.cpp:570
 msgid "Enable"
 msgstr "Activer"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:467
+#: ../modules/SetupUI/scim_imengine_setup.cpp:515
 msgid "Filters"
 msgstr "Filtres"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:560
+#: ../modules/SetupUI/scim_imengine_setup.cpp:608
 msgid "Languages"
 msgstr "Langues"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:574
+#: ../modules/SetupUI/scim_imengine_setup.cpp:622
 msgid "Description"
 msgstr "Description"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:1190
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1238
 #, c-format
 msgid "Edit Hotkeys for %s"
 msgstr "Editer les raccourcis pour %s"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:1417
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1465
 #, c-format
 msgid "Select Filters for %s"
 msgstr "Sélectionner les filtres pour %s"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:1450
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1521
 msgid "Move _Up"
 msgstr "_Monter"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:1457
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1528
 msgid "Move _Down"
 msgstr "_Descendre"
 
@@ -875,89 +585,90 @@ msgstr "GTK"
 msgid "A panel daemon based on GTK+-2.x library."
 msgstr "Un panneau serveur basé sur la librairie GTK+-2.x."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:163
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:166
 msgid "Always"
 msgstr "Toujours"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:164
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:167
 msgid "On demand"
 msgstr "A la demande"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:165
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:168
 msgid "Never"
 msgstr "Jamais"
 
 #. Create the ToolBar setup block.
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:211
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:217
 msgid "ToolBar"
 msgstr "Barre d'Outils"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:229
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:235
 msgid "_Show:"
 msgstr "_Afficher"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:245
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:261
 msgid "Auto s_nap"
 msgstr "Aligne_ment automatique"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:251
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:267
 msgid "Show _input method icon"
 msgstr "Affichage icône méthode de _saisie"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:257
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:273
 msgid "Show inp_ut method name"
 msgstr "Affichage _nom méthode de saisie"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:269
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:285
 msgid "Hide time_out:"
 msgstr "_Délai avant masquage :"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:282
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:298
 msgid "Show s_tick icon"
 msgstr "Affichage icône d'épin_glage fenêtre"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:288
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:304
 msgid "Show m_enu icon"
 msgstr "Afficher l'icône de m_enu"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:294
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:310
 msgid "Show _help icon"
 msgstr "Affichage icône d'_aide"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:300
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:316
 msgid "Show _property label"
 msgstr "Affichage label de p_ropriété"
 
 #. Create the Input Window setup block
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:311
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:327
 msgid "Input window"
 msgstr "Fenêtre de saisie"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:320
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:336
 msgid "E_mbedded lookup table"
 msgstr "Table de recherche _embarquée"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:324
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:340
 msgid "_Vertical lookup table"
 msgstr "Table de recherche _verticale"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:328
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:344
 msgid "Misc"
 msgstr "Divers"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:337
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:353
 msgid "Show tra_y icon"
 msgstr "Affichage icône barre de _tâches"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:341
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:357
 msgid "Stick _windows"
 msgstr "Epinglage _fenêtres"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:349
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:365
 msgid "_Font:"
 msgstr "P_olice :"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:419
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:436
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:504
 msgid ""
 "If option \"Always\" is selected, the toolbar will always be shown on the "
 "screen. If option \"On demand\" is selected, it will only be shown when SCIM "
@@ -968,13 +679,16 @@ msgstr ""
 "la barre d'outils est affichée uniquement lorsque SCIM est activé. Quand "
 "l'option \"Jamais\" estsélectionnée, la barre d'outils n'est jamais affichée."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:426
-msgid "If this option is checked, the toolbar will be snapped to the screen border."
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:443
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:511
+msgid ""
+"If this option is checked, the toolbar will be snapped to the screen border."
 msgstr ""
 "Quand cette option est sélectionnée, la barre d'outil s'aligne "
 "automatiquement sur le bord de l'écran."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:431
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:449
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:517
 msgid ""
 "The toolbar will be hidden out after this timeout is elapsed. This option is "
 "only valid when \"Always show\" is selected. Set to zero to disable this "
@@ -984,7 +698,8 @@ msgstr ""
 "délai. Cette option n'est valide que si l'option \"Afficher Toujours\" est "
 "sélectionnée. Une valeur de délai de 0 supprime ce comportement."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:438
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:456
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:524
 msgid ""
 "If this option is checked, the input method icon will be showed on the "
 "toolbar."
@@ -992,7 +707,8 @@ msgstr ""
 "Quand cette option est sélectionnée, l'icône de la méthode de saisie est "
 "inséré dans la barre d'outils."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:442
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:460
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:528
 msgid ""
 "If this option is checked, the input method name will be showed on the "
 "toolbar."
@@ -1000,25 +716,30 @@ msgstr ""
 "Quand cette option est sélectionnée, le nom de la méthode de saisie est "
 "inséré dans la barre d'outils."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:446
-msgid "If this option is checked, the stick icon will be showed on the toolbar."
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:464
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:532
+msgid ""
+"If this option is checked, the stick icon will be showed on the toolbar."
 msgstr ""
 "Quand cette option est sélectionnée, l'icône d'épinglage de fenêtre est "
 "inséré dans la barre d'outils."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:450
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:468
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:536
 msgid "If this option is checked, the menu icon will be showed on the toolbar."
 msgstr ""
 "Quand cette option est sélectionnée, l'icône de menu est inséré dans la "
 "barre d'outils."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:454
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:472
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:540
 msgid "If this option is checked, the help icon will be showed on the toolbar."
 msgstr ""
 "Quand cette option est sélectionnée, l'icône d'aide est inséré dans la barre "
 "d'outils."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:458
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:476
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:544
 msgid ""
 "If this option is checked, the text label of input method properties will be "
 "showed on the toolbar."
@@ -1026,7 +747,8 @@ msgstr ""
 "Quand cette option est sélectionnée, le label des propriétés de la méthode "
 "de saisie est inséré dans la barre d'outils."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:462
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:480
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:548
 msgid ""
 "If this option is checked, the lookup table will be embedded into the input "
 "window."
@@ -1034,13 +756,16 @@ msgstr ""
 "Quand cette option est sélectionnée, la table de recherche est embarquée "
 "dans la fenêtre de saisie."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:467
-msgid "If this option is checked, the lookup table will be displayed vertically."
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:485
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:553
+msgid ""
+"If this option is checked, the lookup table will be displayed vertically."
 msgstr ""
 "Quand cette option est sélectionnée, la table de recherche est affichée "
 "verticalement."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:472
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:490
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:558
 msgid ""
 "If this option is checked, the tray icon will be showed on the desktop's "
 "taskbar."
@@ -1048,7 +773,8 @@ msgstr ""
 "Quand cette option est sélectionnée, l'icône est inséré dans la barre de "
 "tâches du bureau."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:476
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:494
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:562
 msgid ""
 "If this option is checked, the toolbar, input and lookup table windows will "
 "be sticked to its original position."
@@ -1056,286 +782,605 @@ msgstr ""
 "Quand cette option est sélectionnée, les fenêtres de saisie et de recherche "
 "sont maintenues à leur position originale."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:482
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:500
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:568
 msgid "The font setting will be used in the input and lookup table windows."
 msgstr ""
 "La police de caractères configurée est utilisée dans les fenêtres de saisie "
 "et de recherche."
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:801
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:889
 msgid "Select Interface Font"
 msgstr "Police de Caractères"
 
-#: ../extras/setup/scim_setup_ui.cpp:47
-msgid "SCIM"
-msgstr "SCIM"
+#: ../src/scim_compose_key.cpp:128
+msgid "English/European"
+msgstr "Français/Européen"
 
-#: ../extras/setup/scim_setup_ui.cpp:48
-msgid "FrontEnd"
-msgstr "Interface"
-
-#: ../extras/setup/scim_setup_ui.cpp:49
-msgid "IMEngine"
-msgstr "Moteur de Saisie"
-
-#: ../extras/setup/scim_setup_ui.cpp:50
-msgid "Panel"
-msgstr "Panneau"
-
-#: ../extras/setup/scim_setup_ui.cpp:51
-msgid "Extra"
-msgstr "Extra"
-
-#.
-#. vi:ts=4:nowrap:ai:expandtab
-#.
-#: ../extras/setup/scim_setup_ui.cpp:230
-#: ../extras/setup/scim-setup.desktop.in.h:1
-msgid "SCIM Input Method Setup"
-msgstr "Configuration de la Méthode de Saisie SCIM"
-
-#: ../extras/setup/scim_setup_ui.cpp:369
-msgid ""
-" <span size=\"20000\">Smart Common Input Method platform</span> \n"
-"\n"
-"<span size=\"16000\" style=\"italic\">GUI Setup Utility</span>\n"
-"\n"
-"\n"
-"\n"
-"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
-"cn&gt;</span>"
+#. bail out: can't continue without the helper
+#: ../src/scim_helper_manager.cpp:134
+msgid "Failed to launch HelperManager: exiting..."
 msgstr ""
-" <span size=\"20000\">Plateforme Smart Common Input Method</span> \n"
-"\n"
-"<span size=\"16000\" style=\"italic\">Utilitaire de Configuration</span>\n"
-"\n"
-"\n"
-"\n"
-"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
-"cn&gt;</span>"
 
-#: ../extras/setup/scim_setup_ui.cpp:394
-#, c-format
-msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
-msgstr "<span size=\"x-large\">Configuration des modules %s.</span>"
-
-#msgid "Are you sure you want to quit SCIM Setup?"
-#msgstr "Etes vous sûr de vouloir quitter SCIM Config. ?"
-#: ../extras/setup/scim_setup_ui.cpp:661
-msgid ""
-"Not all configuration can be reloaded on the fly. Don't forget to restart "
-"SCIM in order to let all of the new configuration take effect."
+#: ../src/scim_helper_manager.cpp:162 ../src/scim_helper_manager.cpp:178
+#: ../src/scim_helper_manager.cpp:184 ../src/scim_helper_manager.cpp:189
+#: ../src/scim_helper_manager.cpp:194
+msgid "Error launching HelperManager"
 msgstr ""
-"Certains des paramètres de configuration ne peuvent pas être pris en compte "
-"automatiquement. N'oubliez pas de redémarrer SCIM afin que toutes les "
-"nouvelles valeurs de configuration soient prises en compte."
 
-#: ../extras/setup/scim_setup_helper.cpp:49
-msgid "SCIM Setup"
-msgstr "Configuration de SCIM"
-
-#: ../extras/setup/scim_setup_helper.cpp:51
-msgid "Integrated Setup Utility based on GTK Widget library."
-msgstr "Utilitaire de configuration intégré basé sur la librairie GTK Widget."
-
-#: ../extras/setup/scim-setup.desktop.in.h:2
-msgid "Setup utility for Smart Common Input Method platform"
-msgstr "Utilitaire de configuration de la plateforme \"Smart Common Input Method\""
-
-#: ../extras/panel/scim_panel_gtk.cpp:982
-msgid "SCIM Help"
-msgstr "Aide SCIM"
-
-#: ../extras/panel/scim_panel_gtk.cpp:999
-msgid "Smart Common Input Method"
-msgstr "Smart Common Input Method"
-
-#: ../extras/panel/scim_panel_gtk.cpp:1058
-msgid "Stick/unstick the input window and the toolbar."
-msgstr "Epingle la fenêtre de saisie et la barre d'outils."
-
-#: ../extras/panel/scim_panel_gtk.cpp:1063
-msgid "Show a brief help about SCIM and the current input method."
-msgstr "Affiche une aide succincte sur SCIM et la méthode de saisie courante."
-
-#: ../extras/panel/scim_panel_gtk.cpp:1068
-msgid "Show command menu."
-msgstr "Afficher le menu des commandes."
-
-#: ../extras/panel/scim_panel_gtk.cpp:2306
-msgid ""
-"\n"
-"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
+#: ../src/scim_helper_manager.cpp:162 ../src/scim_helper_manager.cpp:178
+#: ../src/scim_socket.cpp:476 ../src/scim_socket.cpp:510
+msgid "failed"
 msgstr ""
-"\n"
-"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
 
-#. Reload Configuration.
-#: ../extras/panel/scim_panel_gtk.cpp:2385
-msgid "Reload Configuration"
-msgstr "Recharger la Configuration"
-
-#. Stick
-#: ../extras/panel/scim_panel_gtk.cpp:2395
-msgid "Stick Windows"
-msgstr "Epingler les Fenêtres"
-
-#. Toolbar
-#: ../extras/panel/scim_panel_gtk.cpp:2404
-msgid "Hide Toolbar"
-msgstr "Masquer la Barre d'Outils"
-
-#. Help
-#: ../extras/panel/scim_panel_gtk.cpp:2413
-msgid "Help ..."
-msgstr "Aide ..."
-
-#. Clients exit.
-#: ../extras/panel/scim_panel_gtk.cpp:2431
-msgid "Exit"
-msgstr "Quitter"
-
-#: ../utils/scimstringview.c:196
-msgid "Cursor Position"
-msgstr "Position du Curseur"
-
-#: ../utils/scimstringview.c:197
-msgid "The current position of the insertion cursor in chars."
-msgstr "Position courante du curseur d'insertion dans les caractères."
-
-#: ../utils/scimstringview.c:206
-msgid "Maximum length"
-msgstr "Longueur maximale"
-
-#: ../utils/scimstringview.c:207
-msgid "Maximum number of characters for this string view. Zero if no maximum."
+#: ../src/scim_helper_manager.cpp:184
+msgid "abnormal process termination"
 msgstr ""
-"Nombre maximum de caractères pour cette vue de chaîne de caractères. Zero si "
-"pas de maximum."
 
-#: ../utils/scimstringview.c:216
-msgid "Maximum width"
-msgstr "Largeur maximale"
-
-#: ../utils/scimstringview.c:217
-msgid "Maximum width of this string view."
-msgstr "Largeur maximale de cette vue de chaîne de caractères."
-
-#: ../utils/scimstringview.c:226
-msgid "Has Frame"
-msgstr "Avec Cadre"
-
-#: ../utils/scimstringview.c:227
-msgid "FALSE removes outside bevel from string view."
-msgstr "FAUX supprime le cadre extérieur de la vue de chaîne de caractères."
-
-#: ../utils/scimstringview.c:234
-msgid "Draw cursor"
-msgstr "Affichage du curseur"
-
-#: ../utils/scimstringview.c:235
-msgid "TRUE draw blinking cursor."
-msgstr "VRAI Affichage d'un curseur clignotant."
-
-#: ../utils/scimstringview.c:242
-msgid "Auto move cursor"
-msgstr "Déplacement automatique du curseur"
-
-#: ../utils/scimstringview.c:243
-msgid "TRUE auto move cursor position when mouse clicking."
-msgstr "VRAI Déplacement automatique de la position du curseur sur clic de souris."
-
-#: ../utils/scimstringview.c:250
-msgid "Forward button press event"
-msgstr "Transmission événement d'appui de bouton"
-
-#: ../utils/scimstringview.c:251
-msgid "TRUE forward button press event to user program."
-msgstr "VRAI Fait suivre les événements d'appui de bouton vers le programme client."
-
-#: ../utils/scimstringview.c:258
-msgid "Auto resize the widget to fit the string"
-msgstr "Redimensionnement automatique à la taille de la chaîne"
-
-#: ../utils/scimstringview.c:259
-msgid "TRUE Auto resize on."
-msgstr "VRAI Redimensionnement automatique activé."
-
-#: ../utils/scimstringview.c:266
-msgid "Width in chars"
-msgstr "Largeur en caractères"
-
-#: ../utils/scimstringview.c:267
-msgid "Number of characters to leave space for in the string view."
-msgstr "Nombre de caractères à laisser vides dans la vue de chaîne de caractères."
-
-#: ../utils/scimstringview.c:276
-msgid "Scroll offset"
-msgstr "Décalage"
-
-#: ../utils/scimstringview.c:277
-msgid "Number of pixels of the string view scrolled off the screen to the left"
+#: ../src/scim_helper_manager.cpp:190
+msgid "it exited with signal"
 msgstr ""
-"Nombre de pixels de la vue de chaîne de caractères décalés à gauche en "
-"dehors de l'écran"
 
-#: ../utils/scimstringview.c:286
-msgid "Text"
-msgstr "Texte"
+#: ../src/scim_helper_manager.cpp:194
+msgid "unknown process launch error"
+msgstr ""
 
-#: ../utils/scimstringview.c:287
-msgid "The contents of the string view"
-msgstr "Le contenu de la vue de chaîne de caractères"
+#: ../src/scim_keyboard_layout_data.h:4592
+msgid "English (US)"
+msgstr "Anglais (US)"
 
-#: ../utils/scimkeyselection.cpp:155
+#: ../src/scim_keyboard_layout_data.h:4593
+msgid "Belgian"
+msgstr "Belge"
+
+#: ../src/scim_keyboard_layout_data.h:4594 ../src/scim_utility.cpp:744
+msgid "Croatian"
+msgstr "Croate"
+
+#: ../src/scim_keyboard_layout_data.h:4595 ../src/scim_utility.cpp:718
+msgid "Czech"
+msgstr "Tchèque"
+
+#: ../src/scim_keyboard_layout_data.h:4596
+msgid "Czech (qwerty)"
+msgstr "Tchèque (qwerty)"
+
+#: ../src/scim_keyboard_layout_data.h:4597 ../src/scim_utility.cpp:720
+msgid "Danish"
+msgstr "Danois"
+
+#: ../src/scim_keyboard_layout_data.h:4598 ../src/scim_utility.cpp:768
+msgid "Dutch"
+msgstr "Néerlandais"
+
+#: ../src/scim_keyboard_layout_data.h:4599
+msgid "Dvorak"
+msgstr "Dvorak"
+
+#: ../src/scim_keyboard_layout_data.h:4600 ../src/scim_utility.cpp:734
+msgid "Estonian"
+msgstr "Estonien"
+
+#: ../src/scim_keyboard_layout_data.h:4601 ../src/scim_utility.cpp:737
+msgid "Finnish"
+msgstr "Finnois"
+
+#: ../src/scim_keyboard_layout_data.h:4602 ../src/scim_utility.cpp:738
+msgid "French"
+msgstr "Français"
+
+#: ../src/scim_keyboard_layout_data.h:4603
+msgid "French (Canadian)"
+msgstr "Français (Canada)"
+
+#: ../src/scim_keyboard_layout_data.h:4604
+msgid "French (Switzerland)"
+msgstr "Français (Suisse)"
+
+#: ../src/scim_keyboard_layout_data.h:4605 ../src/scim_utility.cpp:721
+msgid "German"
+msgstr "Allemand"
+
+#: ../src/scim_keyboard_layout_data.h:4606
+msgid "German (with deadkeys)"
+msgstr "Allemand (avec touches mortes)"
+
+#: ../src/scim_keyboard_layout_data.h:4607
+msgid "German (Swiss)"
+msgstr "Allemand (Suisse)"
+
+#: ../src/scim_keyboard_layout_data.h:4608 ../src/scim_utility.cpp:723
+msgid "Greek"
+msgstr "Grec"
+
+#: ../src/scim_keyboard_layout_data.h:4609 ../src/scim_utility.cpp:745
+msgid "Hungarian"
+msgstr "Hongrois"
+
+#: ../src/scim_keyboard_layout_data.h:4610 ../src/scim_utility.cpp:750
+msgid "Italian"
+msgstr "Italien"
+
+#: ../src/scim_keyboard_layout_data.h:4611 ../src/scim_utility.cpp:752
+msgid "Japanese"
+msgstr "Japonais"
+
+#: ../src/scim_keyboard_layout_data.h:4612
+msgid "Norwegian"
+msgstr "Norvégien"
+
+#: ../src/scim_keyboard_layout_data.h:4613 ../src/scim_utility.cpp:773
+msgid "Polish"
+msgstr "Polonais"
+
+#: ../src/scim_keyboard_layout_data.h:4614 ../src/scim_utility.cpp:774
+#: ../src/scim_utility.cpp:776
+msgid "Portuguese"
+msgstr "Portugais"
+
+#: ../src/scim_keyboard_layout_data.h:4615 ../src/scim_utility.cpp:775
+msgid "Portuguese (Brazil)"
+msgstr "Portugais (Brésil)"
+
+#: ../src/scim_keyboard_layout_data.h:4616
+msgid "Portuguese (Brazil US accents)"
+msgstr "Portugais (Brésil accents US)"
+
+#: ../src/scim_keyboard_layout_data.h:4617 ../src/scim_utility.cpp:778
+msgid "Russian"
+msgstr "Russe"
+
+#: ../src/scim_keyboard_layout_data.h:4618 ../src/scim_utility.cpp:782
+msgid "Slovak"
+msgstr "Slovaque"
+
+#: ../src/scim_keyboard_layout_data.h:4619
+msgid "Slovak (qwerty)"
+msgstr "Slovaque (qwerty)"
+
+#: ../src/scim_keyboard_layout_data.h:4620 ../src/scim_utility.cpp:783
+msgid "Slovenian"
+msgstr "Slovène"
+
+#: ../src/scim_keyboard_layout_data.h:4621 ../src/scim_utility.cpp:731
+#: ../src/scim_utility.cpp:732
+msgid "Spanish"
+msgstr "Espagnol"
+
+#: ../src/scim_keyboard_layout_data.h:4622
+msgid "Spanish (CP 850)"
+msgstr "Espagnol (CP 850)"
+
+#: ../src/scim_keyboard_layout_data.h:4623
+msgid "Spanish (Latin America)"
+msgstr "Espagnol (Amérique latine)"
+
+#: ../src/scim_keyboard_layout_data.h:4624 ../src/scim_utility.cpp:788
+#: ../src/scim_utility.cpp:790
+msgid "Swedish"
+msgstr "Suédois"
+
+#: ../src/scim_keyboard_layout_data.h:4625 ../src/scim_utility.cpp:794
+msgid "Turkish"
+msgstr "Turc"
+
+#: ../src/scim_keyboard_layout_data.h:4626
+msgid "English (UK)"
+msgstr "Anglais (GB)"
+
+#: ../src/scim_keyboard_layout_data.h:4627 ../src/scim_utility.cpp:749
+msgid "Icelandic"
+msgstr "Islandais"
+
+#: ../src/scim_keyboard_layout_data.h:4628 ../src/scim_utility.cpp:759
+msgid "Lithuanian"
+msgstr "Lituanien"
+
+#: ../src/scim_keyboard_layout_data.h:4629 ../src/scim_utility.cpp:796
+msgid "Ukrainian"
+msgstr "Ukrainien"
+
+#. NOTE another instance of the server is running: we can't just keep running like this
+#. if we attempt to bind anyway there may be more than one servers listening on this socket.
+#. In addition on FreeBSD bind will get EADDRINUSE, not clear why Linux doesn;t produce this same error.
+#: ../src/scim_socket.cpp:475 ../src/scim_socket.cpp:483
+#: ../src/scim_socket.cpp:491 ../src/scim_socket.cpp:509
+msgid "Creating socket"
+msgstr ""
+
+#: ../src/scim_socket.cpp:476
+msgid "file exists and we were unable to delete it"
+msgstr ""
+
+#: ../src/scim_socket.cpp:476 ../src/scim_socket.cpp:510
+msgid "syscall"
+msgstr ""
+
+#: ../src/scim_socket.cpp:478 ../src/scim_socket.cpp:484
+#: ../src/scim_socket.cpp:492
+msgid "exiting"
+msgstr ""
+
+#: ../src/scim_socket.cpp:484
+msgid "file exists and is not a socket"
+msgstr ""
+
+#: ../src/scim_socket.cpp:492
+msgid "another instance of the server is already listening on this socket"
+msgstr ""
+
+#: ../src/scim_socket.cpp:510
+msgid "unable to change the mode of this file"
+msgstr ""
+
+#: ../src/scim_socket.cpp:511
+msgid "continuing"
+msgstr ""
+
+#: ../src/scim_socket.cpp:519 ../src/scim_socket.cpp:535
+#: ../src/scim_socket.cpp:589
+msgid "Error creating socket"
+msgstr ""
+
+#: ../src/scim_socket.cpp:519 ../src/scim_socket.cpp:535
+#: ../src/scim_socket.cpp:589
+msgid "syscall failed"
+msgstr ""
+
+#: ../src/scim_utility.cpp:704
+msgid "Amharic"
+msgstr "Amharique"
+
+#: ../src/scim_utility.cpp:705
+msgid "Arabic"
+msgstr "Arabe"
+
+#: ../src/scim_utility.cpp:706
+msgid "Arabic (Egypt)"
+msgstr "Arabe (Egypte)"
+
+#: ../src/scim_utility.cpp:707
+msgid "Arabic (Lebanon)"
+msgstr "Arabe (Liban)"
+
+#: ../src/scim_utility.cpp:708
+msgid "Assamese"
+msgstr "Assamais"
+
+#: ../src/scim_utility.cpp:709
+msgid "Azerbaijani"
+msgstr "Azerbaïdjanais"
+
+#: ../src/scim_utility.cpp:710
+msgid "Belarusian"
+msgstr "Biélorusse"
+
+#: ../src/scim_utility.cpp:711
+msgid "Bulgarian"
+msgstr "Bulgare"
+
+#: ../src/scim_utility.cpp:712 ../src/scim_utility.cpp:713
+msgid "Bengali"
+msgstr "Bengali"
+
+#: ../src/scim_utility.cpp:714
+msgid "Bengali (India)"
+msgstr "Bengali (Inde)"
+
+#: ../src/scim_utility.cpp:715
+msgid "Tibetan"
+msgstr "Tibétain"
+
+#: ../src/scim_utility.cpp:716
+msgid "Bosnian"
+msgstr "Bosniaque"
+
+#: ../src/scim_utility.cpp:717
+msgid "Catalan"
+msgstr "Catalan"
+
+#: ../src/scim_utility.cpp:719
+msgid "Welsh"
+msgstr "Gallois"
+
+#: ../src/scim_utility.cpp:722
+msgid "Divehi"
+msgstr "Maldivien"
+
+#: ../src/scim_utility.cpp:724
+msgid "English"
+msgstr "Anglais"
+
+#: ../src/scim_utility.cpp:725
+msgid "English (Australian)"
+msgstr "Anglais (Australie)"
+
+#: ../src/scim_utility.cpp:726
+msgid "English (Canadian)"
+msgstr "Anglais (Canada)"
+
+#: ../src/scim_utility.cpp:727
+msgid "English (British)"
+msgstr "Anglais (Royaume Uni)"
+
+#: ../src/scim_utility.cpp:728
+msgid "English (Ireland)"
+msgstr "Anglais (Irlande)"
+
+#: ../src/scim_utility.cpp:729
+msgid "English (American)"
+msgstr "Anglais (Etats-Unis)"
+
+#: ../src/scim_utility.cpp:730
+msgid "Esperanto"
+msgstr ""
+
+#: ../src/scim_utility.cpp:733
+msgid "Spanish (Mexico)"
+msgstr "Espagnol (Mexique)"
+
+#: ../src/scim_utility.cpp:735
+msgid "Basque"
+msgstr "Basque"
+
+#: ../src/scim_utility.cpp:736
+msgid "Persian"
+msgstr "Perse"
+
+#: ../src/scim_utility.cpp:739
+msgid "Irish"
+msgstr "Irlandais"
+
+#: ../src/scim_utility.cpp:740
+msgid "Galician"
+msgstr "Galicien"
+
+#: ../src/scim_utility.cpp:741
+msgid "Gujarati"
+msgstr "Gujarati"
+
+#: ../src/scim_utility.cpp:742 ../src/scim_utility.cpp:751
+msgid "Hebrew"
+msgstr "Hébreu"
+
+#: ../src/scim_utility.cpp:743
+msgid "Hindi"
+msgstr "Hindi"
+
+#: ../src/scim_utility.cpp:746
+msgid "Armenian"
+msgstr "Arménien"
+
+#: ../src/scim_utility.cpp:747
+msgid "Interlingua"
+msgstr "Interlingua"
+
+#: ../src/scim_utility.cpp:748
+msgid "Indonesian"
+msgstr "Indonésien"
+
+#: ../src/scim_utility.cpp:753
+msgid "Georgian"
+msgstr "Géorgien"
+
+#: ../src/scim_utility.cpp:754
+msgid "Kazakh"
+msgstr "Kazakh"
+
+#: ../src/scim_utility.cpp:755
+msgid "Cambodian"
+msgstr "Khmer"
+
+#: ../src/scim_utility.cpp:756
+msgid "Kannada"
+msgstr "Kannara"
+
+#: ../src/scim_utility.cpp:757
+msgid "Korean"
+msgstr "Coréen"
+
+#: ../src/scim_utility.cpp:758
+msgid "Laothian"
+msgstr "Laotien"
+
+#: ../src/scim_utility.cpp:760
+msgid "Latvian"
+msgstr "Letton"
+
+#: ../src/scim_utility.cpp:761
+msgid "Macedonian"
+msgstr "Macédonien"
+
+#: ../src/scim_utility.cpp:762
+msgid "Malayalam"
+msgstr "Malayalam"
+
+#: ../src/scim_utility.cpp:763
+msgid "Mongolian"
+msgstr "Mongol"
+
+#: ../src/scim_utility.cpp:764
+msgid "Marathi"
+msgstr "Marathi"
+
+#: ../src/scim_utility.cpp:765
+msgid "Malay"
+msgstr "Malais"
+
+#: ../src/scim_utility.cpp:766
+msgid "Burmese"
+msgstr "Birman"
+
+#: ../src/scim_utility.cpp:767
+msgid "Nepali"
+msgstr "Népalais"
+
+#: ../src/scim_utility.cpp:769
+msgid "Norwegian (nynorsk)"
+msgstr "Norvégien (Nynorsk)"
+
+#: ../src/scim_utility.cpp:770
+msgid "Norwegian (bokmal)"
+msgstr "Norvégien (Bokmal)"
+
+#: ../src/scim_utility.cpp:771
+msgid "Oriya"
+msgstr "Oriya"
+
+#: ../src/scim_utility.cpp:772
+msgid "Punjabi"
+msgstr "Punjabi"
+
+#: ../src/scim_utility.cpp:777
+msgid "Romanian"
+msgstr "Roumain"
+
+#: ../src/scim_utility.cpp:779 ../src/scim_utility.cpp:780
+msgid "Sindhi"
+msgstr ""
+
+#: ../src/scim_utility.cpp:781
+msgid "Sinhala"
+msgstr "Singhalais"
+
+#: ../src/scim_utility.cpp:784
+msgid "Albanian"
+msgstr "Albanais"
+
+#: ../src/scim_utility.cpp:785 ../src/scim_utility.cpp:786
+#: ../src/scim_utility.cpp:787
+msgid "Serbian"
+msgstr "Serbe"
+
+#: ../src/scim_utility.cpp:789
+msgid "Swedish (Finland)"
+msgstr "Suédois (Finlande)"
+
+#: ../src/scim_utility.cpp:791
+msgid "Tamil"
+msgstr "Tamoul"
+
+#: ../src/scim_utility.cpp:792
+msgid "Telugu"
+msgstr "Telugu"
+
+#: ../src/scim_utility.cpp:793
+msgid "Thai"
+msgstr "Thaï"
+
+#: ../src/scim_utility.cpp:795
+msgid "Uighur"
+msgstr "Uighur"
+
+#: ../src/scim_utility.cpp:797
+msgid "Urdu"
+msgstr "Ourdou"
+
+#: ../src/scim_utility.cpp:798
+msgid "Uzbek"
+msgstr "Ouzbèque"
+
+#: ../src/scim_utility.cpp:799
+msgid "Vietnamese"
+msgstr "Vietnamien"
+
+#: ../src/scim_utility.cpp:800
+msgid "Walloon"
+msgstr "Wallon"
+
+#: ../src/scim_utility.cpp:801 ../src/scim_utility.cpp:802
+msgid "Yiddish"
+msgstr "Yiddish"
+
+#: ../src/scim_utility.cpp:803
+msgid "Chinese"
+msgstr "Chinois"
+
+#: ../src/scim_utility.cpp:804 ../src/scim_utility.cpp:806
+msgid "Chinese (simplified)"
+msgstr "Chinois (simplifié)"
+
+#: ../src/scim_utility.cpp:805 ../src/scim_utility.cpp:807
+msgid "Chinese (traditional)"
+msgstr "Chinois (traditionnel)"
+
+#: ../src/scim_utility.cpp:889
+msgid "Other"
+msgstr "Autre"
+
+#: ../tests/scim_test_helper.cpp:49
+msgid "Test"
+msgstr ""
+
+#: ../tests/scim_test_helper.cpp:51
+msgid "A test helper."
+msgstr ""
+
+#: ../tests/scim_test_imengine.cpp:56
+msgid "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
+msgstr ""
+
+#: ../tests/scim_test_imengine.cpp:102
+msgid "TEST"
+msgstr ""
+
+#: ../tests/scim_test_imengine.cpp:109
+msgid "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>"
+msgstr ""
+
+#: ../utils/scimkeyselection.cpp:162
 msgid "Selected _Keys:"
 msgstr "_Touches Sélectionnées :"
 
-#: ../utils/scimkeyselection.cpp:200
+#: ../utils/scimkeyselection.cpp:207
 msgid "Key Code:"
 msgstr "Code Touche:"
 
-#: ../utils/scimkeyselection.cpp:218
+#: ../utils/scimkeyselection.cpp:229
 msgid "..."
 msgstr "..."
 
-#: ../utils/scimkeyselection.cpp:223
+#: ../utils/scimkeyselection.cpp:234
 msgid "Modifiers:"
 msgstr "Modificateurs:"
 
-#: ../utils/scimkeyselection.cpp:236
+#: ../utils/scimkeyselection.cpp:251
 msgid "_Ctrl"
 msgstr "_Ctrl"
 
-#: ../utils/scimkeyselection.cpp:240
+#: ../utils/scimkeyselection.cpp:255
 msgid "A_lt"
 msgstr "_Alt"
 
-#: ../utils/scimkeyselection.cpp:244
+#: ../utils/scimkeyselection.cpp:259
 msgid "_Shift"
 msgstr "_Maj"
 
-#: ../utils/scimkeyselection.cpp:248
+#: ../utils/scimkeyselection.cpp:263
 msgid "_Release"
 msgstr "_Relâche"
 
-#: ../utils/scimkeyselection.cpp:258
+#: ../utils/scimkeyselection.cpp:277
 msgid "_Meta"
 msgstr "_Meta"
 
-#: ../utils/scimkeyselection.cpp:262
+#: ../utils/scimkeyselection.cpp:281
 msgid "S_uper"
 msgstr "S_uper"
 
-#: ../utils/scimkeyselection.cpp:266
+#: ../utils/scimkeyselection.cpp:285
 msgid "_Hyper"
 msgstr "_Hyper"
 
-#: ../utils/scimkeyselection.cpp:331
+#: ../utils/scimkeyselection.cpp:290
+msgid "Ca_psLock"
+msgstr ""
+
+#: ../utils/scimkeyselection.cpp:361
 msgid "Please enter a Key Code first."
 msgstr "Veuillez d'abord entrer un code de touche."
 
-#: ../utils/scimkeyselection.cpp:385
+#: ../utils/scimkeyselection.cpp:415
 msgid ""
 "Press a key (or a key combination).\n"
 "This dialog will be closed when the key is released."
@@ -1343,13 +1388,108 @@ msgstr ""
 "Appuyer sur une touche (ou une combinaison de touches).\n"
 "Cette fenêtre se fermera dès que la touche sera relâchée."
 
-#: ../utils/scimkeyselection.cpp:388
+#: ../utils/scimkeyselection.cpp:418
 msgid "Grabbing a key."
 msgstr "Capture de touche."
 
-#: ../utils/scimkeyselection.cpp:678
+#: ../utils/scimkeyselection.cpp:723
 msgid "Key Selection"
 msgstr "Sélection de Touche"
+
+#: ../utils/scimstringview.c:231
+msgid "Cursor Position"
+msgstr "Position du Curseur"
+
+#: ../utils/scimstringview.c:232
+msgid "The current position of the insertion cursor in chars."
+msgstr "Position courante du curseur d'insertion dans les caractères."
+
+#: ../utils/scimstringview.c:241
+msgid "Maximum length"
+msgstr "Longueur maximale"
+
+#: ../utils/scimstringview.c:242
+msgid "Maximum number of characters for this string view. Zero if no maximum."
+msgstr ""
+"Nombre maximum de caractères pour cette vue de chaîne de caractères. Zero si "
+"pas de maximum."
+
+#: ../utils/scimstringview.c:251
+msgid "Maximum width"
+msgstr "Largeur maximale"
+
+#: ../utils/scimstringview.c:252
+msgid "Maximum width of this string view."
+msgstr "Largeur maximale de cette vue de chaîne de caractères."
+
+#: ../utils/scimstringview.c:261
+msgid "Has Frame"
+msgstr "Avec Cadre"
+
+#: ../utils/scimstringview.c:262
+msgid "FALSE removes outside bevel from string view."
+msgstr "FAUX supprime le cadre extérieur de la vue de chaîne de caractères."
+
+#: ../utils/scimstringview.c:269
+msgid "Draw cursor"
+msgstr "Affichage du curseur"
+
+#: ../utils/scimstringview.c:270
+msgid "TRUE draw blinking cursor."
+msgstr "VRAI Affichage d'un curseur clignotant."
+
+#: ../utils/scimstringview.c:277
+msgid "Auto move cursor"
+msgstr "Déplacement automatique du curseur"
+
+#: ../utils/scimstringview.c:278
+msgid "TRUE auto move cursor position when mouse clicking."
+msgstr ""
+"VRAI Déplacement automatique de la position du curseur sur clic de souris."
+
+#: ../utils/scimstringview.c:285
+msgid "Forward button press event"
+msgstr "Transmission événement d'appui de bouton"
+
+#: ../utils/scimstringview.c:286
+msgid "TRUE forward button press event to user program."
+msgstr ""
+"VRAI Fait suivre les événements d'appui de bouton vers le programme client."
+
+#: ../utils/scimstringview.c:293
+msgid "Auto resize the widget to fit the string"
+msgstr "Redimensionnement automatique à la taille de la chaîne"
+
+#: ../utils/scimstringview.c:294
+msgid "TRUE Auto resize on."
+msgstr "VRAI Redimensionnement automatique activé."
+
+#: ../utils/scimstringview.c:301
+msgid "Width in chars"
+msgstr "Largeur en caractères"
+
+#: ../utils/scimstringview.c:302
+msgid "Number of characters to leave space for in the string view."
+msgstr ""
+"Nombre de caractères à laisser vides dans la vue de chaîne de caractères."
+
+#: ../utils/scimstringview.c:311
+msgid "Scroll offset"
+msgstr "Décalage"
+
+#: ../utils/scimstringview.c:312
+msgid "Number of pixels of the string view scrolled off the screen to the left"
+msgstr ""
+"Nombre de pixels de la vue de chaîne de caractères décalés à gauche en "
+"dehors de l'écran"
+
+#: ../utils/scimstringview.c:321
+msgid "Text"
+msgstr "Texte"
+
+#: ../utils/scimstringview.c:322
+msgid "The contents of the string view"
+msgstr "Le contenu de la vue de chaîne de caractères"
 
 #: ../utils/scimtrayicon.c:108
 msgid "Orientation"
@@ -1358,4 +1498,3 @@ msgstr "Orientation"
 #: ../utils/scimtrayicon.c:109
 msgid "The orientation of the tray."
 msgstr "Orientation du tiroir."
-

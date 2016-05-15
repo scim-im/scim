@@ -6,465 +6,192 @@
 # Kiyoto Hashida <khashida@redhat.com>, 2008.
 msgid ""
 msgstr ""
-"Project-Id-Version: ja\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-07-20 09:50+0800\n"
-"PO-Revision-Date: 2008-03-26 09:55+1000\n"
-"Last-Translator: Kiyoto Hashida <khashida@redhat.com>\n"
-"Language-Team: Japanese <jp@li.org>\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: http://sourceforge.net/projects/scim\n"
+"POT-Creation-Date: 2014-11-20 00:09+0400\n"
+"PO-Revision-Date: 2015-02-11 16:45+0100\n"
+"Last-Translator: test2\n"
+"Language-Team: Dutch <kde-i18n-doc@kde.org>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 1.5\n"
 
-#: ../src/scim_compose_key.cpp:126
-msgid "English/European"
-msgstr "英語/ヨーロッパ言語"
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1311
+#: ../extras/panel/scim_panel_gtk.cpp:2692
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1849
+msgid "Smart Common Input Method platform "
+msgstr "Smart Common Input Method platform"
+
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1313
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
+msgid ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
+"\n"
+msgstr ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
+"\n"
+
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1318
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1855
+msgid ""
+":\n"
+"\n"
+msgstr ""
+":\n"
+"\n"
+
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1321
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1324
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1858
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1861
+msgid ""
+"\n"
+"\n"
+msgstr ""
+"\n"
+"\n"
 
 #. Append an entry for forward mode.
-#: ../src/scim_imengine.cpp:638 ../src/scim_utility.cpp:693
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1897
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1281
-#: ../extras/panel/scim_panel_gtk.cpp:2814
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1361
+#: ../extras/panel/scim_panel_gtk.cpp:3227
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1901 ../src/scim_imengine.cpp:638
+#: ../src/scim_panel_agent.cpp:217 ../src/scim_panel_agent.cpp:218
+#: ../src/scim_utility.cpp:703
 msgid "English/Keyboard"
 msgstr "英語/キーボード"
 
-#: ../src/scim_utility.cpp:694
-msgid "Amharic"
-msgstr "アムハラ語"
-
-#: ../src/scim_utility.cpp:695
-msgid "Arabic"
-msgstr "アラビア語"
-
-#: ../src/scim_utility.cpp:696
-msgid "Arabic (Egypt)"
-msgstr "アラビア語(エジプト)"
-
-#: ../src/scim_utility.cpp:697
-msgid "Arabic (Lebanon)"
-msgstr "アラビア語(レバノン)"
-
-#: ../src/scim_utility.cpp:698
-msgid "Assamese"
-msgstr "アッサム語"
-
-#: ../src/scim_utility.cpp:699
-msgid "Azerbaijani"
-msgstr "アゼルバイジャン語"
-
-#: ../src/scim_utility.cpp:700
-msgid "Belarusian"
-msgstr "白ロシア語"
-
-#: ../src/scim_utility.cpp:701
-msgid "Bulgarian"
-msgstr "ブルガリア語"
-
-#: ../src/scim_utility.cpp:702 ../src/scim_utility.cpp:703
-msgid "Bengali"
-msgstr "ベンガル語"
-
-#: ../src/scim_utility.cpp:704
-msgid "Bengali (India)"
-msgstr "ベンガル語(インド)"
-
-#: ../src/scim_utility.cpp:705
-msgid "Tibetan"
-msgstr "チベット語"
-
-#: ../src/scim_utility.cpp:706
-msgid "Bosnian"
-msgstr "ボスニア語"
-
-#: ../src/scim_utility.cpp:707
-msgid "Catalan"
-msgstr "カタロニア語"
-
-#: ../src/scim_utility.cpp:708 ../src/scim_keyboard_layout_data.h:4595
-msgid "Czech"
-msgstr "チェコ語"
-
-#: ../src/scim_utility.cpp:709
-msgid "Welsh"
-msgstr "ウェールズ語"
-
-#: ../src/scim_utility.cpp:710 ../src/scim_keyboard_layout_data.h:4597
-msgid "Danish"
-msgstr "デンマーク語"
-
-#: ../src/scim_utility.cpp:711 ../src/scim_keyboard_layout_data.h:4605
-msgid "German"
-msgstr "ドイツ語"
-
-#: ../src/scim_utility.cpp:712
-msgid "Divehi"
-msgstr "ディベヒ語"
-
-#: ../src/scim_utility.cpp:713 ../src/scim_keyboard_layout_data.h:4608
-msgid "Greek"
-msgstr "ギリシャ語"
-
-#: ../src/scim_utility.cpp:714
-msgid "English"
-msgstr "英語"
-
-#: ../src/scim_utility.cpp:715
-msgid "English (Australian)"
-msgstr "英語(オーストラリア)"
-
-#: ../src/scim_utility.cpp:716
-msgid "English (Canadian)"
-msgstr "英語(カナダ)"
-
-#: ../src/scim_utility.cpp:717
-msgid "English (British)"
-msgstr "英語(イギリス)"
-
-#: ../src/scim_utility.cpp:718
-msgid "English (Ireland)"
-msgstr "英語(アイルランド)"
-
-#: ../src/scim_utility.cpp:719
-msgid "English (American)"
-msgstr "英語(アメリカ)"
-
-#: ../src/scim_utility.cpp:720 ../src/scim_utility.cpp:721
-#: ../src/scim_keyboard_layout_data.h:4621
-msgid "Spanish"
-msgstr "スペイン語"
-
-#: ../src/scim_utility.cpp:722
-msgid "Spanish (Mexico)"
-msgstr "スペイン語(メキシコ)"
-
-#: ../src/scim_utility.cpp:723 ../src/scim_keyboard_layout_data.h:4600
-msgid "Estonian"
-msgstr "エストニア語"
-
-#: ../src/scim_utility.cpp:724
-msgid "Basque"
-msgstr "バスク語"
-
-#: ../src/scim_utility.cpp:725
-msgid "Persian"
-msgstr "ペルシア語"
-
-#: ../src/scim_utility.cpp:726 ../src/scim_keyboard_layout_data.h:4601
-msgid "Finnish"
-msgstr "フィンランド語"
-
-#: ../src/scim_utility.cpp:727 ../src/scim_keyboard_layout_data.h:4602
-msgid "French"
-msgstr "フランス語"
-
-#: ../src/scim_utility.cpp:728
-msgid "Irish"
-msgstr "アイルランド語"
-
-#: ../src/scim_utility.cpp:729
-msgid "Galician"
-msgstr "ガリシア語"
-
-#: ../src/scim_utility.cpp:730
-msgid "Gujarati"
-msgstr "グジャラート語"
-
-#: ../src/scim_utility.cpp:731 ../src/scim_utility.cpp:740
-msgid "Hebrew"
-msgstr "ヘブライ語"
-
-#: ../src/scim_utility.cpp:732
-msgid "Hindi"
-msgstr "ヒンディー語"
-
-#: ../src/scim_utility.cpp:733 ../src/scim_keyboard_layout_data.h:4594
-msgid "Croatian"
-msgstr "クロアチア語"
-
-#: ../src/scim_utility.cpp:734 ../src/scim_keyboard_layout_data.h:4609
-msgid "Hungarian"
-msgstr "ハンガリー語"
-
-#: ../src/scim_utility.cpp:735
-msgid "Armenian"
-msgstr "アルメニア語"
-
-#: ../src/scim_utility.cpp:736
-msgid "Interlingua"
-msgstr "インターリングア"
-
-#: ../src/scim_utility.cpp:737
-msgid "Indonesian"
-msgstr "インドネシア語"
-
-#: ../src/scim_utility.cpp:738 ../src/scim_keyboard_layout_data.h:4627
-msgid "Icelandic"
-msgstr "アイスランド語"
-
-#: ../src/scim_utility.cpp:739 ../src/scim_keyboard_layout_data.h:4610
-msgid "Italian"
-msgstr "イタリア語"
-
-#: ../src/scim_utility.cpp:741 ../src/scim_keyboard_layout_data.h:4611
-msgid "Japanese"
-msgstr "日本語"
-
-#: ../src/scim_utility.cpp:742
-msgid "Georgian"
-msgstr "グルジア語"
-
-#: ../src/scim_utility.cpp:743
-msgid "Kazakh"
-msgstr "カザフスタン語"
-
-#: ../src/scim_utility.cpp:744
-msgid "Cambodian"
-msgstr "クメール語"
-
-#: ../src/scim_utility.cpp:745
-msgid "Kannada"
-msgstr "カンナダ語"
-
-#: ../src/scim_utility.cpp:746
-msgid "Korean"
-msgstr "ハングル"
-
-#: ../src/scim_utility.cpp:747
-msgid "Laothian"
-msgstr "ラオス語"
-
-#: ../src/scim_utility.cpp:748 ../src/scim_keyboard_layout_data.h:4628
-msgid "Lithuanian"
-msgstr "リトアニア語"
-
-#: ../src/scim_utility.cpp:749
-msgid "Latvian"
-msgstr "ラトヴィア語"
-
-#: ../src/scim_utility.cpp:750
-msgid "Macedonian"
-msgstr "マケドニア語"
-
-#: ../src/scim_utility.cpp:751
-msgid "Malayalam"
-msgstr "マラヤーラム語"
-
-#: ../src/scim_utility.cpp:752
-msgid "Mongolian"
-msgstr "モンゴル語"
-
-#: ../src/scim_utility.cpp:753
-msgid "Marathi"
-msgstr "マラーティー語"
-
-#: ../src/scim_utility.cpp:754
-msgid "Malay"
-msgstr "マレー語"
-
-#: ../src/scim_utility.cpp:755
-msgid "Burmese"
-msgstr "ビルマ語"
-
-#: ../src/scim_utility.cpp:756
-msgid "Nepali"
-msgstr "ネパール語"
-
-#: ../src/scim_utility.cpp:757 ../src/scim_keyboard_layout_data.h:4598
-msgid "Dutch"
-msgstr "オランダ語"
-
-#: ../src/scim_utility.cpp:758
-msgid "Norwegian (nynorsk)"
-msgstr "ノルウェー語(ニューノルスク)"
-
-#: ../src/scim_utility.cpp:759
-msgid "Norwegian (bokmal)"
-msgstr "ノルウェー語(ボックモール)"
-
-#: ../src/scim_utility.cpp:760
-msgid "Oriya"
-msgstr "オリヤー語"
-
-#: ../src/scim_utility.cpp:761
-msgid "Punjabi"
-msgstr "パンジャブ語"
-
-#: ../src/scim_utility.cpp:762 ../src/scim_keyboard_layout_data.h:4613
-msgid "Polish"
-msgstr "ポーランド語"
-
-#: ../src/scim_utility.cpp:763 ../src/scim_utility.cpp:765
-#: ../src/scim_keyboard_layout_data.h:4614
-msgid "Portuguese"
-msgstr "ポルトガル語"
-
-#: ../src/scim_utility.cpp:764 ../src/scim_keyboard_layout_data.h:4615
-msgid "Portuguese (Brazil)"
-msgstr "ポルトガル語(ブラジル)"
-
-#: ../src/scim_utility.cpp:766
-msgid "Romanian"
-msgstr "ルーマニア語"
-
-#: ../src/scim_utility.cpp:767 ../src/scim_keyboard_layout_data.h:4617
-msgid "Russian"
-msgstr "ロシア語"
-
-#: ../src/scim_utility.cpp:768
-msgid "Sinhala"
-msgstr "シンハラ語"
-
-#: ../src/scim_utility.cpp:769 ../src/scim_keyboard_layout_data.h:4618
-msgid "Slovak"
-msgstr "スロバキア語"
-
-#: ../src/scim_utility.cpp:770 ../src/scim_keyboard_layout_data.h:4620
-msgid "Slovenian"
-msgstr "スロベニア語"
-
-#: ../src/scim_utility.cpp:771
-msgid "Albanian"
-msgstr "アルバニア語"
-
-#: ../src/scim_utility.cpp:772 ../src/scim_utility.cpp:773
-#: ../src/scim_utility.cpp:774
-msgid "Serbian"
-msgstr "セルビア語"
-
-#: ../src/scim_utility.cpp:775 ../src/scim_utility.cpp:777
-#: ../src/scim_keyboard_layout_data.h:4624
-msgid "Swedish"
-msgstr "スウェーデン語"
-
-#: ../src/scim_utility.cpp:776
-msgid "Swedish (Finland)"
-msgstr "スウェーデン語(フィンランド)"
-
-#: ../src/scim_utility.cpp:778
-msgid "Tamil"
-msgstr "タミル語"
-
-#: ../src/scim_utility.cpp:779
-msgid "Telugu"
-msgstr "テルグ語"
-
-#: ../src/scim_utility.cpp:780
-msgid "Thai"
-msgstr "タイ語"
-
-#: ../src/scim_utility.cpp:781 ../src/scim_keyboard_layout_data.h:4625
-msgid "Turkish"
-msgstr "トルコ語"
-
-#: ../src/scim_utility.cpp:782
-msgid "Uighur"
-msgstr "ウィグル語"
-
-#: ../src/scim_utility.cpp:783 ../src/scim_keyboard_layout_data.h:4629
-msgid "Ukrainian"
-msgstr "ウクライナ語"
-
-#: ../src/scim_utility.cpp:784
-msgid "Urdu"
-msgstr "ウルドゥー語"
-
-#: ../src/scim_utility.cpp:785
-msgid "Uzbek"
-msgstr "ウズベク語"
-
-#: ../src/scim_utility.cpp:786
-msgid "Vietnamese"
-msgstr "ベトナム語"
-
-#: ../src/scim_utility.cpp:787
-msgid "Walloon"
-msgstr "ワロン語"
-
-#: ../src/scim_utility.cpp:788 ../src/scim_utility.cpp:789
-msgid "Yiddish"
-msgstr "イディッシュ語"
-
-#: ../src/scim_utility.cpp:790
-msgid "Chinese"
-msgstr "中国語"
-
-#: ../src/scim_utility.cpp:791 ../src/scim_utility.cpp:793
-msgid "Chinese (simplified)"
-msgstr "簡体中国語"
-
-#: ../src/scim_utility.cpp:792 ../src/scim_utility.cpp:794
-msgid "Chinese (traditional)"
-msgstr "繁体中国語"
-
-#: ../src/scim_utility.cpp:876
-msgid "Other"
+#: ../extras/panel/scim_panel_gtk.cpp:1145
+msgid "SCIM Help"
+msgstr "SCIMヘルプ"
+
+#: ../extras/panel/scim_panel_gtk.cpp:1235
+#: ../extras/panel/scim_panel_gtk.cpp:1238
+msgid "Stick/unstick the input window and the toolbar."
+msgstr "入力ウィンドウ・ツールバーを固定する/固定しない"
+
+#: ../extras/panel/scim_panel_gtk.cpp:1245
+#: ../extras/panel/scim_panel_gtk.cpp:1248
+msgid "Show a brief help about SCIM and the current input method."
+msgstr "SCIMと現在の入力メソッドについて簡単なヘルプを表示します"
+
+#: ../extras/panel/scim_panel_gtk.cpp:1254
+#: ../extras/panel/scim_panel_gtk.cpp:1257
+msgid "Show command menu."
+msgstr "コマンドメニューを表示"
+
+#: ../extras/panel/scim_panel_gtk.cpp:2694
+msgid ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
+msgstr ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
+
+#. Reload Configuration.
+#: ../extras/panel/scim_panel_gtk.cpp:2777
+msgid "Reload Configuration"
+msgstr "設定をリロード"
+
+#. Stick
+#: ../extras/panel/scim_panel_gtk.cpp:2787
+msgid "Stick Windows"
+msgstr "ウィンドウを固定"
+
+#. Toolbar
+#: ../extras/panel/scim_panel_gtk.cpp:2796
+msgid "Hide Toolbar"
+msgstr "ツールバーを隠す"
+
+#. Help
+#: ../extras/panel/scim_panel_gtk.cpp:2805
+msgid "Help ..."
+msgstr "ヘルプ..."
+
+#. Clients exit.
+#: ../extras/panel/scim_panel_gtk.cpp:2823
+msgid "Exit"
+msgstr "終了"
+
+#.
+#. vi:ts=4:nowrap:expandtab
+#.
+#: ../extras/setup/scim-setup.desktop.in.h:1
+msgid "SCIM Input Method"
+msgstr ""
+
+#: ../extras/setup/scim-setup.desktop.in.h:2
+msgid "Configure the Smart Common Input Method platform"
+msgstr ""
+
+#: ../extras/setup/scim_setup_helper.cpp:49
+msgid "SCIM Setup"
+msgstr "SCIMを設定"
+
+#: ../extras/setup/scim_setup_helper.cpp:51
+msgid "Integrated Setup Utility based on GTK Widget library."
+msgstr "GTK Widget library に基づく統合設定ユーティリティ"
+
+#: ../extras/setup/scim_setup_ui.cpp:47
+msgid "SCIM"
+msgstr "SCIM"
+
+#: ../extras/setup/scim_setup_ui.cpp:48
+msgid "FrontEnd"
+msgstr "フロントエンド"
+
+#: ../extras/setup/scim_setup_ui.cpp:49
+msgid "IMEngine"
+msgstr "IMエンジン"
+
+#: ../extras/setup/scim_setup_ui.cpp:50
+msgid "Panel"
+msgstr "パネル"
+
+#: ../extras/setup/scim_setup_ui.cpp:51
+msgid "Extra"
 msgstr "その他"
 
-#: ../src/scim_keyboard_layout_data.h:4591
-#: ../modules/IMEngine/scim_socket_imengine.cpp:386
-#: ../modules/IMEngine/scim_socket_imengine.cpp:416
-#: ../modules/IMEngine/scim_socket_imengine.cpp:501
-#: ../modules/IMEngine/scim_socket_imengine.cpp:531
-#: ../modules/IMEngine/scim_socket_imengine.cpp:561
-msgid "Unknown"
-msgstr "不明"
+#: ../extras/setup/scim_setup_ui.cpp:230
+msgid "SCIM Input Method Setup"
+msgstr "SCIM入力メソッドの設定"
 
-#: ../src/scim_keyboard_layout_data.h:4592
-msgid "English (US)"
-msgstr "英語(US)"
+#: ../extras/setup/scim_setup_ui.cpp:397
+msgid ""
+" <span size=\"20000\">Smart Common Input Method platform</span> \n"
+"\n"
+"<span size=\"16000\" style=\"italic\">GUI Setup Utility</span>\n"
+"\n"
+"\n"
+"\n"
+"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
+"cn&gt;</span>"
+msgstr ""
+" <span size=\"20000\">Smart Common Input Method platform</span> \n"
+"\n"
+"<span size=\"16000\" style=\"italic\">GUI セットアップユーティリティ</span>\n"
+"\n"
+"\n"
+"\n"
+"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
+"cn&gt;</span>"
 
-#: ../src/scim_keyboard_layout_data.h:4593
-msgid "Belgian"
-msgstr "ベルギー"
+#: ../extras/setup/scim_setup_ui.cpp:422
+#, c-format
+msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
+msgstr "<span size=\"x-large\">%s モジュールの設定</span>"
 
-#: ../src/scim_keyboard_layout_data.h:4596
-msgid "Czech (qwerty)"
-msgstr "チェコ語(qwerty)"
-
-#: ../src/scim_keyboard_layout_data.h:4599
-msgid "Dvorak"
-msgstr "Dvorak"
-
-#: ../src/scim_keyboard_layout_data.h:4603
-msgid "French (Canadian)"
-msgstr "フランス語(カナダ)"
-
-#: ../src/scim_keyboard_layout_data.h:4604
-msgid "French (Switzerland)"
-msgstr "フランス語(スイス)"
-
-#: ../src/scim_keyboard_layout_data.h:4606
-msgid "German (with deadkeys)"
-msgstr "ドイツ語(deadkeyあり)"
-
-#: ../src/scim_keyboard_layout_data.h:4607
-msgid "German (Swiss)"
-msgstr "ドイツ語(スイス)"
-
-#: ../src/scim_keyboard_layout_data.h:4612
-msgid "Norwegian"
-msgstr "ノルウェー語"
-
-#: ../src/scim_keyboard_layout_data.h:4616
-msgid "Portuguese (Brazil US accents)"
-msgstr "ポルトガル語(ブラジルUSアクセント)"
-
-#: ../src/scim_keyboard_layout_data.h:4619
-msgid "Slovak (qwerty)"
-msgstr "スロバキア語(qwerty)"
-
-#: ../src/scim_keyboard_layout_data.h:4622
-msgid "Spanish (CP 850)"
-msgstr "スペイン語(CP 850)"
-
-#: ../src/scim_keyboard_layout_data.h:4623
-msgid "Spanish (Latin America)"
-msgstr "スペイン語(ラテンアメリカ)"
-
-#: ../src/scim_keyboard_layout_data.h:4626
-msgid "English (UK)"
-msgstr "英語(UK)"
+#: ../extras/setup/scim_setup_ui.cpp:698
+msgid ""
+"Not all configuration can be reloaded on the fly. Don't forget to restart "
+"SCIM in order to let all of the new configuration take effect."
+msgstr ""
+"すぐに有効にならない設定項目があります。\n"
+"すべての変更を有効にするにはSCIMを再起動して下さい。"
 
 #: ../modules/Filter/scim_sctc_filter.cpp:57
 msgid "Simplified-Traditional Chinese Conversion"
@@ -519,43 +246,6 @@ msgstr "簡体->繁体"
 msgid "TC->SC"
 msgstr "繁体->簡体"
 
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1845
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1231
-#: ../extras/panel/scim_panel_gtk.cpp:2304
-msgid "Smart Common Input Method platform "
-msgstr "Smart Common Input Method platform"
-
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1847
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1233
-msgid ""
-"\n"
-"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
-"\n"
-msgstr ""
-"\n"
-"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
-"\n"
-
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1238
-msgid ""
-":\n"
-"\n"
-msgstr ""
-":\n"
-"\n"
-
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1854
-#: ../modules/FrontEnd/scim_x11_frontend.cpp:1857
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1241
-#: ../extras/gtk2_immodule/gtkimcontextscim.cpp:1244
-msgid ""
-"\n"
-"\n"
-msgstr ""
-"\n"
-"\n"
-
 #: ../modules/IMEngine/scim_rawcode_imengine.cpp:120
 msgid "RAW CODE"
 msgstr "RAW CODE"
@@ -591,6 +281,15 @@ msgstr "現在の入力モード。変更するにはここをクリックして
 msgid "Unicode"
 msgstr "ユニコード"
 
+#: ../modules/IMEngine/scim_socket_imengine.cpp:386
+#: ../modules/IMEngine/scim_socket_imengine.cpp:416
+#: ../modules/IMEngine/scim_socket_imengine.cpp:501
+#: ../modules/IMEngine/scim_socket_imengine.cpp:531
+#: ../modules/IMEngine/scim_socket_imengine.cpp:561
+#: ../src/scim_keyboard_layout_data.h:4591
+msgid "Unknown"
+msgstr "不明"
+
 #: ../modules/SetupUI/scim_frontend_setup.cpp:82
 #: ../modules/SetupUI/scim_imengine_setup.cpp:88
 msgid "Global Setup"
@@ -605,17 +304,17 @@ msgstr ""
 "で使用する全体オプションを設定"
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:143
+#: ../modules/SetupUI/scim_frontend_setup.cpp:146
 msgid "_Trigger:"
 msgstr "開始/終了(_T):"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:145
+#: ../modules/SetupUI/scim_frontend_setup.cpp:148
 msgid "Select the trigger keys"
 msgstr "開始/終了キーの設定"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:147
+#: ../modules/SetupUI/scim_frontend_setup.cpp:150
 msgid ""
 "The key events to turn on/off SCIM input method. Click on the button on the "
 "right to edit it."
@@ -624,17 +323,17 @@ msgstr ""
 "場合は右のボタンをクリックして下さい。"
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:160
+#: ../modules/SetupUI/scim_frontend_setup.cpp:163
 msgid "Turn _On:"
 msgstr "開始(_O):"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:162
+#: ../modules/SetupUI/scim_frontend_setup.cpp:165
 msgid "Select the Turn On keys"
 msgstr "開始キーの設定"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:164
+#: ../modules/SetupUI/scim_frontend_setup.cpp:167
 msgid ""
 "The key events to turn on SCIM input method. Click on the button on the "
 "right to edit it."
@@ -643,17 +342,17 @@ msgstr ""
 "右のボタンをクリックして下さい。"
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:177
+#: ../modules/SetupUI/scim_frontend_setup.cpp:180
 msgid "Turn O_ff:"
 msgstr "終了(_F):"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:179
+#: ../modules/SetupUI/scim_frontend_setup.cpp:182
 msgid "Select the Turn Off keys"
 msgstr "終了キーの設定"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:181
+#: ../modules/SetupUI/scim_frontend_setup.cpp:184
 msgid ""
 "The key events to turn off SCIM input method. Click on the button on the "
 "right to edit it."
@@ -662,17 +361,17 @@ msgstr ""
 "右のボタンをクリックして下さい。"
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:194
+#: ../modules/SetupUI/scim_frontend_setup.cpp:197
 msgid "_Next input method:"
 msgstr "次の入力メソッド(_N):"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:196
+#: ../modules/SetupUI/scim_frontend_setup.cpp:199
 msgid "Select the next input method keys"
 msgstr "次の入力メソッドキーの設定"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:198
+#: ../modules/SetupUI/scim_frontend_setup.cpp:201
 msgid ""
 "The key events to switch to the next input method. Click on the button on "
 "the right to edit it."
@@ -681,17 +380,17 @@ msgstr ""
 "右のボタンをクリックして下さい。"
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:213
+#: ../modules/SetupUI/scim_frontend_setup.cpp:216
 msgid "_Previous input method:"
 msgstr "前の入力メソッド(_P):"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:215
+#: ../modules/SetupUI/scim_frontend_setup.cpp:218
 msgid "Select the previous input method keys"
 msgstr "前の入力メソッドキーの設定"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:217
+#: ../modules/SetupUI/scim_frontend_setup.cpp:220
 msgid ""
 "The key events to switch to the previous input method. Click on the button "
 "on the right to edit it."
@@ -700,17 +399,17 @@ msgstr ""
 "右のボタンをクリックして下さい。"
 
 #. label
-#: ../modules/SetupUI/scim_frontend_setup.cpp:232
+#: ../modules/SetupUI/scim_frontend_setup.cpp:235
 msgid "Show input method _menu:"
 msgstr "入力メソッドメニューを表示(_M):"
 
 #. title
-#: ../modules/SetupUI/scim_frontend_setup.cpp:234
+#: ../modules/SetupUI/scim_frontend_setup.cpp:237
 msgid "Select the show input method menu keys"
 msgstr "入力メソッドメニュー表示キーの設定"
 
 #. tooltip
-#: ../modules/SetupUI/scim_frontend_setup.cpp:236
+#: ../modules/SetupUI/scim_frontend_setup.cpp:239
 msgid ""
 "The key events to show the input method menu. Click on the button on the "
 "right to edit it."
@@ -718,15 +417,16 @@ msgstr ""
 "入力メソッドメニューを表示させるキー。変更する\n"
 "場合は右のボタンをクリックして下さい。"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:306
+#: ../modules/SetupUI/scim_frontend_setup.cpp:316
 msgid "Options"
 msgstr "オプション"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:321
+#: ../modules/SetupUI/scim_frontend_setup.cpp:339
 msgid "_Keyboard Layout:"
 msgstr "キーボード配列(_K):"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:342
+#: ../modules/SetupUI/scim_frontend_setup.cpp:369
+#: ../modules/SetupUI/scim_frontend_setup.cpp:373
 msgid ""
 "You should choose your currently used keyboard layout here so that input "
 "methods, who care about keyboard layout, could work correctly."
@@ -735,11 +435,12 @@ msgstr ""
 "るキーボード配列を選んでください。"
 
 #. On The Spot.
-#: ../modules/SetupUI/scim_frontend_setup.cpp:346
+#: ../modules/SetupUI/scim_frontend_setup.cpp:378
 msgid "_Embed Preedit String into client window"
 msgstr "未確定文字列を入力対象クライアントのウィンドウに表示(_E)"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:351
+#: ../modules/SetupUI/scim_frontend_setup.cpp:384
+#: ../modules/SetupUI/scim_frontend_setup.cpp:389
 msgid ""
 "If this option is checked, the preedit string will be displayed directly in "
 "the client input window, rather than in a independent float window."
@@ -748,11 +449,12 @@ msgstr ""
 "入力対象クライアントに直接表示されます。"
 
 #. Shared input method.
-#: ../modules/SetupUI/scim_frontend_setup.cpp:360
+#: ../modules/SetupUI/scim_frontend_setup.cpp:399
 msgid "_Share the same input method among all applications"
 msgstr "全てのアプリケーションで同一入力メソッドを使用(_S)"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:365
+#: ../modules/SetupUI/scim_frontend_setup.cpp:405
+#: ../modules/SetupUI/scim_frontend_setup.cpp:410
 msgid ""
 "If this option is checked, then only one input method could be used by all "
 "applications at the same time.Otherwise different input method could be used "
@@ -762,106 +464,113 @@ msgstr ""
 "用できるようになります。アプリケーションごとに別々の入力メソッドを使用する場"
 "合はこのオプションを無効にして下さい。"
 
-#: ../modules/SetupUI/scim_frontend_setup.cpp:373
-#: ../modules/SetupUI/scim_imengine_setup.cpp:453
+#: ../modules/SetupUI/scim_frontend_setup.cpp:419
+#: ../modules/SetupUI/scim_imengine_setup.cpp:501
 msgid "Hotkeys"
 msgstr "ホットキー"
 
 #: ../modules/SetupUI/scim_imengine_setup.cpp:93
-msgid "You can enable/disable input methods and set hotkeys for input methods here."
+msgid ""
+"You can enable/disable input methods and set hotkeys for input methods here."
 msgstr "入力メソッドの有効/無効とホットキーの設定を行います。"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:296
+#: ../modules/SetupUI/scim_imengine_setup.cpp:306
 msgid "The installed input method services:"
 msgstr "インストールされている入力メソッド:"
 
 #. Create hotkey and filter button before factory list view, because
 #. factory_list_selection_changed_callback may access these two buttons.
-#: ../modules/SetupUI/scim_imengine_setup.cpp:311
+#: ../modules/SetupUI/scim_imengine_setup.cpp:321
 msgid "Edit _Hotkeys"
 msgstr "ホットキー(_H)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:320
+#: ../modules/SetupUI/scim_imengine_setup.cpp:331
+#: ../modules/SetupUI/scim_imengine_setup.cpp:334
 msgid "Edit Hotkeys associated with the selected input method."
 msgstr "この入力メソッドに切り替えるホットキーを編集"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:322
+#: ../modules/SetupUI/scim_imengine_setup.cpp:337
 msgid "Select _Filters"
 msgstr "フィルター(_F)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:331
+#: ../modules/SetupUI/scim_imengine_setup.cpp:347
+#: ../modules/SetupUI/scim_imengine_setup.cpp:350
 msgid "Select the Filters which will be attached to this input method."
 msgstr "この入力メソッドで使用するフィルターを選択"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:348
+#: ../modules/SetupUI/scim_imengine_setup.cpp:376
 msgid "_Expand"
 msgstr "開く(_E)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:357
+#: ../modules/SetupUI/scim_imengine_setup.cpp:386
+#: ../modules/SetupUI/scim_imengine_setup.cpp:389
 msgid "Expand all language categories."
 msgstr "全ての言語グループを展開する"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:359
+#: ../modules/SetupUI/scim_imengine_setup.cpp:392
 msgid "_Collapse"
 msgstr "閉じる(_C)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:368
+#: ../modules/SetupUI/scim_imengine_setup.cpp:402
+#: ../modules/SetupUI/scim_imengine_setup.cpp:405
 msgid "Collapse all language categories."
 msgstr "全ての言語グループを閉じる"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:370
+#: ../modules/SetupUI/scim_imengine_setup.cpp:408
 msgid "E_nable All"
 msgstr "全て有効(_N)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:379
+#: ../modules/SetupUI/scim_imengine_setup.cpp:418
+#: ../modules/SetupUI/scim_imengine_setup.cpp:421
 msgid "Enable all input methods."
 msgstr "全ての入力メソッドを有効にする"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:381
+#: ../modules/SetupUI/scim_imengine_setup.cpp:424
 msgid "_Disable All"
 msgstr "全て無効(_D)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:390
+#: ../modules/SetupUI/scim_imengine_setup.cpp:434
+#: ../modules/SetupUI/scim_imengine_setup.cpp:437
 msgid "Disable all input methods."
 msgstr "全ての入力メソッドを無効にする"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:414
-#: ../modules/SetupUI/scim_imengine_setup.cpp:541
+#: ../modules/SetupUI/scim_imengine_setup.cpp:462
+#: ../modules/SetupUI/scim_imengine_setup.cpp:589
 msgid "Name"
 msgstr "名称"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:432
-#: ../modules/SetupUI/scim_imengine_setup.cpp:522
+#: ../modules/SetupUI/scim_imengine_setup.cpp:480
+#: ../modules/SetupUI/scim_imengine_setup.cpp:570
 msgid "Enable"
 msgstr "有効にする"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:467
+#: ../modules/SetupUI/scim_imengine_setup.cpp:515
 msgid "Filters"
 msgstr "フィルター"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:560
+#: ../modules/SetupUI/scim_imengine_setup.cpp:608
 msgid "Languages"
 msgstr "言語"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:574
+#: ../modules/SetupUI/scim_imengine_setup.cpp:622
 msgid "Description"
 msgstr "説明"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:1190
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1238
 #, c-format
 msgid "Edit Hotkeys for %s"
 msgstr "%s のホットキーを編集"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:1417
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1465
 #, c-format
 msgid "Select Filters for %s"
 msgstr "%s のフィルターを編集"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:1450
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1521
 msgid "Move _Up"
 msgstr "上に移動(_U)"
 
-#: ../modules/SetupUI/scim_imengine_setup.cpp:1457
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1528
 msgid "Move _Down"
 msgstr "下に移動(_D)"
 
@@ -873,89 +582,90 @@ msgstr "GTK"
 msgid "A panel daemon based on GTK+-2.x library."
 msgstr "GTK+-2.xライブラリによるパネルデーモン"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:163
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:166
 msgid "Always"
 msgstr "常に"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:164
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:167
 msgid "On demand"
 msgstr "開始時に"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:165
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:168
 msgid "Never"
 msgstr "しない"
 
 #. Create the ToolBar setup block.
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:211
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:217
 msgid "ToolBar"
 msgstr "ツールバー"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:229
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:235
 msgid "_Show:"
 msgstr "表示(_S):"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:245
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:261
 msgid "Auto s_nap"
 msgstr "オートスナップ(_N)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:251
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:267
 msgid "Show _input method icon"
 msgstr "入力メソッドのアイコンを表示(_I)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:257
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:273
 msgid "Show inp_ut method name"
 msgstr "入力メソッドの名称を表示(_U)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:269
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:285
 msgid "Hide time_out:"
 msgstr "オートハイド(_O)："
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:282
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:298
 msgid "Show s_tick icon"
 msgstr "スティックアイコンを表示(_T)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:288
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:304
 msgid "Show m_enu icon"
 msgstr "メニューアイコンを表示(_E)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:294
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:310
 msgid "Show _help icon"
 msgstr "ヘルプアイコンを表示(_H)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:300
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:316
 msgid "Show _property label"
 msgstr "プロパティーラベルを表示(_P)"
 
 #. Create the Input Window setup block
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:311
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:327
 msgid "Input window"
 msgstr "入力ウィンドウ"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:320
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:336
 msgid "E_mbedded lookup table"
 msgstr "候補ウィンドウを埋め込む(_M)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:324
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:340
 msgid "_Vertical lookup table"
 msgstr "候補ウィンドウを縦に表示(_V)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:328
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:344
 msgid "Misc"
 msgstr "その他"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:337
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:353
 msgid "Show tra_y icon"
 msgstr "トレーアイコンを表示(_Y)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:341
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:357
 msgid "Stick _windows"
 msgstr "ウィンドウを固定(_W)"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:349
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:365
 msgid "_Font:"
 msgstr "フォント(_F):"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:419
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:436
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:504
 msgid ""
 "If option \"Always\" is selected, the toolbar will always be shown on the "
 "screen. If option \"On demand\" is selected, it will only be shown when SCIM "
@@ -965,13 +675,16 @@ msgstr ""
 "時に\"を選ぶと、SCIMがアクティブな時だけ表示されます。\"しない\"を選ぶと、"
 "SCIMがアクティブな時もツールバーは表示されません。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:426
-msgid "If this option is checked, the toolbar will be snapped to the screen border."
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:443
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:511
+msgid ""
+"If this option is checked, the toolbar will be snapped to the screen border."
 msgstr ""
 "このオプションを有効にするとツールバーが\n"
 "自動的にスクリーンの端に移動します。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:431
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:449
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:517
 msgid ""
 "The toolbar will be hidden out after this timeout is elapsed. This option is "
 "only valid when \"Always show\" is selected. Set to zero to disable this "
@@ -981,7 +694,8 @@ msgstr ""
 "表示に\"常に\"が選択されている場合にのみ有効です。オートハイドを無効にするに"
 "は値をゼロにして下さい。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:438
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:456
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:524
 msgid ""
 "If this option is checked, the input method icon will be showed on the "
 "toolbar."
@@ -989,7 +703,8 @@ msgstr ""
 "このオプションを有効にすると入力メソッドの\n"
 "アイコンがツールバーに表示されます。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:442
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:460
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:528
 msgid ""
 "If this option is checked, the input method name will be showed on the "
 "toolbar."
@@ -997,25 +712,30 @@ msgstr ""
 "このオプションを有効にすると入力メソッドの\n"
 "名称がツールバーに表示されます。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:446
-msgid "If this option is checked, the stick icon will be showed on the toolbar."
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:464
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:532
+msgid ""
+"If this option is checked, the stick icon will be showed on the toolbar."
 msgstr ""
 "このオプションを有効にするとスティックアイコンが\n"
 "ツールバーに表示されます。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:450
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:468
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:536
 msgid "If this option is checked, the menu icon will be showed on the toolbar."
 msgstr ""
 "このオプションを有効にするとメニューアイコンが\n"
 "ツールバーに表示されます。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:454
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:472
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:540
 msgid "If this option is checked, the help icon will be showed on the toolbar."
 msgstr ""
 "このオプションを有効にするとヘルプアイコンが\n"
 "ツールバーに表示されます。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:458
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:476
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:544
 msgid ""
 "If this option is checked, the text label of input method properties will be "
 "showed on the toolbar."
@@ -1023,7 +743,8 @@ msgstr ""
 "このオプションを有効にすると入力メソッドの\n"
 "プロパティーがツールバーにテキスト表示されます。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:462
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:480
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:548
 msgid ""
 "If this option is checked, the lookup table will be embedded into the input "
 "window."
@@ -1031,13 +752,16 @@ msgstr ""
 "このオプションを有効にすると候補ウィンドウが\n"
 "入力ウィンドウの中に表示されます。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:467
-msgid "If this option is checked, the lookup table will be displayed vertically."
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:485
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:553
+msgid ""
+"If this option is checked, the lookup table will be displayed vertically."
 msgstr ""
 "このオプションを有効にすると候補ウィンドウが\n"
 "縦に表示されます。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:472
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:490
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:558
 msgid ""
 "If this option is checked, the tray icon will be showed on the desktop's "
 "taskbar."
@@ -1045,7 +769,8 @@ msgstr ""
 "このオプションを有効にするとトレーアイコンが\n"
 "タスクバーに表示されます。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:476
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:494
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:562
 msgid ""
 "If this option is checked, the toolbar, input and lookup table windows will "
 "be sticked to its original position."
@@ -1053,280 +778,603 @@ msgstr ""
 "このオプションを有効にするとツールバーと入力/候補ウィンドウが\n"
 "本来の表示位置に固定されます。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:482
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:500
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:568
 msgid "The font setting will be used in the input and lookup table windows."
 msgstr "このフォント設定は入力/候補ウィンドウに適用されます。"
 
-#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:801
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:889
 msgid "Select Interface Font"
 msgstr "インターフェイスのフォントを選択"
 
-#: ../extras/setup/scim_setup_ui.cpp:47
-msgid "SCIM"
-msgstr "SCIM"
+#: ../src/scim_compose_key.cpp:128
+msgid "English/European"
+msgstr "英語/ヨーロッパ言語"
 
-#: ../extras/setup/scim_setup_ui.cpp:48
-msgid "FrontEnd"
-msgstr "フロントエンド"
+#. bail out: can't continue without the helper
+#: ../src/scim_helper_manager.cpp:134
+msgid "Failed to launch HelperManager: exiting..."
+msgstr ""
 
-#: ../extras/setup/scim_setup_ui.cpp:49
-msgid "IMEngine"
-msgstr "IMエンジン"
+#: ../src/scim_helper_manager.cpp:162 ../src/scim_helper_manager.cpp:178
+#: ../src/scim_helper_manager.cpp:184 ../src/scim_helper_manager.cpp:189
+#: ../src/scim_helper_manager.cpp:194
+msgid "Error launching HelperManager"
+msgstr ""
 
-#: ../extras/setup/scim_setup_ui.cpp:50
-msgid "Panel"
-msgstr "パネル"
+#: ../src/scim_helper_manager.cpp:162 ../src/scim_helper_manager.cpp:178
+#: ../src/scim_socket.cpp:476 ../src/scim_socket.cpp:510
+msgid "failed"
+msgstr ""
 
-#: ../extras/setup/scim_setup_ui.cpp:51
-msgid "Extra"
+#: ../src/scim_helper_manager.cpp:184
+msgid "abnormal process termination"
+msgstr ""
+
+#: ../src/scim_helper_manager.cpp:190
+msgid "it exited with signal"
+msgstr ""
+
+#: ../src/scim_helper_manager.cpp:194
+msgid "unknown process launch error"
+msgstr ""
+
+#: ../src/scim_keyboard_layout_data.h:4592
+msgid "English (US)"
+msgstr "英語(US)"
+
+#: ../src/scim_keyboard_layout_data.h:4593
+msgid "Belgian"
+msgstr "ベルギー"
+
+#: ../src/scim_keyboard_layout_data.h:4594 ../src/scim_utility.cpp:744
+msgid "Croatian"
+msgstr "クロアチア語"
+
+#: ../src/scim_keyboard_layout_data.h:4595 ../src/scim_utility.cpp:718
+msgid "Czech"
+msgstr "チェコ語"
+
+#: ../src/scim_keyboard_layout_data.h:4596
+msgid "Czech (qwerty)"
+msgstr "チェコ語(qwerty)"
+
+#: ../src/scim_keyboard_layout_data.h:4597 ../src/scim_utility.cpp:720
+msgid "Danish"
+msgstr "デンマーク語"
+
+#: ../src/scim_keyboard_layout_data.h:4598 ../src/scim_utility.cpp:768
+msgid "Dutch"
+msgstr "オランダ語"
+
+#: ../src/scim_keyboard_layout_data.h:4599
+msgid "Dvorak"
+msgstr "Dvorak"
+
+#: ../src/scim_keyboard_layout_data.h:4600 ../src/scim_utility.cpp:734
+msgid "Estonian"
+msgstr "エストニア語"
+
+#: ../src/scim_keyboard_layout_data.h:4601 ../src/scim_utility.cpp:737
+msgid "Finnish"
+msgstr "フィンランド語"
+
+#: ../src/scim_keyboard_layout_data.h:4602 ../src/scim_utility.cpp:738
+msgid "French"
+msgstr "フランス語"
+
+#: ../src/scim_keyboard_layout_data.h:4603
+msgid "French (Canadian)"
+msgstr "フランス語(カナダ)"
+
+#: ../src/scim_keyboard_layout_data.h:4604
+msgid "French (Switzerland)"
+msgstr "フランス語(スイス)"
+
+#: ../src/scim_keyboard_layout_data.h:4605 ../src/scim_utility.cpp:721
+msgid "German"
+msgstr "ドイツ語"
+
+#: ../src/scim_keyboard_layout_data.h:4606
+msgid "German (with deadkeys)"
+msgstr "ドイツ語(deadkeyあり)"
+
+#: ../src/scim_keyboard_layout_data.h:4607
+msgid "German (Swiss)"
+msgstr "ドイツ語(スイス)"
+
+#: ../src/scim_keyboard_layout_data.h:4608 ../src/scim_utility.cpp:723
+msgid "Greek"
+msgstr "ギリシャ語"
+
+#: ../src/scim_keyboard_layout_data.h:4609 ../src/scim_utility.cpp:745
+msgid "Hungarian"
+msgstr "ハンガリー語"
+
+#: ../src/scim_keyboard_layout_data.h:4610 ../src/scim_utility.cpp:750
+msgid "Italian"
+msgstr "イタリア語"
+
+#: ../src/scim_keyboard_layout_data.h:4611 ../src/scim_utility.cpp:752
+msgid "Japanese"
+msgstr "日本語"
+
+#: ../src/scim_keyboard_layout_data.h:4612
+msgid "Norwegian"
+msgstr "ノルウェー語"
+
+#: ../src/scim_keyboard_layout_data.h:4613 ../src/scim_utility.cpp:773
+msgid "Polish"
+msgstr "ポーランド語"
+
+#: ../src/scim_keyboard_layout_data.h:4614 ../src/scim_utility.cpp:774
+#: ../src/scim_utility.cpp:776
+msgid "Portuguese"
+msgstr "ポルトガル語"
+
+#: ../src/scim_keyboard_layout_data.h:4615 ../src/scim_utility.cpp:775
+msgid "Portuguese (Brazil)"
+msgstr "ポルトガル語(ブラジル)"
+
+#: ../src/scim_keyboard_layout_data.h:4616
+msgid "Portuguese (Brazil US accents)"
+msgstr "ポルトガル語(ブラジルUSアクセント)"
+
+#: ../src/scim_keyboard_layout_data.h:4617 ../src/scim_utility.cpp:778
+msgid "Russian"
+msgstr "ロシア語"
+
+#: ../src/scim_keyboard_layout_data.h:4618 ../src/scim_utility.cpp:782
+msgid "Slovak"
+msgstr "スロバキア語"
+
+#: ../src/scim_keyboard_layout_data.h:4619
+msgid "Slovak (qwerty)"
+msgstr "スロバキア語(qwerty)"
+
+#: ../src/scim_keyboard_layout_data.h:4620 ../src/scim_utility.cpp:783
+msgid "Slovenian"
+msgstr "スロベニア語"
+
+#: ../src/scim_keyboard_layout_data.h:4621 ../src/scim_utility.cpp:731
+#: ../src/scim_utility.cpp:732
+msgid "Spanish"
+msgstr "スペイン語"
+
+#: ../src/scim_keyboard_layout_data.h:4622
+msgid "Spanish (CP 850)"
+msgstr "スペイン語(CP 850)"
+
+#: ../src/scim_keyboard_layout_data.h:4623
+msgid "Spanish (Latin America)"
+msgstr "スペイン語(ラテンアメリカ)"
+
+#: ../src/scim_keyboard_layout_data.h:4624 ../src/scim_utility.cpp:788
+#: ../src/scim_utility.cpp:790
+msgid "Swedish"
+msgstr "スウェーデン語"
+
+#: ../src/scim_keyboard_layout_data.h:4625 ../src/scim_utility.cpp:794
+msgid "Turkish"
+msgstr "トルコ語"
+
+#: ../src/scim_keyboard_layout_data.h:4626
+msgid "English (UK)"
+msgstr "英語(UK)"
+
+#: ../src/scim_keyboard_layout_data.h:4627 ../src/scim_utility.cpp:749
+msgid "Icelandic"
+msgstr "アイスランド語"
+
+#: ../src/scim_keyboard_layout_data.h:4628 ../src/scim_utility.cpp:759
+msgid "Lithuanian"
+msgstr "リトアニア語"
+
+#: ../src/scim_keyboard_layout_data.h:4629 ../src/scim_utility.cpp:796
+msgid "Ukrainian"
+msgstr "ウクライナ語"
+
+#. NOTE another instance of the server is running: we can't just keep running like this
+#. if we attempt to bind anyway there may be more than one servers listening on this socket.
+#. In addition on FreeBSD bind will get EADDRINUSE, not clear why Linux doesn;t produce this same error.
+#: ../src/scim_socket.cpp:475 ../src/scim_socket.cpp:483
+#: ../src/scim_socket.cpp:491 ../src/scim_socket.cpp:509
+msgid "Creating socket"
+msgstr ""
+
+#: ../src/scim_socket.cpp:476
+msgid "file exists and we were unable to delete it"
+msgstr ""
+
+#: ../src/scim_socket.cpp:476 ../src/scim_socket.cpp:510
+msgid "syscall"
+msgstr ""
+
+#: ../src/scim_socket.cpp:478 ../src/scim_socket.cpp:484
+#: ../src/scim_socket.cpp:492
+msgid "exiting"
+msgstr ""
+
+#: ../src/scim_socket.cpp:484
+msgid "file exists and is not a socket"
+msgstr ""
+
+#: ../src/scim_socket.cpp:492
+msgid "another instance of the server is already listening on this socket"
+msgstr ""
+
+#: ../src/scim_socket.cpp:510
+msgid "unable to change the mode of this file"
+msgstr ""
+
+#: ../src/scim_socket.cpp:511
+msgid "continuing"
+msgstr ""
+
+#: ../src/scim_socket.cpp:519 ../src/scim_socket.cpp:535
+#: ../src/scim_socket.cpp:589
+msgid "Error creating socket"
+msgstr ""
+
+#: ../src/scim_socket.cpp:519 ../src/scim_socket.cpp:535
+#: ../src/scim_socket.cpp:589
+msgid "syscall failed"
+msgstr ""
+
+#: ../src/scim_utility.cpp:704
+msgid "Amharic"
+msgstr "アムハラ語"
+
+#: ../src/scim_utility.cpp:705
+msgid "Arabic"
+msgstr "アラビア語"
+
+#: ../src/scim_utility.cpp:706
+msgid "Arabic (Egypt)"
+msgstr "アラビア語(エジプト)"
+
+#: ../src/scim_utility.cpp:707
+msgid "Arabic (Lebanon)"
+msgstr "アラビア語(レバノン)"
+
+#: ../src/scim_utility.cpp:708
+msgid "Assamese"
+msgstr "アッサム語"
+
+#: ../src/scim_utility.cpp:709
+msgid "Azerbaijani"
+msgstr "アゼルバイジャン語"
+
+#: ../src/scim_utility.cpp:710
+msgid "Belarusian"
+msgstr "白ロシア語"
+
+#: ../src/scim_utility.cpp:711
+msgid "Bulgarian"
+msgstr "ブルガリア語"
+
+#: ../src/scim_utility.cpp:712 ../src/scim_utility.cpp:713
+msgid "Bengali"
+msgstr "ベンガル語"
+
+#: ../src/scim_utility.cpp:714
+msgid "Bengali (India)"
+msgstr "ベンガル語(インド)"
+
+#: ../src/scim_utility.cpp:715
+msgid "Tibetan"
+msgstr "チベット語"
+
+#: ../src/scim_utility.cpp:716
+msgid "Bosnian"
+msgstr "ボスニア語"
+
+#: ../src/scim_utility.cpp:717
+msgid "Catalan"
+msgstr "カタロニア語"
+
+#: ../src/scim_utility.cpp:719
+msgid "Welsh"
+msgstr "ウェールズ語"
+
+#: ../src/scim_utility.cpp:722
+msgid "Divehi"
+msgstr "ディベヒ語"
+
+#: ../src/scim_utility.cpp:724
+msgid "English"
+msgstr "英語"
+
+#: ../src/scim_utility.cpp:725
+msgid "English (Australian)"
+msgstr "英語(オーストラリア)"
+
+#: ../src/scim_utility.cpp:726
+msgid "English (Canadian)"
+msgstr "英語(カナダ)"
+
+#: ../src/scim_utility.cpp:727
+msgid "English (British)"
+msgstr "英語(イギリス)"
+
+#: ../src/scim_utility.cpp:728
+msgid "English (Ireland)"
+msgstr "英語(アイルランド)"
+
+#: ../src/scim_utility.cpp:729
+msgid "English (American)"
+msgstr "英語(アメリカ)"
+
+#: ../src/scim_utility.cpp:730
+msgid "Esperanto"
+msgstr ""
+
+#: ../src/scim_utility.cpp:733
+msgid "Spanish (Mexico)"
+msgstr "スペイン語(メキシコ)"
+
+#: ../src/scim_utility.cpp:735
+msgid "Basque"
+msgstr "バスク語"
+
+#: ../src/scim_utility.cpp:736
+msgid "Persian"
+msgstr "ペルシア語"
+
+#: ../src/scim_utility.cpp:739
+msgid "Irish"
+msgstr "アイルランド語"
+
+#: ../src/scim_utility.cpp:740
+msgid "Galician"
+msgstr "ガリシア語"
+
+#: ../src/scim_utility.cpp:741
+msgid "Gujarati"
+msgstr "グジャラート語"
+
+#: ../src/scim_utility.cpp:742 ../src/scim_utility.cpp:751
+msgid "Hebrew"
+msgstr "ヘブライ語"
+
+#: ../src/scim_utility.cpp:743
+msgid "Hindi"
+msgstr "ヒンディー語"
+
+#: ../src/scim_utility.cpp:746
+msgid "Armenian"
+msgstr "アルメニア語"
+
+#: ../src/scim_utility.cpp:747
+msgid "Interlingua"
+msgstr "インターリングア"
+
+#: ../src/scim_utility.cpp:748
+msgid "Indonesian"
+msgstr "インドネシア語"
+
+#: ../src/scim_utility.cpp:753
+msgid "Georgian"
+msgstr "グルジア語"
+
+#: ../src/scim_utility.cpp:754
+msgid "Kazakh"
+msgstr "カザフスタン語"
+
+#: ../src/scim_utility.cpp:755
+msgid "Cambodian"
+msgstr "クメール語"
+
+#: ../src/scim_utility.cpp:756
+msgid "Kannada"
+msgstr "カンナダ語"
+
+#: ../src/scim_utility.cpp:757
+msgid "Korean"
+msgstr "ハングル"
+
+#: ../src/scim_utility.cpp:758
+msgid "Laothian"
+msgstr "ラオス語"
+
+#: ../src/scim_utility.cpp:760
+msgid "Latvian"
+msgstr "ラトヴィア語"
+
+#: ../src/scim_utility.cpp:761
+msgid "Macedonian"
+msgstr "マケドニア語"
+
+#: ../src/scim_utility.cpp:762
+msgid "Malayalam"
+msgstr "マラヤーラム語"
+
+#: ../src/scim_utility.cpp:763
+msgid "Mongolian"
+msgstr "モンゴル語"
+
+#: ../src/scim_utility.cpp:764
+msgid "Marathi"
+msgstr "マラーティー語"
+
+#: ../src/scim_utility.cpp:765
+msgid "Malay"
+msgstr "マレー語"
+
+#: ../src/scim_utility.cpp:766
+msgid "Burmese"
+msgstr "ビルマ語"
+
+#: ../src/scim_utility.cpp:767
+msgid "Nepali"
+msgstr "ネパール語"
+
+#: ../src/scim_utility.cpp:769
+msgid "Norwegian (nynorsk)"
+msgstr "ノルウェー語(ニューノルスク)"
+
+#: ../src/scim_utility.cpp:770
+msgid "Norwegian (bokmal)"
+msgstr "ノルウェー語(ボックモール)"
+
+#: ../src/scim_utility.cpp:771
+msgid "Oriya"
+msgstr "オリヤー語"
+
+#: ../src/scim_utility.cpp:772
+msgid "Punjabi"
+msgstr "パンジャブ語"
+
+#: ../src/scim_utility.cpp:777
+msgid "Romanian"
+msgstr "ルーマニア語"
+
+#: ../src/scim_utility.cpp:779 ../src/scim_utility.cpp:780
+msgid "Sindhi"
+msgstr ""
+
+#: ../src/scim_utility.cpp:781
+msgid "Sinhala"
+msgstr "シンハラ語"
+
+#: ../src/scim_utility.cpp:784
+msgid "Albanian"
+msgstr "アルバニア語"
+
+#: ../src/scim_utility.cpp:785 ../src/scim_utility.cpp:786
+#: ../src/scim_utility.cpp:787
+msgid "Serbian"
+msgstr "セルビア語"
+
+#: ../src/scim_utility.cpp:789
+msgid "Swedish (Finland)"
+msgstr "スウェーデン語(フィンランド)"
+
+#: ../src/scim_utility.cpp:791
+msgid "Tamil"
+msgstr "タミル語"
+
+#: ../src/scim_utility.cpp:792
+msgid "Telugu"
+msgstr "テルグ語"
+
+#: ../src/scim_utility.cpp:793
+msgid "Thai"
+msgstr "タイ語"
+
+#: ../src/scim_utility.cpp:795
+msgid "Uighur"
+msgstr "ウィグル語"
+
+#: ../src/scim_utility.cpp:797
+msgid "Urdu"
+msgstr "ウルドゥー語"
+
+#: ../src/scim_utility.cpp:798
+msgid "Uzbek"
+msgstr "ウズベク語"
+
+#: ../src/scim_utility.cpp:799
+msgid "Vietnamese"
+msgstr "ベトナム語"
+
+#: ../src/scim_utility.cpp:800
+msgid "Walloon"
+msgstr "ワロン語"
+
+#: ../src/scim_utility.cpp:801 ../src/scim_utility.cpp:802
+msgid "Yiddish"
+msgstr "イディッシュ語"
+
+#: ../src/scim_utility.cpp:803
+msgid "Chinese"
+msgstr "中国語"
+
+#: ../src/scim_utility.cpp:804 ../src/scim_utility.cpp:806
+msgid "Chinese (simplified)"
+msgstr "簡体中国語"
+
+#: ../src/scim_utility.cpp:805 ../src/scim_utility.cpp:807
+msgid "Chinese (traditional)"
+msgstr "繁体中国語"
+
+#: ../src/scim_utility.cpp:889
+msgid "Other"
 msgstr "その他"
 
-#.
-#. vi:ts=4:nowrap:ai:expandtab
-#.
-#: ../extras/setup/scim_setup_ui.cpp:230
-#: ../extras/setup/scim-setup.desktop.in.h:1
-msgid "SCIM Input Method Setup"
-msgstr "SCIM入力メソッドの設定"
-
-#: ../extras/setup/scim_setup_ui.cpp:369
-msgid ""
-" <span size=\"20000\">Smart Common Input Method platform</span> \n"
-"\n"
-"<span size=\"16000\" style=\"italic\">GUI Setup Utility</span>\n"
-"\n"
-"\n"
-"\n"
-"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
-"cn&gt;</span>"
+#: ../tests/scim_test_helper.cpp:49
+msgid "Test"
 msgstr ""
-" <span size=\"20000\">Smart Common Input Method platform</span> \n"
-"\n"
-"<span size=\"16000\" style=\"italic\">GUI セットアップユーティリティ</span>\n"
-"\n"
-"\n"
-"\n"
-"<span size=\"12000\">Copyright 2002-2004, James Su &lt;suzhe@tsinghua.org."
-"cn&gt;</span>"
 
-#: ../extras/setup/scim_setup_ui.cpp:394
-#, c-format
-msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
-msgstr "<span size=\"x-large\">%s モジュールの設定</span>"
-
-#msgid "Are you sure you want to quit SCIM Setup?"
-#msgstr "SCIMの設定を終了しますか？"
-
-#: ../extras/setup/scim_setup_ui.cpp:661
-msgid ""
-"Not all configuration can be reloaded on the fly. Don't forget to restart "
-"SCIM in order to let all of the new configuration take effect."
+#: ../tests/scim_test_helper.cpp:51
+msgid "A test helper."
 msgstr ""
-"すぐに有効にならない設定項目があります。\n"
-"すべての変更を有効にするにはSCIMを再起動して下さい。"
 
-#: ../extras/setup/scim_setup_helper.cpp:49
-msgid "SCIM Setup"
-msgstr "SCIMを設定"
-
-#: ../extras/setup/scim_setup_helper.cpp:51
-msgid "Integrated Setup Utility based on GTK Widget library."
-msgstr "GTK Widget library に基づく統合設定ユーティリティ"
-
-#: ../extras/setup/scim-setup.desktop.in.h:2
-msgid "Setup utility for Smart Common Input Method platform"
-msgstr "Smart Common Input Method platform セットアップユーティリティ"
-
-#: ../extras/panel/scim_panel_gtk.cpp:982
-msgid "SCIM Help"
-msgstr "SCIMヘルプ"
-
-#: ../extras/panel/scim_panel_gtk.cpp:999
-msgid "Smart Common Input Method"
-msgstr "Smart Common Input Method"
-
-#: ../extras/panel/scim_panel_gtk.cpp:1058
-msgid "Stick/unstick the input window and the toolbar."
-msgstr "入力ウィンドウ・ツールバーを固定する/固定しない"
-
-#: ../extras/panel/scim_panel_gtk.cpp:1063
-msgid "Show a brief help about SCIM and the current input method."
-msgstr "SCIMと現在の入力メソッドについて簡単なヘルプを表示します"
-
-#: ../extras/panel/scim_panel_gtk.cpp:1068
-msgid "Show command menu."
-msgstr "コマンドメニューを表示"
-
-#: ../extras/panel/scim_panel_gtk.cpp:2306
-msgid ""
-"\n"
-"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
+#: ../tests/scim_test_imengine.cpp:56
+msgid "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
 msgstr ""
-"\n"
-"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
 
-#. Reload Configuration.
-#: ../extras/panel/scim_panel_gtk.cpp:2385
-msgid "Reload Configuration"
-msgstr "設定をリロード"
+#: ../tests/scim_test_imengine.cpp:102
+msgid "TEST"
+msgstr ""
 
-#. Stick
-#: ../extras/panel/scim_panel_gtk.cpp:2395
-msgid "Stick Windows"
-msgstr "ウィンドウを固定"
+#: ../tests/scim_test_imengine.cpp:109
+msgid "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>"
+msgstr ""
 
-#. Toolbar
-#: ../extras/panel/scim_panel_gtk.cpp:2404
-msgid "Hide Toolbar"
-msgstr "ツールバーを隠す"
-
-#. Help
-#: ../extras/panel/scim_panel_gtk.cpp:2413
-msgid "Help ..."
-msgstr "ヘルプ..."
-
-#. Clients exit.
-#: ../extras/panel/scim_panel_gtk.cpp:2431
-msgid "Exit"
-msgstr "終了"
-
-#: ../utils/scimstringview.c:196
-msgid "Cursor Position"
-msgstr "カーソル位置"
-
-#: ../utils/scimstringview.c:197
-msgid "The current position of the insertion cursor in chars."
-msgstr "現在のカーソル位置"
-
-#: ../utils/scimstringview.c:206
-msgid "Maximum length"
-msgstr "最大の長さ"
-
-#: ../utils/scimstringview.c:207
-msgid "Maximum number of characters for this string view. Zero if no maximum."
-msgstr "String viewウィジェットの最大表示文字数。無制限の場合は0を指定して下さい。"
-
-#: ../utils/scimstringview.c:216
-msgid "Maximum width"
-msgstr "最大幅"
-
-#: ../utils/scimstringview.c:217
-msgid "Maximum width of this string view."
-msgstr "String viewウィジェットの最大表示幅"
-
-#: ../utils/scimstringview.c:226
-msgid "Has Frame"
-msgstr "フレーム有りかどうか"
-
-#: ../utils/scimstringview.c:227
-msgid "FALSE removes outside bevel from string view."
-msgstr "FALSEを指定した場合、文字表示ウィジェットの縁取りを描画しません。"
-
-#: ../utils/scimstringview.c:234
-msgid "Draw cursor"
-msgstr "カーソルを描画する"
-
-#: ../utils/scimstringview.c:235
-msgid "TRUE draw blinking cursor."
-msgstr "TRUEを指定した場合、カーソルを点滅させます。"
-
-#: ../utils/scimstringview.c:242
-msgid "Auto move cursor"
-msgstr "カーソルの自動移動"
-
-#: ../utils/scimstringview.c:243
-msgid "TRUE auto move cursor position when mouse clicking."
-msgstr "TRUEを指定した場合、マウスクリックされた位置にカーソルが移動します。"
-
-#: ../utils/scimstringview.c:250
-msgid "Forward button press event"
-msgstr "マウスボタンのイベントを送る"
-
-#: ../utils/scimstringview.c:251
-msgid "TRUE forward button press event to user program."
-msgstr "TRUEの場合はマウスボタンのイベントをユーザプログラムに送ります。"
-
-#: ../utils/scimstringview.c:258
-msgid "Auto resize the widget to fit the string"
-msgstr "文字列に合わせてウィジェットのサイズを自動調整"
-
-#: ../utils/scimstringview.c:259
-msgid "TRUE Auto resize on."
-msgstr "TRUEを指定した、場合はウィジェットサイズを自動的に調整します。"
-
-#: ../utils/scimstringview.c:266
-msgid "Width in chars"
-msgstr "文字の幅"
-
-#: ../utils/scimstringview.c:267
-msgid "Number of characters to leave space for in the string view."
-msgstr "String viewウィジェットに表示する文字数"
-
-#: ../utils/scimstringview.c:276
-msgid "Scroll offset"
-msgstr "スクロールオフセット"
-
-#: ../utils/scimstringview.c:277
-msgid "Number of pixels of the string view scrolled off the screen to the left"
-msgstr "String viewウィジェットが画面左端に畳み込まれた際の表示ピクセル数"
-
-#: ../utils/scimstringview.c:286
-msgid "Text"
-msgstr "テキスト"
-
-#: ../utils/scimstringview.c:287
-msgid "The contents of the string view"
-msgstr "String viewウィジェットの内容"
-
-#: ../utils/scimkeyselection.cpp:155
+#: ../utils/scimkeyselection.cpp:162
 msgid "Selected _Keys:"
 msgstr "設定済のキー:"
 
-#: ../utils/scimkeyselection.cpp:200
+#: ../utils/scimkeyselection.cpp:207
 msgid "Key Code:"
 msgstr "キーコード:"
 
-#: ../utils/scimkeyselection.cpp:218
+#: ../utils/scimkeyselection.cpp:229
 msgid "..."
 msgstr "..."
 
-#: ../utils/scimkeyselection.cpp:223
+#: ../utils/scimkeyselection.cpp:234
 msgid "Modifiers:"
 msgstr "モディファイア:"
 
-#: ../utils/scimkeyselection.cpp:236
+#: ../utils/scimkeyselection.cpp:251
 msgid "_Ctrl"
 msgstr "_Ctrl"
 
-#: ../utils/scimkeyselection.cpp:240
+#: ../utils/scimkeyselection.cpp:255
 msgid "A_lt"
 msgstr "A_lt"
 
-#: ../utils/scimkeyselection.cpp:244
+#: ../utils/scimkeyselection.cpp:259
 msgid "_Shift"
 msgstr "_Shift"
 
-#: ../utils/scimkeyselection.cpp:248
+#: ../utils/scimkeyselection.cpp:263
 msgid "_Release"
 msgstr "リリース(_R)"
 
-#: ../utils/scimkeyselection.cpp:258
+#: ../utils/scimkeyselection.cpp:277
 msgid "_Meta"
 msgstr "_Meta"
 
-#: ../utils/scimkeyselection.cpp:262
+#: ../utils/scimkeyselection.cpp:281
 msgid "S_uper"
 msgstr "S_uper"
 
-#: ../utils/scimkeyselection.cpp:266
+#: ../utils/scimkeyselection.cpp:285
 msgid "_Hyper"
 msgstr "_Hyper"
 
-#: ../utils/scimkeyselection.cpp:331
+#: ../utils/scimkeyselection.cpp:290
+msgid "Ca_psLock"
+msgstr ""
+
+#: ../utils/scimkeyselection.cpp:361
 msgid "Please enter a Key Code first."
 msgstr "キーコードを先に入力して下さい。"
 
-#: ../utils/scimkeyselection.cpp:385
+#: ../utils/scimkeyselection.cpp:415
 msgid ""
 "Press a key (or a key combination).\n"
 "This dialog will be closed when the key is released."
@@ -1334,13 +1382,101 @@ msgstr ""
 "キー（もしくは複数のキーの組合せ）を押して下さい。\n"
 "キーをリリースするとこのダイアログは閉じます。"
 
-#: ../utils/scimkeyselection.cpp:388
+#: ../utils/scimkeyselection.cpp:418
 msgid "Grabbing a key."
 msgstr "キー選択"
 
-#: ../utils/scimkeyselection.cpp:678
+#: ../utils/scimkeyselection.cpp:723
 msgid "Key Selection"
 msgstr "キー選択"
+
+#: ../utils/scimstringview.c:231
+msgid "Cursor Position"
+msgstr "カーソル位置"
+
+#: ../utils/scimstringview.c:232
+msgid "The current position of the insertion cursor in chars."
+msgstr "現在のカーソル位置"
+
+#: ../utils/scimstringview.c:241
+msgid "Maximum length"
+msgstr "最大の長さ"
+
+#: ../utils/scimstringview.c:242
+msgid "Maximum number of characters for this string view. Zero if no maximum."
+msgstr "String viewウィジェットの最大表示文字数。無制限の場合は0を指定して下さい。"
+
+#: ../utils/scimstringview.c:251
+msgid "Maximum width"
+msgstr "最大幅"
+
+#: ../utils/scimstringview.c:252
+msgid "Maximum width of this string view."
+msgstr "String viewウィジェットの最大表示幅"
+
+#: ../utils/scimstringview.c:261
+msgid "Has Frame"
+msgstr "フレーム有りかどうか"
+
+#: ../utils/scimstringview.c:262
+msgid "FALSE removes outside bevel from string view."
+msgstr "FALSEを指定した場合、文字表示ウィジェットの縁取りを描画しません。"
+
+#: ../utils/scimstringview.c:269
+msgid "Draw cursor"
+msgstr "カーソルを描画する"
+
+#: ../utils/scimstringview.c:270
+msgid "TRUE draw blinking cursor."
+msgstr "TRUEを指定した場合、カーソルを点滅させます。"
+
+#: ../utils/scimstringview.c:277
+msgid "Auto move cursor"
+msgstr "カーソルの自動移動"
+
+#: ../utils/scimstringview.c:278
+msgid "TRUE auto move cursor position when mouse clicking."
+msgstr "TRUEを指定した場合、マウスクリックされた位置にカーソルが移動します。"
+
+#: ../utils/scimstringview.c:285
+msgid "Forward button press event"
+msgstr "マウスボタンのイベントを送る"
+
+#: ../utils/scimstringview.c:286
+msgid "TRUE forward button press event to user program."
+msgstr "TRUEの場合はマウスボタンのイベントをユーザプログラムに送ります。"
+
+#: ../utils/scimstringview.c:293
+msgid "Auto resize the widget to fit the string"
+msgstr "文字列に合わせてウィジェットのサイズを自動調整"
+
+#: ../utils/scimstringview.c:294
+msgid "TRUE Auto resize on."
+msgstr "TRUEを指定した、場合はウィジェットサイズを自動的に調整します。"
+
+#: ../utils/scimstringview.c:301
+msgid "Width in chars"
+msgstr "文字の幅"
+
+#: ../utils/scimstringview.c:302
+msgid "Number of characters to leave space for in the string view."
+msgstr "String viewウィジェットに表示する文字数"
+
+#: ../utils/scimstringview.c:311
+msgid "Scroll offset"
+msgstr "スクロールオフセット"
+
+#: ../utils/scimstringview.c:312
+msgid "Number of pixels of the string view scrolled off the screen to the left"
+msgstr "String viewウィジェットが画面左端に畳み込まれた際の表示ピクセル数"
+
+#: ../utils/scimstringview.c:321
+msgid "Text"
+msgstr "テキスト"
+
+#: ../utils/scimstringview.c:322
+msgid "The contents of the string view"
+msgstr "String viewウィジェットの内容"
 
 #: ../utils/scimtrayicon.c:108
 msgid "Orientation"
@@ -1350,743 +1486,3 @@ msgstr "方向"
 msgid "The orientation of the tray."
 msgstr "トレイの方向"
 
-#~ msgid "Are you sure you want to quit SCIM Setup?"
-#~ msgstr "SCIMの設定を終了しますか？"
-
-#~ msgid "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
-#~ msgstr "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
-
-#~ msgid "En"
-#~ msgstr "En"
-
-#~ msgid "Preedit String mode"
-#~ msgstr "未確定文字列の表示モード"
-
-#~ msgid "X Window"
-#~ msgstr "Xウィンドウ"
-
-#~ msgid "A FrontEnd module for X11R6 Window System, using XIM Protocol."
-#~ msgstr ""
-#~ "XIMプロトコルによるX11R6ウィンドウシステム用フロントエンドモジュール"
-
-#~ msgid "XIM Settings"
-#~ msgstr "XIMの設定"
-
-#~ msgid "_On The Spot"
-#~ msgstr "_On The Spot"
-
-#~ msgid "_Dynamic Event Flow"
-#~ msgstr "_Dynamic Event Flow"
-
-#~ msgid ""
-#~ "If this option is checked, the OnTheSpot input style will be used when "
-#~ "the client supports it."
-#~ msgstr ""
-#~ "このオプションを有効にするとOn The Spot入力スタイルが適用されます。但し、"
-#~ "クライアント側のサポートが必要です。"
-
-#~ msgid ""
-#~ "If this option is checked, then dynamic event flow will be used.This can "
-#~ "speed up the key event response, especially in remote X11 environment.But "
-#~ "SCIM may become unstable."
-#~ msgstr ""
-#~ "このオプションを有効にすると、特にリモートX11環境においてキーイベントのレ"
-#~ "スポンスを向上させることができます。但し、SCIMが不安定になる場合がありま"
-#~ "す。"
-
-#~ msgid "Portuguese (Brazilian)"
-#~ msgstr "ポルトガル語(ブラジル)"
-
-#, fuzzy
-#~ msgid "Slovene"
-#~ msgstr "スロベニア語"
-
-#, fuzzy
-#~ msgid "Global"
-#~ msgstr "全体設定"
-
-#, fuzzy
-#~ msgid ""
-#~ "\n"
-#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>\n"
-#~ "\n"
-#~ msgstr ""
-#~ "\n"
-#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>"
-
-#~ msgid ""
-#~ "\n"
-#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>"
-#~ msgstr ""
-#~ "\n"
-#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>"
-
-#, fuzzy
-#~ msgid "Hot Keys"
-#~ msgstr ""
-#~ "ショートカットキー:\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ "\n"
-#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>\n"
-#~ "\n"
-#~ "Hot keys:\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "\n"
-#~ "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>\n"
-#~ "\n"
-#~ "ショートカットキー:\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ ":\n"
-#~ "    open/close the input method.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ ":\n"
-#~ "   入力メソッドを開始/終了する\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ ":\n"
-#~ "    switch to the next input method.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ ":\n"
-#~ "    次の入力メソッドに切替える\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ ":\n"
-#~ "    switch to the previous input method.\n"
-#~ "\n"
-#~ "\n"
-#~ msgstr ""
-#~ ":\n"
-#~ "    前の入力メソッドに切替える\n"
-#~ "\n"
-#~ "\n"
-
-#~ msgid "Full/Half Letter"
-#~ msgstr "全角/半角文字"
-
-#~ msgid "Full/Half Punct"
-#~ msgstr "全角/半角句読点"
-
-#~ msgid ""
-#~ "The input mode of the letters. Click to toggle between half and full."
-#~ msgstr ""
-#~ "文字入力モード。全角/半角文字に切替えるにはここをクリックして下さい。"
-
-#~ msgid ""
-#~ "The input mode of the puncutations. Click to toggle between half and full."
-#~ msgstr "句読点入力モード。全角/半角に切替えるにはここをクリックして下さい。"
-
-#~ msgid ""
-#~ "    Switch between full/half width letter mode.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "    全角/半角文字切替\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ "    Switch between full/half width punctuation mode.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "    全角/半角句読点切替\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ "    Switch between Forward/Input mode.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr "直接入力/変換入力モードに切替"
-
-#~ msgid ""
-#~ "    Add a new phrase.\n"
-#~ "\n"
-#~ "  "
-#~ msgstr ""
-#~ "    新しいフレーズを追加する\n"
-#~ "\n"
-#~ "  "
-
-#~ msgid ""
-#~ "    Delete the selected phrase.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "    選択されたフレーズを削除する\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "  Control+Down:\n"
-#~ "    Move lookup cursor to next shorter phrase\n"
-#~ "    Only available when LongPhraseFirst option is set.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Control+Down:\n"
-#~ "    カーソルを次のより短いフレーズに移動する\n"
-#~ "    \"長いフレーズを優先的に表示\"が有効な場合のみ使用できます。\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "  Control+Up:\n"
-#~ "    Move lookup cursor to previous longer phrase\n"
-#~ "    Only available when LongPhraseFirst option is set.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  Control+Up:\n"
-#~ "    カーソルを前のより長いフレーズに移動する\n"
-#~ "    \"長いフレーズを優先的に表示\"が有効な場合のみ使用できます。\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "  Esc:\n"
-#~ "    reset the input method.\n"
-#~ "\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  Esc:\n"
-#~ "   入力メソッドをリセット\n"
-#~ "\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "How to add a phrase:\n"
-#~ "    Input the new phrase as normal, then press the\n"
-#~ "  hot key. A hint will be shown to let you input a key\n"
-#~ "  for this phrase.\n"
-#~ "    Input a key then press the space bar.\n"
-#~ "  A hint will be shown to indicate whether\n"
-#~ "  the phrase was added sucessfully.\n"
-#~ msgstr ""
-#~ "フレーズの追加方法:\n"
-#~ "  新しいフレーズを普通に入力しショートカットキーを押します。\n"
-#~ "  ヒントが表示され、そのフレーズを入力する際に使うキーの入力\n"
-#~ "  を促します。\n"
-#~ "  キーを入力しスペースを押して下さい。\n"
-#~ "  ヒントにフレーズが正しく登録されたかどうか表示されますので\n"
-#~ "  確認して下さい。\n"
-
-#~ msgid "Input a key string for phrase: "
-#~ msgstr "このフレーズに使うキーを入力して下さい: "
-
-#~ msgid "Success."
-#~ msgstr "登録完了"
-
-#~ msgid "Failed."
-#~ msgstr "登録に失敗しました"
-
-#~ msgid "option -no cannot be used with -o\n"
-#~ msgstr "-noオプションは-oオプションと同時には使用できません\n"
-
-#~ msgid "option -o cannot be used with -no\n"
-#~ msgstr "-oオプションは-noオプションと同時には使用できません\n"
-
-#~ msgid "No argument for option "
-#~ msgstr "オプション引数がありません"
-
-#~ msgid "Invalid option: "
-#~ msgstr "オプションが無効です:"
-
-#~ msgid "Loading table file "
-#~ msgstr "テーブルを読込中"
-
-#~ msgid " ...\n"
-#~ msgstr " ...\n"
-
-#~ msgid "table file load failed!"
-#~ msgstr "テーブルの読込に失敗!"
-
-#~ msgid "Saving frequency table file "
-#~ msgstr "頻度テーブルを保存中"
-
-#~ msgid "frequency table file load failed!"
-#~ msgstr "頻度テーブルの読込に失敗!"
-
-#~ msgid "Saving table file "
-#~ msgstr "テーブルを保存中"
-
-#~ msgid "Table file save failed!"
-#~ msgstr "テーブルの保存に失敗!"
-
-#~ msgid "Generic Table"
-#~ msgstr "汎用テーブル"
-
-#~ msgid "An IMEngine Module which uses generic table input method file."
-#~ msgstr "汎用テーブル入力メソッドを使用するIMエンジンモジュール"
-
-#~ msgid "Full width _punctuation:"
-#~ msgstr "全角/半角句読点(_P):"
-
-#~ msgid "Select full width puncutation keys"
-#~ msgstr "全角/半角句読点切替キーの設定"
-
-#~ msgid ""
-#~ "The key events to switch full/half width punctuation input mode. Click on "
-#~ "the button on the right to edit it."
-#~ msgstr ""
-#~ "全角/半角句読点を切替えるキー。変更する\n"
-#~ "場合は右のボタンをクリックして下さい。"
-
-#~ msgid "Full width _letter:"
-#~ msgstr "全角/半角文字(_L):"
-
-#~ msgid "Select full width letter keys"
-#~ msgstr "全角/半角文字切替キーの設定"
-
-#~ msgid ""
-#~ "The key events to switch full/half width letter input mode. Click on the "
-#~ "button on the right to edit it."
-#~ msgstr ""
-#~ "全角/半角文字を切替えるキー。変更する\n"
-#~ "場合は右のボタンをクリックして下さい。"
-
-#~ msgid "_Mode switch:"
-#~ msgstr "入力モード切替(_M):"
-
-#~ msgid "Select mode switch keys"
-#~ msgstr "入力モード切替キーの設定"
-
-#~ msgid ""
-#~ "The key events to change current input mode. Click on the button on the "
-#~ "right to edit it."
-#~ msgstr ""
-#~ "入力モードを切替えるキー。変更する場合は\n"
-#~ "右のボタンをクリックして下さい。"
-
-#~ msgid "_Add phrase:"
-#~ msgstr "フレーズ追加(_A):"
-
-#~ msgid "Select add phrase keys."
-#~ msgstr "フレーズ追加キーの設定"
-
-#~ msgid ""
-#~ "The key events to add a new user defined phrase. Click on the button on "
-#~ "the right to edit it."
-#~ msgstr ""
-#~ "新しいフレーズを追加するキー。変更する\n"
-#~ "場合は右のボタンをクリックして下さい。"
-
-#~ msgid "_Delete phrase:"
-#~ msgstr "フレーズ削除(_D):"
-
-#~ msgid "Select delete phrase keys."
-#~ msgstr "フレーズ削除キーの設定"
-
-#~ msgid ""
-#~ "The key events to delete a selected phrase. Click on the button on the "
-#~ "right to edit it."
-#~ msgstr ""
-#~ "選択されたフレーズを削除するキー。変更する\n"
-#~ "場合は右のボタンをクリックして下さい。"
-
-#~ msgid "Show _prompt"
-#~ msgstr "プロンプトを表示(_P)"
-
-#~ msgid "Show key _hint"
-#~ msgstr "ヒントキーを表示(_H)"
-
-#~ msgid "Save _user table in binary format"
-#~ msgstr "ユーザーテーブルをバイナリー形式で保存(_U)"
-
-#~ msgid "Show the u_ser defined phrases first"
-#~ msgstr "ユーザー定義フレーズを優先的に表示(_S)"
-
-#~ msgid "Show the _longer phrases first"
-#~ msgstr "長いフレーズを優先的に表示(_L)"
-
-#~ msgid ""
-#~ "If this option is checked, the key prompt of the currently selected "
-#~ "phrase will be shown."
-#~ msgstr ""
-#~ "このオプションを有効にすると選択された\n"
-#~ "フレーズのキープロンプトが表示されます。"
-
-#~ msgid ""
-#~ "If this option is checked, the remaining keystrokes of the phraseswill be "
-#~ "shown on the lookup table."
-#~ msgstr ""
-#~ "このオプションを有効にするとフレーズの残りの\n"
-#~ "キーストロークが候補ウィンドウに表示されます。"
-
-#~ msgid ""
-#~ "If this option is checked, the user table will be stored with binary "
-#~ "format, this will increase the loading speed."
-#~ msgstr ""
-#~ "このオプションを有効にするとユーザー定義テーブルがバイナリー\n"
-#~ "形式で保存されます。テーブルの読込が速くなります。"
-
-#~ msgid ""
-#~ "If this option is checked, the user defined phrases will be shown in "
-#~ "front of others. "
-#~ msgstr ""
-#~ "このオプションを有効にするとユーザー定義フレーズ\n"
-#~ "が優先的に表示されます。"
-
-#~ msgid ""
-#~ "If this option is checked, the longer phrase will be shown in front of "
-#~ "others. "
-#~ msgstr ""
-#~ "このオプションを有効にすると長いフレーズが\n"
-#~ "優先的に表示されます。"
-
-#~ msgid "The installed tables:"
-#~ msgstr "インストール済みのテーブル:"
-
-#~ msgid "_Install"
-#~ msgstr "インストール(_I)"
-
-#~ msgid "Install a new table."
-#~ msgstr "新しいテーブルをインストール"
-
-#~ msgid "_Delete"
-#~ msgstr "削除(_D)"
-
-#~ msgid "Delete the selected table."
-#~ msgstr "選択されたテーブルを削除"
-
-#~ msgid "_Properties"
-#~ msgstr "プロパティー(_P)"
-
-#~ msgid "Edit the properties of the selected table."
-#~ msgstr "選択されたテーブルのプロパティーを編集"
-
-#~ msgid "Generic"
-#~ msgstr "全般"
-
-#~ msgid "Table Management"
-#~ msgstr "テーブル管理"
-
-#~ msgid "Select an icon file"
-#~ msgstr "アイコンファイルを選択"
-
-#~ msgid "User"
-#~ msgstr "ユーザー"
-
-#~ msgid "System"
-#~ msgstr "システム"
-
-#~ msgid "Please select the table file to be installed."
-#~ msgstr "インストールするテーブルファイルを選択して下さい。"
-
-#~ msgid "Failed to install the table! It's already in table file directory."
-#~ msgstr "テーブルのインストールに失敗!すでにインストールされています。"
-
-#~ msgid "Failed to load the table file!"
-#~ msgstr "テーブルファイルの読込に失敗!"
-
-#~ msgid ""
-#~ "Failed to install the table! Another version of this table was already "
-#~ "installed."
-#~ msgstr ""
-#~ "テーブルのインストールに失敗!他のバージョンが\n"
-#~ "すでにインストールされています。"
-
-#~ msgid ""
-#~ "Another version of this table was already installed. Do you want to "
-#~ "replace it with the new one?"
-#~ msgstr ""
-#~ "このテーブルの他のバージョンがすでにインストールされています。\n"
-#~ "新しいバージョンに置き換えますか?"
-
-#~ msgid ""
-#~ "Failed to install the table! A table with the same file name was already "
-#~ "installed."
-#~ msgstr ""
-#~ "テーブルのインストールに失敗!同じ名前のテーブルが\n"
-#~ "すでにインストールされています。"
-
-#~ msgid ""
-#~ "A table with the same file name was already installed. Do you want to "
-#~ "overwrite it?"
-#~ msgstr ""
-#~ "同じ名前のテーブルがすでにインストールされています。\n"
-#~ "上書きしますか?"
-
-#~ msgid "Failed to install the table to %s!"
-#~ msgstr "%sにテーブルをインストールできませんでした!"
-
-#~ msgid "Can not delete the file %s!"
-#~ msgstr "ファイル%sを削除できません!"
-
-#~ msgid "Are you sure to delete this table file?"
-#~ msgstr "このテーブルを削除しますか?"
-
-#~ msgid "Failed to delete the table file!"
-#~ msgstr "テーブルの削除に失敗!"
-
-#~ msgid "True"
-#~ msgstr "True"
-
-#~ msgid "False"
-#~ msgstr "False"
-
-#~ msgid "Split Keys:"
-#~ msgstr "スプリットキー:"
-
-#~ msgid "The key strokes to split inputed string."
-#~ msgstr "入力済みの文字列を分割するキー"
-
-#~ msgid "Commit Keys:"
-#~ msgstr "変換確定キー:"
-
-#~ msgid "The key strokes to commit converted result to client."
-#~ msgstr "変換結果をクライアントに送るキー"
-
-#~ msgid "Forward Keys:"
-#~ msgstr "直接入力キー:"
-
-#~ msgid "The key strokes to forward inputed string to client."
-#~ msgstr "入力された文字列を変換せずに直接クライアントに送るキー"
-
-#~ msgid "The key strokes to select candidate phrases in lookup table."
-#~ msgstr "候補ウィンドウからフレーズを選択するキー"
-
-#~ msgid "Page Up Keys:"
-#~ msgstr "前ページキー:"
-
-#~ msgid "The lookup table page up keys"
-#~ msgstr "候補ウィンドウで前のページに戻るキー"
-
-#~ msgid "Page Down Keys:"
-#~ msgstr "次ページキー:"
-
-#~ msgid "The lookup table page down keys"
-#~ msgstr "候補ウィンドウで次のページに進むキー"
-
-#~ msgid "Table Properties"
-#~ msgstr "テーブルのプロパティー"
-
-#~ msgid "Name:"
-#~ msgstr "名称:"
-
-#~ msgid "The name of this table."
-#~ msgstr "このテーブルの名称"
-
-#~ msgid "Author:"
-#~ msgstr "作者:"
-
-#~ msgid "The author of this table."
-#~ msgstr "このテーブルの作者"
-
-#~ msgid "UUID:"
-#~ msgstr "UUID:"
-
-#~ msgid "The unique ID of this table."
-#~ msgstr "このテーブルのID"
-
-#~ msgid "Serial Number:"
-#~ msgstr "バージョン:"
-
-#~ msgid "The serial number of this table."
-#~ msgstr "このテーブルのバージョン"
-
-#~ msgid "Icon File:"
-#~ msgstr "アイコンファイル:"
-
-#~ msgid "The icon file of this table."
-#~ msgstr "このテーブルのアイコンファイル"
-
-#~ msgid "Supported Languages:"
-#~ msgstr "サポート言語:"
-
-#~ msgid "The languages supported by this table."
-#~ msgstr "このテーブルがサポートする言語"
-
-#~ msgid "Status Prompt:"
-#~ msgstr "ステイタスプロンプト:"
-
-#~ msgid "A prompt string to be shown in status area."
-#~ msgstr "ステイタスに表示される文字列"
-
-#~ msgid "Valid Input Chars:"
-#~ msgstr "有効な文字:"
-
-#~ msgid "The valid input chars of this table."
-#~ msgstr "このテーブルで使用できる文字"
-
-#~ msgid "Multi Wildcard Char:"
-#~ msgstr "マルチワイルドカード文字:"
-
-#~ msgid ""
-#~ "The multi wildcard chars of this table. These chars can be used to match "
-#~ "one or more arbitrary chars."
-#~ msgstr ""
-#~ "このテーブルのマルチワイルドカード文字。\n"
-#~ "複数の文字の代わりに使用できます。"
-
-#~ msgid "Single Wildcard Char:"
-#~ msgstr "シングルワイルドカード文字:"
-
-#~ msgid ""
-#~ "The single wildcard chars of this table.These chars can be used to match "
-#~ "one arbitrary char."
-#~ msgstr ""
-#~ "このテーブルのシングルワイルドカード文字。\n"
-#~ "任意の一文字の代わりに使用できます。"
-
-#~ msgid "Max Key Length:"
-#~ msgstr "最大キー数:"
-
-#~ msgid "The maxmium length of key strings."
-#~ msgstr "文字列の最大キー数"
-
-#~ msgid "Show Key Prompt:"
-#~ msgstr "キープロンプトを表示:"
-
-#~ msgid "If true then the key prompts will be shown instead of the raw keys."
-#~ msgstr "Trueの場合は入力された文字の代わりにキープロンプトが表示されます。"
-
-#~ msgid "Auto Select:"
-#~ msgstr "自動選択:"
-
-#~ msgid ""
-#~ "If true then the first candidate phrase will be selected automatically "
-#~ "when inputing the next key."
-#~ msgstr ""
-#~ "Trueの場合は次のフレーズの入力を開始すると同時に入力済みの\n"
-#~ "フレーズに対してその第一変換候補が自動的に選択されます。"
-
-#~ msgid "Auto Wildcard:"
-#~ msgstr "自動ワイルドカード:"
-
-#~ msgid ""
-#~ "If true then a multi wildcard char will be append to the end of inputed "
-#~ "key string when searching phrases."
-#~ msgstr ""
-#~ "Trueの場合は検索時にマルチワイルドカード文字が\n"
-#~ "入力された文字列の最後に自動的に付加されます。"
-
-#~ msgid "Auto Commit:"
-#~ msgstr "自動コミット:"
-
-#~ msgid ""
-#~ "If true then the converted result string will be committed to client "
-#~ "automatically."
-#~ msgstr "Trueの場合は変換結果が自動的にコミットされます。"
-
-#~ msgid "Auto Split:"
-#~ msgstr "自動スプリット:"
-
-#~ msgid ""
-#~ "If true then the inputed key string will be splitted automatically when "
-#~ "necessary."
-#~ msgstr "Trueの場合は、入力された文字列が必要に応じて自動的に分割されます。"
-
-#~ msgid "Discard Invalid Key:"
-#~ msgstr "無効な文字列を排除:"
-
-#~ msgid ""
-#~ "If true then the invalid key will be discarded automatically.This option "
-#~ "is only valid when Auto Select and Auto Commit is true."
-#~ msgstr ""
-#~ "Trueの場合は、入力された無効な文字列を自動的に排除します。このオプションは"
-#~ "自動選択と自動コミットがTrueの場合のみ有効になります。"
-
-#~ msgid "Dynamic Adjust:"
-#~ msgstr "動的アップデート:"
-
-#~ msgid "If true then the phrases' frequencies will be adjusted dynamically."
-#~ msgstr "Trueの場合は、使用頻度情報が動的にアップデートされます。"
-
-#~ msgid "Auto Fill Preedit Area:"
-#~ msgstr "プリエディットの自動補完:"
-
-#~ msgid ""
-#~ "If true then the preedit string will be filled up with the current "
-#~ "candiate phrase automatically.This option is only valid when Auto Select "
-#~ "is TRUE."
-#~ msgstr ""
-#~ "Trueの場合は、自動的にプリエディットが変換候補によって補完されます。\n"
-#~ "このオプションは自動選択がTrueの場合のみ有効になります。"
-
-#~ msgid "Always Show Lookup Table:"
-#~ msgstr "候補リストを常に表示:"
-
-#~ msgid ""
-#~ "If true then the lookup table will always be shown when any candidate "
-#~ "phrase is available. Otherwise the lookup table will only be shown when "
-#~ "necessary.\n"
-#~ "If Auto Fill is false, then this option will be no effect, and always be "
-#~ "true."
-#~ msgstr ""
-#~ "Trueの場合は変換候補があれば常に候補ウィンドウが表示されます。\n"
-#~ "Falseの場合は必要な時のみ表示されます。\n"
-#~ "但し、自動補完が無効の場合は常に表示されます。"
-
-#~ msgid "Default Full Width Punct:"
-#~ msgstr "デフォルト句読点を全角に設定:"
-
-#~ msgid "If true then full width punctuations will be inputed by default."
-#~ msgstr "Trueの場合は、指定のない限り全角句読点が入力されます。"
-
-#~ msgid "Default Full Width Letter:"
-#~ msgstr "デフォルト文字幅を全角に設定:"
-
-#~ msgid "If true then full width letters will be inputed by default."
-#~ msgstr "Trueの場合は、指定のない限り全角文字が入力されます。"
-
-#~ msgid "Invalid icon file."
-#~ msgstr "アイコンファイルが無効です。"
-
-#~ msgid "Invalid languages."
-#~ msgstr "言語が無効です。"
-
-#~ msgid "Invalid status prompt."
-#~ msgstr "ステイタスプロンプトが無効です。"
-
-#~ msgid "Invalid multi wildcard chars."
-#~ msgstr "マルチワイルドカード文字が無効です。"
-
-#~ msgid "Invalid single wildcard chars."
-#~ msgstr "シングルワイルドカード文字が無効です。"
-
-#~ msgid "Invalid commit keys."
-#~ msgstr "コミットキーが無効です。"
-
-#~ msgid "Invalid select keys."
-#~ msgstr "選択キーが無効です。"
-
-#~ msgid "Invalid page up keys."
-#~ msgstr "次ページキーが無効です。"
-
-#~ msgid "Invalid page down keys."
-#~ msgstr "前ページキーが無効です。"
-
-#~ msgid "Invalid max key length."
-#~ msgstr "最大キー数が無効です。"
-
-#~ msgid "Failed to save table %s!"
-#~ msgstr "テーブル%sの保存に失敗!"
-
-#~ msgid "Failed to load any Config Modules!"
-#~ msgstr "設定モジュールの読込に失敗!"
-
-#~ msgid "_Current Config Module:"
-#~ msgstr "現在の設定モジュール(_C):"
-
-#~ msgid "<Not found>"
-#~ msgstr "<見つかりません>"
-
-#~ msgid "Current Config Module has been changed to %s."
-#~ msgstr "現在の設定モジュールを%sに変更しました。"
-
-#~ msgid "Start the SCIM Setup Utility."
-#~ msgstr "SCIMセットアップユーティリティを開く"
-
-#~ msgid "Setup ..."
-#~ msgstr "設定..."
