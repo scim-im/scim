@@ -1230,7 +1230,7 @@ retval_t scim_bridge_client_read_and_dispatch ()
     scim_bridge_pdebugln (2, "scim_bridge_client_read_and_dispatch");
 
     if (!initialized) {
-        scim_bridge_perrorln ("The client library is not intialized at scim_bridge_client_read_and_dispatch ()");
+        scim_bridge_perrorln ("The client library is not initialized at scim_bridge_client_read_and_dispatch ()");
         return RETVAL_FAILED;
     }
 
