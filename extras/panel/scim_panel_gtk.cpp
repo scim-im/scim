@@ -2559,6 +2559,18 @@ create_pango_attrlist (const String        &mbs,
     guint start_index, end_index;
     guint wlen = g_utf8_strlen (mbs.c_str (), mbs.length ());
 
+#if GTK_CHECK_VERSION(3, 0, 0)
+    guint16 _normal_bg_rgb[] = { 65536*_normal_bg.red, 65536*_normal_bg.green, 65536*_normal_bg.blue };
+    guint16 _active_bg_rgb[] = { 65536*_active_bg.red, 65536*_active_bg.green, 65536*_active_bg.blue };
+    guint16 _normal_text_rgb[] = { 65536*_normal_text.red, 65536*_normal_text.green, 65536*_normal_text.blue };
+    guint16 _active_text_rgb[] = { 65536*_active_text.red, 65536*_active_text.green, 65536*_active_text.blue };
+#else
+    guint16 _normal_bg_rgb[] = { _normal_bg.red, _normal_bg.green, _normal_bg.blue };
+    guint16 _active_bg_rgb[] = { _active_bg.red, _active_bg.green, _active_bg.blue };
+    guint16 _normal_text_rgb[] = { _normal_text.red, _normal_text.green, _normal_text.blue };
+    guint16 _active_text_rgb[] = { _active_text.red, _active_text.green, _active_text.blue };
+#endif
+
     for (int i=0; i < (int) attrs.size (); ++i) {
         start_index = attrs[i].get_start ();
         end_index = attrs[i].get_end ();
@@ -2574,26 +2586,22 @@ create_pango_attrlist (const String        &mbs,
                     attr->end_index = end_index;
                     pango_attr_list_insert (attrlist, attr);
                 } else if (attrs[i].get_value () == SCIM_ATTR_DECORATE_REVERSE) {
-                    attr = pango_attr_foreground_new (_normal_bg.red, _normal_bg.green, _normal_bg.blue);
+                    attr = pango_attr_foreground_new (_normal_bg_rgb[0], _normal_bg_rgb[1], _normal_bg_rgb[2]);
                     attr->start_index = start_index;
                     attr->end_index = end_index;
                     pango_attr_list_insert (attrlist, attr);
 
-                    attr = pango_attr_background_new (_normal_text.red, _normal_text.green, _normal_text.blue);
+                    attr = pango_attr_background_new (_normal_text_rgb[0], _normal_text_rgb[1], _normal_text_rgb[2]);
                     attr->start_index = start_index;
                     attr->end_index = end_index;
                     pango_attr_list_insert (attrlist, attr);
                 } else if (attrs[i].get_value () == SCIM_ATTR_DECORATE_HIGHLIGHT) {
-                    attr = pango_attr_foreground_new (_active_text.red, _active_text.green, _active_text.blue);
+                    attr = pango_attr_foreground_new (_active_text_rgb[0], _active_text_rgb[1], _active_text_rgb[2]);
                     attr->start_index = start_index;
                     attr->end_index = end_index;
                     pango_attr_list_insert (attrlist, attr);
 
-#if GTK_CHECK_VERSION(3, 0, 0)
-                    attr = pango_attr_background_new (65536*_active_bg.red, 65536*_active_bg.green, 65536*_active_bg.blue);
-#else
-                    attr = pango_attr_background_new (_active_bg.red, _active_bg.green, _active_bg.blue);
-#endif
+                    attr = pango_attr_background_new (_active_bg_rgb[0], _active_bg_rgb[1], _active_bg_rgb[2]);
                     attr->start_index = start_index;
                     attr->end_index = end_index;
                     pango_attr_list_insert (attrlist, attr);
