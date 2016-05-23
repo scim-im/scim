@@ -56,7 +56,7 @@ void scim_bridge_key_event_bridge_to_gdk (GdkEventKey *gdk_key_event, GdkWindow 
     if (scim_bridge_key_event_is_caps_lock_down (key_event)) gdk_key_event->state |= GDK_LOCK_MASK;
     if (scim_bridge_key_event_is_control_down (key_event)) gdk_key_event->state |= GDK_CONTROL_MASK;
     if (scim_bridge_key_event_is_alt_down (key_event)) gdk_key_event->state |= GDK_MOD1_MASK;
-    /*if (scim_bridge_key_event_is_num_lock_down (key_event)) gdk_key_event->state |= GDK_MOD2_MASK;*/
+    if (scim_bridge_key_event_is_num_lock_down (key_event)) gdk_key_event->state |= GDK_MOD2_MASK;
 
     if (scim_bridge_key_event_is_pressed (key_event)) {
         gdk_key_event->type = GDK_KEY_PRESS;

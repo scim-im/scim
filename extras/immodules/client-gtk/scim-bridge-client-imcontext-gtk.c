@@ -51,6 +51,8 @@
 struct _ScimBridgeClientIMContext
 {
     GtkIMContext parent;
+    GtkIMContext *slave;
+    boolean slave_preedit;
 
     scim_bridge_imcontext_id_t id;
 
@@ -91,10 +93,6 @@ static GObjectClass *root_klass = NULL;
 static ScimBridgeClientIMContext *focused_imcontext = NULL;
 static GtkWidget *focused_widget = NULL;
 
-static GtkIMContext *fallback_imcontext = NULL;
-static gulong fallback_commit_handler;
-static gulong fallback_preedit_changed_handler;
-
 static guint key_snooper_id = 0;
 static boolean key_snooper_used = FALSE;
 
@@ -114,45 +112,11 @@ static void scim_bridge_client_imcontext_focus_in (GtkIMContext *context);
 static void scim_bridge_client_imcontext_focus_out (GtkIMContext *context);
 static void scim_bridge_client_imcontext_set_cursor_location (GtkIMContext *context, GdkRectangle *area);
 
-
-/* Helper functions */
-static void fallback_commit (GtkIMContext *context, const char *str, gpointer data)
-{
-    scim_bridge_pdebugln (4, "fallback_commit ()");
-    if (focused_imcontext != NULL && !focused_imcontext->enabled && str != NULL) {
-        g_signal_emit_by_name (focused_imcontext, "commit", str);
-    }
-}
-
-static void fallback_preedit_changed (GtkIMContext *context, gpointer data)
-{
-    scim_bridge_pdebugln (4, "fallback_preedit_changed ()");
-    if (focused_imcontext != NULL && !focused_imcontext->enabled && context != NULL) {
-        gchar* preedit_string = NULL;
-        gint preedit_cursor_position = 0;
-        PangoAttrList *preedit_attributes = NULL;
-        gtk_im_context_get_preedit_string (context, &preedit_string, &preedit_attributes, &preedit_cursor_position);
-        
-        if (preedit_string != NULL) {
-            free (focused_imcontext->preedit_string);
-            focused_imcontext->preedit_string = preedit_string;
-            focused_imcontext->preedit_string_capacity = strlen (preedit_string);
-            focused_imcontext->preedit_shown = TRUE;
-        } else {
-            focused_imcontext->preedit_string[0] = '\0';
-            focused_imcontext->preedit_shown = FALSE;
-        }
-        
-        focused_imcontext->preedit_cursor_position = preedit_cursor_position;
-        
-        if (focused_imcontext->preedit_attributes != NULL)
-            pango_attr_list_unref (focused_imcontext->preedit_attributes);
-        focused_imcontext->preedit_attributes = preedit_attributes;
-        
-        g_signal_emit_by_name (focused_imcontext, "preedit-changed");
-    }
-}
-
+/* slave callbacks */
+static void gtk_im_slave_commit_cb (GtkIMContext *context, const char *str, ScimBridgeClientIMContext *imcontext);
+static void gtk_im_slave_preedit_changed_cb (GtkIMContext *context, ScimBridgeClientIMContext *imcontext);
+static void gtk_im_slave_preedit_start_cb (GtkIMContext *context, ScimBridgeClientIMContext *imcontext);
+static void gtk_im_slave_preedit_end_cb (GtkIMContext *context, ScimBridgeClientIMContext *imcontext);
 
 static retval_t filter_key_event (ScimBridgeClientIMContext *imcontext, GdkEventKey *event, boolean *consumed)
 {
@@ -212,8 +176,10 @@ static gboolean key_snooper (GtkWidget *widget, GdkEventKey *event, gpointer dat
 {
     scim_bridge_pdebugln (7, "key_snooper ()");
 
-    if (!(event->send_event & SEND_EVENT_MASK) && scim_bridge_client_is_messenger_opened () && focused_imcontext != NULL) {
-        if (focused_imcontext->client_window != NULL) {
+    if (focused_imcontext && scim_bridge_client_is_messenger_opened () &&
+        (event->type == GDK_KEY_PRESS || event->type == GDK_KEY_RELEASE) &&
+        !(event->send_event & SEND_EVENT_MASK)) {
+        if (focused_imcontext->client_window) {
             int new_window_x;
             int new_window_y;
             gdk_window_get_origin (focused_imcontext->client_window, &new_window_x, &new_window_y);
@@ -237,9 +203,9 @@ static gboolean key_snooper (GtkWidget *widget, GdkEventKey *event, gpointer dat
             return FALSE;
         } else {
             if (consumed) {
-				g_signal_emit_by_name (focused_imcontext, "preedit-changed");
+                g_signal_emit_by_name (focused_imcontext, "preedit-changed");
                 return TRUE;
-			}
+            }
         }
     }
 
@@ -570,24 +536,26 @@ boolean scim_bridge_client_imcontext_replace_surrounding_text (ScimBridgeClientI
     return TRUE;
 }
 
-
 void scim_bridge_client_imcontext_forward_key_event (ScimBridgeClientIMContext *imcontext, const ScimBridgeKeyEvent *key_event)
 { 
-    GdkEventKey gdk_event;
-    scim_bridge_key_event_bridge_to_gdk (&gdk_event, imcontext->client_window, key_event);
-    gdk_event.send_event |= SEND_EVENT_MASK;
-    if (imcontext == focused_imcontext && focused_widget != NULL) {
-        const char *signal_name = NULL;
-        if (scim_bridge_key_event_is_pressed (key_event)) {
-            signal_name = "key-press-event";
-        } else {
-            signal_name = "key-release-event";
+    if (imcontext && imcontext == focused_imcontext) {
+        GdkEventKey gdk_event;
+        scim_bridge_key_event_bridge_to_gdk (&gdk_event, imcontext->client_window, key_event);
+        gdk_event.send_event |= SEND_EVENT_MASK;
+
+        if (!gtk_im_context_filter_keypress (GTK_IM_CONTEXT (imcontext->slave), &gdk_event)) {
+            // To avoid timing issue, we need emit the signal directly, rather than put the event into the queue.
+            if (focused_widget) {
+                gboolean result;
+                g_signal_emit_by_name(focused_widget,
+                    scim_bridge_key_event_is_pressed (key_event) ? "key-press-event" : "key-release-event",
+                    &gdk_event,
+                    &result
+                );
+            } else {
+                gdk_event_put ((GdkEvent *) &gdk_event);
+            }
         }
-        
-        gboolean consumed;
-        g_signal_emit_by_name (focused_widget, signal_name, &gdk_event, &consumed);
-    } else {
-        gdk_event_put ((GdkEvent*) &gdk_event);
     }
 }
 
@@ -598,8 +566,6 @@ void scim_bridge_client_imcontext_imengine_status_changed (ScimBridgeClientIMCon
         if (imcontext->enabled) {
             scim_bridge_client_imcontext_set_preedit_shown (imcontext, FALSE);
             scim_bridge_client_imcontext_update_preedit (imcontext);
-        } else {
-            gtk_im_context_reset (GTK_IM_CONTEXT (fallback_imcontext));
         }
     }
     imcontext->enabled = enabled;
@@ -615,24 +581,17 @@ void scim_bridge_client_imcontext_static_initialize ()
     gdk_color_parse ("black", &preedit_active_foreground);
 
     focused_imcontext = NULL;
-
-    fallback_imcontext = gtk_im_context_simple_new ();
-    fallback_commit_handler = g_signal_connect (G_OBJECT (fallback_imcontext), "commit", G_CALLBACK (fallback_commit), NULL);
-    fallback_preedit_changed_handler = g_signal_connect (G_OBJECT (fallback_imcontext), "preedit_changed", G_CALLBACK (fallback_preedit_changed), NULL);
 }
 
 
 void scim_bridge_client_imcontext_static_finalize ()
 {
-    g_signal_handlers_disconnect_by_func (fallback_imcontext, &fallback_commit_handler, NULL);
-    g_object_unref (fallback_imcontext);
     if (key_snooper_used) {
         gtk_key_snooper_remove (key_snooper_id);
         key_snooper_id = 0;
         key_snooper_used = FALSE;
     }
 
-    fallback_imcontext = NULL;
     focused_imcontext = NULL;
 }
 
@@ -675,7 +634,7 @@ GType scim_bridge_client_imcontext_get_type ()
 
 void scim_bridge_client_imcontext_register_type (GTypeModule *type_module)
 {
-	scim_bridge_pdebugln (2, "scim_bridge_client_imcontext_register_type ()");
+    scim_bridge_pdebugln (2, "scim_bridge_client_imcontext_register_type ()");
 
     static const GTypeInfo klass_info = {
         sizeof (ScimBridgeClientIMContextClass),
@@ -697,7 +656,7 @@ void scim_bridge_client_imcontext_register_type (GTypeModule *type_module)
 #else
         (GtkObjectInitFunc) scim_bridge_client_imcontext_initialize,
 #endif
-		0
+        0
     };
 
     class_type = g_type_module_register_type (type_module, GTK_TYPE_IM_CONTEXT, "ScimBridgeClientIMContext", &klass_info, 0);
@@ -716,6 +675,29 @@ GtkIMContext *scim_bridge_client_imcontext_new ()
 void scim_bridge_client_imcontext_initialize (ScimBridgeClientIMContext *imcontext, ScimBridgeClientIMContextClass *klass)
 {
     scim_bridge_pdebugln (5, "scim_bridge_client_imcontext_initialize  ()");
+
+    /* slave exists for using gtk+'s table based input method */
+    imcontext->slave_preedit = FALSE;
+    imcontext->slave = gtk_im_context_simple_new ();
+    g_signal_connect(G_OBJECT(imcontext->slave),
+                     "commit",
+                     G_CALLBACK(gtk_im_slave_commit_cb),
+                     imcontext);
+    
+    g_signal_connect(G_OBJECT(imcontext->slave),
+                     "preedit-changed",
+                     G_CALLBACK(gtk_im_slave_preedit_changed_cb),
+                     imcontext);
+    
+    g_signal_connect(G_OBJECT(imcontext->slave),
+                     "preedit-start",
+                     G_CALLBACK(gtk_im_slave_preedit_start_cb),
+                     imcontext);
+    
+    g_signal_connect(G_OBJECT(imcontext->slave),
+                     "preedit-end",
+                     G_CALLBACK(gtk_im_slave_preedit_end_cb),
+                     imcontext);
 
     imcontext->preedit_shown = FALSE;
     imcontext->preedit_started = FALSE;
@@ -775,6 +757,20 @@ void scim_bridge_client_imcontext_finalize (GObject *object)
     
     imcontext->preedit_attributes = NULL;
     
+    g_signal_handlers_disconnect_by_func(imcontext->slave,
+                                         (void *)gtk_im_slave_commit_cb,
+                                         (void *)imcontext);
+    g_signal_handlers_disconnect_by_func(imcontext->slave,
+                                         (void *)gtk_im_slave_preedit_changed_cb,
+                                         (void *)imcontext);
+    g_signal_handlers_disconnect_by_func(imcontext->slave,
+                                         (void *)gtk_im_slave_preedit_start_cb,
+                                         (void *)imcontext);
+    g_signal_handlers_disconnect_by_func(imcontext->slave,
+                                         (void *)gtk_im_slave_preedit_end_cb,
+                                         (void *)imcontext);
+    g_object_unref(imcontext->slave);
+
     root_klass->finalize (object);
 }
 
@@ -786,63 +782,22 @@ gboolean scim_bridge_client_imcontext_filter_key_event (GtkIMContext *context, G
 
     ScimBridgeClientIMContext *imcontext = SCIM_BRIDGE_CLIENT_IMCONTEXT (context);
 
-	if (imcontext && !key_snooper_used)
-		if (key_snooper(0, event, 0) == TRUE)
-			return TRUE;
+    boolean ret = FALSE;
+    if (imcontext) {
+        if (!key_snooper_used) ret = key_snooper(0, event, 0);
 
-	if (fallback_imcontext)
-		if (gtk_im_context_filter_keypress (fallback_imcontext, event) == TRUE)
-			return TRUE;
+        if (imcontext->slave) {
+            if (!ret) {
+                ret = gtk_im_context_filter_keypress (imcontext->slave, event);
+            } else if (imcontext->slave_preedit) {
+                imcontext->slave_preedit = FALSE;
+                gtk_im_context_reset (imcontext->slave);
+            }
+        }
 
-#if GTK_CHECK_VERSION(3, 0, 0)
-	if (event->keyval == GDK_KEY_BackSpace ||
-		event->keyval == GDK_KEY_Escape ||
-		event->keyval == GDK_KEY_Return ||
-		event->keyval == GDK_KEY_ISO_Enter ||
-		event->keyval == GDK_KEY_KP_Enter ||
-		event->keyval == GDK_KEY_Delete ||
-		event->keyval == GDK_KEY_KP_Delete)
-		return FALSE;
-#else
-	if (event->keyval == GDK_BackSpace ||
-		event->keyval == GDK_Escape ||
-		event->keyval == GDK_Return ||
-		event->keyval == GDK_ISO_Enter ||
-		event->keyval == GDK_KP_Enter ||
-		event->keyval == GDK_Delete ||
-		event->keyval == GDK_KP_Delete)
-		return FALSE;
-#endif
+    }
 
-	unsigned int accelerator_mask = (gtk_accelerator_get_default_mod_mask () & ~GDK_SHIFT_MASK);
-	if (event->type == GDK_KEY_PRESS && (event->state & accelerator_mask) == 0) {
-		guint32 wchar = gdk_keyval_to_unicode (event->keyval);
-		if (wchar != 0) {
-			gchar buffer[10];
-			const int buffer_length = g_unichar_to_utf8 (wchar, buffer);
-			buffer[buffer_length] = '\0';
-			g_signal_emit_by_name (focused_imcontext, "commit", &buffer);
-			return TRUE;
-		}
-	}
-
-	/*
-	unsigned int accelerator_mask = (gtk_accelerator_get_default_mod_mask () & ~GDK_SHIFT_MASK);
-	if (fallback_imcontext && (imcontext == NULL || !imcontext->enabled)) {
-		return gtk_im_context_filter_keypress (fallback_imcontext, event);
-	} else if (event->type == GDK_KEY_PRESS && (event->state & accelerator_mask) == 0) {
-		guint32 wchar = gdk_keyval_to_unicode (event->keyval);
-		if (wchar != 0) {
-			gchar buffer[10];
-			const int buffer_length = g_unichar_to_utf8 (wchar, buffer);
-			buffer[buffer_length] = '\0';
-			g_signal_emit_by_name (focused_imcontext, "commit", &buffer);
-			return TRUE;
-		}
-	}
-	*/
-    
-    return FALSE;
+    return ret;
 }
 
 
@@ -867,6 +822,11 @@ void scim_bridge_client_imcontext_get_preedit_string (GtkIMContext *context, gch
     scim_bridge_pdebugln (4, "scim_bridge_client_imcontext_get_preedit_string ()");
 
     ScimBridgeClientIMContext *imcontext = SCIM_BRIDGE_CLIENT_IMCONTEXT (context);
+
+    if (imcontext->slave_preedit) {
+        gtk_im_context_get_preedit_string (imcontext->slave, str, pango_attrs, cursor_pos);
+        return;
+    }
     
     if (scim_bridge_client_is_messenger_opened () && imcontext != NULL && imcontext->preedit_shown) {
         const size_t preedit_string_length = strlen (imcontext->preedit_string);
@@ -938,8 +898,6 @@ void scim_bridge_client_imcontext_focus_out (GtkIMContext *context)
         if (imcontext->enabled) {
             scim_bridge_client_imcontext_set_preedit_shown (imcontext, FALSE);
             scim_bridge_client_imcontext_update_preedit (imcontext);
-        } else {
-            gtk_im_context_reset (GTK_IM_CONTEXT (fallback_imcontext));
         }
     }
     if (scim_bridge_client_is_messenger_opened () && imcontext != NULL) {
@@ -1010,4 +968,41 @@ void scim_bridge_client_imcontext_set_preedit_enabled (GtkIMContext *context, gb
             }
         }
     }
+}
+
+static void
+gtk_im_slave_commit_cb (
+    GtkIMContext *context,
+    const char *str,
+    ScimBridgeClientIMContext *imcontext
+) {
+    g_return_if_fail(str);
+    g_signal_emit_by_name(imcontext, "commit", str);
+}
+
+static void
+gtk_im_slave_preedit_changed_cb (
+    GtkIMContext *context,
+    ScimBridgeClientIMContext *imcontext
+) {
+    imcontext->slave_preedit = TRUE;
+    g_signal_emit_by_name(imcontext, "preedit-changed");
+}
+
+static void
+gtk_im_slave_preedit_start_cb (
+    GtkIMContext *context,
+    ScimBridgeClientIMContext *imcontext
+) {
+    imcontext->slave_preedit = TRUE;
+    g_signal_emit_by_name(imcontext, "preedit-start");
+}
+
+static void
+gtk_im_slave_preedit_end_cb (
+    GtkIMContext *context,
+    ScimBridgeClientIMContext *imcontext
+) {
+    imcontext->slave_preedit = FALSE;
+    g_signal_emit_by_name(imcontext, "preedit-end");
 }
