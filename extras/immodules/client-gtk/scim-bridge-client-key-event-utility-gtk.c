@@ -101,13 +101,13 @@ void scim_bridge_key_event_gdk_to_bridge (ScimBridgeKeyEvent *bridge_key_event, 
     if (key_event->state & GDK_LOCK_MASK || key_event->keyval == GDK_KEY_Caps_Lock) scim_bridge_key_event_set_caps_lock_down (bridge_key_event, TRUE);
     if (key_event->state & GDK_CONTROL_MASK || key_event->keyval == GDK_KEY_Control_L || key_event->keyval == GDK_KEY_Control_R) scim_bridge_key_event_set_control_down (bridge_key_event, TRUE);
     if (key_event->state & GDK_MOD1_MASK || key_event->keyval == GDK_KEY_Alt_L || key_event->keyval == GDK_KEY_Alt_R) scim_bridge_key_event_set_alt_down (bridge_key_event, TRUE);
-    /*if (key_event->state & GDK_MOD2_MASK) scim_bridge_key_event_set_num_lock_down (bridge_key_event, TRUE);*/
+    if (key_event->state & GDK_MOD2_MASK) scim_bridge_key_event_set_num_lock_down (bridge_key_event, TRUE);
 #else
     if (key_event->state & GDK_SHIFT_MASK || key_event->keyval == GDK_Shift_L || key_event->keyval == GDK_Shift_R) scim_bridge_key_event_set_shift_down (bridge_key_event, TRUE);
     if (key_event->state & GDK_LOCK_MASK || key_event->keyval == GDK_Caps_Lock) scim_bridge_key_event_set_caps_lock_down (bridge_key_event, TRUE);
     if (key_event->state & GDK_CONTROL_MASK || key_event->keyval == GDK_Control_L || key_event->keyval == GDK_Control_R) scim_bridge_key_event_set_control_down (bridge_key_event, TRUE);
     if (key_event->state & GDK_MOD1_MASK || key_event->keyval == GDK_Alt_L || key_event->keyval == GDK_Alt_R) scim_bridge_key_event_set_alt_down (bridge_key_event, TRUE);
-    /*if (key_event->state & GDK_MOD2_MASK) scim_bridge_key_event_set_num_lock_down (bridge_key_event, TRUE);*/
+    if (key_event->state & GDK_MOD2_MASK) scim_bridge_key_event_set_num_lock_down (bridge_key_event, TRUE);
 #endif
 
     if (key_event->type != GDK_KEY_RELEASE) {
