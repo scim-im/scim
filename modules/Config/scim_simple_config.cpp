@@ -382,9 +382,6 @@ SimpleConfig::flush()
         // Reload config to ensure user made modification won't lost.
         load_all_config ();
 
-        std::ofstream os (userconf.c_str ());
-        if (!os) return false;
-
         KeyValueRepository::iterator i;
         std::vector<String>::iterator j;
 
@@ -408,6 +405,8 @@ SimpleConfig::flush()
 
         m_config [String (SCIM_CONFIG_UPDATE_TIMESTAMP)] = String (buf);
 
+        std::ofstream os (userconf.c_str ());
+        if (!os) return false;
         save_config (os);
         return true;
     }
