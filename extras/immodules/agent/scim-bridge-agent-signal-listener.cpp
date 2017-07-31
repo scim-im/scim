@@ -64,7 +64,7 @@ static void sig_quit (int sig)
 {
     if (!signal_occurred) {
         signal_occurred = true;
-        send (pipe_in, '\0', sizeof (char), MSG_NOSIGNAL);
+        send (pipe_in, "", sizeof (char), MSG_NOSIGNAL);
     }
 }
 
