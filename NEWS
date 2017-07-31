@@ -1,0 +1,4 @@
+2017-07-31 marguerite <marguerite@opensuse.org> 1.4.18 bugfix
+* define G_GNUC_BEGIN/END_IGNORE_DEPRECATIONS in scim-private.h
+* fixed a no return in non void function error
+* FTBFS with GCC-7: invalid conversion from 'char' to 'const void*'

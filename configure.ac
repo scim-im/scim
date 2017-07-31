@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script
-AC_INIT([scim],[1.4.17],[https://github.com/scim-im/scim])
+AC_INIT([scim],[1.4.18],[https://github.com/scim-im/scim])
 AC_CONFIG_SRCDIR([src/scim.h])
 
 
@@ -9,7 +9,7 @@ AC_CONFIG_SRCDIR([src/scim.h])
 
 SCIM_MAJOR_VERSION=1
 SCIM_MINOR_VERSION=4
-SCIM_MICRO_VERSION=17
+SCIM_MICRO_VERSION=18
 
 SCIM_VERSION=$SCIM_MAJOR_VERSION.$SCIM_MINOR_VERSION.$SCIM_MICRO_VERSION
 
