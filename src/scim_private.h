@@ -46,6 +46,17 @@
   #define bind_textdomain_codeset(domain,codeset)
 #endif
 
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)
+#define G_GNUC_BEGIN_IGNORE_DEPRECATIONS                \
+  _Pragma ("GCC diagnostic push")                       \
+  _Pragma ("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define G_GNUC_END_IGNORE_DEPRECATIONS                  \
+  _Pragma ("GCC diagnostic pop")
+#else
+#define G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+#define G_GNUC_END_IGNORE_DEPRECATIONS
+#endif
+
 #endif //__SCIM_PRIVATE_H
 
 /*
