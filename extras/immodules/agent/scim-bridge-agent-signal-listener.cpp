@@ -32,6 +32,11 @@
 #include "scim-bridge-agent-protected.h"
 #include "scim-bridge-agent-signal-listener.h"
 
+/* GCC version */
+#define GCC_VERSION (__GNUC__ * 10000 \
+                     + __GNUC_MINOR__ * 100 \
+                     + __GNUC_PATCHLEVEL__)
+
 /* Static variable */
 static bool signal_occurred = FALSE;
 
@@ -64,7 +69,12 @@ static void sig_quit (int sig)
 {
     if (!signal_occurred) {
         signal_occurred = true;
-        send (pipe_in, "", sizeof (char), MSG_NOSIGNAL);
+        if (GCC_VERSION >= 70000) {
+            send (pipe_in, "", sizeof (char), MSG_NOSIGNAL);
+        }
+        else {
+            send (pipe_in, '\0', sizeof (char), MSG_NOSIGNAL);
+        }
     }
 }
 
