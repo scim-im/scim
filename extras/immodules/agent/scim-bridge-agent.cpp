@@ -249,16 +249,16 @@ retval_t ScimBridgeAgentImpl::run_event_loop ()
             } else {
                 if (socket_fd > max_fd) max_fd = socket_fd;
                 if (triggers & SCIM_BRIDGE_AGENT_EVENT_READ) {
-                    scim_bridge_pdebugln (1, "FD (%d) is registred as a reading socket", socket_fd);
+                    scim_bridge_pdebugln (1, "FD (%d) is registered as a reading socket", socket_fd);
                     FD_SET (socket_fd, &read_set);
                 }
                 if (triggers & SCIM_BRIDGE_AGENT_EVENT_WRITE) {
                     FD_SET (socket_fd, &write_set);
-                    scim_bridge_pdebugln (1, "FD (%d) is registred as a writing socket", socket_fd);
+                    scim_bridge_pdebugln (1, "FD (%d) is registered as a writing socket", socket_fd);
                 }
                 if (triggers & SCIM_BRIDGE_AGENT_EVENT_ERROR) {
                     FD_SET (socket_fd, &error_set);
-                    scim_bridge_pdebugln (1, "FD (%d) is registred as a error socket", socket_fd);
+                    scim_bridge_pdebugln (1, "FD (%d) is registered as a error socket", socket_fd);
                 }
             }
             ++i;
