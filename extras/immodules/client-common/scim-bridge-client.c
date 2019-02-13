@@ -1569,7 +1569,7 @@ retval_t scim_bridge_client_reset_imcontext (const ScimBridgeClientIMContext *im
     }
 
     if (pending_response.status == RESPONSE_SUCCEEDED) {
-        scim_bridge_pdebugln (6, "reseted: id = %d", id);
+        scim_bridge_pdebugln (6, "reset: id = %d", id);
         pending_response.header = NULL;
         pending_response.status = RESPONSE_DONE;
         return RETVAL_SUCCEEDED;
