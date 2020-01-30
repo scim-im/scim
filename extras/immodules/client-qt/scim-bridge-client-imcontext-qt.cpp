@@ -20,16 +20,12 @@
 #include <cassert>
 #include <string>
 
-#ifdef QT4
 #include <QColor>
 #include <QInputMethodEvent>
 #include <QPalette>
 #include <QTextCharFormat>
 
-#ifdef Q_WS_X11
 #include <QX11Info>
-#endif
-#endif
 
 #include "scim-bridge-output.h"
 #include "scim-bridge-string.h"
@@ -39,13 +35,11 @@
 #include "scim-bridge-client-imcontext-qt.h"
 #include "scim-bridge-client-key-event-utility-qt.h"
 
-#ifdef QT4
 using namespace std;
 
 using namespace Qt;
 
 typedef QInputMethodEvent::Attribute QAttribute;
-#endif
 
 /* Static variables */
 class ScimBridgeClientIMContextImpl;
@@ -66,22 +60,16 @@ class ScimBridgeClientIMContextImpl: public _ScimBridgeClientIMContext
         bool x11FilterEvent (QWidget *widget, XEvent *event);
         bool filterEvent (const QEvent *event);
 
-#ifdef QT4
         void update ();
         QString identifierName ();
         QString language ();
 
-        void setFocusWidget (QWidget *widget);
+        bool isValid() const Q_DECL_OVERRIDE;
+        void setFocusObject (QObject *object) Q_DECL_OVERRIDE;
         void widgetDestroyed (QWidget *widget);
 
         bool isComposing () const;
         void mouseHandler (int offset, QMouseEvent *event);
-#else
-        void setFocus ();
-        void unsetFocus ();
-        void setMicroFocus (int x, int y, int w, int h, QFont *font = 0);
-        void mouseHandler (int offset, QEvent::Type type, ButtonState button, ButtonState state);
-#endif
 
         void reset ();
 
@@ -103,11 +91,9 @@ class ScimBridgeClientIMContextImpl: public _ScimBridgeClientIMContext
         scim_bridge_imcontext_id_t get_id () const;
         void set_id (scim_bridge_imcontext_id_t new_id);
 
-#ifdef QT4
         bool get_surrounding_text (unsigned int before_max, unsigned int after_max, char **string, int *cursor_position);
         bool delete_surrounding_text (int offset, int length);
         bool replace_surrounding_text (const char *text, int cursor_position);
-#endif
 
     private:
 
@@ -117,12 +103,7 @@ class ScimBridgeClientIMContextImpl: public _ScimBridgeClientIMContext
 
         QString preedit_string;
 
-#ifdef QT4
         QList<QAttribute> preedit_attributes;
-#else
-        int preedit_selected_offset;
-        int preedit_selected_length;
-#endif
 
         int preedit_cursor_position;
 
@@ -165,12 +146,7 @@ ScimBridgeClientIMContextImpl::ScimBridgeClientIMContextImpl (): id (-1), preedi
 {
     scim_bridge_pdebugln (5, "ScimBridgeClientIMContextImpl::ScimBridgeClientIMContextImpl ()");
 
-#ifdef QT4
     preedit_attributes.push_back (QAttribute (QInputMethodEvent::Cursor, preedit_cursor_position, true, 0));
-#else
-    preedit_selected_offset = 0;
-    preedit_selected_length = 0;
-#endif
 
     if (!scim_bridge_client_is_messenger_opened ()) {
         scim_bridge_perrorln ("The messenger is now down");
@@ -197,8 +173,6 @@ ScimBridgeClientIMContextImpl::~ScimBridgeClientIMContextImpl ()
     }
 }
 
-#ifdef QT4
-
 QString ScimBridgeClientIMContextImpl::identifierName ()
 {
     return SCIM_BRIDGE_IDENTIFIER_NAME;
@@ -216,16 +190,20 @@ void ScimBridgeClientIMContextImpl::widgetDestroyed (QWidget *widget)
     update ();
 }
 
-void ScimBridgeClientIMContextImpl::setFocusWidget (QWidget *widget)
+bool ScimBridgeClientIMContextImpl::isValid() const
 {
-    scim_bridge_pdebugln (4, "ScimBridgeClientIMContextImpl::setFocusWidget ()");
-    QInputContext::setFocusWidget (widget);
-	if (widget == NULL) {
-    	focus_out ();
-	}
-	else {
-    	focus_in ();
-	}
+    return true;
+}
+
+void ScimBridgeClientIMContextImpl::setFocusObject (QObject *object)
+{
+    scim_bridge_pdebugln (4, "ScimBridgeClientIMContextImpl::setFocusObject ()");
+    QPlatformInputContext::setFocusObject (object);
+    if (object == NULL) {
+        focus_out ();
+    } else {
+        focus_in ();
+    }
     update ();
 }
 
@@ -276,43 +254,10 @@ bool ScimBridgeClientIMContextImpl::replace_surrounding_text (const char *text, 
     return false;
 }
 
-#else
-
-void ScimBridgeClientIMContextImpl::setFocus ()
-{
-    scim_bridge_pdebugln (4, "ScimBridgeClientIMContextImpl::setFocus ()");
-    
-    focus_in ();
-}
-
-
-void ScimBridgeClientIMContextImpl::unsetFocus ()
-{
-    scim_bridge_pdebugln (4, "ScimBridgeClientIMContextImpl::unsetFocus ()");
-    
-    focus_out ();
-}
-
-
-void ScimBridgeClientIMContextImpl::setMicroFocus (int x, int y, int w, int h, QFont *qfont)
-{
-    scim_bridge_pdebugln (4, "ScimBridgeClientIMContextImpl::setMicroFocus ()");
-
-    QPoint new_cursor_location (x, y + h);
-    set_cursor_location (new_cursor_location);
-}
-
-void ScimBridgeClientIMContextImpl::mouseHandler (int offset, QEvent::Type type, ButtonState button, ButtonState state)
-{
-}
-#endif
-
-
 bool ScimBridgeClientIMContextImpl::x11FilterEvent (QWidget *widget, XEvent *xevent)
 {
     scim_bridge_pdebugln (5, "ScimBridgeClientIMContextImpl::x11FilterEvent ()");
 
-#ifdef Q_WS_X11
     if (key_event_forwarded || (xevent->type != XKeyPress && xevent->type != XKeyRelease)) return false;
     
     if (focused_imcontext != this) focus_in ();
@@ -331,17 +276,14 @@ bool ScimBridgeClientIMContextImpl::x11FilterEvent (QWidget *widget, XEvent *xev
             return consumed;
         }
     }
-#endif
 
     return false;
 }
-
 
 bool ScimBridgeClientIMContextImpl::filterEvent (const QEvent *qevent)
 {
     scim_bridge_pdebugln (5, "ScimBridgeClientIMContextImpl::filterEvent ()");
 
-#ifndef Q_WS_X11
     if (key_event_forwarded || (qevent->type () != QEvent::KeyPress && qevent->type () != QEvent::KeyRelease)) return false;
     
     if (focused_imcontext != this) focus_in ();
@@ -364,7 +306,6 @@ bool ScimBridgeClientIMContextImpl::filterEvent (const QEvent *qevent)
             return consumed;
         }
     }
-#endif
 
     return false;
 }
@@ -375,13 +316,8 @@ void ScimBridgeClientIMContextImpl::reset ()
     scim_bridge_pdebugln (5, "ScimBridgeClientIMContextImpl::reset ()");
 
     preedit_cursor_position = 0;
-#ifdef QT4
     preedit_attributes.clear ();
     preedit_attributes.push_back (QAttribute (QInputMethodEvent::Cursor, preedit_cursor_position, true, 0));
-#else
-    preedit_selected_offset = 0;
-    preedit_selected_length = 0;
-#endif
     preedit_string = "";
 
     if (scim_bridge_client_is_messenger_opened ()) {
@@ -389,10 +325,6 @@ void ScimBridgeClientIMContextImpl::reset ()
             scim_bridge_perrorln ("An IOException at filterEvent ()");
         }
     }
-
-#ifndef QT4
-    QInputContext::reset ();
-#endif
 }
 
 
@@ -469,20 +401,16 @@ void ScimBridgeClientIMContextImpl::commit ()
     scim_bridge_pdebugln (5, "ScimBridgeClientIMContextImpl::commit ()");
     
     if (commit_string.length () <= 0) return;
-#ifdef QT4
     scim_bridge_pdebugln (9, "commit string: %s", commit_string.toUtf8 ().data ());
-#endif
+
+    QObject *input = qApp->focusObject();
+    if (!input) return;
 
     const bool is_composing = isComposing ();
 
-#ifdef QT4
     QInputMethodEvent commit_event;
     commit_event.setCommitString (commit_string);
-    sendEvent (commit_event);
-#else
-    if (!is_composing) sendIMEvent (QEvent::IMStart);
-    sendIMEvent (QEvent::IMEnd, commit_string);
-#endif
+    QCoreApplication::sendEvent (input, &commit_event);
 
     if (is_composing) update_preedit ();
 }
@@ -495,21 +423,9 @@ void ScimBridgeClientIMContextImpl::forward_key_event (const ScimBridgeKeyEvent 
     QWidget *focused_widget = qApp->focusWidget ();
     if (focused_widget != NULL) {
         key_event_forwarded = true;
-#ifdef Q_WS_X11
-        const WId window_id = focused_widget->winId ();
-#ifdef QT4
-        Display *x11_display = QX11Info::display();
-#else
-        Display *x11_display = qt_xdisplay ();
-#endif
-        XEvent *x_event = scim_bridge_key_event_bridge_to_x11 (key_event, x11_display, window_id);
-        qApp->x11ProcessEvent (x_event);
-        free (x_event);
-#else
         QKeyEvent *forwarded_key_event = scim_bridge_key_event_bridge_to_qt (key_event);
         QApplication::sendEvent (focused_widget, forwarded_key_event);
         delete forwarded_key_event;
-#endif
         key_event_forwarded = false;
     } else {
         scim_bridge_pdebugln (4, "No widget is focused");
@@ -525,13 +441,8 @@ void ScimBridgeClientIMContextImpl::set_preedit_shown (bool shown)
     if (!preedit_shown) {
         preedit_string = "";
         preedit_cursor_position = 0;
-#ifdef QT4
         preedit_attributes.clear ();
         preedit_attributes.push_back (QAttribute (QInputMethodEvent::Cursor, preedit_cursor_position, true, 0));
-#else
-        preedit_selected_offset = 0;
-        preedit_selected_length = 0;
-#endif
     }
 }
 
@@ -554,13 +465,8 @@ void ScimBridgeClientIMContextImpl::set_preedit_attributes (ScimBridgeAttribute*
 {
     scim_bridge_pdebugln (5, "ScimBridgeClientIMContextImpl::set_preedit_attribute ()");
     
-#ifdef QT4
     preedit_attributes.clear ();
     preedit_attributes.push_back (QAttribute (QInputMethodEvent::Cursor, preedit_cursor_position, true, 0));
-#else
-    preedit_selected_offset = 0;
-    preedit_selected_length = 0;
-#endif
 
     for (int i = 0; i < attribute_count; ++i) {
         const ScimBridgeAttribute *attribute = attributes[i];
@@ -570,7 +476,6 @@ void ScimBridgeClientIMContextImpl::set_preedit_attributes (ScimBridgeAttribute*
         const scim_bridge_attribute_type_t attribute_type = scim_bridge_attribute_get_type (attribute);
         const scim_bridge_attribute_value_t attribute_value = scim_bridge_attribute_get_value (attribute);
 
-#ifdef QT4
         const size_t attribute_length = attribute_end - attribute_begin;
 
         const QWidget *focused_widget = qApp->focusWidget ();
@@ -637,13 +542,6 @@ void ScimBridgeClientIMContextImpl::set_preedit_attributes (ScimBridgeAttribute*
         default:
             break;
         }
-#else
-        if (attribute_type == ATTRIBUTE_DECORATE && (attribute_value == SCIM_BRIDGE_ATTRIBUTE_DECORATE_HIGHLIGHT || attribute_value == SCIM_BRIDGE_ATTRIBUTE_DECORATE_REVERSE)) {
-            preedit_selected_offset = attribute_begin;
-            preedit_selected_length = attribute_end - attribute_begin;
-            break;
-        }
-#endif
     }
 }
 
@@ -652,26 +550,13 @@ void ScimBridgeClientIMContextImpl::update_preedit ()
 {
     scim_bridge_pdebugln (5, "ScimBridgeClientIMContextImpl::update_preedit ()");
 
-#ifdef QT4
+    QObject *input = qApp->focusObject();
+    if (!input) return;
+
     preedit_attributes[0] = QAttribute (QInputMethodEvent::Cursor, preedit_cursor_position, true, 0);
     QInputMethodEvent im_event (preedit_string, preedit_attributes);
-    sendEvent (im_event);
+    QCoreApplication::sendEvent(input, &im_event);
     update ();
-#else
-    if (preedit_shown) {
-        if (!isComposing ()) sendIMEvent (QEvent::IMStart);
-        const size_t preedit_length = preedit_string.length ();
-
-        size_t cursor_position = preedit_cursor_position;
-        if (cursor_position > preedit_length) cursor_position = preedit_length;
-
-        size_t selected_length = preedit_selected_length;
-        if (cursor_position + selected_length > preedit_length) selected_length = preedit_length - cursor_position;
-        sendIMEvent (QEvent::IMCompose, preedit_string, cursor_position, selected_length);
-    } else {
-        if (isComposing ()) sendIMEvent (QEvent::IMEnd);
-    }
-#endif
 }
 
 
@@ -780,37 +665,22 @@ void scim_bridge_client_imcontext_update_preedit (ScimBridgeClientIMContext *imc
 
 boolean scim_bridge_client_imcontext_get_surrounding_text (ScimBridgeClientIMContext *imcontext, int before_max, int after_max, char **string, int *cursor_position)
 {
-#ifdef QT4
     ScimBridgeClientIMContextImpl *imcontext_impl = static_cast<ScimBridgeClientIMContextImpl*> (imcontext);
     return imcontext_impl->get_surrounding_text (before_max, after_max, string, cursor_position);
-#else
-    scim_bridge_perrorln ("FIXME: scim_bridge_client_imcontext_get_surrounding_text () is not yet implemented.");
-    return FALSE;
-#endif
 }
 
 
 boolean scim_bridge_client_imcontext_delete_surrounding_text (ScimBridgeClientIMContext *imcontext, int offset, int length)
 {
-#ifdef QT4
     ScimBridgeClientIMContextImpl *imcontext_impl = static_cast<ScimBridgeClientIMContextImpl*> (imcontext);
     return imcontext_impl->delete_surrounding_text (offset, length);
-#else
-    scim_bridge_perrorln ("FIXME: scim_bridge_client_imcontext_delete_surrounding_text () is not yet implemented.");
-    return FALSE;
-#endif
 }
 
 
 boolean scim_bridge_client_imcontext_replace_surrounding_text (ScimBridgeClientIMContext *imcontext, int cursor_position, const char *string)
 {
-#ifdef QT4
     ScimBridgeClientIMContextImpl *imcontext_impl = static_cast<ScimBridgeClientIMContextImpl*> (imcontext);
     return imcontext_impl->replace_surrounding_text (string, cursor_position);
-#else
-    scim_bridge_perrorln ("FIXME: scim_bridge_client_imcontext_replace_surrounding_text () is not yet implemented.");
-    return FALSE;
-#endif
 }
 
 

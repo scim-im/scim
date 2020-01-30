@@ -23,9 +23,7 @@
 
 #include "scim-bridge-client-qt.h"
 
-#ifdef QT4
 using namespace Qt;
-#endif
 
 /* Static variables */
 static ScimBridgeClientQt *client = NULL;

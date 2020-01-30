@@ -32,7 +32,6 @@
 
 #include "scim-bridge-client-common-qt.h"
 
-#ifdef Q_WS_X11
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
@@ -40,7 +39,6 @@ static const int XKeyPress = KeyPress;
 static const int XKeyRelease = KeyRelease;
 #undef KeyPress
 #undef KeyRelease
-#endif
 
 class QKeyEvent;
 
@@ -60,7 +58,6 @@ QKeyEvent *scim_bridge_key_event_bridge_to_qt (const ScimBridgeKeyEvent *bridge_
  */
 ScimBridgeKeyEvent *scim_bridge_key_event_qt_to_bridge (const QKeyEvent *qt_key_event);
 
-#ifdef Q_WS_X11
 /**
  * Translate a key event from scim-bridge into X11.
  *
@@ -79,6 +76,5 @@ XEvent *scim_bridge_key_event_bridge_to_x11 (const ScimBridgeKeyEvent *bridge_ke
  * @return The key event from scim-bridge.
  */
 ScimBridgeKeyEvent* scim_bridge_key_event_x11_to_bridge (const XEvent *x11_event);
-#endif
 
 #endif                                            /*SCIMBRIDGECLIENTKEYEVENTUTILITYQT_H_*/

@@ -22,15 +22,10 @@
 #include <cstdlib>
 #include <map>
 
-#ifdef QT4
 #include <QApplication>
 #include <QChar>
 #include <QEvent>
 #include <QKeyEvent>
-#else
-#include <qapplication.h>
-#include <qkeycode.h>
-#endif
 
 #include "scim-bridge-output.h"
 #include "scim-bridge-client-key-event-utility-qt.h"
@@ -82,13 +77,8 @@ static void static_initialize ()
     register_key (Qt::Key_Up, SCIM_BRIDGE_KEY_CODE_Up);
     register_key (Qt::Key_Right, SCIM_BRIDGE_KEY_CODE_Right);
     register_key (Qt::Key_Down, SCIM_BRIDGE_KEY_CODE_Down);
-#ifdef QT4
     register_key (Qt::Key_PageUp, SCIM_BRIDGE_KEY_CODE_Prior);
-    register_key (Qt::Key_PageUp, SCIM_BRIDGE_KEY_CODE_Next);
-#else
-    register_key (Qt::Key_Prior, SCIM_BRIDGE_KEY_CODE_Prior);
-    register_key (Qt::Key_Next, SCIM_BRIDGE_KEY_CODE_Next);
-#endif
+    register_key (Qt::Key_PageDown, SCIM_BRIDGE_KEY_CODE_Next);
     register_key (Qt::Key_CapsLock, SCIM_BRIDGE_KEY_CODE_Caps_Lock);
     register_key (Qt::Key_NumLock, SCIM_BRIDGE_KEY_CODE_Num_Lock);
     register_key (Qt::Key_ScrollLock, SCIM_BRIDGE_KEY_CODE_Scroll_Lock);
@@ -184,34 +174,17 @@ QKeyEvent *scim_bridge_key_event_bridge_to_qt (const ScimBridgeKeyEvent *bridge_
     if (bridge_key_code < 0x1000) {
         if (bridge_key_code >= SCIM_BRIDGE_KEY_CODE_a && bridge_key_code <= SCIM_BRIDGE_KEY_CODE_z) {
             ascii_code = bridge_key_code;
-#ifdef QT4
-            qt_key_code = QChar (ascii_code).toUpper ().toAscii ();
-#else
-            qt_key_code = QChar (ascii_code).upper ();
-#endif
+            qt_key_code = QChar (ascii_code).toUpper ().toLatin1 ();
         } else {
             ascii_code = bridge_key_code;
             qt_key_code = bridge_key_code;
         }
     } else if (bridge_key_code < 0x3000) {
-#ifdef Q_WS_WIN
         qt_key_code = bridge_key_code;
     } else {
-        qt_key_code = Key_unknown;
+        qt_key_code = Qt::Key_unknown;
     }
-#else
-        qt_key_code = bridge_key_code | Qt::UNICODE_ACCEL;
-    } else {
-        map<scim_bridge_key_code_t, int>::iterator iter = bridge_to_qt_key_map.find (bridge_key_code);
-        if (iter != bridge_to_qt_key_map.end ()) {
-            qt_key_code = iter->second;
-        } else {
-            qt_key_code = Qt::Key_unknown;
-        }
-    }
-#endif
 
-#ifdef QT4
     Qt::KeyboardModifiers modifiers = Qt::NoModifier;
 
     if (scim_bridge_key_event_is_alt_down (bridge_key_event)) modifiers |= Qt::AltModifier;
@@ -220,16 +193,6 @@ QKeyEvent *scim_bridge_key_event_bridge_to_qt (const ScimBridgeKeyEvent *bridge_
     if (scim_bridge_key_event_is_meta_down (bridge_key_event)) modifiers |= Qt::MetaModifier;
 
     return new QKeyEvent (type, qt_key_code, modifiers);
-#else
-    unsigned int modifiers = 0;
-
-    if (scim_bridge_key_event_is_alt_down (bridge_key_event)) modifiers |= Qt::AltButton;
-    if (scim_bridge_key_event_is_shift_down (bridge_key_event)) modifiers |= Qt::ShiftButton;
-    if (scim_bridge_key_event_is_control_down (bridge_key_event)) modifiers |= Qt::ControlButton;
-    if (scim_bridge_key_event_is_meta_down (bridge_key_event)) modifiers |= Qt::MetaButton;
-
-    return new QKeyEvent (type, qt_key_code, ascii_code, modifiers);
-#endif
 }
 
 
@@ -239,7 +202,6 @@ ScimBridgeKeyEvent *scim_bridge_key_event_qt_to_bridge (const QKeyEvent *key_eve
     
     ScimBridgeKeyEvent *bridge_key_event = scim_bridge_alloc_key_event ();
 
-#ifdef QT4
     const Qt::KeyboardModifiers modifiers = key_event->modifiers ();
 
     if (modifiers & Qt::ShiftModifier) {
@@ -254,22 +216,6 @@ ScimBridgeKeyEvent *scim_bridge_key_event_qt_to_bridge (const QKeyEvent *key_eve
     if (modifiers & Qt::MetaModifier) {
         scim_bridge_key_event_set_meta_down (bridge_key_event, TRUE);
     }
-#else
-    const int modifiers = key_event->state ();
-
-    if (modifiers & Qt::ShiftButton) {
-        scim_bridge_key_event_set_shift_down (bridge_key_event, TRUE);
-    }
-    if (modifiers & Qt::ControlButton) {
-        scim_bridge_key_event_set_control_down (bridge_key_event, TRUE);
-    }
-    if (modifiers & Qt::AltButton) {
-        scim_bridge_key_event_set_alt_down (bridge_key_event, TRUE);
-    }
-    if (modifiers & Qt::MetaButton) {
-        scim_bridge_key_event_set_meta_down (bridge_key_event, TRUE);
-    }
-#endif
 
     const int qt_key_code = key_event->key ();
     int bridge_key_code;
@@ -294,17 +240,9 @@ ScimBridgeKeyEvent *scim_bridge_key_event_qt_to_bridge (const QKeyEvent *key_eve
         }
         
         if (!scim_bridge_key_event_is_caps_lock_down (bridge_key_event) ^ scim_bridge_key_event_is_shift_down (bridge_key_event)) {
-#ifdef QT4
 	        bridge_key_code = QChar (qt_key_code).toLower ().unicode ();
-#else
-	        bridge_key_code = QChar (qt_key_code).lower ().unicode ();
-#endif
 	    } else {
-#ifdef QT4
 	        bridge_key_code = QChar (qt_key_code).toUpper ().unicode ();
-#else
-	        bridge_key_code = QChar (qt_key_code).upper ().unicode ();
-#endif
 	    }
     } else {
         map<int, scim_bridge_key_code_t>::iterator iter = qt_to_bridge_key_map.find (qt_key_code);
@@ -324,7 +262,6 @@ ScimBridgeKeyEvent *scim_bridge_key_event_qt_to_bridge (const QKeyEvent *key_eve
 }
 
 
-#ifdef Q_WS_X11
 XEvent *scim_bridge_key_event_bridge_to_x11 (const ScimBridgeKeyEvent *bridge_key_event, Display *display, WId window_id)
 {
     XEvent *x_event = static_cast<XEvent*> (malloc (sizeof (XEvent)));
@@ -412,5 +349,3 @@ ScimBridgeKeyEvent* scim_bridge_key_event_x11_to_bridge (const XEvent *x_event)
     
     return bridge_key_event;
 }
-
-#endif
