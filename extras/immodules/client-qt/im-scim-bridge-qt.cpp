@@ -19,14 +19,10 @@
 
 #include <cassert>
 
-#ifdef QT4
 #include <Qt>
-#include <QInputContextPlugin>
+#include <qpa/qplatforminputcontextplugin_p.h>
 
 using namespace Qt;
-#else
-#include <qinputcontextplugin.h>
-#endif
 
 #include "scim-bridge.h"
 #include "scim-bridge-client-common-qt.h"
@@ -37,8 +33,10 @@ using namespace Qt;
 static ScimBridgeClientQt *client = NULL;
 
 /* The class Definition */
-class ScimBridgeInputContextPlugin: public QInputContextPlugin
+class ScimBridgeInputContextPlugin: public QPlatformInputContextPlugin
 {
+        Q_OBJECT
+        Q_PLUGIN_METADATA(IID QPlatformInputContextFactoryInterface_iid FILE "scim.json")
 
     private:
 
@@ -59,7 +57,7 @@ class ScimBridgeInputContextPlugin: public QInputContextPlugin
 
         QString description (const QString &key);
         
-        QInputContext *create (const QString &key);
+        ScimBridgeClientIMContext *create (const QString &key, const QStringList &param) Q_DECL_OVERRIDE;
 
         QString displayName (const QString &key);
 
@@ -68,7 +66,6 @@ class ScimBridgeInputContextPlugin: public QInputContextPlugin
 
 /* Implementations */
 QStringList ScimBridgeInputContextPlugin::scim_languages;
-
 
 ScimBridgeInputContextPlugin::ScimBridgeInputContextPlugin ()
 {
@@ -107,13 +104,10 @@ QString ScimBridgeInputContextPlugin::description (const QString &key)
 }
 
 
-QInputContext *ScimBridgeInputContextPlugin::create (const QString &key)
+ScimBridgeClientIMContext *ScimBridgeInputContextPlugin::create (const QString &key, const QStringList &param)
 {
-#ifdef QT4
+    Q_UNUSED(param);
     if (key.toLower () != SCIM_BRIDGE_IDENTIFIER_NAME) {
-#else
-    if (key.lower () != SCIM_BRIDGE_IDENTIFIER_NAME) {
-#endif
         return NULL;
     } else {
         if (client == NULL) client = new ScimBridgeClientQt ();
@@ -127,8 +121,4 @@ QString ScimBridgeInputContextPlugin::displayName (const QString &key)
     return key;
 }
 
-#ifdef QT4
-Q_EXPORT_PLUGIN2 (ScimBridgeInputContextPlugin, ScimBridgeInputContextPlugin)
-#else
-Q_EXPORT_PLUGIN (ScimBridgeInputContextPlugin)
-#endif
+#include "im-scim-bridge-qt.moc"

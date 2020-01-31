@@ -27,13 +27,8 @@
 #ifndef SCIMBRIDGECOMMONQT_H_
 #define SCIMBRIDGECOMMONQT_H_
 
-#ifdef QT4
 #include <QString>
 #include <QStringList>
-#else
-#include <qstring.h>
-#include <qstringlist.h>
-#endif
 
 #include "scim-bridge.h"
 

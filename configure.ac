@@ -930,8 +930,6 @@ AC_CONFIG_FILES([Makefile
 		 extras/immodules/client-common/Makefile
 		 extras/immodules/client-gtk/gtk2/Makefile
 		 extras/immodules/client-gtk/gtk3/Makefile
-		 extras/immodules/client-qt/qt3/Makefile
-		 extras/immodules/client-qt/qt4/Makefile
 		 extras/immodules/client-clutter/Makefile
 		 extras/immodules/doc/Makefile
 		 tests/Makefile
