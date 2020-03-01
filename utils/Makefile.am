@@ -55,7 +55,8 @@ libscim_gtkutils@SCIM_EPOCH@_la_LDFLAGS= -version-info $(SCIM_CURRENT):$(SCIM_RE
 				  -export-dynamic \
 				  @LIBTOOL_EXPORT_OPTIONS@ \
 				  @LTLIBINTL@ \
-				  @GTK_LIBS@ 
+				  @GTK_LIBS@ \
+				  @X_LIBS@
 
 libscim_gtkutils@SCIM_EPOCH@_la_LIBADD= $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(X11_UTILS)
 

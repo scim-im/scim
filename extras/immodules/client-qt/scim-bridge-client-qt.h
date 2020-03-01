@@ -26,8 +26,13 @@
 #ifndef SCIMBRIDGECLIENTQT_H_
 #define SCIMBRIDGECLIENTQT_H_
 
+#if QT_VERSION >= 0x040000
 #include <QObject>
 #include <QSocketNotifier>
+#else
+#include <qobject.h>
+#include <qsocketnotifier.h>
+#endif
 
 #include "scim-bridge.h"
 #include "scim-bridge-client-imcontext-qt.h"
