@@ -42,14 +42,23 @@ if SCIM_BUILD_FRONTEND_SOCKET
 CONFIG_FRONTEND_SOCKET_MODULE	= socket.la
 endif
 
+if SCIM_BUILD_FRONTEND_IBUS
+CONFIG_FRONTEND_IBUS_MODULE	= ibus.la
+endif
+
 noinst_HEADERS		= scim_x11_ic.h \
 		  	  scim_x11_frontend.h \
-			  scim_socket_frontend.h
+			  scim_socket_frontend.h \
+			  scim_ibus_ctx.h \
+			  scim_ibus_utils.h \
+			  scim_ibus_types.h \
+			  scim_ibus_frontend.h
 
 moduledir		= $(libdir)/scim@SCIM_EPOCH@/$(SCIM_BINARY_VERSION)/FrontEnd
 
 module_LTLIBRARIES	= $(CONFIG_FRONTEND_X11_MODULE) \
-		     	  $(CONFIG_FRONTEND_SOCKET_MODULE)
+		     	  $(CONFIG_FRONTEND_SOCKET_MODULE) \
+		     	  $(CONFIG_FRONTEND_IBUS_MODULE)
 
 x11_la_SOURCES 		= scim_x11_frontend.cpp \
 			  scim_x11_ic.cpp
@@ -77,4 +86,19 @@ socket_la_LDFLAGS	= -avoid-version \
 			  @LIBTOOL_EXPORT_OPTIONS@
 
 socket_la_LIBADD	= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
+
+ibus_la_SOURCES 	= scim_ibus_frontend.cpp \
+					  scim_ibus_ctx.cpp
+
+ibus_la_CFLAGS		= @SD_CFLAGS@ @X_CFLAGS@
+
+ibus_la_CXXFLAGS	= @SD_CFLAGS@ @X_CFLAGS@
+
+ibus_la_LDFLAGS		= -avoid-version \
+		     	  -rpath $(moduledir) \
+			  -module \
+			  @LIBTOOL_EXPORT_OPTIONS@ \
+			  @SD_LIBS@
+
+ibus_la_LIBADD		= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
 

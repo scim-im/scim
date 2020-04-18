@@ -11,6 +11,7 @@ modules/Filter/scim_sctc_filter.cpp
 modules/FrontEnd/scim_socket_frontend.cpp
 modules/FrontEnd/scim_x11_frontend.cpp
 modules/FrontEnd/scim_x11_ic.cpp
+modules/FrontEnd/scim_ibus_frontend.cpp
 modules/IMEngine/scim_rawcode_imengine.cpp
 modules/IMEngine/scim_socket_imengine.cpp
 modules/SetupUI/scim_frontend_setup.cpp

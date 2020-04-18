@@ -32,7 +32,7 @@ EXTRA_DIST		= config.rpath THANKS \
 			  intltool-merge.in \
 			  intltool-update.in
 
-AUTOMAKE_OPTIONS 	= gnu
+AUTOMAKE_OPTIONS 	= gnu foreign
 SUBDIRS 		= src utils modules configs po extras data docs tests
 
 MAINTAINERCLEANFILES 	= Makefile.in \
@@ -41,11 +41,24 @@ MAINTAINERCLEANFILES 	= Makefile.in \
 			  config.h.in \
 			  $(AUX_DIST)
 
-DISTCLEANFILES		= scim.pc scim-gtkutils.pc intltool-extract intltool-merge intltool-update
+DISTCLEANFILES		= scim.pc \
+					  scim-gtkutils.pc \
+					  intltool-extract \
+					  intltool-merge \
+					  intltool-update \
+					  org.freedesktop.portal.IBus.service
 
 CLEANFILES		= *.bak *.tar.*
 
 ACLOCAL			= aclocal -I $(ac_aux_dir)
+
+dbussessionservicesdir            = @DBUS_SESSION_SERVICES_DIR@
+
+if SCIM_BUILD_FRONTEND_IBUS
+IBUS_PORTAL_SERVICE               = org.freedesktop.portal.IBus.service
+endif
+
+dbussessionservices_DATA          = $(IBUS_PORTAL_SERVICE)
 
 pkgconfigdir            = $(libdir)/pkgconfig
 
@@ -63,7 +76,12 @@ pkgconfig_DATA          = scim.pc \
 
 ACLOCAL_AMFLAGS = -I m4
 
-.PHONY: update-ChangeLog docs
+.PHONY: update-ChangeLog docs gen_dbus_service
+
+gen_dbus_service:
+	sed -e "s^SCIM_LIBEXECDIR^$(SCIM_LIBEXECDIR)^" $(top_srcdir)/org.freedesktop.portal.IBus.service.in >org.freedesktop.portal.IBus.service
+
+org.freedesktop.portal.IBus.service: gen_dbus_service
 
 update-ChangeLog:
 	/bin/sh $(top_srcdir)/svn2cl.sh --authors=$(top_srcdir)/developers -f $(top_srcdir)/ChangeLog

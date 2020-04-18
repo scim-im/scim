@@ -1,7 +1,6 @@
 # Process this file with autoconf to produce a configure script
-AC_INIT([scim],[1.4.18],[https://github.com/scim-im/scim])
+AC_INIT([scim],[1.4.19],[https://github.com/scim-im/scim])
 AC_CONFIG_SRCDIR([src/scim.h])
-
 
 ###########################################################
 ##          Some definitions of Version macros.          ##
@@ -9,7 +8,7 @@ AC_CONFIG_SRCDIR([src/scim.h])
 
 SCIM_MAJOR_VERSION=1
 SCIM_MINOR_VERSION=4
-SCIM_MICRO_VERSION=18
+SCIM_MICRO_VERSION=19
 
 SCIM_VERSION=$SCIM_MAJOR_VERSION.$SCIM_MINOR_VERSION.$SCIM_MICRO_VERSION
 
@@ -22,7 +21,7 @@ AC_SUBST(SCIM_VERSION)
 SCIM_CURRENT=10
 
 # increment any time the source changes; set to 0 if you increment CURRENT
-SCIM_REVISION=6
+SCIM_REVISION=7
 
 # increment if any interfaces have been added; set to 0
 # if any interfaces have been removed. removal has 
@@ -301,6 +300,19 @@ PKG_CHECK_MODULES(QT4, [x11, QtGui >= 4.0],
             [SCIM_HAS_QT4=yes],
             [SCIM_HAS_QT4=no])
 
+PKG_CHECK_MODULES(SD, [libsystemd >= 245],
+            [SCIM_HAS_SD=yes],
+            [SCIM_HAS_SD=no])
+
+PKG_CHECK_MODULES(DBUS, [dbus-1],
+            [SCIM_HAS_DBUS=yes],
+            [SCIM_HAS_DBUS=no])
+
+if test "$SCIM_HAS_DBUS" = "yes"; then
+    DBUS_SESSION_SERVICES_DIR=`$PKG_CONFIG --variable=session_bus_services_dir dbus-1`
+    AC_SUBST(DBUS_SESSION_SERVICES_DIR)
+fi
+
 if test "$SCIM_HAS_QT4" = "yes"; then
   if test -z "$QT4_PREFIX"; then
     QT4_PREFIX=`$PKG_CONFIG --variable=prefix QtCore`
@@ -491,6 +503,12 @@ AC_ARG_ENABLE([frontend-socket],
 	[], 
 	[enable_frontend_socket=yes])
 
+AC_ARG_ENABLE([frontend-ibus],
+	[AS_HELP_STRING([--disable-frontend-ibus],
+		[Do not build IBus FrontEnd module])],
+	[],
+	[enable_frontend_ibus=yes])
+
 AC_ARG_ENABLE([im-rawcode],
 	[AS_HELP_STRING([--disable-im-rawcode],
 		[Do not build RawCode IMEngine module])],
@@ -647,6 +665,13 @@ if test "$enable_frontend_socket" = "yes" -a "$socket_ok" = "yes"; then
 else
   SCIM_BUILD_FRONTEND_SOCKET=0
   enable_frontend_socket=no
+fi
+
+if test "$enable_frontend_ibus" = "yes" -a "$SCIM_HAS_SD" = "yes" -a "$SCIM_HAS_DBUS" = "yes"; then
+  SCIM_BUILD_FRONTEND_IBUS=1
+else
+  SCIM_BUILD_FRONTEND_IBUS=0
+  enable_frontend_ibusus=no
 fi
 
 if test "$enable_im_rawcode" = "yes"; then
@@ -914,6 +939,9 @@ AM_CONDITIONAL(SCIM_BUILD_FRONTEND_X11,
 AM_CONDITIONAL(SCIM_BUILD_FRONTEND_SOCKET,
 		[test "$enable_frontend_socket" = "yes"])
 
+AM_CONDITIONAL(SCIM_BUILD_FRONTEND_IBUS,
+		[test "$enable_frontend_ibus" = "yes"])
+
 AM_CONDITIONAL(SCIM_BUILD_IMENGINE_SOCKET,
 		[test "$enable_im_socket" = "yes"])
 
@@ -978,6 +1006,7 @@ AC_SUBST(SCIM_BUILD_CONFIG_SIMPLE)
 AC_SUBST(SCIM_BUILD_CONFIG_SOCKET)
 AC_SUBST(SCIM_BUILD_FRONTEND_X11)
 AC_SUBST(SCIM_BUILD_FRONTEND_SOCKET)
+AC_SUBST(SCIM_BUILD_FRONTEND_IBUS)
 AC_SUBST(SCIM_BUILD_IMENGINE_RAWCODE)
 AC_SUBST(SCIM_BUILD_IMENGINE_TABLE)
 AC_SUBST(SCIM_BUILD_IMENGINE_SOCKET)
@@ -1086,6 +1115,7 @@ Module options:
 
   X11 FrontEnd module      $enable_frontend_x11
   Socket FrontEnd module   $enable_frontend_socket
+  IBus FrontEnd module     $enable_frontend_ibus
 
   RawCode IMEngine module  $enable_im_rawcode
   Socket IMEngine module   $enable_im_socket
@@ -1110,6 +1140,8 @@ Module options:
   QT4 IMModule dir         $QT4_IM_MODULEDIR
   QT5 IMModule dir         $QT5_IM_MODULEDIR
   Clutter IMModule dir     $CLUTTER_IM_MODULEDIR
+
+  DBus Services dir        $DBUS_SESSION_SERVICESDIR
 
   QT3 moc program          $QT3_MOC
   QT4 moc program          $QT4_MOC
