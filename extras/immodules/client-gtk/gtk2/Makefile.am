@@ -40,11 +40,12 @@ im_scim_la_CFLAGS  =@GTK2_CFLAGS@
 
 im_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     -avoid-version -no-undefined \
-		     -module \
-		     @GTK2_LIBS@
+		     -module
 
 im_scim_la_LIBADD  = $(top_builddir)/extras/immodules/common/libscimbridgecommon.la \
-					$(top_builddir)/extras/immodules/client-common/libscimbridgeclientcommon.la
+		     $(top_builddir)/extras/immodules/client-common/libscimbridgeclientcommon.la \
+		     @X_LIBS@ \
+		     @GTK2_LIBS@
 
 endif
 
