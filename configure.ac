@@ -242,6 +242,10 @@ PKG_CHECK_MODULES(GTK3, [gtk+-3.0 >= 3.0.0 pango >= 1.1.0 gdk-pixbuf-2.0 >= 2.4.
 			[SCIM_HAS_GTK3=yes],
 			[SCIM_HAS_GTK3=no])
 
+PKG_CHECK_MODULES(GTK4, [gtk4 >= 4.0.0 pango >= 1.48.0 gdk-pixbuf-2.0 >= 2.42.0],
+			[SCIM_HAS_GTK4=yes],
+			[SCIM_HAS_GTK4=no])
+
 SCIM_HAS_GTK2_2=no
 if test "$SCIM_HAS_GTK2" = "yes"; then
   if $PKG_CONFIG --exists "gtk+-2.0 >= 2.2" ; then
@@ -259,6 +263,14 @@ if test "$SCIM_HAS_GTK3" = "yes"; then
   GTK3_LIBDIR=`$PKG_CONFIG --variable=libdir gtk+-3.0`
   GTK3_IM_MODULEDIR=$GTK3_LIBDIR/gtk-3.0/$GTK3_BINARY_VERSION/immodules
   AC_SUBST(GTK3_IM_MODULEDIR)
+fi
+
+if test "$SCIM_HAS_GTK4" = "yes"; then
+  GTK4_VERSION=4.0.0
+  GTK4_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk4`
+  GTK4_LIBDIR=`$PKG_CONFIG --variable=libdir gtk4`
+  GTK4_IM_MODULEDIR=$GTK4_LIBDIR/gtk-4.0/$GTK4_BINARY_VERSION/immodules
+  AC_SUBST(GTK4_IM_MODULEDIR)
 fi
 
 # Check if we have gthread
@@ -343,6 +355,11 @@ AC_ARG_WITH([gtk3-im-module-dir],
 	[AS_HELP_STRING([--with-gtk3-im-module-dir=dir], 
 	    [Select GTK3 immodule dir])],
 	[GTK3_IM_MODULEDIR=$with_gtk3_im_module_dir])
+
+AC_ARG_WITH([gtk4-im-module-dir],
+	[AS_HELP_STRING([--with-gtk4-im-module-dir=dir], 
+	    [Select GTK4 immodule dir])],
+	[GTK4_IM_MODULEDIR=$with_gtk4_im_module_dir])
 
 AC_ARG_WITH([qt3-moc],
 	[AS_HELP_STRING([--with-qt3-moc=file],
@@ -482,6 +499,12 @@ AC_ARG_ENABLE([gtk3-immodule],
 		[Do not build GTK3 IMModule])],
 	[],
 	[enable_gtk3_immodule=yes])
+
+AC_ARG_ENABLE([gtk4-immodule],
+	[AS_HELP_STRING([--disable-gtk4-immodule],
+		[Do not build GTK4 IMModule])],
+	[],
+	[enable_gtk4_immodule=yes])
 
 AC_ARG_ENABLE([qt3-immodule],
 	[AS_HELP_STRING([--disable-qt3-immodule],
@@ -625,6 +648,15 @@ else
   enable_gtk3_immodule=no
 fi
 
+if test "$enable_gtk4_immodule" = "yes" -a "$SCIM_HAS_GTK4" = "yes"; then
+  SCIM_BUILD_GTK4_IMMODULE=1
+  SCIM_BUILD_IMMODULE=1
+  enable_immodule=yes
+else
+  SCIM_BUILD_GTK4_IMMODULE=0
+  enable_gtk4_immodule=no
+fi
+
 if test "$enable_im_agent" = "yes"; then
   SCIM_BUILD_IM_AGENT=1
 else
@@ -655,6 +687,17 @@ if test "$enable_gtk3_immodule" = "yes" -a "$SCIM_HAS_GTK3" = "yes"; then
 else
   SCIM_BUILD_GTK3_IMMODULE=0
   enable_gtk3_immodule=no
+fi
+
+if test "$enable_gtk4_immodule" = "yes" -a "$SCIM_HAS_GTK4" = "yes"; then
+  SCIM_BUILD_GTK4_IMMODULE=1
+  SCIM_BUILD_IMMODULE=1
+  enable_immodule=yes
+  SCIM_BUILD_IM_AGENT=1
+  enable_im_agent=yes
+else
+  SCIM_BUILD_GTK4_IMMODULE=0
+  enable_gtk4_immodule=no
 fi
 
 if test "$enable_qt3_immodule" = "yes" -a "$SCIM_HAS_QT3" = "yes"; then
@@ -692,19 +735,37 @@ else
   enable_clutter_immodule=no
 fi
 
-if test "$SCIM_HAS_GTK3" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
+if test "$SCIM_HAS_GTK4" = "yes" -a "$SCIM_HAS_GTK3" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
   if test "$WANT_GTK_VERSION" = "2"; then
 	USE_GTK_VERSION="2"
-  else
+  elif test "$WANT_GTK_VERSION" = "3"; then
 	USE_GTK_VERSION="3"
+  else
+	USE_GTK_VERSION="4"
   fi
+elif test "$SCIM_HAS_GTK4" = "yes"; then
+  USE_GTK_VERSION="4"
 elif test "$SCIM_HAS_GTK3" = "yes"; then
   USE_GTK_VERSION="3"
 elif test "$SCIM_HAS_GTK2" = "yes"; then
   USE_GTK_VERSION="2"
 fi
 
-if test "$USE_GTK_VERSION" = "3"; then
+if test "$USE_GTK_VERSION" = "4"; then
+  SCIM_HAS_GTK=yes
+  GTK_LIBDIR=$GTK4_LIBDIR
+  GTK_VERSION=$GTK4_VERSION
+  GTK_MAJOR_VERSION=4
+  GTK_BINARY_VERSION=$GTK4_BINARY_VERSION
+  GTK_CFLAGS=$GTK4_CFLAGS
+  GTK_LIBS=$GTK4_LIBS
+  AC_SUBST(GTK_LIBDIR)
+  AC_SUBST(GTK_VERSION)
+  AC_SUBST(GTK_MAJOR_VERSION)
+  AC_SUBST(GTK_BINARY_VERSION)
+  AC_SUBST(GTK_CFLAGS)
+  AC_SUBST(GTK_LIBS)
+elif test "$USE_GTK_VERSION" = "3"; then
   SCIM_HAS_GTK=yes
   GTK_LIBDIR=$GTK3_LIBDIR
   GTK_VERSION=$GTK3_VERSION
@@ -753,7 +814,7 @@ else
 fi
 
 enable_tray_icon=no
-if test \( "$SCIM_HAS_GTK3"="yes" -o "$SCIM_HAS_GTK2_2" = "yes" \) -a "$no_x" != "yes"; then
+if test \( "$SCIM_HAS_GTK4"="yes" -o "$SCIM_HAS_GTK3"="yes" -o "$SCIM_HAS_GTK2_2" = "yes" \) -a "$no_x" != "yes"; then
   enable_tray_icon=yes
   AC_DEFINE(ENABLE_TRAY_ICON,1,[Enable the TrayIcon code.])
 fi
@@ -818,6 +879,9 @@ AM_CONDITIONAL(SCIM_BUILD_GTK2_IMMODULE,
 AM_CONDITIONAL(SCIM_BUILD_GTK3_IMMODULE,
         [test "$enable_gtk3_immodule" = "yes"])
 
+AM_CONDITIONAL(SCIM_BUILD_GTK4_IMMODULE,
+        [test "$enable_gtk4_immodule" = "yes"])
+
 AM_CONDITIONAL(SCIM_BUILD_QT3_IMMODULE,
         [test "$enable_qt3_immodule" = "yes"])
 
@@ -868,6 +932,7 @@ AC_SUBST(SCIM_BUILD_X11_UTILS)
 AC_SUBST(SCIM_BUILD_IM_AGENT)
 AC_SUBST(SCIM_BUILD_GTK2_IMMODULE)
 AC_SUBST(SCIM_BUILD_GTK3_IMMODULE)
+AC_SUBST(SCIM_BUILD_GTK4_IMMODULE)
 AC_SUBST(SCIM_BUILD_QT3_IMMODULE)
 AC_SUBST(SCIM_BUILD_QT4_IMMODULE)
 AC_SUBST(SCIM_BUILD_CLUTTER_IMMODULE)
@@ -930,6 +995,7 @@ AC_CONFIG_FILES([Makefile
 		 extras/immodules/client-common/Makefile
 		 extras/immodules/client-gtk/gtk2/Makefile
 		 extras/immodules/client-gtk/gtk3/Makefile
+		 extras/immodules/client-gtk/gtk4/Makefile
 		 extras/immodules/client-clutter/Makefile
 		 extras/immodules/doc/Makefile
 		 tests/Makefile
@@ -976,6 +1042,7 @@ Module options:
 
   GTK2 IMModule dir        $GTK2_IM_MODULEDIR
   GTK3 IMModule dir        $GTK3_IM_MODULEDIR
+  GTK4 IMModule dir        $GTK4_IM_MODULEDIR
   QT3 IMModule dir         $QT3_IM_MODULEDIR
   QT4 IMModule dir         $QT4_IM_MODULEDIR
   Clutter IMModule dir     $CLUTTER_IM_MODULEDIR
@@ -989,6 +1056,7 @@ Module options:
   Scim IM Agent            $enable_im_agent
   GTK2 IMModule            $enable_gtk2_immodule
   GTK3 IMModule            $enable_gtk3_immodule
+  GTK4 IMModule            $enable_gtk4_immodule
   QT3 IMModule             $enable_qt3_immodule
   QT4 IMModule             $enable_qt4_immodule
   CLUTTER IMModule         $enable_clutter_immodule

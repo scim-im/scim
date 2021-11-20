@@ -65,6 +65,10 @@ PKG_CHECK_MODULES(GTK3, [gtk+-3.0 >= 3.0.0 pango >= 1.24.0 gdk-pixbuf-2.0 >= 2.2
 			[SCIM_BRIDGE_HAS_GTK3=yes],
 			[SCIM_BRIDGE_HAS_GTK3=no])
 
+PKG_CHECK_MODULES(GTK4, [gtk4 >= 4.0.0 pango >= 1.48.0 gdk-pixbuf-2.0 >= 2.42.0],
+			[SCIM_BRIDGE_HAS_GTK4=yes],
+			[SCIM_BRIDGE_HAS_GTK4=no])
+
 SCIM_BRIDGE_HAS_GTK2_2=no
 if test "$SCIM_BRIDGE_HAS_GTK2" = "yes"; then
   if $PKG_CONFIG --exists "gtk+-2.0 >= 2.2" ; then
@@ -96,6 +100,17 @@ if test "$SCIM_BRIDGE_HAS_GTK3" = "yes"; then
   AC_SUBST(GTK3_LIBDIR)
   AC_SUBST(GTK3_VERSION)
   AC_SUBST(GTK3_BINARY_VERSION)
+fi
+
+if test "$SCIM_BRIDGE_HAS_GTK4" = "yes"; then
+  GTK4_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk4`
+  GTK4_LIBDIR=`$PKG_CONFIG --variable=libdir gtk4`
+  if test -z "$GTK4_LIBDIR)"; then
+    GTK4_LIBDIR="$libdir"
+  fi
+  AC_SUBST(GTK4_LIBDIR)
+  AC_SUBST(GTK4_VERSION)
+  AC_SUBST(GTK4_BINARY_VERSION)
 fi
 
 # Check if we should build scim-bridge-qt-immodule
@@ -162,6 +177,10 @@ AC_ARG_ENABLE(gtk3-immodule,
 	      [AS_HELP_STRING([--enable-gtk3-immodule], [build GTK3 IM module])], , 
 		  enable_gtk3_immodule=yes)
 
+AC_ARG_ENABLE(gtk4-immodule,
+	      [AS_HELP_STRING([--enable-gtk4-immodule], [build GTK4 IM module])], , 
+		  enable_gtk4_immodule=yes)
+
 AC_ARG_ENABLE(qt3-immodule,
 	      [AS_HELP_STRING([--enable-qt3-immodule], [build Qt3 IM module])], , 
 		  enable_qt3_immodule=yes)
@@ -224,6 +243,15 @@ else
   enable_gtk3_immodule=no
 fi
 
+if test "$enable_gtk4_immodule" = "yes" -a "$SCIM_BRIDGE_HAS_GTK4" = "yes"; then
+  SCIM_BRIDGE_BUILD_GTK4_IMMODULE=1
+  SCIM_BRIDGE_BUILD_IMMODULE=1
+  enable_immodule=yes
+else
+  SCIM_BRIDGE_BUILD_GTK4_IMMODULE=0
+  enable_gtk4_immodule=no
+fi
+
 if test "$enable_qt3_immodule" = "yes" -a "$SCIM_BRIDGE_HAS_QT3" = "yes"; then
   SCIM_BRIDGE_BUILD_QT3_IMMODULE=1
   SCIM_BRIDGE_BUILD_IMMODULE=1
@@ -269,6 +297,9 @@ AM_CONDITIONAL(SCIM_BRIDGE_BUILD_GTK2_IMMODULE,
 AM_CONDITIONAL(SCIM_BRIDGE_BUILD_GTK3_IMMODULE,
 		[test "$enable_gtk3_immodule" = "yes"])
 
+AM_CONDITIONAL(SCIM_BRIDGE_BUILD_GTK4_IMMODULE,
+		[test "$enable_gtk4_immodule" = "yes"])
+
 AM_CONDITIONAL(SCIM_BRIDGE_BUILD_QT3_IMMODULE,
 		[test "$enable_qt3_immodule" = "yes"])
 
@@ -285,6 +316,7 @@ AC_SUBST(SCIM_BRIDGE_BUILD_DOCUMENTS)
 AC_SUBST(SCIM_BRIDGE_BUILD_AGENT)
 AC_SUBST(SCIM_BRIDGE_BUILD_GTK2_IMMODULE)
 AC_SUBST(SCIM_BRIDGE_BUILD_GTK3_IMMODULE)
+AC_SUBST(SCIM_BRIDGE_BUILD_GTK4_IMMODULE)
 AC_SUBST(SCIM_BRIDGE_BUILD_QT3_IMMODULE)
 AC_SUBST(SCIM_BRIDGE_BUILD_QT4_IMMODULE)
 AC_SUBST(SCIM_BRIDGE_BUILD_CLUTTER_IMMODULE)
@@ -343,6 +375,7 @@ Module options:
   Build Agent              $enable_agent
   Build GTK2 IMModule      $enable_gtk2_immodule
   Build GTK3 IMModule      $enable_gtk3_immodule
+  Build GTK4 IMModule      $enable_gtk4_immodule
   Build QT3 IMModule       $enable_qt3_immodule
   Build QT4 IMModule       $enable_qt4_immodule
   Build CLUTTER IMModule   $enable_clutter_immodule
