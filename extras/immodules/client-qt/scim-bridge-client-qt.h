@@ -26,13 +26,8 @@
 #ifndef SCIMBRIDGECLIENTQT_H_
 #define SCIMBRIDGECLIENTQT_H_
 
-#ifdef QT4
 #include <QObject>
 #include <QSocketNotifier>
-#else
-#include <qobject.h>
-#include <qsocketnotifier.h>
-#endif
 
 #include "scim-bridge.h"
 #include "scim-bridge-client-imcontext-qt.h"

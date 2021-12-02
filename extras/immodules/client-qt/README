@@ -1,0 +1,16 @@
+SCIM Qt5 Input Method Plugin
+
+This code is adopted from SCIM Qt4 counterpart, using the qmake build
+system.  Integration of qmake to autotools is possible in the future.
+
+To build and install,
+
+1. build scim, including the im-agent.
+2. change to this directory and call `qmake`
+3. make
+4. make install
+
+Reference:
+1. Debian packages gcin-qt5-immodule, uim-qt5-immodule
+   libfcitx-qt5-1 (dbus), ibus (dbus)
+2. https://www.kdab.com/qt-input-method-depth/
