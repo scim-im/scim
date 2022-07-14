@@ -23,7 +23,9 @@
 
 #include "scim-bridge-client-qt.h"
 
+#if QT_VERSION >= 0x040000
 using namespace Qt;
+#endif
 
 /* Static variables */
 static ScimBridgeClientQt *client = NULL;

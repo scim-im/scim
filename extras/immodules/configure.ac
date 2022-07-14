@@ -136,6 +136,17 @@ if test "$SCIM_BRIDGE_HAS_QT4" = "yes"; then
   AC_SUBST(QT4_PREFIX)
 fi
 
+PKG_CHECK_MODULES(QT5, [Qt5Gui >= 5.0, Qt5Core >= 5.0],
+			[SCIM_BRIDGE_HAS_QT5=yes],
+			[SCIM_BRIDGE_HAS_QT5=no])
+
+if test "$SCIM_BRIDGE_HAS_QT5" = "yes"; then
+  if test -z "$QT5_PREFIX"; then
+    QT5_PREFIX=`$PKG_CONFIG --variable=prefix Qt5Core`
+  fi
+  AC_SUBST(QT5_PREFIX)
+fi
+
 # Check if we should build scim-bridge-clutter-immodule
 PKG_CHECK_MODULES(CLUTTER, clutter-0.9 clutter-imcontext-0.1,
            [SCIM_BRIDGE_HAS_CLUTTER=yes],
@@ -188,6 +199,10 @@ AC_ARG_ENABLE(qt3-immodule,
 AC_ARG_ENABLE(qt4-immodule,
 	      [AS_HELP_STRING([--enable-qt4-immodule], [build Qt4 IM module])], , 
 		  enable_qt4_immodule=yes)
+
+AC_ARG_ENABLE(qt5-immodule,
+	      [AS_HELP_STRING([--enable-qt5-immodule], [build Qt5 IM module])], , 
+		  enable_qt5_immodule=yes)
 
 AC_ARG_ENABLE(clutter-immodule,
 	      [AS_HELP_STRING([--enable-clutter-immodule], [build CLUTTER IM module])], , )
@@ -270,6 +285,15 @@ else
   enable_qt4_immodule=no
 fi
 
+if test "$enable_qt5_immodule" = "yes" -a "$SCIM_BRIDGE_HAS_QT5" = "yes"; then
+  SCIM_BRIDGE_BUILD_QT5_IMMODULE=1
+  SCIM_BRIDGE_BUILD_IMMODULE=1
+  enable_immodule=yes
+else
+  SCIM_BRIDGE_BUILD_QT5_IMMODULE=0
+  enable_qt5_immodule=no
+fi
+
 if test "$enable_clutter_immodule" = "yes"; then
   SCIM_BRIDGE_BUILD_CLUTTER_IMMODULE=1
   SCIM_BRIDGE_BUILD_IMMODULE=1
@@ -306,6 +330,9 @@ AM_CONDITIONAL(SCIM_BRIDGE_BUILD_QT3_IMMODULE,
 AM_CONDITIONAL(SCIM_BRIDGE_BUILD_QT4_IMMODULE,
 		[test "$enable_qt4_immodule" = "yes"])
 
+AM_CONDITIONAL(SCIM_BRIDGE_BUILD_QT5_IMMODULE,
+		[test "$enable_qt5_immodule" = "yes"])
+
 AM_CONDITIONAL(SCIM_BRIDGE_BUILD_CLUTTER_IMMODULE,
 		[test "$enable_clutter_immodule" = "yes"])
 
@@ -319,6 +346,7 @@ AC_SUBST(SCIM_BRIDGE_BUILD_GTK3_IMMODULE)
 AC_SUBST(SCIM_BRIDGE_BUILD_GTK4_IMMODULE)
 AC_SUBST(SCIM_BRIDGE_BUILD_QT3_IMMODULE)
 AC_SUBST(SCIM_BRIDGE_BUILD_QT4_IMMODULE)
+AC_SUBST(SCIM_BRIDGE_BUILD_QT5_IMMODULE)
 AC_SUBST(SCIM_BRIDGE_BUILD_CLUTTER_IMMODULE)
 AC_SUBST(SCIM_BRIDGE_BUILD_IMMODULE)
 
@@ -357,7 +385,7 @@ AC_SUBST(SCIM_LOCALDIR)
 ##                      Output files.                    ##
 ###########################################################
 AC_SUBST(ac_aux_dir)
-AC_CONFIG_FILES([Makefile common/Makefile agent/Makefile client-common/Makefile client-gtk/gtk2/Makefile client-gtk/gtk3/Makefile client-qt/qt3/Makefile client-qt/qt4/Makefile client-clutter/Makefile tests/Makefile doc/Makefile])
+AC_CONFIG_FILES([Makefile common/Makefile agent/Makefile client-common/Makefile client-gtk/gtk2/Makefile client-gtk/gtk3/Makefile client-qt/qt3/Makefile client-qt/qt4/Makefile client-qt/qt5/Makefile client-clutter/Makefile tests/Makefile doc/Makefile])
 
 AC_OUTPUT
 
@@ -378,6 +406,7 @@ Module options:
   Build GTK4 IMModule      $enable_gtk4_immodule
   Build QT3 IMModule       $enable_qt3_immodule
   Build QT4 IMModule       $enable_qt4_immodule
+  Build QT5 IMModule       $enable_qt5_immodule
   Build CLUTTER IMModule   $enable_clutter_immodule
 ])
 

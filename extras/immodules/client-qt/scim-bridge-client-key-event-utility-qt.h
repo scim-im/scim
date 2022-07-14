@@ -32,13 +32,22 @@
 
 #include "scim-bridge-client-common-qt.h"
 
+#ifdef Q_WS_X11
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
+#elif QT_VERSION >= 0x050000
+#include <xcb/xcb.h>
+#include <xcb/xcb_keysyms.h>
+#include <X11/keysym.h>
+#endif
+
+#ifdef Q_WS_X11
 static const int XKeyPress = KeyPress;
 static const int XKeyRelease = KeyRelease;
 #undef KeyPress
 #undef KeyRelease
+#endif
 
 class QKeyEvent;
 
@@ -58,6 +67,7 @@ QKeyEvent *scim_bridge_key_event_bridge_to_qt (const ScimBridgeKeyEvent *bridge_
  */
 ScimBridgeKeyEvent *scim_bridge_key_event_qt_to_bridge (const QKeyEvent *qt_key_event);
 
+#ifdef Q_WS_X11
 /**
  * Translate a key event from scim-bridge into X11.
  *
@@ -76,5 +86,23 @@ XEvent *scim_bridge_key_event_bridge_to_x11 (const ScimBridgeKeyEvent *bridge_ke
  * @return The key event from scim-bridge.
  */
 ScimBridgeKeyEvent* scim_bridge_key_event_x11_to_bridge (const XEvent *x11_event);
+#endif
 
+#if QT_VERSION >= 0x050000
+/**
+ * Translate a key event from scim-bridge into xcb.
+ *
+ * @param bridge_key_event The key event from scim-bridge.
+ * @return The key event for xcb.
+ */
+xcb_generic_event_t *scim_bridge_key_event_bridge_to_xcb (const ScimBridgeKeyEvent *bridge_key_event);
+
+/**
+ * Translate a key event from xcb into scim-bridge.
+ *
+ * @param xcb_event The event from xcb.
+ * @return The key event from scim-bridge.
+ */
+ScimBridgeKeyEvent* scim_bridge_key_event_xcb_to_bridge (xcb_generic_event_t *xcb_event, xcb_connection_t *xcb_connection);
+#endif
 #endif                                            /*SCIMBRIDGECLIENTKEYEVENTUTILITYQT_H_*/

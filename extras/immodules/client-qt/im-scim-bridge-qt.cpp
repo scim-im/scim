@@ -19,53 +19,17 @@
 
 #include <cassert>
 
-#include <Qt>
-#include <qpa/qplatforminputcontextplugin_p.h>
-
-using namespace Qt;
-
 #include "scim-bridge.h"
 #include "scim-bridge-client-common-qt.h"
-#include "scim-bridge-client-imcontext-qt.h"
 #include "scim-bridge-client-qt.h"
+#include "im-scim-bridge-qt.h"
+
+#if QT_VERSION >= 0x040000
+using namespace Qt;
+#endif
 
 /* Static Variables */
 static ScimBridgeClientQt *client = NULL;
-
-/* The class Definition */
-class ScimBridgeInputContextPlugin: public QPlatformInputContextPlugin
-{
-        Q_OBJECT
-        Q_PLUGIN_METADATA(IID QPlatformInputContextFactoryInterface_iid FILE "scim.json")
-
-    private:
-
-        /**
-         * The language list for SCIM.
-         */
-        static QStringList scim_languages;
-
-    public:
-
-        ScimBridgeInputContextPlugin ();
-
-        ~ScimBridgeInputContextPlugin ();
-
-        QStringList keys () const;
-
-        QStringList languages (const QString &key);
-
-        QString description (const QString &key);
-        
-        ScimBridgeClientIMContext *create (const QString &key, const QStringList &param) Q_DECL_OVERRIDE;
-
-        QString displayName (const QString &key);
-
-};
-
-
-/* Implementations */
-QStringList ScimBridgeInputContextPlugin::scim_languages;
 
 ScimBridgeInputContextPlugin::ScimBridgeInputContextPlugin ()
 {
@@ -77,6 +41,12 @@ ScimBridgeInputContextPlugin::~ScimBridgeInputContextPlugin ()
     delete client;
     client = NULL;
 }
+
+#if QT_VERSION < 0x050000
+
+/* Implementations */
+QStringList ScimBridgeInputContextPlugin::scim_languages;
+
 
 QStringList ScimBridgeInputContextPlugin::keys () const {
     QStringList identifiers;
@@ -104,10 +74,24 @@ QString ScimBridgeInputContextPlugin::description (const QString &key)
 }
 
 
-ScimBridgeClientIMContext *ScimBridgeInputContextPlugin::create (const QString &key, const QStringList &param)
+QString ScimBridgeInputContextPlugin::displayName (const QString &key)
 {
-    Q_UNUSED(param);
+    return key;
+}
+
+#endif
+
+#if QT_VERSION >= 0x050000
+QInputContext *ScimBridgeInputContextPlugin::create (const QString &key, const QStringList &paramList)
+#else
+QInputContext *ScimBridgeInputContextPlugin::create (const QString &key)
+#endif
+{
+#if QT_VERSION >= 0x040000
     if (key.toLower () != SCIM_BRIDGE_IDENTIFIER_NAME) {
+#else
+    if (key.lower () != SCIM_BRIDGE_IDENTIFIER_NAME) {
+#endif
         return NULL;
     } else {
         if (client == NULL) client = new ScimBridgeClientQt ();
@@ -115,10 +99,8 @@ ScimBridgeClientIMContext *ScimBridgeInputContextPlugin::create (const QString &
     }
 }
 
-
-QString ScimBridgeInputContextPlugin::displayName (const QString &key)
-{
-    return key;
-}
-
-#include "im-scim-bridge-qt.moc"
+#if QT_VERSION < 0x040000
+Q_EXPORT_PLUGIN (ScimBridgeInputContextPlugin)
+#elif QT_VERSION < 0x050000
+Q_EXPORT_PLUGIN2 (ScimBridgeInputContextPlugin, ScimBridgeInputContextPlugin)
+#endif

@@ -27,8 +27,14 @@
 #ifndef SCIMBRIDGECOMMONQT_H_
 #define SCIMBRIDGECOMMONQT_H_
 
+#include <QtGlobal>
+#if QT_VERSION >= 0x040000
 #include <QString>
 #include <QStringList>
+#else
+#include <qstring.h>
+#include <qstringlist.h>
+#endif
 
 #include "scim-bridge.h"
 

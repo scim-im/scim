@@ -22,10 +22,16 @@
 #include <cstdlib>
 #include <map>
 
+#include <QtGlobal>
+#if QT_VERSION >= 0x040000
 #include <QApplication>
 #include <QChar>
 #include <QEvent>
 #include <QKeyEvent>
+#else
+#include <qapplication.h>
+#include <qkeycode.h>
+#endif
 
 #include "scim-bridge-output.h"
 #include "scim-bridge-client-key-event-utility-qt.h"
@@ -43,7 +49,7 @@ static map<scim_bridge_key_code_t, int> bridge_to_qt_key_map;
 static void register_key (int qt_key_code, scim_bridge_key_code_t bridge_key_code)
 {
     qt_to_bridge_key_map[qt_key_code] = bridge_key_code;
-    qt_to_bridge_key_map[bridge_key_code] = qt_key_code;
+    bridge_to_qt_key_map[bridge_key_code] = qt_key_code;
 }
 
 
@@ -77,8 +83,13 @@ static void static_initialize ()
     register_key (Qt::Key_Up, SCIM_BRIDGE_KEY_CODE_Up);
     register_key (Qt::Key_Right, SCIM_BRIDGE_KEY_CODE_Right);
     register_key (Qt::Key_Down, SCIM_BRIDGE_KEY_CODE_Down);
+#if QT_VERSION >= 0x040000
     register_key (Qt::Key_PageUp, SCIM_BRIDGE_KEY_CODE_Prior);
-    register_key (Qt::Key_PageDown, SCIM_BRIDGE_KEY_CODE_Next);
+    register_key (Qt::Key_PageUp, SCIM_BRIDGE_KEY_CODE_Next);
+#else
+    register_key (Qt::Key_Prior, SCIM_BRIDGE_KEY_CODE_Prior);
+    register_key (Qt::Key_Next, SCIM_BRIDGE_KEY_CODE_Next);
+#endif
     register_key (Qt::Key_CapsLock, SCIM_BRIDGE_KEY_CODE_Caps_Lock);
     register_key (Qt::Key_NumLock, SCIM_BRIDGE_KEY_CODE_Num_Lock);
     register_key (Qt::Key_ScrollLock, SCIM_BRIDGE_KEY_CODE_Scroll_Lock);
@@ -174,17 +185,36 @@ QKeyEvent *scim_bridge_key_event_bridge_to_qt (const ScimBridgeKeyEvent *bridge_
     if (bridge_key_code < 0x1000) {
         if (bridge_key_code >= SCIM_BRIDGE_KEY_CODE_a && bridge_key_code <= SCIM_BRIDGE_KEY_CODE_z) {
             ascii_code = bridge_key_code;
+#if QT_VERSION >= 0x050000
             qt_key_code = QChar (ascii_code).toUpper ().toLatin1 ();
+#elif QT_VERSION >= 0x040000
+            qt_key_code = QChar (ascii_code).toUpper ().toAscii ();
+#else
+            qt_key_code = QChar (ascii_code).upper ();
+#endif
         } else {
             ascii_code = bridge_key_code;
             qt_key_code = bridge_key_code;
         }
     } else if (bridge_key_code < 0x3000) {
+#ifdef Q_WS_WIN
         qt_key_code = bridge_key_code;
     } else {
-        qt_key_code = Qt::Key_unknown;
+        qt_key_code = Key_unknown;
     }
+#else
+        qt_key_code = bridge_key_code | Qt::UNICODE_ACCEL;
+    } else {
+        map<scim_bridge_key_code_t, int>::iterator iter = bridge_to_qt_key_map.find (bridge_key_code);
+        if (iter != bridge_to_qt_key_map.end ()) {
+            qt_key_code = iter->second;
+        } else {
+            qt_key_code = Qt::Key_unknown;
+        }
+    }
+#endif
 
+#if QT_VERSION >= 0x040000
     Qt::KeyboardModifiers modifiers = Qt::NoModifier;
 
     if (scim_bridge_key_event_is_alt_down (bridge_key_event)) modifiers |= Qt::AltModifier;
@@ -193,6 +223,16 @@ QKeyEvent *scim_bridge_key_event_bridge_to_qt (const ScimBridgeKeyEvent *bridge_
     if (scim_bridge_key_event_is_meta_down (bridge_key_event)) modifiers |= Qt::MetaModifier;
 
     return new QKeyEvent (type, qt_key_code, modifiers);
+#else
+    unsigned int modifiers = 0;
+
+    if (scim_bridge_key_event_is_alt_down (bridge_key_event)) modifiers |= Qt::AltButton;
+    if (scim_bridge_key_event_is_shift_down (bridge_key_event)) modifiers |= Qt::ShiftButton;
+    if (scim_bridge_key_event_is_control_down (bridge_key_event)) modifiers |= Qt::ControlButton;
+    if (scim_bridge_key_event_is_meta_down (bridge_key_event)) modifiers |= Qt::MetaButton;
+
+    return new QKeyEvent (type, qt_key_code, ascii_code, modifiers);
+#endif
 }
 
 
@@ -202,6 +242,7 @@ ScimBridgeKeyEvent *scim_bridge_key_event_qt_to_bridge (const QKeyEvent *key_eve
     
     ScimBridgeKeyEvent *bridge_key_event = scim_bridge_alloc_key_event ();
 
+#if QT_VERSION >= 0x040000
     const Qt::KeyboardModifiers modifiers = key_event->modifiers ();
 
     if (modifiers & Qt::ShiftModifier) {
@@ -216,6 +257,22 @@ ScimBridgeKeyEvent *scim_bridge_key_event_qt_to_bridge (const QKeyEvent *key_eve
     if (modifiers & Qt::MetaModifier) {
         scim_bridge_key_event_set_meta_down (bridge_key_event, TRUE);
     }
+#else
+    const int modifiers = key_event->state ();
+
+    if (modifiers & Qt::ShiftButton) {
+        scim_bridge_key_event_set_shift_down (bridge_key_event, TRUE);
+    }
+    if (modifiers & Qt::ControlButton) {
+        scim_bridge_key_event_set_control_down (bridge_key_event, TRUE);
+    }
+    if (modifiers & Qt::AltButton) {
+        scim_bridge_key_event_set_alt_down (bridge_key_event, TRUE);
+    }
+    if (modifiers & Qt::MetaButton) {
+        scim_bridge_key_event_set_meta_down (bridge_key_event, TRUE);
+    }
+#endif
 
     const int qt_key_code = key_event->key ();
     int bridge_key_code;
@@ -240,9 +297,17 @@ ScimBridgeKeyEvent *scim_bridge_key_event_qt_to_bridge (const QKeyEvent *key_eve
         }
         
         if (!scim_bridge_key_event_is_caps_lock_down (bridge_key_event) ^ scim_bridge_key_event_is_shift_down (bridge_key_event)) {
+#if QT_VERSION >= 0x040000
 	        bridge_key_code = QChar (qt_key_code).toLower ().unicode ();
+#else
+	        bridge_key_code = QChar (qt_key_code).lower ().unicode ();
+#endif
 	    } else {
+#if QT_VERSION >= 0x040000
 	        bridge_key_code = QChar (qt_key_code).toUpper ().unicode ();
+#else
+	        bridge_key_code = QChar (qt_key_code).upper ().unicode ();
+#endif
 	    }
     } else {
         map<int, scim_bridge_key_code_t>::iterator iter = qt_to_bridge_key_map.find (qt_key_code);
@@ -262,6 +327,7 @@ ScimBridgeKeyEvent *scim_bridge_key_event_qt_to_bridge (const QKeyEvent *key_eve
 }
 
 
+#ifdef Q_WS_X11
 XEvent *scim_bridge_key_event_bridge_to_x11 (const ScimBridgeKeyEvent *bridge_key_event, Display *display, WId window_id)
 {
     XEvent *x_event = static_cast<XEvent*> (malloc (sizeof (XEvent)));
@@ -349,3 +415,59 @@ ScimBridgeKeyEvent* scim_bridge_key_event_x11_to_bridge (const XEvent *x_event)
     
     return bridge_key_event;
 }
+
+#endif
+
+#if QT_VERSION >= 0x050000
+ScimBridgeKeyEvent* scim_bridge_key_event_xcb_to_bridge (xcb_generic_event_t *xcb_event, xcb_connection_t *xcb_connection)
+{
+    xcb_key_press_event_t *key_event = (xcb_key_press_event_t *) xcb_event;
+    
+    ScimBridgeKeyEvent *bridge_key_event = scim_bridge_alloc_key_event ();
+
+    uint8_t event_type = key_event->response_type & ~0x80;
+    scim_bridge_key_event_set_pressed (bridge_key_event, event_type == XCB_KEY_PRESS);
+
+    xcb_key_symbols_t *key_symbols = xcb_key_symbols_alloc(xcb_connection);
+    if(key_symbols == NULL) {
+        return bridge_key_event;
+    }
+    
+    xcb_keysym_t keysym = (event_type == XCB_KEY_PRESS)
+        ? xcb_key_press_lookup_keysym(key_symbols, key_event, 0)
+        : xcb_key_release_lookup_keysym(key_symbols, key_event, 0);
+    scim_bridge_key_event_set_code (bridge_key_event, keysym);
+    xcb_key_symbols_free(key_symbols);
+
+    if (key_event->state & XCB_MOD_MASK_SHIFT || (event_type == XCB_KEY_PRESS && (keysym == XK_Shift_L || keysym == XK_Shift_R))) {
+        scim_bridge_key_event_set_shift_down (bridge_key_event, TRUE);
+    }
+    if (key_event->state & XCB_MOD_MASK_CONTROL || (event_type == XCB_KEY_PRESS && (keysym == XK_Control_L || keysym == XK_Control_R))) {
+        scim_bridge_key_event_set_control_down (bridge_key_event, TRUE);
+    }
+    if (key_event->state & XCB_MOD_MASK_LOCK || (event_type == XCB_KEY_PRESS && (keysym == XK_Caps_Lock))) {
+        scim_bridge_key_event_set_caps_lock_down (bridge_key_event, TRUE);
+    }
+    if (key_event->state & XCB_MOD_MASK_1 || (event_type == XCB_KEY_PRESS && (keysym == XK_Alt_L || keysym == XK_Alt_R))) {
+        scim_bridge_key_event_set_alt_down (bridge_key_event, TRUE);
+    }
+    // super or window key
+    if (key_event->state & XCB_MOD_MASK_4 || (event_type == XCB_KEY_PRESS && (keysym == XK_Meta_L || keysym == XK_Meta_R))) {
+        scim_bridge_key_event_set_meta_down (bridge_key_event, TRUE);
+    }
+
+    if (scim_bridge_key_event_get_code (bridge_key_event) == SCIM_BRIDGE_KEY_CODE_backslash) {
+        boolean kana_ro = FALSE;
+        int keysym_size = 0;
+        xcb_key_symbols_t *key_symbols = xcb_key_symbols_alloc(xcb_connection);
+        if(key_symbols != NULL) {
+            kana_ro = (xcb_key_symbols_get_keysym(key_symbols, key_event->detail, 0) == XK_backslash
+                    && xcb_key_symbols_get_keysym(key_symbols, key_event->detail, 1) == XK_underscore);
+            xcb_key_symbols_free(key_symbols);
+        }
+        scim_bridge_key_event_set_quirk_enabled (bridge_key_event, SCIM_BRIDGE_KEY_QUIRK_KANA_RO, kana_ro);
+    }
+    
+    return bridge_key_event;
+}
+#endif

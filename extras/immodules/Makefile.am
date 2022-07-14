@@ -37,4 +37,4 @@
 MAINTAINERCLEANFILES    = Makefile.in
 CLEANFILES      = *.bak
 
-SUBDIRS = common client-common client-gtk/gtk2 client-gtk/gtk3 client-gtk/gtk4 client-clutter agent doc
+SUBDIRS = common client-common client-gtk/gtk2 client-gtk/gtk3 client-gtk/gtk4 client-qt/qt3 client-qt/qt4 client-qt/qt5 client-clutter agent doc
