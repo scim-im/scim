@@ -6,10 +6,10 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation and 
+ * License as published by the Free Software Foundation and
  * appearing in the file LICENSE.LGPL included in the package of this file.
- * You can also redistribute it and/or modify it under the terms of 
- * the GNU General Public License as published by the Free Software Foundation and 
+ * You can also redistribute it and/or modify it under the terms of
+ * the GNU General Public License as published by the Free Software Foundation and
  * appearing in the file LICENSE.GPL included in the package of this file.
  *
  * This library is distributed in the hope that it will be useful,
@@ -23,7 +23,7 @@
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 
-#ifdef GDK_WINDOWING_X11 
+#ifdef GDK_WINDOWING_X11
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -115,25 +115,26 @@ void scim_bridge_key_event_gdk_to_bridge (ScimBridgeKeyEvent *bridge_key_event, 
     } else {
         scim_bridge_key_event_set_pressed (bridge_key_event, FALSE);
     }
-    
-#ifdef GDK_WINDOWING_X11
-    Display *display = NULL;
 
+    GdkDisplay *display = NULL;
     if (window != NULL) {
-        display = GDK_WINDOW_XDISPLAY (window);
+        display = gtk_widget_get_display (window);
     } else {
-        display = GDK_DISPLAY_XDISPLAY (gdk_display_get_default ());
+        display = gdk_display_get_default ();
     }
-    
-    if (scim_bridge_key_event_get_code (bridge_key_event) == SCIM_BRIDGE_KEY_CODE_backslash) {
-        boolean kana_ro = FALSE;
-        int keysym_size = 0;
-        KeySym *keysyms = XGetKeyboardMapping (display, key_event->hardware_keycode, 1, &keysym_size);
-        if (keysyms != NULL) {
-            kana_ro = (keysyms[0] == XK_backslash && keysyms[1] == XK_underscore);
-            XFree (keysyms);
-        }
-        scim_bridge_key_event_set_quirk_enabled (bridge_key_event, SCIM_BRIDGE_KEY_QUIRK_KANA_RO, kana_ro);
+
+#ifdef GDK_WINDOWING_X11
+    if (GDK_IS_X11_DISPLAY (display)) {
+      if (scim_bridge_key_event_get_code (bridge_key_event) == SCIM_BRIDGE_KEY_CODE_backslash) {
+          boolean kana_ro = FALSE;
+          int keysym_size = 0;
+          KeySym *keysyms = XGetKeyboardMapping (display, key_event->hardware_keycode, 1, &keysym_size);
+          if (keysyms != NULL) {
+              kana_ro = (keysyms[0] == XK_backslash && keysyms[1] == XK_underscore);
+              XFree (keysyms);
+          }
+          scim_bridge_key_event_set_quirk_enabled (bridge_key_event, SCIM_BRIDGE_KEY_QUIRK_KANA_RO, kana_ro);
+      }
     }
 #endif
 }

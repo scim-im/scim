@@ -496,15 +496,22 @@ keyevent_gdk_to_scim (const GdkEventKey &gdkevent)
     // Use Key Symbole provided by gtk.
     key.code = gdkevent.keyval;
 
+    GdkDisplay *display = gdk_display_get_default ();
+
+    bool is_x11 = false;
 #ifdef GDK_WINDOWING_X11
-    key.mask = scim_x11_keymask_x11_to_scim (GDK_DISPLAY_XDISPLAY (gdk_display_get_default ()), gdkevent.state);
-#else
-    if (gdkevent.state & GDK_SHIFT_MASK) key.mask |=SCIM_KEY_ShiftMask;
-    if (gdkevent.state & GDK_LOCK_MASK) key.mask |=SCIM_KEY_CapsLockMask;
-    if (gdkevent.state & GDK_CONTROL_MASK) key.mask |=SCIM_KEY_ControlMask;
-    if (gdkevent.state & GDK_MOD1_MASK) key.mask |=SCIM_KEY_AltMask;
-    if (gdkevent.state & GDK_MOD2_MASK) key.mask |=SCIM_KEY_NumLockMask;
+    if (GDK_IS_X11_DISPLAY (display)) {
+      is_x11 = true;
+      key.mask = scim_x11_keymask_x11_to_scim (GDK_DISPLAY_XDISPLAY (display), gdkevent.state);
+    }
 #endif
+    if (!is_x11) {
+      if (gdkevent.state & GDK_SHIFT_MASK) key.mask |=SCIM_KEY_ShiftMask;
+      if (gdkevent.state & GDK_LOCK_MASK) key.mask |=SCIM_KEY_CapsLockMask;
+      if (gdkevent.state & GDK_CONTROL_MASK) key.mask |=SCIM_KEY_ControlMask;
+      if (gdkevent.state & GDK_MOD1_MASK) key.mask |=SCIM_KEY_AltMask;
+      if (gdkevent.state & GDK_MOD2_MASK) key.mask |=SCIM_KEY_NumLockMask;
+    }
 
     if (gdkevent.type == GDK_KEY_RELEASE) key.mask |= SCIM_KEY_ReleaseMask;
 

@@ -25,7 +25,7 @@ SCIM_CURRENT=10
 SCIM_REVISION=6
 
 # increment if any interfaces have been added; set to 0
-# if any interfaces have been removed. removal has 
+# if any interfaces have been removed. removal has
 # precedence over adding, so set to 0 if both happened.
 SCIM_AGE=2
 
@@ -107,12 +107,12 @@ AM_GNU_GETTEXT_VERSION(0.14.1)
 
 AC_ARG_WITH([doxygen],
   AS_HELP_STRING([--without-doxygen], [Don't build API documentation]) )
- 
+
 DOXYGEN=no
 if test "x$with_doxygen" != "xno"; then
   AC_PATH_PROG(DOXYGEN, doxygen, no)
 fi
- 
+
 AM_CONDITIONAL(HAVE_DOXYGEN, test x$DOXYGEN != xno)
 AC_SUBST(DOXYGEN)
 
@@ -381,12 +381,12 @@ AC_ARG_WITH([gtk2-im-module-dir],
 	[GTK2_IM_MODULEDIR=$with_gtk2_im_module_dir])
 
 AC_ARG_WITH([gtk3-im-module-dir],
-	[AS_HELP_STRING([--with-gtk3-im-module-dir=dir], 
+	[AS_HELP_STRING([--with-gtk3-im-module-dir=dir],
 	    [Select GTK3 immodule dir])],
 	[GTK3_IM_MODULEDIR=$with_gtk3_im_module_dir])
 
 AC_ARG_WITH([gtk4-im-module-dir],
-	[AS_HELP_STRING([--with-gtk4-im-module-dir=dir], 
+	[AS_HELP_STRING([--with-gtk4-im-module-dir=dir],
 	    [Select GTK4 immodule dir])],
 	[GTK4_IM_MODULEDIR=$with_gtk4_im_module_dir])
 
@@ -426,7 +426,7 @@ AC_ARG_WITH([clutter-im-module-dir],
 	[CLUTTER_IM_MODULEDIR=$with_clutter_im_module_dir])
 
 AC_ARG_WITH([gtk-version],
-	[AS_HELP_STRING([--with-gtk-version=2 or 3], 
+	[AS_HELP_STRING([--with-gtk-version=2 or 3],
 		[Select gtk version if both gtk2 and gtk3 are available (default is 3)])],
 	[WANT_GTK_VERSION=$withval],
 	[WANT_GTK_VERSION=3])
@@ -446,19 +446,19 @@ AC_ARG_ENABLE([ltdladvise],
 AC_ARG_ENABLE([debug],
 	[AS_HELP_STRING([--enable-debug],
 		[Turn on debugging])],
-	[], 
+	[],
 	[enable_debug=no])
 
 AC_ARG_ENABLE([tests],
 	[AS_HELP_STRING([--enable-tests],
 		[Build tests/*])],
-	[], 
+	[],
 	[enable_tests=no])
 
 AC_ARG_ENABLE([documents],
 	[AS_HELP_STRING([--enable-documents],
 		[build documents])],
-	[], 
+	[],
 	[enable_documents=no])
 
 AC_ARG_ENABLE([hash-map],
@@ -488,13 +488,13 @@ AC_ARG_ENABLE([frontend-x11],
 AC_ARG_ENABLE([frontend-socket],
 	[AS_HELP_STRING([--disable-frontend-socket],
 		[Do not build Socket FrontEnd module])],
-	[], 
+	[],
 	[enable_frontend_socket=yes])
 
 AC_ARG_ENABLE([im-rawcode],
 	[AS_HELP_STRING([--disable-im-rawcode],
 		[Do not build RawCode IMEngine module])],
-	[], 
+	[],
 	[enable_im_rawcode=yes])
 
 AC_ARG_ENABLE([im-socket],
@@ -524,7 +524,7 @@ AC_ARG_ENABLE([orig-gtk3-immodule],
 AC_ARG_ENABLE([agent],
 	[AS_HELP_STRING([--disable-im-agent],
 		[Do not build scim-im-agent (required by other immodules)])],
-	[], 
+	[],
 	[enable_im_agent=yes])
 
 AC_ARG_ENABLE([gtk2-immodule],
@@ -566,19 +566,19 @@ AC_ARG_ENABLE([qt5-immodule],
 AC_ARG_ENABLE([clutter-immodule],
 	[AS_HELP_STRING([--enable-clutter-immodule],
 		[Do not build CLUTTER IMModule])],
-	[], 
+	[],
 	[enable_clutter_immodule=no])
 
 AC_ARG_ENABLE([panel-gtk],
 	[AS_HELP_STRING([--disable-panel-gtk],
 		[Do not build GTK2 Panel])],
-	[], 
+	[],
 	[enable_panel_gtk=check])
 
 AC_ARG_ENABLE([setup-ui],
 	[AS_HELP_STRING([--disable-setup-ui],
 		[Do not build Setup UI])],
-	[], 
+	[],
 	[enable_setup_ui=yes])
 
 if test "$have_x" = "yes"; then
@@ -634,7 +634,7 @@ else
   SCIM_BUILD_CONFIG_SOCKET=0
   enable_config_socket=no
 fi
- 
+
 if test "$enable_frontend_x11" = "yes" -a "$have_x" = "yes"; then
   SCIM_BUILD_FRONTEND_X11=1
 else
@@ -1049,7 +1049,7 @@ AC_CONFIG_FILES([Makefile
 		 extras/setup/Makefile
 		 extras/setup/scim-setup
 		 extras/panel/Makefile
-		 extras/immodules/Makefile 
+		 extras/immodules/Makefile
 		 extras/immodules/common/Makefile
 		 extras/immodules/agent/Makefile
 		 extras/immodules/client-common/Makefile
@@ -1080,7 +1080,7 @@ Build options:
   Enable lt_dladvise       $enable_ltdladvise
   Build documents          $enable_documents
 
-Module options:           
+Module options:
   Simple config module     $enable_config_simple
   Socket config module     $enable_config_socket
 

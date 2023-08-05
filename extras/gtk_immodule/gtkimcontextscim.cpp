@@ -2,9 +2,9 @@
  *  @brief immodule for GTK.
  */
 
-/* 
+/*
  * Smart Common Input Method
- * 
+ *
  * Copyright (c) 2002-2005 James Su <suzhe@tsinghua.org.cn>
  *
  *
@@ -49,7 +49,7 @@
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 
-#ifdef GDK_WINDOWING_X11 
+#ifdef GDK_WINDOWING_X11
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -59,7 +59,7 @@
 #include "scim_private.h"
 #include "scim.h"
 
-#ifdef GDK_WINDOWING_X11 
+#ifdef GDK_WINDOWING_X11
 #include "scim_x11_utils.h"
 #endif
 
@@ -408,7 +408,7 @@ static GtkIMContextSCIM *
 find_ic (int id)
 {
     GtkIMContextSCIMImpl *rec = _used_ic_impl_list;
- 
+
     while (rec != 0) {
         if (rec->parent && rec->parent->id == id)
             return rec->parent;
@@ -426,7 +426,7 @@ gtk_im_context_scim_new (void)
     SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_new...\n";
 
     GtkIMContextSCIM *result;
- 
+
     result = GTK_IM_CONTEXT_SCIM (g_object_new (GTK_TYPE_IM_CONTEXT_SCIM, NULL));
 
     return GTK_IM_CONTEXT (result);
@@ -451,7 +451,7 @@ gtk_im_context_scim_register_type (GTypeModule *type_module)
     SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_register_type...\n";
 
     if (!_gtk_type_im_context_scim) {
-        _gtk_type_im_context_scim = 
+        _gtk_type_im_context_scim =
             g_type_module_register_type (type_module,
                                      GTK_TYPE_IM_CONTEXT,
                                      "GtkIMContextSCIM",
@@ -516,17 +516,17 @@ gtk_im_context_scim_init (GtkIMContextSCIM      *context_scim,
                      "commit",
                      G_CALLBACK(gtk_im_slave_commit_cb),
                      context_scim);
-    
+
     g_signal_connect(G_OBJECT(context_scim->slave),
                      "preedit-changed",
                      G_CALLBACK(gtk_im_slave_preedit_changed_cb),
                      context_scim);
-    
+
     g_signal_connect(G_OBJECT(context_scim->slave),
                      "preedit-start",
                      G_CALLBACK(gtk_im_slave_preedit_start_cb),
                      context_scim);
-    
+
     g_signal_connect(G_OBJECT(context_scim->slave),
                      "preedit-end",
                      G_CALLBACK(gtk_im_slave_preedit_end_cb),
@@ -598,7 +598,7 @@ gtk_im_context_scim_finalize_partial (GtkIMContextSCIM *context_scim)
 
         if (context_scim == _focused_ic)
             context_scim->impl->si->focus_out ();
- 
+
         // Delete the instance.
         // FIXME:
         // In case the instance send out some helper event,
@@ -845,7 +845,7 @@ gtk_im_context_scim_set_cursor_location (GtkIMContext *context,
 
     gint x, y;
     GtkIMContextSCIM *context_scim = GTK_IM_CONTEXT_SCIM (context);
- 
+
     if (context_scim && context_scim->impl && context_scim->impl->client_window && context_scim == _focused_ic) {
         // Don't update spot location while updating preedit string.
         if (context_scim->impl->preedit_updating)
@@ -860,7 +860,7 @@ gtk_im_context_scim_set_cursor_location (GtkIMContext *context,
             panel_req_update_spot_location (context_scim);
             _panel_client.send ();
             SCIM_DEBUG_FRONTEND(2) << "new cursor location = " << context_scim->impl->cursor_x << "," << context_scim->impl->cursor_y << "\n";
-        } 
+        }
     }
 }
 
@@ -883,7 +883,7 @@ gtk_im_context_scim_set_use_preedit (GtkIMContext *context,
             if (old != use_preedit)
                 set_ic_capabilities (context_scim);
 
-            if (context_scim->impl->preedit_string.length ()) 
+            if (context_scim->impl->preedit_string.length ())
                 slot_show_preedit_string (context_scim->impl->si);
 
             _panel_client.send ();
@@ -900,7 +900,7 @@ gtk_im_context_scim_get_preedit_string (GtkIMContext   *context,
     SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_get_preedit_string...\n";
 
     GtkIMContextSCIM *context_scim = GTK_IM_CONTEXT_SCIM (context);
-    
+
     if (context_scim->slave_preedit == true) {
         gtk_im_context_get_preedit_string (context_scim->slave, str, attrs, cursor_pos);
         return;
@@ -955,7 +955,7 @@ gtk_im_context_scim_get_preedit_string (GtkIMContext   *context,
                                 attr->start_index = start_index;
                                 attr->end_index = end_index;
                                 pango_attr_list_insert (*attrs, attr);
-   
+
                                 attr = pango_attr_background_new (_normal_text.red, _normal_text.green, _normal_text.blue);
                                 attr->start_index = start_index;
                                 attr->end_index = end_index;
@@ -965,7 +965,7 @@ gtk_im_context_scim_get_preedit_string (GtkIMContext   *context,
                                 attr->start_index = start_index;
                                 attr->end_index = end_index;
                                 pango_attr_list_insert (*attrs, attr);
-   
+
                                 attr = pango_attr_background_new (_active_bg.red, _active_bg.green, _active_bg.blue);
                                 attr->start_index = start_index;
                                 attr->end_index = end_index;
@@ -973,14 +973,14 @@ gtk_im_context_scim_get_preedit_string (GtkIMContext   *context,
                             }
                         } else if (i->get_type () == SCIM_ATTR_FOREGROUND) {
                             unsigned int color = i->get_value ();
-   
+
                             attr = pango_attr_foreground_new (SCIM_RGB_COLOR_RED(color) * 256, SCIM_RGB_COLOR_GREEN(color) * 256, SCIM_RGB_COLOR_BLUE(color) * 256);
                             attr->start_index = start_index;
                             attr->end_index = end_index;
                             pango_attr_list_insert (*attrs, attr);
                         } else if (i->get_type () == SCIM_ATTR_BACKGROUND) {
                             unsigned int color = i->get_value ();
-   
+
                             attr = pango_attr_background_new (SCIM_RGB_COLOR_RED(color) * 256, SCIM_RGB_COLOR_GREEN(color) * 256, SCIM_RGB_COLOR_BLUE(color) * 256);
                             attr->start_index = start_index;
                             attr->end_index = end_index;
@@ -1414,7 +1414,7 @@ filter_hotkeys (GtkIMContextSCIM *ic, const KeyEvent &key)
         String sfid = _imengine_hotkey_matcher.get_match_result ();
         open_specific_factory (ic, sfid);
         ret = true;
-    } 
+    }
     return ret;
 }
 
@@ -1559,34 +1559,44 @@ keyevent_gdk_to_scim (const GtkIMContextSCIM *ic, const GdkEventKey &gdkevent)
     // Use Key Symbole provided by gtk.
     key.code = gdkevent.keyval;
 
-#ifdef GDK_WINDOWING_X11 
-    Display *display = 0;
-
-    if (ic && ic->impl && ic->impl->client_window)
-        display = GDK_WINDOW_XDISPLAY (ic->impl->client_window);
-    else
-        display = GDK_DISPLAY_XDISPLAY (gdk_display_get_default ());
-
-    key.mask = scim_x11_keymask_x11_to_scim (display, gdkevent.state);
-
-    // Special treatment for two backslash keys on jp106 keyboard.
-    if (key.code == SCIM_KEY_backslash) {
-        int keysym_size = 0;
-        KeySym *keysyms = XGetKeyboardMapping (display, gdkevent.hardware_keycode, 1, &keysym_size);
-        if (keysyms != NULL) {
-            if (keysyms[0] == XK_backslash &&
-                (keysym_size > 1 && keysyms[1] == XK_underscore))
-                key.mask |= SCIM_KEY_QuirkKanaRoMask;
-            XFree (keysyms);
-        }
+    GdkDisplay *display = NULL;
+    if (ic && ic->impl && ic->impl->client_window) {
+        display = gdk_window_get_display (ic->impl->client_window);
+    } else {
+        display = gdk_display_get_default ();
     }
-#else
-    if (gdkevent.state & GDK_SHIFT_MASK) key.mask |=SCIM_KEY_ShiftMask;
-    if (gdkevent.state & GDK_LOCK_MASK) key.mask |=SCIM_KEY_CapsLockMask;
-    if (gdkevent.state & GDK_CONTROL_MASK) key.mask |=SCIM_KEY_ControlMask;
-    if (gdkevent.state & GDK_MOD1_MASK) key.mask |=SCIM_KEY_AltMask;
-    if (gdkevent.state & GDK_MOD2_MASK) key.mask |=SCIM_KEY_NumLockMask;
+
+    bool is_x11 = false;
+
+#ifdef GDK_WINDOWING_X11
+#if GTK_CHECK_VERSION(3, 0, 0)
+    if (GDK_IS_X11_DISPLAY (display)) {
+      is_x11 = true;
+      Display *x11_display = GDK_DISPLAY_XDISPLAY (display);
+      key.mask = scim_x11_keymask_x11_to_scim (x11_display, gdkevent.state);
+
+      // Special treatment for two backslash keys on jp106 keyboard.
+      if (key.code == SCIM_KEY_backslash) {
+          int keysym_size = 0;
+          KeySym *keysyms = XGetKeyboardMapping (x11_display, gdkevent.hardware_keycode, 1, &keysym_size);
+          if (keysyms != NULL) {
+              if (keysyms[0] == XK_backslash &&
+                  (keysym_size > 1 && keysyms[1] == XK_underscore))
+                  key.mask |= SCIM_KEY_QuirkKanaRoMask;
+              XFree (keysyms);
+          }
+      }
+    }
 #endif
+#endif
+
+    if (!is_x11) {
+      if (gdkevent.state & GDK_SHIFT_MASK) key.mask |=SCIM_KEY_ShiftMask;
+      if (gdkevent.state & GDK_LOCK_MASK) key.mask |=SCIM_KEY_CapsLockMask;
+      if (gdkevent.state & GDK_CONTROL_MASK) key.mask |=SCIM_KEY_ControlMask;
+      if (gdkevent.state & GDK_MOD1_MASK) key.mask |=SCIM_KEY_AltMask;
+      if (gdkevent.state & GDK_MOD2_MASK) key.mask |=SCIM_KEY_NumLockMask;
+    }
 
     if (gdkevent.type == GDK_KEY_RELEASE) key.mask |= SCIM_KEY_ReleaseMask;
 
@@ -1618,9 +1628,9 @@ get_time (void)
     int tint;
     struct timeval tv;
     struct timezone tz;           /* is not used since ages */
-    gettimeofday (&tv, &tz); 
+    gettimeofday (&tv, &tz);
     tint = (int) tv.tv_sec * 1000;
-    tint = tint / 1000 * 1000; 
+    tint = tint / 1000 * 1000;
     tint = tint + tv.tv_usec / 1000;
     return ((guint32) tint);
 }
@@ -1631,23 +1641,34 @@ keyevent_scim_to_gdk (const GtkIMContextSCIM *ic,
 {
     GdkEventKey gdkevent;
 
+    GdkDisplay *display = 0;
+
+    if (ic && ic->impl && ic->impl->client_window) {
+        display = gdk_window_get_display (ic->impl->client_window);
+    } else {
+        display = gdk_display_get_default();
+    }
+
+    bool is_x11 = false;
 #ifdef GDK_WINDOWING_X11
-    Display *display = 0;
-
-    if (ic && ic->impl && ic->impl->client_window)
-        display = GDK_WINDOW_XDISPLAY (ic->impl->client_window);
-    else
-        display = GDK_DISPLAY_XDISPLAY (gdk_display_get_default ());
-
-    gdkevent.state = scim_x11_keymask_scim_to_x11 (display, scimkey.mask);
-#else
-    gdkevent.state = 0;
-    if (scimkey.is_shift_down ()) gdkevent.state |= GDK_SHIFT_MASK;
-    if (scimkey.is_caps_lock_down ()) gdkevent.state |= GDK_LOCK_MASK;
-    if (scimkey.is_control_down ()) gdkevent.state |= GDK_CONTROL_MASK;
-    if (scimkey.is_alt_down ()) gdkevent.state |= GDK_MOD1_MASK;
-    if (scimkey.is_num_lock_down ()) gdkevent.state |= GDK_MOD2_MASK;
+#if GTK_CHECK_VERSION(3, 0, 0)
+    if (GDK_IS_X11_DISPLAY (display)) {
+        is_x11 = true;
+        gdkevent.state = scim_x11_keymask_scim_to_x11 (
+            GDK_DISPLAY_XDISPLAY (display),
+            scimkey.mask
+        );
+    }
 #endif
+#endif
+    if (!is_x11) {
+        gdkevent.state = 0;
+        if (scimkey.is_shift_down ()) gdkevent.state |= GDK_SHIFT_MASK;
+        if (scimkey.is_caps_lock_down ()) gdkevent.state |= GDK_LOCK_MASK;
+        if (scimkey.is_control_down ()) gdkevent.state |= GDK_CONTROL_MASK;
+        if (scimkey.is_alt_down ()) gdkevent.state |= GDK_MOD1_MASK;
+        if (scimkey.is_num_lock_down ()) gdkevent.state |= GDK_MOD2_MASK;
+    }
 
     if (scimkey.is_key_release ()) gdkevent.state |= GDK_RELEASE_MASK;
 
@@ -1844,7 +1865,7 @@ initialize (void)
     gdk_color_parse ("light blue", &_active_bg);
     gdk_color_parse ("black",      &_active_text);
 
-    reload_config_callback (_config); 
+    reload_config_callback (_config);
     _config->signal_connect_reload (slot (reload_config_callback));
 
     // create backend
@@ -2095,7 +2116,7 @@ slot_show_preedit_string (IMEngineInstanceBase *si)
     }
 }
 
-static void 
+static void
 slot_show_aux_string (IMEngineInstanceBase *si)
 {
     SCIM_DEBUG_FRONTEND(1) << "slot_show_aux_string...\n";
@@ -2106,7 +2127,7 @@ slot_show_aux_string (IMEngineInstanceBase *si)
         _panel_client.show_aux_string (ic->id);
 }
 
-static void 
+static void
 slot_show_lookup_table (IMEngineInstanceBase *si)
 {
     SCIM_DEBUG_FRONTEND(1) << "slot_show_lookup_table...\n";
@@ -2117,7 +2138,7 @@ slot_show_lookup_table (IMEngineInstanceBase *si)
         _panel_client.show_lookup_table (ic->id);
 }
 
-static void 
+static void
 slot_hide_preedit_string (IMEngineInstanceBase *si)
 {
     SCIM_DEBUG_FRONTEND(1) << "slot_hide_preedit_string...\n";
@@ -2144,7 +2165,7 @@ slot_hide_preedit_string (IMEngineInstanceBase *si)
     }
 }
 
-static void 
+static void
 slot_hide_aux_string (IMEngineInstanceBase *si)
 {
     SCIM_DEBUG_FRONTEND(1) << "slot_hide_aux_string...\n";
@@ -2155,7 +2176,7 @@ slot_hide_aux_string (IMEngineInstanceBase *si)
         _panel_client.hide_aux_string (ic->id);
 }
 
-static void 
+static void
 slot_hide_lookup_table (IMEngineInstanceBase *si)
 {
     SCIM_DEBUG_FRONTEND(1) << "slot_hide_lookup_table...\n";
@@ -2166,7 +2187,7 @@ slot_hide_lookup_table (IMEngineInstanceBase *si)
         _panel_client.hide_lookup_table (ic->id);
 }
 
-static void 
+static void
 slot_update_preedit_caret (IMEngineInstanceBase *si, int caret)
 {
     SCIM_DEBUG_FRONTEND(1) << "slot_update_preedit_caret...\n";
@@ -2187,7 +2208,7 @@ slot_update_preedit_caret (IMEngineInstanceBase *si, int caret)
     }
 }
 
-static void 
+static void
 slot_update_preedit_string (IMEngineInstanceBase *si,
                             const WideString & str,
                             const AttributeList & attrs)
@@ -2214,7 +2235,7 @@ slot_update_preedit_string (IMEngineInstanceBase *si,
     }
 }
 
-static void 
+static void
 slot_update_aux_string (IMEngineInstanceBase *si,
                         const WideString & str,
                         const AttributeList & attrs)
@@ -2227,7 +2248,7 @@ slot_update_aux_string (IMEngineInstanceBase *si,
         _panel_client.update_aux_string (ic->id, str, attrs);
 }
 
-static void 
+static void
 slot_commit_string (IMEngineInstanceBase *si,
                     const WideString & str)
 {
@@ -2239,7 +2260,7 @@ slot_commit_string (IMEngineInstanceBase *si,
         g_signal_emit_by_name (ic, "commit", utf8_wcstombs (str).c_str ());
 }
 
-static void 
+static void
 slot_forward_key_event (IMEngineInstanceBase *si,
                         const KeyEvent & key)
 {
@@ -2263,7 +2284,7 @@ slot_forward_key_event (IMEngineInstanceBase *si,
     }
 }
 
-static void 
+static void
 slot_update_lookup_table (IMEngineInstanceBase *si,
                           const LookupTable & table)
 {
@@ -2275,7 +2296,7 @@ slot_update_lookup_table (IMEngineInstanceBase *si,
         _panel_client.update_lookup_table (ic->id, table);
 }
 
-static void 
+static void
 slot_register_properties (IMEngineInstanceBase *si,
                           const PropertyList & properties)
 {
@@ -2287,7 +2308,7 @@ slot_register_properties (IMEngineInstanceBase *si,
         _panel_client.register_properties (ic->id, properties);
 }
 
-static void 
+static void
 slot_update_property (IMEngineInstanceBase *si,
                       const Property & property)
 {
