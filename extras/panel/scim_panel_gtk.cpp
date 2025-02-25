@@ -2560,10 +2560,10 @@ create_pango_attrlist (const String        &mbs,
     guint wlen = g_utf8_strlen (mbs.c_str (), mbs.length ());
 
 #if GTK_CHECK_VERSION(3, 0, 0)
-    guint16 _normal_bg_rgb[] = { 65536*_normal_bg.red, 65536*_normal_bg.green, 65536*_normal_bg.blue };
-    guint16 _active_bg_rgb[] = { 65536*_active_bg.red, 65536*_active_bg.green, 65536*_active_bg.blue };
-    guint16 _normal_text_rgb[] = { 65536*_normal_text.red, 65536*_normal_text.green, 65536*_normal_text.blue };
-    guint16 _active_text_rgb[] = { 65536*_active_text.red, 65536*_active_text.green, 65536*_active_text.blue };
+    guint16 _normal_bg_rgb[] = { (guint16)(65536*_normal_bg.red), (guint16)(65536*_normal_bg.green), (guint16)(65536*_normal_bg.blue) };
+    guint16 _active_bg_rgb[] = { (guint16)(65536*_active_bg.red), (guint16)(65536*_active_bg.green), (guint16)(65536*_active_bg.blue) };
+    guint16 _normal_text_rgb[] = { (guint16)(65536*_normal_text.red), (guint16)(65536*_normal_text.green), (guint16)(65536*_normal_text.blue) };
+    guint16 _active_text_rgb[] = { (guint16)(65536*_active_text.red), (guint16)(65536*_active_text.green), (guint16)(65536*_active_text.blue) };
 #else
     guint16 _normal_bg_rgb[] = { _normal_bg.red, _normal_bg.green, _normal_bg.blue };
     guint16 _active_bg_rgb[] = { _active_bg.red, _active_bg.green, _active_bg.blue };
