@@ -4286,6 +4286,9 @@ int main (int argc, char *argv [])
         return -1;
     }
 
+    if (daemon)
+        scim_daemon ();
+
 #if !GTK_CHECK_VERSION(2, 32, 0)
     /* init threads */
     g_thread_init (NULL);
@@ -4317,9 +4320,6 @@ int main (int argc, char *argv [])
         std::cerr << "Failed to initialize Panel Agent!\n";
         return -1;
     }
-
-    if (daemon)
-        scim_daemon ();
 
     // connect the configuration reload signal.
     _config->signal_connect_reload (slot (ui_config_reload_callback));
