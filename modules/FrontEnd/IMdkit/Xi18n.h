@@ -69,12 +69,18 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #define I18N_SET	1
 #define I18N_GET	2
 
-typedef struct
+typedef struct _Xi18nCore *Xi18n;
+struct _TransportSW;
+typedef struct _TransportSW TransportSW;
+
+typedef Bool (*CheckAddrFunc)(Xi18n i18n_core, TransportSW *transSW, char *address);
+
+struct _TransportSW
 {
     char        *transportname;
     int         namelen;
-    Bool        (*checkAddr) ();
-} TransportSW;
+    CheckAddrFunc checkAddr;
+};
 
 typedef struct _XIMPending
 {
@@ -167,8 +173,6 @@ typedef struct _Xi18nClient
     void *trans_rec;		/* contains transport specific data  */
     struct _Xi18nClient *next;
 } Xi18nClient;
-
-typedef struct _Xi18nCore *Xi18n;
 
 /*
  * Callback Struct for XIM Protocol
