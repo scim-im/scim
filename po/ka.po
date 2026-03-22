@@ -1,0 +1,1499 @@
+# Georgian translation for scim.
+# Copyright (C) 2026 scim's authors.
+# This file is distributed under the same license as the scim package.
+# Ekaterine Papava <papava.e@gtu.ge>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: scim\n"
+"Report-Msgid-Bugs-To: http://sourceforge.net/projects/scim\n"
+"POT-Creation-Date: 2016-05-29 14:33+0200\n"
+"PO-Revision-Date: 2026-03-22 14:05+0100\n"
+"Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
+"Language-Team: Georgian <(nothing)>\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.9\n"
+
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1311
+#: ../extras/panel/scim_panel_gtk.cpp:2759
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1849
+msgid "Smart Common Input Method platform "
+msgstr "ჭვიანი საერთო შეყვანის მეთოდის პლატფორმა "
+
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1313
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1851
+msgid ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
+"\n"
+msgstr ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>\n"
+"\n"
+
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1318
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1855
+msgid ""
+":\n"
+"\n"
+msgstr ""
+":\n"
+"\n"
+
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1321
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1324
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1858
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1861
+msgid ""
+"\n"
+"\n"
+msgstr ""
+"\n"
+"\n"
+
+#. Append an entry for forward mode.
+#: ../extras/gtk_immodule/gtkimcontextscim.cpp:1361
+#: ../extras/panel/scim_panel_gtk.cpp:3355
+#: ../modules/FrontEnd/scim_x11_frontend.cpp:1901 ../src/scim_imengine.cpp:638
+#: ../src/scim_panel_agent.cpp:217 ../src/scim_panel_agent.cpp:218
+#: ../src/scim_utility.cpp:703
+msgid "English/Keyboard"
+msgstr "ინგლისური/კლავიატურა"
+
+#: ../extras/panel/scim_panel_gtk.cpp:1145
+msgid "SCIM Help"
+msgstr "SCIM-ის დახმარება"
+
+#: ../extras/panel/scim_panel_gtk.cpp:1148
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1479
+#: ../utils/scimkeyselection.cpp:790
+msgid "_OK"
+msgstr "_დიახ"
+
+#: ../extras/panel/scim_panel_gtk.cpp:1245
+#: ../extras/panel/scim_panel_gtk.cpp:1248
+msgid "Stick/unstick the input window and the toolbar."
+msgstr "შეყვანის ფანჯრისა და ხელსაწყოთა პანელის მიწებება/მოხსნა."
+
+#: ../extras/panel/scim_panel_gtk.cpp:1255
+#: ../extras/panel/scim_panel_gtk.cpp:1258
+msgid "Show a brief help about SCIM and the current input method."
+msgstr ""
+"მოკლე დახმარების ჩვენება SCIM-ისა და მიმდინარე შეყვანის მეთოდის შესახებ."
+
+#: ../extras/panel/scim_panel_gtk.cpp:1264
+#: ../extras/panel/scim_panel_gtk.cpp:1267
+msgid "Show command menu."
+msgstr "ბრძანების მენიუს ჩვენება."
+
+#: ../extras/panel/scim_panel_gtk.cpp:2761
+msgid ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
+msgstr ""
+"\n"
+"(C) 2002-2005 James Su <suzhe@tsinghua.org.cn>"
+
+#: ../extras/panel/scim_panel_gtk.cpp:2858
+msgid "Reload Configuration"
+msgstr "კონფიგურაციის თავიდან ჩატვირთვა"
+
+#. Stick
+#: ../extras/panel/scim_panel_gtk.cpp:2871
+msgid "Stick Windows"
+msgstr "ფანჯრების მიწებება"
+
+#. Toolbar
+#: ../extras/panel/scim_panel_gtk.cpp:2880
+msgid "Hide Toolbar"
+msgstr "ხელსაწყოთა ზოლის დამალვა"
+
+#: ../extras/panel/scim_panel_gtk.cpp:2895
+msgid "Help ..."
+msgstr "დახმარება ..."
+
+#: ../extras/panel/scim_panel_gtk.cpp:2922
+msgid "Exit"
+msgstr "გასვლა"
+
+#.
+#. vi:ts=4:nowrap:expandtab
+#.
+#: ../extras/setup/scim-setup.desktop.in.h:1
+msgid "SCIM Input Method"
+msgstr "შეყვანის მეთოდი SCIM"
+
+#: ../extras/setup/scim-setup.desktop.in.h:2
+msgid "Configure the Smart Common Input Method platform"
+msgstr "ჭვიანი საერთო შეყვანის მეთოდის პლატფორმის მორგება"
+
+#: ../extras/setup/scim_setup_helper.cpp:49
+msgid "SCIM Setup"
+msgstr "SCIM-ის მორგება"
+
+#: ../extras/setup/scim_setup_helper.cpp:51
+msgid "Integrated Setup Utility based on GTK Widget library."
+msgstr ""
+"ინტეგრირებული მორგების პროგრამა, რომელიც GTK ვიჯეტის ბიბლიოთეკას იყენებს."
+
+#: ../extras/setup/scim_setup_ui.cpp:47
+msgid "SCIM"
+msgstr "SCIM"
+
+#: ../extras/setup/scim_setup_ui.cpp:48
+msgid "FrontEnd"
+msgstr "წინაბოლო"
+
+#: ../extras/setup/scim_setup_ui.cpp:49
+msgid "IMEngine"
+msgstr "IMEngine"
+
+#: ../extras/setup/scim_setup_ui.cpp:50
+msgid "Panel"
+msgstr "პანელი"
+
+#: ../extras/setup/scim_setup_ui.cpp:51
+msgid "Extra"
+msgstr "დამატებით"
+
+#: ../extras/setup/scim_setup_ui.cpp:230
+msgid "SCIM Input Method Setup"
+msgstr "შეყვანის მეთოდი SCIM-ის მორგება"
+
+#: ../extras/setup/scim_setup_ui.cpp:423
+msgid ""
+" <span size=\"20000\">Smart Common Input Method platform</span> \n"
+"\n"
+"<span size=\"16000\" style=\"italic\">GUI Setup Utility</span>\n"
+"\n"
+"\n"
+"\n"
+"<span size=\"12000\">Copyright 2002-2004, James Su "
+"&lt;suzhe@tsinghua.org.cn&gt;</span>"
+msgstr ""
+" <span size=\"20000\">ჭკვიანი საერთო შეყვანის მეთოდის პლატფორმა</span> \n"
+"\n"
+"<span size=\"16000\" style=\"italic\">გრაფიკული მორგების პროგრამა</span>\n"
+"\n"
+"\n"
+"\n"
+"<span size=\"12000\">Copyright 2002-2004, James Su "
+"&lt;suzhe@tsinghua.org.cn&gt;</span>"
+
+#: ../extras/setup/scim_setup_ui.cpp:452
+#, c-format
+msgid "<span size=\"x-large\">The Setup for %s modules.</span>"
+msgstr "<span size=\"x-large\">მორგება %s-ის მოდულებისთვის.</span>"
+
+#: ../extras/setup/scim_setup_ui.cpp:732
+msgid ""
+"Not all configuration can be reloaded on the fly. Don't forget to restart "
+"SCIM in order to let all of the new configuration take effect."
+msgstr ""
+"ყველა კონფიგურაცია ჩართულზევე არ გადაიტვირთება. არ დაგავიწყდეთ, რომ "
+"გადატვირთოთ SCIM, რომ კონფიგურაციის ყველა ცვლილება შევიდეს ძალაში."
+
+#: ../modules/Filter/scim_sctc_filter.cpp:57
+msgid "Simplified-Traditional Chinese Conversion"
+msgstr "გამარტივებულიდან ტრადიციულ ჩინურზე გადაყვანა"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:60
+msgid "Convert between Simplified Chinese and Traditional Chinese"
+msgstr "გადაყვანა გამარტივებული ჩინურიდან და ტრადიციულ ჩინურზე"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:71
+msgid "SC-TC"
+msgstr "SC-TC"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:73
+#: ../modules/Filter/scim_sctc_filter.cpp:78
+msgid "Simplified-Traditional Chinese conversion"
+msgstr "გამარტივებულიდან ტრადიციულ ჩინურზე გადაყვანა"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:76
+msgid "No Conversion"
+msgstr "გადაყვანის გარეშე"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:81
+msgid "Simplified to Traditional"
+msgstr "გამარტივებულიდან ტრადიციულზე"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:83
+msgid "Convert Simplified Chinese to Traditional Chinese"
+msgstr "გადაყვანა გამარტივებულ ჩინურიდან და ტრადიციულ ჩინურზე"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:86
+msgid "Traditional to Simplified"
+msgstr "ტრადიციულიდან გამარტივებულზე"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:88
+msgid "Convert Traditional Chinese to Simplified Chinese"
+msgstr "გადაყვანა ტრადიციული ჩინურიდან გამარტივებულ ჩინურზე"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:300
+msgid "James Su <suzhe@tsinghua.org.cn>"
+msgstr "James Su <suzhe@tsinghua.org.cn>"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:425
+#: ../modules/Filter/scim_sctc_filter.cpp:555
+#: ../modules/Filter/scim_sctc_filter.cpp:571
+msgid "SC->TC"
+msgstr "SC->TC"
+
+#: ../modules/Filter/scim_sctc_filter.cpp:431
+#: ../modules/Filter/scim_sctc_filter.cpp:559
+#: ../modules/Filter/scim_sctc_filter.cpp:575
+msgid "TC->SC"
+msgstr "TC->SC"
+
+#: ../modules/IMEngine/scim_rawcode_imengine.cpp:120
+msgid "RAW CODE"
+msgstr "დაუმუშავებელი კოდი"
+
+#: ../modules/IMEngine/scim_rawcode_imengine.cpp:127
+msgid "(C) 2002-2006 James Su <suzhe@tsinghua.org.cn>"
+msgstr "(C) 2002-2006 James Su <suzhe@tsinghua.org.cn>"
+
+#: ../modules/IMEngine/scim_rawcode_imengine.cpp:140
+msgid ""
+"Hot Keys:\n"
+"\n"
+"  Control+u:\n"
+"    switch between Multibyte encoding and Unicode.\n"
+"\n"
+"  Esc:\n"
+"    reset the input method.\n"
+msgstr ""
+"კლავიატურის მალსახმობები:\n"
+"\n"
+"  Control+u:\n"
+"     გადართვა მრავალბაიტიან კოდირებასა და უნიკოდს შორის.\n"
+"\n"
+"  Esc:\n"
+"    შეყვანის მეთოდის ჩამოყრა.\n"
+
+#: ../modules/IMEngine/scim_rawcode_imengine.cpp:407
+#: ../modules/IMEngine/scim_rawcode_imengine.cpp:423
+msgid "The status of the current input method. Click to change it."
+msgstr "მიმდინარე შეყვანის მეთოდის სტატუსი. შესაცვლელად დააწკაპუნეთ."
+
+#: ../modules/IMEngine/scim_rawcode_imengine.cpp:409
+msgid "Unicode"
+msgstr "უნიკოდი"
+
+#: ../modules/IMEngine/scim_socket_imengine.cpp:386
+#: ../modules/IMEngine/scim_socket_imengine.cpp:416
+#: ../modules/IMEngine/scim_socket_imengine.cpp:501
+#: ../modules/IMEngine/scim_socket_imengine.cpp:531
+#: ../modules/IMEngine/scim_socket_imengine.cpp:561
+#: ../src/scim_keyboard_layout_data.h:4591
+msgid "Unknown"
+msgstr "უცნობი"
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:82
+#: ../modules/SetupUI/scim_imengine_setup.cpp:88
+msgid "Global Setup"
+msgstr "გლობალური პარამეტრები"
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:87
+msgid ""
+"Setup the global options used by All FrontEnd modules, including X11 "
+"FrontEnd, GTK IMModule, QT IMModule etc."
+msgstr ""
+"მოირგეთ გლობალური პარამეტრები, რომლებსაც ყველა წინაბოლოს მოდული, X11 "
+"წინაბოლოს, GTK IMModule, QT IMModule ა.შ. ჩათვლით."
+
+#. label
+#: ../modules/SetupUI/scim_frontend_setup.cpp:146
+msgid "_Trigger:"
+msgstr "_ტრიგერი:"
+
+#. title
+#: ../modules/SetupUI/scim_frontend_setup.cpp:148
+msgid "Select the trigger keys"
+msgstr "ტრიგერის ღილაკების არჩევა"
+
+#. tooltip
+#: ../modules/SetupUI/scim_frontend_setup.cpp:150
+msgid ""
+"The key events to turn on/off SCIM input method. Click on the button on the "
+"right to edit it."
+msgstr ""
+"ღილაკის მოვლენები SCIM შეყვანის მეთოდის ჩასართავად/გამოსართავად. დააწკაპუნეთ "
+"ღილაკზე მარჯვნივ მის ჩასასწორებლად."
+
+#. label
+#: ../modules/SetupUI/scim_frontend_setup.cpp:163
+msgid "Turn _On:"
+msgstr "_ჩართვა:"
+
+#. title
+#: ../modules/SetupUI/scim_frontend_setup.cpp:165
+msgid "Select the Turn On keys"
+msgstr "ჩართვის ღილაკების არჩევა"
+
+#. tooltip
+#: ../modules/SetupUI/scim_frontend_setup.cpp:167
+msgid ""
+"The key events to turn on SCIM input method. Click on the button on the "
+"right to edit it."
+msgstr ""
+"ღილაკის მოვლენები SCIM შეყვანის მეთოდის ჩასართავად. დააწკაპუნეთ ღილაკზე "
+"მარჯვნივ მის ჩასასწორებლად."
+
+#. label
+#: ../modules/SetupUI/scim_frontend_setup.cpp:180
+msgid "Turn O_ff:"
+msgstr "გა_მორთვა:"
+
+#. title
+#: ../modules/SetupUI/scim_frontend_setup.cpp:182
+msgid "Select the Turn Off keys"
+msgstr "გამორთვის ღილაკების არჩევა"
+
+#. tooltip
+#: ../modules/SetupUI/scim_frontend_setup.cpp:184
+msgid ""
+"The key events to turn off SCIM input method. Click on the button on the "
+"right to edit it."
+msgstr ""
+"ღილაკის მოვლენები SCIM შეყვანის მეთოდის გამოსართავად. დააწკაპუნეთ ღილაკზე "
+"მარჯვნივ მის ჩასასწორებლად."
+
+#. label
+#: ../modules/SetupUI/scim_frontend_setup.cpp:197
+msgid "_Next input method:"
+msgstr "შემდეგი შეყვა_ნის მეთოდი:"
+
+#. title
+#: ../modules/SetupUI/scim_frontend_setup.cpp:199
+msgid "Select the next input method keys"
+msgstr "აირჩიეთ შემდეგი შეყვანის მეთოდის ღილაკები"
+
+#. tooltip
+#: ../modules/SetupUI/scim_frontend_setup.cpp:201
+msgid ""
+"The key events to switch to the next input method. Click on the button on "
+"the right to edit it."
+msgstr ""
+"ღილაკის მოვლენები შემდეგი შეყვანის მეთოდზე გადასართავად. დააწკაპუნეთ ღილაკზე "
+"მარჯვნივ მის ჩასასწორებლად."
+
+#. label
+#: ../modules/SetupUI/scim_frontend_setup.cpp:216
+msgid "_Previous input method:"
+msgstr "_წინა შეყვანის მეთოდი:"
+
+#. title
+#: ../modules/SetupUI/scim_frontend_setup.cpp:218
+msgid "Select the previous input method keys"
+msgstr "აირჩიეთ წინა შეყვანის მეთოდის ღილაკები"
+
+#. tooltip
+#: ../modules/SetupUI/scim_frontend_setup.cpp:220
+msgid ""
+"The key events to switch to the previous input method. Click on the button "
+"on the right to edit it."
+msgstr ""
+"ღილაკის მოვლენები წინა შეყვანის მეთოდზე გადასართავად. დააწკაპუნეთ ღილაკზე "
+"მარჯვნივ მის ჩასასწორებლად."
+
+#. label
+#: ../modules/SetupUI/scim_frontend_setup.cpp:235
+msgid "Show input method _menu:"
+msgstr "შეყვანის მეთოდების _მენიუს ჩვენება:"
+
+#. title
+#: ../modules/SetupUI/scim_frontend_setup.cpp:237
+msgid "Select the show input method menu keys"
+msgstr "აირჩიეთ შეყვანის მეთოდის მენიუს ჩვენების ღილაკები"
+
+#. tooltip
+#: ../modules/SetupUI/scim_frontend_setup.cpp:239
+msgid ""
+"The key events to show the input method menu. Click on the button on the "
+"right to edit it."
+msgstr ""
+"ღილაკის მოვლენები შეყვანის მეთოდის მენიუს საჩვენებლად. დააწკაპუნეთ ღილაკზე "
+"მარჯვნივ მის ჩასასწორებლად."
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:316
+msgid "Options"
+msgstr "მორგება"
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:339
+msgid "_Keyboard Layout:"
+msgstr "_კლავიატურის განლაგება:"
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:369
+#: ../modules/SetupUI/scim_frontend_setup.cpp:373
+msgid ""
+"You should choose your currently used keyboard layout here so that input "
+"methods, who care about keyboard layout, could work correctly."
+msgstr ""
+"აქ უნდა აირჩიოთ თქვენი მიმდინარე კლავიატურის განლაგება, რომ შეყვანის "
+"მეთოდებმა, რომლებიც კლავიატურის განლაგებაზე ზრუნავენ, სწორად იმუშაონ."
+
+#. On The Spot.
+#: ../modules/SetupUI/scim_frontend_setup.cpp:378
+msgid "_Embed Preedit String into client window"
+msgstr "ჩასწორებისწინა სტრიქონის ჩაშენ_ება კლიენტის ფანჯარაში"
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:384
+#: ../modules/SetupUI/scim_frontend_setup.cpp:389
+msgid ""
+"If this option is checked, the preedit string will be displayed directly in "
+"the client input window, rather than in a independent float window."
+msgstr ""
+"თუ ეს პარამეტრი ჩართულია, ჩასწორებისწინა სტრიქონი პირდაპირ კლიენტის შეყვანის "
+"ფანჯარაში გამოჩნდება დამოუკიდებელი მცურავი ფანჯრის მაგიერ."
+
+#. Shared input method.
+#: ../modules/SetupUI/scim_frontend_setup.cpp:399
+msgid "_Share the same input method among all applications"
+msgstr "იგივე შეყვანის მეთოდი_ს გაზიარება ყველა აპლიკაციასთან"
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:405
+#: ../modules/SetupUI/scim_frontend_setup.cpp:410
+msgid ""
+"If this option is checked, then only one input method could be used by all "
+"applications at the same time.Otherwise different input method could be used "
+"by each application."
+msgstr ""
+"თუ ეს პარამეტრი ჩართულია, ყველა აპლიკაციისთვის გამოყენებული იქნება ერთი "
+"შეყვანის მეთოდი. თუ არა, თითოეული აპლიკაციისთვის გამოყენებული იქნება "
+"განსხვავებული შეყვანის მეთოდი."
+
+#: ../modules/SetupUI/scim_frontend_setup.cpp:419
+#: ../modules/SetupUI/scim_imengine_setup.cpp:508
+msgid "Hotkeys"
+msgstr "კლავიატურის მალსახმობები"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:93
+msgid ""
+"You can enable/disable input methods and set hotkeys for input methods here."
+msgstr ""
+"აქ შეგიძლიათ გამორთოთ/ჩართოთ შეყვანის მეთოდები და დააყენოთ კლავიატურის "
+"მალსახმობები შეყვანის მეთოდებისთვის."
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:306
+msgid "The installed input method services:"
+msgstr "დაყენებული შეყვანის მეთოდის სერვისები:"
+
+#. Create hotkey and filter button before factory list view, because
+#. factory_list_selection_changed_callback may access these two buttons.
+#: ../modules/SetupUI/scim_imengine_setup.cpp:326
+msgid "Edit _Hotkeys"
+msgstr "კლავიატურის მალსა_ხმობების ჩასწორება"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:336
+#: ../modules/SetupUI/scim_imengine_setup.cpp:339
+msgid "Edit Hotkeys associated with the selected input method."
+msgstr ""
+"მონიშნულ შეყვანის მეთოდთან ასოცირებული კლავიატურის მალსახმობების ჩასწორება."
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:342
+msgid "Select _Filters"
+msgstr "აირჩიეთ _ფილტრები"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:352
+#: ../modules/SetupUI/scim_imengine_setup.cpp:355
+msgid "Select the Filters which will be attached to this input method."
+msgstr "აირჩიეთ ფილტრები, რომლებიც ამ შეყვანის მეთოდზე იქნება მიმაგრებული."
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:381
+msgid "_Expand"
+msgstr "_ჩამოსლა"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:391
+#: ../modules/SetupUI/scim_imengine_setup.cpp:394
+msgid "Expand all language categories."
+msgstr "ყველა ენის კატეგორიის გაშლა."
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:397
+msgid "_Collapse"
+msgstr "_აკეცვა"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:407
+#: ../modules/SetupUI/scim_imengine_setup.cpp:410
+msgid "Collapse all language categories."
+msgstr "ყველა ენის კატეგორიის ჩაკეცვა."
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:413
+msgid "E_nable All"
+msgstr "_ყველას ჩართვა"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:423
+#: ../modules/SetupUI/scim_imengine_setup.cpp:426
+msgid "Enable all input methods."
+msgstr "ყველა შეყვანის მეთოდის ჩართვა."
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:429
+msgid "_Disable All"
+msgstr "ყველას _გამორთვა"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:439
+#: ../modules/SetupUI/scim_imengine_setup.cpp:442
+msgid "Disable all input methods."
+msgstr "ყველა შეყვანის მეთოდის გამორთვა."
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:469
+#: ../modules/SetupUI/scim_imengine_setup.cpp:598
+msgid "Name"
+msgstr "სახელი"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:487
+#: ../modules/SetupUI/scim_imengine_setup.cpp:579
+msgid "Enable"
+msgstr "ჩართვა"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:522
+msgid "Filters"
+msgstr "ფილტრები"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:617
+msgid "Languages"
+msgstr "ენები"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:631
+msgid "Description"
+msgstr "აღწერა"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1247
+#, c-format
+msgid "Edit Hotkeys for %s"
+msgstr "კლავიატურის მალსახმობების ჩასწორება %s-ისთვის"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1474
+#, c-format
+msgid "Select Filters for %s"
+msgstr "აირჩიეთ ფილტრები %s-ისთვის"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1480
+#: ../utils/scimkeyselection.cpp:782
+msgid "_Cancel"
+msgstr "გაუ_ქმება"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1530
+msgid "Move _Up"
+msgstr "_აწევა"
+
+#: ../modules/SetupUI/scim_imengine_setup.cpp:1537
+msgid "Move _Down"
+msgstr "_დაწევა"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:95
+msgid "GTK"
+msgstr "GTK"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:100
+msgid "A panel daemon based on GTK+-2.x library."
+msgstr "პანელის დემონი, რომელიც GTK+-2x ბიბლიოთეკაზეა დაფუძნებული."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:166
+msgid "Always"
+msgstr "ყოველთვის"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:167
+msgid "On demand"
+msgstr "საჭიროებისამებრ"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:168
+msgid "Never"
+msgstr "არასდროს"
+
+#. Create the ToolBar setup block.
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:221
+msgid "ToolBar"
+msgstr "ხელსაწყოთა პანელი"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:254
+msgid "_Show:"
+msgstr "ჩ_ვენება:"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:285
+msgid "Auto s_nap"
+msgstr "ავტომი_წებება"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:288
+msgid "Show _input method icon"
+msgstr "შეყვან_ის მეთოდის ხატულას ჩვენება"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:291
+msgid "Show inp_ut method name"
+msgstr "შეყვანის მეთოდის სახელის ჩვენე_ბა"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:333
+msgid "Hide time_out:"
+msgstr "დამალვის მ_ოლოდინის ვადა:"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:351
+msgid "Show s_tick icon"
+msgstr "მი_წებების ხატულას ჩვენება"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:354
+msgid "Show m_enu icon"
+msgstr "მ_ენიუს ხატულას ჩვენება"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:357
+msgid "Show _help icon"
+msgstr "და_ხმარების ხატულას ჩვენება"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:360
+msgid "Show _property label"
+msgstr "_თვისების ჭდის ჩვენება"
+
+#. Create the Input Window setup block
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:399
+msgid "Input window"
+msgstr "შეყვანის ფანჯარა"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:412
+msgid "E_mbedded lookup table"
+msgstr "ჩაშენებული _ძებნის ცხრილი"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:416
+msgid "_Vertical lookup table"
+msgstr "_ვერტიკალური ძებნის ცხრილი"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:420
+msgid "Misc"
+msgstr "სხვადასხვა"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:433
+msgid "Show tra_y icon"
+msgstr "სისტემურ საათთან ხატ_ულას ჩვენება"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:437
+msgid "Stick _windows"
+msgstr "ფანჯრების მი_წებება"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:449
+msgid "_Font:"
+msgstr "_ფონტი:"
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:525
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:593
+msgid ""
+"If option \"Always\" is selected, the toolbar will always be shown on the "
+"screen. If option \"On demand\" is selected, it will only be shown when SCIM "
+"is activated. If option \"Never\" is selected, it will never be shown."
+msgstr ""
+"თუ არჩეულია ვარიანტი \"ყოველთვის\" ხელსაწყოთა პანელი ყოველთვის გამოჩნდება. "
+"თუ \"საჭიროებისამებრ\", მხოლოდ მაშინ, როცა SCIM გააქტიურდება. თუ არჩეულია "
+"\"არასდროს\", ის არასდროს იქნება ნაჩვენები."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:532
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:600
+msgid ""
+"If this option is checked, the toolbar will be snapped to the screen border."
+msgstr "თუეს პარამეტრი ჩართულია, ხელსაწყოთა პანელი ეკრანის წიბოს მიეწებება."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:538
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:606
+msgid ""
+"The toolbar will be hidden out after this timeout is elapsed. This option is "
+"only valid when \"Always show\" is selected. Set to zero to disable this "
+"behavior."
+msgstr ""
+"ხელსაწყოთა პანელი დაიმალება, როცა ეს რაოდენობის დრო გავა. ეს პარამეტრი, "
+"მხოლოდ, მაშინ მუშაობს, როცა არჩეულია \"ყოველთვის ჩვენება\". ამ ქცევის "
+"გამოსართავად დააყენეთ ის ნულზე."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:545
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:613
+msgid ""
+"If this option is checked, the input method icon will be showed on the "
+"toolbar."
+msgstr ""
+"თუ ეს პარამეტრი ჩართულია, ხელსაწყოთა პანელზე შეყვანის მეთოდის ხატულა იქნება "
+"ნაჩვენები."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:549
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:617
+msgid ""
+"If this option is checked, the input method name will be showed on the "
+"toolbar."
+msgstr ""
+"თუ ეს პარამეტრი ჩართულია, ხელსაწყოთა პანელზე შეყვანის მეთოდის სახელი იქნება "
+"ნაჩვენები."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:553
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:621
+msgid ""
+"If this option is checked, the stick icon will be showed on the toolbar."
+msgstr ""
+"თუ ეს პარამეტრი ჩართულია, ხელსაწყოთა პანელზე მიწებების ხატულა იქნება "
+"ნაჩვენები."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:557
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:625
+msgid "If this option is checked, the menu icon will be showed on the toolbar."
+msgstr ""
+"თუ ეს პარამეტრი ჩართულია, ხელსაწყოთა პანელზე მენიუს ხატულა იქნება ნაჩვენები."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:561
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:629
+msgid "If this option is checked, the help icon will be showed on the toolbar."
+msgstr ""
+"თუ ეს პარამეტრი ჩართულია, ხელსაწყოთა პანელზე დახმარების ხატულა იქნება "
+"ნაჩვენები."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:565
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:633
+msgid ""
+"If this option is checked, the text label of input method properties will be "
+"showed on the toolbar."
+msgstr ""
+"თუ ეს პარამეტრი ჩართულია, ხელსაწყოთა პანელზე შეყვანის მეთოდის თვისებების "
+"ტექსტური ჭდე იქნება ნაჩვენები."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:569
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:637
+msgid ""
+"If this option is checked, the lookup table will be embedded into the input "
+"window."
+msgstr ""
+"თუ ეს პარამეტრი ჩართულია, ძებნის ცხრილი შეყვანის ფანჯარაში იქნება ჩაშენებული."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:574
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:642
+msgid ""
+"If this option is checked, the lookup table will be displayed vertically."
+msgstr "თუ ეს პარამეტრი ჩართულია, ძებნის ცხრილი ვერტიკალურად იქნება ნაჩვენები."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:579
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:647
+msgid ""
+"If this option is checked, the tray icon will be showed on the desktop's "
+"taskbar."
+msgstr ""
+"თუ ეს პარამეტრი ჩართულია, სამუშაო მაგიდის სისტემურ კუთხეში ნაჩვენები იქნება "
+"ხატულა."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:583
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:651
+msgid ""
+"If this option is checked, the toolbar, input and lookup table windows will "
+"be sticked to its original position."
+msgstr ""
+"თუ ეს პარამეტრი ჩართულია, ხელსაწყოთა პანელი, შეყვანისა და ძებნის ცხრილის "
+"ფანჯრები ორიგინალ მდებარეობაზე დარჩებიან."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:589
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:657
+msgid "The font setting will be used in the input and lookup table windows."
+msgstr ""
+"ფონტის პარამეტრი გამოყენებული იქნება შეყვანისა და ძებნის ცხრილის ფანჯრებში."
+
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:979
+#: ../modules/SetupUI/scim_panel_gtk_setup.cpp:1004
+msgid "Select Interface Font"
+msgstr "აირჩიეთ ინტერფეისის ფონტი"
+
+#: ../src/scim_compose_key.cpp:128
+msgid "English/European"
+msgstr "ინგლისური/ევროპული"
+
+#. bail out: can't continue without the helper
+#: ../src/scim_helper_manager.cpp:134
+msgid "Failed to launch HelperManager: exiting..."
+msgstr "HelperManager-ის გაშვება ჩავარდა: გასვლა..."
+
+#: ../src/scim_helper_manager.cpp:162 ../src/scim_helper_manager.cpp:178
+#: ../src/scim_helper_manager.cpp:184 ../src/scim_helper_manager.cpp:189
+#: ../src/scim_helper_manager.cpp:194
+msgid "Error launching HelperManager"
+msgstr "HelperManager-ის გაშვების შეცდომა"
+
+#: ../src/scim_helper_manager.cpp:162 ../src/scim_helper_manager.cpp:178
+#: ../src/scim_socket.cpp:476 ../src/scim_socket.cpp:510
+msgid "failed"
+msgstr "ჩავარდა"
+
+#: ../src/scim_helper_manager.cpp:184
+msgid "abnormal process termination"
+msgstr "პროცესის არანორმალური შეწყვეტა"
+
+#: ../src/scim_helper_manager.cpp:190
+msgid "it exited with signal"
+msgstr "გავიდა სიგნალით"
+
+#: ../src/scim_helper_manager.cpp:194
+msgid "unknown process launch error"
+msgstr "უცნობი პროცესის გაშვების შეცდომა"
+
+#: ../src/scim_keyboard_layout_data.h:4592
+msgid "English (US)"
+msgstr "ინგლისური (აშშ)"
+
+#: ../src/scim_keyboard_layout_data.h:4593
+msgid "Belgian"
+msgstr "ბელგიური"
+
+#: ../src/scim_keyboard_layout_data.h:4594 ../src/scim_utility.cpp:744
+msgid "Croatian"
+msgstr "ხორვატული"
+
+#: ../src/scim_keyboard_layout_data.h:4595 ../src/scim_utility.cpp:718
+msgid "Czech"
+msgstr "ჩეხური"
+
+#: ../src/scim_keyboard_layout_data.h:4596
+msgid "Czech (qwerty)"
+msgstr "ჩეხური (QWERTY)"
+
+#: ../src/scim_keyboard_layout_data.h:4597 ../src/scim_utility.cpp:720
+msgid "Danish"
+msgstr "დანიური"
+
+#: ../src/scim_keyboard_layout_data.h:4598 ../src/scim_utility.cpp:768
+msgid "Dutch"
+msgstr "ჰოლანდიური"
+
+#: ../src/scim_keyboard_layout_data.h:4599
+msgid "Dvorak"
+msgstr "Dvorak"
+
+#: ../src/scim_keyboard_layout_data.h:4600 ../src/scim_utility.cpp:734
+msgid "Estonian"
+msgstr "ესტონური"
+
+#: ../src/scim_keyboard_layout_data.h:4601 ../src/scim_utility.cpp:737
+msgid "Finnish"
+msgstr "ფინური"
+
+#: ../src/scim_keyboard_layout_data.h:4602 ../src/scim_utility.cpp:738
+msgid "French"
+msgstr "ფრანგული"
+
+#: ../src/scim_keyboard_layout_data.h:4603
+msgid "French (Canadian)"
+msgstr "ფრანგული (კანადური)"
+
+#: ../src/scim_keyboard_layout_data.h:4604
+msgid "French (Switzerland)"
+msgstr "ფრანგული (შვეიცარია)"
+
+#: ../src/scim_keyboard_layout_data.h:4605 ../src/scim_utility.cpp:721
+msgid "German"
+msgstr "გერმანული"
+
+#: ../src/scim_keyboard_layout_data.h:4606
+msgid "German (with deadkeys)"
+msgstr "გერმანული (მკვდარი ღილაკებით)"
+
+#: ../src/scim_keyboard_layout_data.h:4607
+msgid "German (Swiss)"
+msgstr "გერმანული (შვეიცარიული)"
+
+#: ../src/scim_keyboard_layout_data.h:4608 ../src/scim_utility.cpp:723
+msgid "Greek"
+msgstr "ბერძნული"
+
+#: ../src/scim_keyboard_layout_data.h:4609 ../src/scim_utility.cpp:745
+msgid "Hungarian"
+msgstr "უნგრული"
+
+#: ../src/scim_keyboard_layout_data.h:4610 ../src/scim_utility.cpp:750
+msgid "Italian"
+msgstr "იტალიური"
+
+#: ../src/scim_keyboard_layout_data.h:4611 ../src/scim_utility.cpp:752
+msgid "Japanese"
+msgstr "იაპონური"
+
+#: ../src/scim_keyboard_layout_data.h:4612
+msgid "Norwegian"
+msgstr "ნორვეგიული"
+
+#: ../src/scim_keyboard_layout_data.h:4613 ../src/scim_utility.cpp:773
+msgid "Polish"
+msgstr "პოლონური"
+
+#: ../src/scim_keyboard_layout_data.h:4614 ../src/scim_utility.cpp:774
+#: ../src/scim_utility.cpp:776
+msgid "Portuguese"
+msgstr "პორტუგალიური"
+
+#: ../src/scim_keyboard_layout_data.h:4615 ../src/scim_utility.cpp:775
+msgid "Portuguese (Brazil)"
+msgstr "პორტუგალური (ბრაზილია)"
+
+#: ../src/scim_keyboard_layout_data.h:4616
+msgid "Portuguese (Brazil US accents)"
+msgstr "პორტუგალიური (ბრაზილიური აშშ აქცენტები)"
+
+#: ../src/scim_keyboard_layout_data.h:4617 ../src/scim_utility.cpp:778
+msgid "Russian"
+msgstr "რუსული"
+
+#: ../src/scim_keyboard_layout_data.h:4618 ../src/scim_utility.cpp:782
+msgid "Slovak"
+msgstr "სლოვაკური"
+
+#: ../src/scim_keyboard_layout_data.h:4619
+msgid "Slovak (qwerty)"
+msgstr "სლოვაკური (QWERTY)"
+
+#: ../src/scim_keyboard_layout_data.h:4620 ../src/scim_utility.cpp:783
+msgid "Slovenian"
+msgstr "სლოვენური"
+
+#: ../src/scim_keyboard_layout_data.h:4621 ../src/scim_utility.cpp:731
+#: ../src/scim_utility.cpp:732
+msgid "Spanish"
+msgstr "ესპანური"
+
+#: ../src/scim_keyboard_layout_data.h:4622
+msgid "Spanish (CP 850)"
+msgstr "ესპანური (CP 850)"
+
+#: ../src/scim_keyboard_layout_data.h:4623
+msgid "Spanish (Latin America)"
+msgstr "ესპანური (ლათინური ამერიკა)"
+
+#: ../src/scim_keyboard_layout_data.h:4624 ../src/scim_utility.cpp:788
+#: ../src/scim_utility.cpp:790
+msgid "Swedish"
+msgstr "შვედური"
+
+#: ../src/scim_keyboard_layout_data.h:4625 ../src/scim_utility.cpp:794
+msgid "Turkish"
+msgstr "თურქული"
+
+#: ../src/scim_keyboard_layout_data.h:4626
+msgid "English (UK)"
+msgstr "ინგლისური (დბ)"
+
+#: ../src/scim_keyboard_layout_data.h:4627 ../src/scim_utility.cpp:749
+msgid "Icelandic"
+msgstr "ისლანდიური"
+
+#: ../src/scim_keyboard_layout_data.h:4628 ../src/scim_utility.cpp:759
+msgid "Lithuanian"
+msgstr "ლიეტუვური"
+
+#: ../src/scim_keyboard_layout_data.h:4629 ../src/scim_utility.cpp:796
+msgid "Ukrainian"
+msgstr "უკრაინული"
+
+#. NOTE another instance of the server is running: we can't just keep running like this
+#. if we attempt to bind anyway there may be more than one servers listening on this socket.
+#. In addition on FreeBSD bind will get EADDRINUSE, not clear why Linux doesn;t produce this same error.
+#: ../src/scim_socket.cpp:475 ../src/scim_socket.cpp:483
+#: ../src/scim_socket.cpp:491 ../src/scim_socket.cpp:509
+msgid "Creating socket"
+msgstr "სოკეტის შექმნა"
+
+#: ../src/scim_socket.cpp:476
+msgid "file exists and we were unable to delete it"
+msgstr "ფაილი არსებობს და ვერ წავშალე"
+
+#: ../src/scim_socket.cpp:476 ../src/scim_socket.cpp:510
+msgid "syscall"
+msgstr "სისტემური გამოძახება"
+
+#: ../src/scim_socket.cpp:478 ../src/scim_socket.cpp:484
+#: ../src/scim_socket.cpp:492
+msgid "exiting"
+msgstr "გასვლა"
+
+#: ../src/scim_socket.cpp:484
+msgid "file exists and is not a socket"
+msgstr "ფაილი არსებობს და სოკეტი არაა"
+
+#: ../src/scim_socket.cpp:492
+msgid "another instance of the server is already listening on this socket"
+msgstr "სერვერის სხვა გაშვებული ასლი უკვე უსმენს ამ სოკეტს"
+
+#: ../src/scim_socket.cpp:510
+msgid "unable to change the mode of this file"
+msgstr "ამ ფაილის რეჟიმის შეცვლა შეუძლებელია"
+
+#: ../src/scim_socket.cpp:511
+msgid "continuing"
+msgstr "გაგრძელება"
+
+#: ../src/scim_socket.cpp:519 ../src/scim_socket.cpp:535
+#: ../src/scim_socket.cpp:589
+msgid "Error creating socket"
+msgstr "სოკეტის შექმნის შეცდომა"
+
+#: ../src/scim_socket.cpp:519 ../src/scim_socket.cpp:535
+#: ../src/scim_socket.cpp:589
+msgid "syscall failed"
+msgstr "სისტემური გამოძახება ჩავარდა"
+
+#: ../src/scim_utility.cpp:704
+msgid "Amharic"
+msgstr "ამჰარული"
+
+#: ../src/scim_utility.cpp:705
+msgid "Arabic"
+msgstr "არაბული"
+
+#: ../src/scim_utility.cpp:706
+msgid "Arabic (Egypt)"
+msgstr "არაბული (ეგვიპტე)"
+
+#: ../src/scim_utility.cpp:707
+msgid "Arabic (Lebanon)"
+msgstr "არაბული (ლებანი)"
+
+#: ../src/scim_utility.cpp:708
+msgid "Assamese"
+msgstr "ასამური"
+
+#: ../src/scim_utility.cpp:709
+msgid "Azerbaijani"
+msgstr "აზერბაიჯანული"
+
+#: ../src/scim_utility.cpp:710
+msgid "Belarusian"
+msgstr "ბელორუსული"
+
+#: ../src/scim_utility.cpp:711
+msgid "Bulgarian"
+msgstr "ბულგარული"
+
+#: ../src/scim_utility.cpp:712 ../src/scim_utility.cpp:713
+msgid "Bengali"
+msgstr "ბენგალური"
+
+#: ../src/scim_utility.cpp:714
+msgid "Bengali (India)"
+msgstr "ბენგალური (ინდია)"
+
+#: ../src/scim_utility.cpp:715
+msgid "Tibetan"
+msgstr "ტიბეტური"
+
+#: ../src/scim_utility.cpp:716
+msgid "Bosnian"
+msgstr "ბოსნიური"
+
+#: ../src/scim_utility.cpp:717
+msgid "Catalan"
+msgstr "კატალანური"
+
+#: ../src/scim_utility.cpp:719
+msgid "Welsh"
+msgstr "უელსური"
+
+#: ../src/scim_utility.cpp:722
+msgid "Divehi"
+msgstr "დივეხი"
+
+#: ../src/scim_utility.cpp:724
+msgid "English"
+msgstr "ინგლისური"
+
+#: ../src/scim_utility.cpp:725
+msgid "English (Australian)"
+msgstr "ინგლისური (ავსტრალიური)"
+
+#: ../src/scim_utility.cpp:726
+msgid "English (Canadian)"
+msgstr "ინგლისური (კანადური)"
+
+#: ../src/scim_utility.cpp:727
+msgid "English (British)"
+msgstr "ინგლისური (ბრიტანული)"
+
+#: ../src/scim_utility.cpp:728
+msgid "English (Ireland)"
+msgstr "ინგლისური (ირლანდია)"
+
+#: ../src/scim_utility.cpp:729
+msgid "English (American)"
+msgstr "ინგლისური (ამერიკული)"
+
+#: ../src/scim_utility.cpp:730
+msgid "Esperanto"
+msgstr "ესპერანტო"
+
+#: ../src/scim_utility.cpp:733
+msgid "Spanish (Mexico)"
+msgstr "ესპანური (მექსიკა)"
+
+#: ../src/scim_utility.cpp:735
+msgid "Basque"
+msgstr "ბასკური"
+
+#: ../src/scim_utility.cpp:736
+msgid "Persian"
+msgstr "სპარსული"
+
+#: ../src/scim_utility.cpp:739
+msgid "Irish"
+msgstr "ირლანდიური"
+
+#: ../src/scim_utility.cpp:740
+msgid "Galician"
+msgstr "გალური"
+
+#: ../src/scim_utility.cpp:741
+msgid "Gujarati"
+msgstr "გუჯარათული"
+
+#: ../src/scim_utility.cpp:742 ../src/scim_utility.cpp:751
+msgid "Hebrew"
+msgstr "ივრითი"
+
+#: ../src/scim_utility.cpp:743
+msgid "Hindi"
+msgstr "ინდური"
+
+#: ../src/scim_utility.cpp:746
+msgid "Armenian"
+msgstr "სომხური"
+
+#: ../src/scim_utility.cpp:747
+msgid "Interlingua"
+msgstr "ინტერლინგვა"
+
+#: ../src/scim_utility.cpp:748
+msgid "Indonesian"
+msgstr "ინდონეზიური"
+
+#: ../src/scim_utility.cpp:753
+msgid "Georgian"
+msgstr "ქართული"
+
+#: ../src/scim_utility.cpp:754
+msgid "Kazakh"
+msgstr "ყაზახური"
+
+#: ../src/scim_utility.cpp:755
+msgid "Cambodian"
+msgstr "კამბოჯური"
+
+#: ../src/scim_utility.cpp:756
+msgid "Kannada"
+msgstr "კანნადა"
+
+#: ../src/scim_utility.cpp:757
+msgid "Korean"
+msgstr "კორეული"
+
+#: ../src/scim_utility.cpp:758
+msgid "Laothian"
+msgstr "ლაოსური"
+
+#: ../src/scim_utility.cpp:760
+msgid "Latvian"
+msgstr "ლატვიური"
+
+#: ../src/scim_utility.cpp:761
+msgid "Macedonian"
+msgstr "მაკედონური"
+
+#: ../src/scim_utility.cpp:762
+msgid "Malayalam"
+msgstr "მალაიამი"
+
+#: ../src/scim_utility.cpp:763
+msgid "Mongolian"
+msgstr "მონღოლური"
+
+#: ../src/scim_utility.cpp:764
+msgid "Marathi"
+msgstr "მარათი"
+
+#: ../src/scim_utility.cpp:765
+msgid "Malay"
+msgstr "მალაიური"
+
+#: ../src/scim_utility.cpp:766
+msgid "Burmese"
+msgstr "ბირმული"
+
+#: ../src/scim_utility.cpp:767
+msgid "Nepali"
+msgstr "ნეპალური"
+
+#: ../src/scim_utility.cpp:769
+msgid "Norwegian (nynorsk)"
+msgstr "ნორვეგიული (ნიუნორსკი)"
+
+#: ../src/scim_utility.cpp:770
+msgid "Norwegian (bokmal)"
+msgstr "ნორვეგიული (ბოქმალი)"
+
+#: ../src/scim_utility.cpp:771
+msgid "Oriya"
+msgstr "ორია"
+
+#: ../src/scim_utility.cpp:772
+msgid "Punjabi"
+msgstr "პანჯაბი"
+
+#: ../src/scim_utility.cpp:777
+msgid "Romanian"
+msgstr "რუმინული"
+
+#: ../src/scim_utility.cpp:779 ../src/scim_utility.cpp:780
+msgid "Sindhi"
+msgstr "სინდი"
+
+#: ../src/scim_utility.cpp:781
+msgid "Sinhala"
+msgstr "სინჰალა"
+
+#: ../src/scim_utility.cpp:784
+msgid "Albanian"
+msgstr "ალბანური"
+
+#: ../src/scim_utility.cpp:785 ../src/scim_utility.cpp:786
+#: ../src/scim_utility.cpp:787
+msgid "Serbian"
+msgstr "სერბული"
+
+#: ../src/scim_utility.cpp:789
+msgid "Swedish (Finland)"
+msgstr "შვედური (ფინეთი)"
+
+#: ../src/scim_utility.cpp:791
+msgid "Tamil"
+msgstr "თამილური"
+
+#: ../src/scim_utility.cpp:792
+msgid "Telugu"
+msgstr "ტელუგური"
+
+#: ../src/scim_utility.cpp:793
+msgid "Thai"
+msgstr "ტაილანდური"
+
+#: ../src/scim_utility.cpp:795
+msgid "Uighur"
+msgstr "უიღური"
+
+#: ../src/scim_utility.cpp:797
+msgid "Urdu"
+msgstr "ურდუ"
+
+#: ../src/scim_utility.cpp:798
+msgid "Uzbek"
+msgstr "უზბეკური"
+
+#: ../src/scim_utility.cpp:799
+msgid "Vietnamese"
+msgstr "ვიეტნამური"
+
+#: ../src/scim_utility.cpp:800
+msgid "Walloon"
+msgstr "ვალონური"
+
+#: ../src/scim_utility.cpp:801 ../src/scim_utility.cpp:802
+msgid "Yiddish"
+msgstr "იდიში"
+
+#: ../src/scim_utility.cpp:803
+msgid "Chinese"
+msgstr "ჩინური"
+
+#: ../src/scim_utility.cpp:804 ../src/scim_utility.cpp:806
+msgid "Chinese (simplified)"
+msgstr "ჩინური (გამარტივებული)"
+
+#: ../src/scim_utility.cpp:805 ../src/scim_utility.cpp:807
+msgid "Chinese (traditional)"
+msgstr "ჩინური (ტრადიციული)"
+
+#: ../src/scim_utility.cpp:889
+msgid "Other"
+msgstr "სხვა"
+
+#: ../tests/scim_test_helper.cpp:49
+msgid "Test"
+msgstr "შემოწმება"
+
+#: ../tests/scim_test_helper.cpp:51
+msgid "A test helper."
+msgstr "შემოწმების დამხმარე."
+
+#: ../tests/scim_test_imengine.cpp:56
+msgid "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
+msgstr "zh_CN,zh_TW,zh_HK,zh_SG,ja_JP,ko_KR"
+
+#: ../tests/scim_test_imengine.cpp:102
+msgid "TEST"
+msgstr "შემოწმება"
+
+#: ../tests/scim_test_imengine.cpp:109
+msgid "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>"
+msgstr "(C) 2002-2004 James Su <suzhe@tsinghua.org.cn>"
+
+#: ../utils/scimkeyselection.cpp:171
+msgid "Selected _Keys:"
+msgstr "არჩეული ღილა_კები:"
+
+#: ../utils/scimkeyselection.cpp:222
+msgid "Key Code:"
+msgstr "ღილაკის კოდი:"
+
+#: ../utils/scimkeyselection.cpp:259
+msgid "..."
+msgstr "..."
+
+#: ../utils/scimkeyselection.cpp:264
+msgid "Modifiers:"
+msgstr "მოდიფიკატორები:"
+
+#: ../utils/scimkeyselection.cpp:296
+msgid "_Ctrl"
+msgstr "_Ctrl"
+
+#: ../utils/scimkeyselection.cpp:300
+msgid "A_lt"
+msgstr "A_lt"
+
+#: ../utils/scimkeyselection.cpp:304
+msgid "_Shift"
+msgstr "_Shift"
+
+#: ../utils/scimkeyselection.cpp:308
+msgid "_Release"
+msgstr "_გაშვება"
+
+#: ../utils/scimkeyselection.cpp:327
+msgid "_Meta"
+msgstr "_მეტა"
+
+#: ../utils/scimkeyselection.cpp:331
+msgid "S_uper"
+msgstr "S_uper"
+
+#: ../utils/scimkeyselection.cpp:335
+msgid "_Hyper"
+msgstr "_ჰიპერ"
+
+#: ../utils/scimkeyselection.cpp:340
+msgid "Ca_psLock"
+msgstr "Ca_psLock"
+
+#: ../utils/scimkeyselection.cpp:419
+msgid "Please enter a Key Code first."
+msgstr "ჯერ შეიყვანეთ ღილაკის კოდი."
+
+#: ../utils/scimkeyselection.cpp:473
+msgid ""
+"Press a key (or a key combination).\n"
+"This dialog will be closed when the key is released."
+msgstr ""
+"დააჭირეთ ღილაკს (ან ღილაკების კომბინაციას).\n"
+"ეს დიალოგი დაიხურება, როცა ღილაკს აუშვებთ."
+
+#: ../utils/scimkeyselection.cpp:476
+msgid "Grabbing a key."
+msgstr "ღილაკის ჩაჭერა."
+
+#: ../utils/scimkeyselection.cpp:798
+msgid "Key Selection"
+msgstr "ღილაკების არჩევანი"
+
+#: ../utils/scimstringview.c:232
+msgid "Cursor Position"
+msgstr "კურსორის პოზიცია"
+
+#: ../utils/scimstringview.c:233
+msgid "The current position of the insertion cursor in chars."
+msgstr "ჩასმის კურსორის მიმდინარე პოზიცია სიმბოლოებში."
+
+#: ../utils/scimstringview.c:242
+msgid "Maximum length"
+msgstr "მაქსიმალური სიგრძე"
+
+#: ../utils/scimstringview.c:243
+msgid "Maximum number of characters for this string view. Zero if no maximum."
+msgstr ""
+"სტრიქონების მაქსიმალური რაოდენობა ამ სტრიქონის ხედისთვის. 0, თუ მაქსიმუმი არ "
+"არსებობს."
+
+#: ../utils/scimstringview.c:252
+msgid "Maximum width"
+msgstr "მაქსიმალური სიგანე"
+
+#: ../utils/scimstringview.c:253
+msgid "Maximum width of this string view."
+msgstr "ამ სტრიქონის ხედის მაქსიმალური სიგანე."
+
+#: ../utils/scimstringview.c:262
+msgid "Has Frame"
+msgstr "აქვს ჩარჩო"
+
+#: ../utils/scimstringview.c:263
+msgid "FALSE removes outside bevel from string view."
+msgstr "**ცრუ** წაშლის გარე დახრას სტრიქონის ხედიდან."
+
+#: ../utils/scimstringview.c:270
+msgid "Draw cursor"
+msgstr "კურსორის დახატვა"
+
+#: ../utils/scimstringview.c:271
+msgid "TRUE draw blinking cursor."
+msgstr "*ჭეშმარიტი* მოციმციმე კურსორის დახატვა."
+
+#: ../utils/scimstringview.c:278
+msgid "Auto move cursor"
+msgstr "კურსორის ავტომატური გადაადგილება"
+
+#: ../utils/scimstringview.c:279
+msgid "TRUE auto move cursor position when mouse clicking."
+msgstr ""
+"**ჭეშმარიტი** კურსორის მდებარეობის ავტოგადატანა თაგუნათი დაწკაპუნებისას."
+
+#: ../utils/scimstringview.c:286
+msgid "Forward button press event"
+msgstr "წინ წასვლის ღილაკის დაწოლის მოვლენა"
+
+#: ../utils/scimstringview.c:287
+msgid "TRUE forward button press event to user program."
+msgstr ""
+"**ჭეშმარიტი** წინ წასვლის ღილაკის დაჭერის მოვლენის გადაგზავნა მომხმარებლის "
+"პროგრამისთვის."
+
+#: ../utils/scimstringview.c:294
+msgid "Auto resize the widget to fit the string"
+msgstr "ვიჯეტის ზომის ავტომატური შეცვლა სტრიქონის ჩასატევად"
+
+#: ../utils/scimstringview.c:295
+msgid "TRUE Auto resize on."
+msgstr "*ჭეშმარიტი* ავტომატური ზომის სეცვლა ჩართულია."
+
+#: ../utils/scimstringview.c:302
+msgid "Width in chars"
+msgstr "სიგანე სიმბოლოებში"
+
+#: ../utils/scimstringview.c:303
+msgid "Number of characters to leave space for in the string view."
+msgstr "სიმბოლოების რაოდენობა ადგილის დასატოვებლად სტრიქონის ხედში."
+
+#: ../utils/scimstringview.c:312
+msgid "Scroll offset"
+msgstr "ჩოჩიის წანაცვლება"
+
+#: ../utils/scimstringview.c:313
+msgid "Number of pixels of the string view scrolled off the screen to the left"
+msgstr "სტრიქონის ხედის პიქსელების რაოდენობა მარცხნივ გადახვევისას"
+
+#: ../utils/scimstringview.c:322
+msgid "Text"
+msgstr "ტექსტი"
+
+#: ../utils/scimstringview.c:323
+msgid "The contents of the string view"
+msgstr "სტრიქონის ხედის შემცველობა"
+
+#: ../utils/scimtrayicon.c:109
+msgid "Orientation"
+msgstr "ორიენტაცია"
+
+#: ../utils/scimtrayicon.c:110
+msgid "The orientation of the tray."
+msgstr "ორიენტაცია საათთან."

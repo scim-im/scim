@@ -99,7 +99,7 @@ AC_PROG_CC
 AC_LANG(C)
 
 # Init gettext
-ALL_LINGUAS="as bn_IN ca cs de es fi fr gu hi it ja kn ko ml mr nl pa pt_BR ru sk sv ta te vi zh_CN zh_TW"
+ALL_LINGUAS="as bn_IN ca cs de es fi fr gu hi it ja ka kn ko ml mr nl pa pt_BR ru sk sv ta te vi zh_CN zh_TW"
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION(0.14.1)
 
