@@ -62,14 +62,17 @@ setup_la_LDFLAGS	= -avoid-version \
 setup_la_LIBADD		= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
 
 if SCIM_BUILD_SCIM_SETUP
-@INTLTOOL_DESKTOP_RULE@
-
 desktopdir       = $(datadir)/applications
 desktop_in_files = scim-setup.desktop.in
 desktop_DATA     = $(desktop_in_files:.desktop.in=.desktop)
 
 gnomeccdir       = $(datadir)/control-center-2.0/capplets
 gnomecc_DATA     = $(desktop_in_files:.desktop.in=.desktop)
+
+# Translate the desktop file with plain gettext (replaces intltool-merge).
+scim-setup.desktop: scim-setup.desktop.in
+	$(AM_V_GEN) $(MSGFMT) --desktop \
+		--template=$(srcdir)/scim-setup.desktop.in -d $(top_srcdir)/po -o $@
 endif
 
 EXTRA_DIST = $(desktop_in_files) scim-setup.in

@@ -1,15 +1,7 @@
 #! /bin/sh
 
+set -e
 set -x
 
-AUTOPOINT=`which autopoint`
-AUTORECONF=`which autoreconf`
-INTLTOOLIZE=`which intltoolize`
-
-if test -z $AUTOPOINT -o -z $INTLTOOLIZE -o -z $AUTORECONF; then
-	echo "Error: no autopoint, intltoolize, or autoreconf found, please install them" >&2
-	exit 1
-fi
-
-$AUTOPOINT --force
-AUTOPOINT="$INTLTOOLIZE --automake --copy" $AUTORECONF --force --install --verbose
+# autoreconf runs autopoint/aclocal/autoheader/automake/autoconf as needed.
+autoreconf --force --install --verbose

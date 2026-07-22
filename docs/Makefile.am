@@ -23,9 +23,9 @@ EXTRA_DIST		= scim.cfg developers design.zh_CN
 
 SUBDIRS			= manual
 
-.PHONY: html
+.PHONY: html-local
 
-html:
+html-local:
 if HAVE_DOXYGEN
 	(cd $(top_builddir)/docs; rm -fr html/*; $(DOXYGEN) scim.cfg; tar -czf scim-doc-$(SCIM_VERSION).tar.gz html)
 else

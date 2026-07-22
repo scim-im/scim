@@ -36,10 +36,7 @@
 #endif
 
 #include <sys/time.h>
-
-#ifdef TIME_WITH_SYS_TIME
-  #include <time.h>
-#endif
+#include <time.h>
 
 #include <stdlib.h>
 

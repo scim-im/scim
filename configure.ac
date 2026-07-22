@@ -1,6 +1,8 @@
 # Process this file with autoconf to produce a configure script
+AC_PREREQ([2.71])
 AC_INIT([scim],[1.4.18],[https://github.com/scim-im/scim])
 AC_CONFIG_SRCDIR([src/scim.h])
+AC_CONFIG_MACRO_DIRS([m4])
 
 
 ###########################################################
@@ -78,8 +80,11 @@ AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [The gettext domain])
 ###########################################################
 
 # Init automake stuff
-AM_INIT_AUTOMAKE([])
-AM_CONFIG_HEADER([config.h])
+AM_INIT_AUTOMAKE([foreign subdir-objects -Wall])
+AC_CONFIG_HEADERS([config.h])
+
+# Use a POSIX archiver interface (required by automake >= 1.12 for some libs)
+AM_PROG_AR
 
 # Init libtool
 LT_CONFIG_LTDL_DIR([libltdl])
@@ -98,10 +103,30 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_LANG(C)
 
-# Init gettext
-ALL_LINGUAS="as bn_IN ca cs de es fi fr gu hi it ja kn ko ml mr nl pa pt_BR ru sk sv ta te vi zh_CN zh_TW"
+# Require a C++17 compiler.
+AC_LANG_PUSH([C++])
+AC_MSG_CHECKING([whether $CXX supports C++17])
+ac_scim_save_CXXFLAGS="$CXXFLAGS"
+CXXFLAGS="$CXXFLAGS -std=c++17"
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([[#include <optional>
+                    #include <string_view>
+                    #include <memory>]],
+                   [[std::optional<int> o; std::string_view sv;
+                     auto p = std::make_unique<int>(0); (void)p;]])],
+  [AC_MSG_RESULT([yes])],
+  [CXXFLAGS="$ac_scim_save_CXXFLAGS"
+   AC_MSG_ERROR([a C++17-capable compiler is required to build SCIM])])
+AC_LANG_POP([C++])
+
+# Enable a baseline set of warnings for development builds (non-fatal).
+SCIM_WARNING_FLAGS="-Wall -Wextra"
+CFLAGS="$CFLAGS $SCIM_WARNING_FLAGS"
+CXXFLAGS="$CXXFLAGS $SCIM_WARNING_FLAGS"
+
+# Init gettext (languages are listed in po/LINGUAS)
 AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION(0.14.1)
+AM_GNU_GETTEXT_VERSION([0.21])
 
 # Checks if doxygen is avaiable
 
@@ -150,12 +175,7 @@ AC_SUBST(DOCBOOK_XSL)
 AM_CONDITIONAL(HAVE_DOCBOOK, test x$DOCBOOK_XSL != xno)
 AM_CONDITIONAL(BUILD_MANUAL, test x$XSLTPROC != xno -a x$DOCBOOK_XSL != xno)
 
-# Check intltool
-IT_PROG_INTLTOOL([0.33], [no-xml])
-
 # Checks for libraries.
-AC_HEADER_STDC
-AC_HEADER_TIME
 AC_CHECK_HEADERS([langinfo.h libintl.h string.h dirent.h hash_map ext/hash_map])
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -273,10 +293,6 @@ if test "$SCIM_HAS_GTK4" = "yes"; then
   AC_SUBST(GTK4_IM_MODULEDIR)
 fi
 
-# Check if we have gthread
-PKG_CHECK_MODULES(GTHREAD2,[gthread-2.0 >= 2.0.0],
-			[SCIM_HAS_GTHREAD2=yes],
-			[SCIM_HAS_GTHREAD2=no])
 
 
 # Check if we should build scim-bridge-qt-immodule
@@ -878,7 +894,7 @@ fi
 SCIM_BUILD_PANEL_GTK=0
 if test "$enable_panel_gtk" != "no"; then
   enable_panel_gtk=no
-  if test "$SCIM_HAS_GTHREAD2" = "yes" -a "$SCIM_HAS_GTK" = "yes"; then
+  if test "$SCIM_HAS_GTK" = "yes"; then
     SCIM_BUILD_PANEL_GTK=1
     enable_panel_gtk=yes
   fi

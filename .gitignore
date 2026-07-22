@@ -1,0 +1,80 @@
+# Compiled objects and libraries
+*.o
+*.lo
+*.la
+*.a
+*.so
+*.mo
+*.gmo
+.deps/
+.libs/
+.dirstamp
+
+# Editor / tool backups
+*~
+*.bak
+*.orig
+
+# Qt meta-object output
+moc_*.cpp
+
+# Automake-generated makefiles (Makefile.am is the source)
+Makefile
+Makefile.in
+
+# Autotools / libtool generated files (top level)
+/aclocal.m4
+/autom4te.cache/
+/config.h
+/config.h.in
+/config.h.in~
+/config.log
+/config.status
+/config.guess
+/config.sub
+/config.rpath
+/configure
+/configure~
+/libtool
+/ltmain.sh
+/compile
+/depcomp
+/install-sh
+/missing
+/ar-lib
+/stamp-h1
+/libltdl/
+/ABOUT-NLS
+/INSTALL
+
+# Macros copied in by aclocal/libtoolize/autopoint (keep the dir marker)
+/m4/*.m4
+
+# gettext-generated files under po/ (sources are *.in, *.po, LINGUAS, etc.)
+/po/Makefile.in.in
+/po/POTFILES
+/po/stamp-po
+/po/Rules-quot
+/po/remove-potcdate.sed
+/po/*.pot
+/po/.pot
+
+# Files generated from *.in templates
+/scim.pc
+/scim-gtkutils.pc
+/scim-x11utils.pc
+/scim.spec
+/src/scim_types.h
+/docs/scim.cfg
+/extras/setup/scim-setup
+/extras/setup/scim-setup.desktop
+/extras/setup/gtk3/scim-setup-gtk3-host
+
+# Built executables
+/src/scim
+/src/scim-launcher
+/src/scim-config-agent
+/src/scim-helper-launcher
+/src/scim-helper-manager
+/extras/panel/scim-panel-gtk
+/extras/immodules/agent/scim-im-agent
