@@ -254,7 +254,7 @@ AM_ICONV
 PKG_PROG_PKG_CONFIG
 
 # Check if we should build scim-panel-gtk daemon
-PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.4.0 pango >= 1.1.0 gdk-pixbuf-2.0 >= 2.4.0],
+PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.24.0 pango >= 1.1.0 gdk-pixbuf-2.0 >= 2.4.0],
 			[SCIM_HAS_GTK2=yes],
 			[SCIM_HAS_GTK2=no])
 
@@ -295,41 +295,7 @@ fi
 
 
 
-# Check if we should build scim-bridge-qt-immodule
-PKG_CHECK_MODULES(QT3, [qt-mt >= 3.3],
-            [SCIM_HAS_QT3=yes],
-            [SCIM_HAS_QT3=no])
-
-if test "$SCIM_HAS_QT3" = "yes"; then
-  if test -z "$QT3_PREFIX"; then
-    QT3_PREFIX=`$PKG_CONFIG --variable=prefix qt-mt`
-    QT3_LIBDIR=`$PKG_CONFIG --variable=libdir qt-mt`
-  fi
-  QT3_MOC=$QT3_PREFIX/bin/moc
-  QT3_IM_MODULEDIR=$QT3_LIBDIR/qt3/plugins/inputmethods
-  AC_SUBST(QT3_MOC)
-  AC_SUBST(QT3_IM_MODULEDIR)
-  AC_SUBST(QT3_PREFIX)
-  AC_SUBST(QT3_LIBDIR)
-fi
-
-PKG_CHECK_MODULES(QT4, [x11, QtGui >= 4.0],
-            [SCIM_HAS_QT4=yes],
-            [SCIM_HAS_QT4=no])
-
-if test "$SCIM_HAS_QT4" = "yes"; then
-  if test -z "$QT4_PREFIX"; then
-    QT4_PREFIX=`$PKG_CONFIG --variable=prefix QtCore`
-    QT4_LIBDIR=`$PKG_CONFIG --variable=libdir QtCore`
-  fi
-  QT4_MOC=`$PKG_CONFIG --variable=moc_location QtCore`
-  QT4_IM_MODULEDIR=$QT4_LIBDIR/qt4/plugins/inputmethods
-  AC_SUBST(QT4_MOC)
-  AC_SUBST(QT4_IM_MODULEDIR)
-  AC_SUBST(QT4_PREFIX)
-  AC_SUBST(QT4_LIBDIR)
-fi
-
+# Check if we should build the scim Qt input-method module
 PKG_CHECK_MODULES(QT5, [xproto, xcb-keysyms, Qt5X11Extras >= 5.0, Qt5Widgets >= 5.0],
             [SCIM_HAS_QT5=yes],
             [SCIM_HAS_QT5=no])
@@ -359,19 +325,35 @@ if test "$SCIM_HAS_QT5" = "yes"; then
   AC_LANG_POP
 fi
 
-# Check if we should build scim-bridge-clutter-immodule
-PKG_CHECK_MODULES(CLUTTER, clutter-1.0,
-           [SCIM_HAS_CLUTTER=yes],
-           [SCIM_HAS_CLUTTER=no])
+PKG_CHECK_MODULES(QT6, [Qt6Gui >= 6.0],
+            [SCIM_HAS_QT6=yes],
+            [SCIM_HAS_QT6=no])
 
-PKG_CHECK_MODULES(CLUTTERIMCONTEXT, clutter-imcontext-0.1,
-           [SCIM_HAS_CLUTTERIMCONTEXT=yes],
-           [SCIM_HAS_CLUTTERIMCONTEXT=no])
+if test "$SCIM_HAS_QT6" = "yes"; then
+  if test -z "$QT6_PREFIX"; then
+    QT6_PREFIX=`$PKG_CONFIG --variable=prefix Qt6Core`
+    QT6_LIBDIR=`$PKG_CONFIG --variable=libdir Qt6Core`
+  fi
+  QT6_INCDIR=`$PKG_CONFIG --variable=includedir Qt6Core`
+  QT6_VERSION=`$PKG_CONFIG --modversion Qt6Core`
+  QT6_CFLAGS="$QT6_CFLAGS -I$QT6_INCDIR/QtCore/$QT6_VERSION -I$QT6_INCDIR/QtCore/$QT6_VERSION/QtCore -I$QT6_INCDIR/QtGui/$QT6_VERSION"
+  QT6_MOC=`$PKG_CONFIG --variable=libexecdir Qt6Core`/moc
+  QT6_IM_MODULEDIR=$QT6_LIBDIR/qt6/plugins/platforminputcontexts
+  AC_SUBST(QT6_MOC)
+  AC_SUBST(QT6_IM_MODULEDIR)
+  AC_SUBST(QT6_PREFIX)
+  AC_SUBST(QT6_LIBDIR)
 
-if test "$SCIM_HAS_CLUTTER" = "yes" -a "$SCIM_HAS_CLUTTERIMCONTEXT" = "yes"; then
-  CLUTTERIMCONTEXT_LIBDIR=`$PKG_CONFIG --variable=libdir clutter-imcontext-0.1`
-  CLUTTER_IM_MODULEDIR=$CLUTTERIMCONTEXT_LIBDIR/clutter-imcontext/immodules
-  AC_SUBST(CLUTTER_IM_MODULEDIR)
+  tmp_CPPFLAGS="$CPPFLAGS"
+  CPPFLAGS="$QT6_CFLAGS -fPIC"
+  AC_LANG_PUSH([C++])
+  # Re-test with the QT6 flags (the identically-named QT5 check is cached).
+  AS_UNSET([ac_cv_header_QtGui_qpa_qplatforminputcontext_h])
+  AC_CHECK_HEADERS([QtGui/qpa/qplatforminputcontext.h],
+                   [SCIM_HAS_QT6_PRIVATE=yes],
+                   [SCIM_HAS_QT6=no])
+  CPPFLAGS="$tmp_CPPFLAGS"
+  AC_LANG_POP
 fi
 
 
@@ -406,40 +388,15 @@ AC_ARG_WITH([gtk4-im-module-dir],
 	    [Select GTK4 immodule dir])],
 	[GTK4_IM_MODULEDIR=$with_gtk4_im_module_dir])
 
-AC_ARG_WITH([qt3-moc],
-	[AS_HELP_STRING([--with-qt3-moc=file],
-		[Select QT3 moc program (default to QT3_PREFIX/bin/moc)])],
-	[QT3_MOC=$with_qt3_moc])
-
-AC_ARG_WITH([qt4-moc],
-	[AS_HELP_STRING([--with-qt4-moc=file],
-		[Select QT4 moc program (default to QT4_PREFIX/bin/moc)])],
-	[QT4_MOC=$with_qt4_moc])
-
 AC_ARG_WITH([qt5-moc],
 	[AS_HELP_STRING([--with-qt5-moc=file],
 		[Select QT5 moc program (default to QT5_PREFIX/bin/moc)])],
 	[QT5_MOC=$with_qt5_moc])
 
-AC_ARG_WITH([qt3-im-module-dir],
-	[AS_HELP_STRING([--with-qt3-im-module-dir=dir],
-		[Select QT3 immodule dir])],
-	[QT3_IM_MODULEDIR=$with_qt3_im_module_dir])
-
-AC_ARG_WITH([qt4-im-module-dir],
-	[AS_HELP_STRING([--with-qt4-im-module-dir=dir],
-		[Select QT4 immodule dir])],
-	[QT4_IM_MODULEDIR=$with_qt4_im_module_dir])
-
 AC_ARG_WITH([qt5-im-module-dir],
 	[AS_HELP_STRING([--with-qt5-im-module-dir=dir],
 		[Select QT5 immodule dir])],
 	[QT5_IM_MODULEDIR=$with_qt5_im_module_dir])
-
-AC_ARG_WITH([clutter-im-module-dir],
-	[AS_HELP_STRING([--with-clutter-im-module-dir=dir],
-		[Select clutter immodule dir])],
-	[CLUTTER_IM_MODULEDIR=$with_clutter_im_module_dir])
 
 AC_ARG_WITH([gtk-version],
 	[AS_HELP_STRING([--with-gtk-version=2 or 3], 
@@ -525,65 +482,35 @@ AC_ARG_ENABLE([filter-sctc],
 	[],
 	[enable_filter_sctc=yes])
 
-AC_ARG_ENABLE([orig-gtk2-immodule],
-	[AS_HELP_STRING([--enable-orig-gtk2-immodule],
-		[Build original GTK2 IMModule])],
-	[],
-	[enable_orig_gtk2_immodule=no])
-
-AC_ARG_ENABLE([orig-gtk3-immodule],
-	[AS_HELP_STRING([--enable-orig-gtk3-immodule],
-		[Build original GTK3 IMModule])],
-	[],
-	[enable_orig_gtk3_immodule=no])
-
-AC_ARG_ENABLE([agent],
-	[AS_HELP_STRING([--disable-im-agent],
-		[Do not build scim-im-agent (required by other immodules)])],
-	[], 
-	[enable_im_agent=yes])
-
 AC_ARG_ENABLE([gtk2-immodule],
-	[AS_HELP_STRING([--disable-gtk2-immodule],
-		[Do not build GTK2 IMModule])],
+	[AS_HELP_STRING([--enable-gtk2-immodule],
+		[Enable GTK2 IMModule])],
 	[],
 	[enable_gtk2_immodule=yes])
 
 AC_ARG_ENABLE([gtk3-immodule],
-	[AS_HELP_STRING([--disable-gtk3-immodule],
-		[Do not build GTK3 IMModule])],
+	[AS_HELP_STRING([--enable-gtk3-immodule],
+		[Enable GTK3 IMModule])],
 	[],
 	[enable_gtk3_immodule=yes])
 
 AC_ARG_ENABLE([gtk4-immodule],
-	[AS_HELP_STRING([--disable-gtk4-immodule],
-		[Do not build GTK4 IMModule])],
+	[AS_HELP_STRING([--enable-gtk4-immodule],
+		[Enable GTK4 IMModule])],
 	[],
 	[enable_gtk4_immodule=yes])
 
-AC_ARG_ENABLE([qt3-immodule],
-	[AS_HELP_STRING([--disable-qt3-immodule],
-		[Do not build QT3 IMModule])],
-	[],
-	[enable_qt3_immodule=yes])
-
-AC_ARG_ENABLE([qt4-immodule],
-	[AS_HELP_STRING([--disable-qt4-immodule],
-		[Do not build QT4 IMModule])],
-	[],
-	[enable_qt4_immodule=yes])
-
 AC_ARG_ENABLE([qt5-immodule],
-	[AS_HELP_STRING([--disable-qt5-immodule],
-		[Do not build QT5 IMModule])],
+	[AS_HELP_STRING([--enable-qt5-immodule],
+		[Enable QT5 IMModule])],
 	[],
 	[enable_qt5_immodule=yes])
 
-AC_ARG_ENABLE([clutter-immodule],
-	[AS_HELP_STRING([--enable-clutter-immodule],
-		[Do not build CLUTTER IMModule])],
-	[], 
-	[enable_clutter_immodule=no])
+AC_ARG_ENABLE([qt6-immodule],
+	[AS_HELP_STRING([--enable-qt6-immodule],
+		[Enable QT6 IMModule])],
+	[],
+	[enable_qt6_immodule=yes])
 
 AC_ARG_ENABLE([panel-gtk],
 	[AS_HELP_STRING([--disable-panel-gtk],
@@ -686,54 +613,8 @@ else
   enable_filter_sctc=no
 fi
 
-if test "$enable_orig_gtk2_immodule" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
-  SCIM_BUILD_ORIG_GTK2_IMMODULE=1
-else
-  SCIM_BUILD_ORIG_GTK2_IMMODULE=0
-  enable_orig_gtk2_immodule=no
-fi
-
-if test "$enable_orig_gtk3_immodule" = "yes" -a "$SCIM_HAS_GTK3" = "yes"; then
-  SCIM_BUILD_ORIG_GTK3_IMMODULE=1
-else
-  SCIM_BUILD_ORIG_GTK3_IMMODULE=0
-  enable_orig_gtk3_immodule=no
-fi
-
-if test "$enable_gtk3_immodule" = "yes" -a "$SCIM_HAS_GTK3" = "yes"; then
-  SCIM_BUILD_GTK3_IMMODULE=1
-  SCIM_BUILD_IMMODULE=1
-  enable_immodule=yes
-else
-  SCIM_BUILD_GTK3_IMMODULE=0
-  enable_gtk3_immodule=no
-fi
-
-if test "$enable_gtk4_immodule" = "yes" -a "$SCIM_HAS_GTK4" = "yes"; then
-  SCIM_BUILD_GTK4_IMMODULE=1
-  SCIM_BUILD_IMMODULE=1
-  enable_immodule=yes
-else
-  SCIM_BUILD_GTK4_IMMODULE=0
-  enable_gtk4_immodule=no
-fi
-
-if test "$enable_im_agent" = "yes"; then
-  SCIM_BUILD_IM_AGENT=1
-else
-  SCIM_BUILD_IM_AGENT=0
-  enable_im_agent=no
-fi
-
-SCIM_BUILD_IMMODULE=0
-enable_immodule=no
-
 if test "$enable_gtk2_immodule" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
   SCIM_BUILD_GTK2_IMMODULE=1
-  SCIM_BUILD_IMMODULE=1
-  enable_immodule=yes
-  SCIM_BUILD_IM_AGENT=1
-  enable_im_agent=yes
 else
   SCIM_BUILD_GTK2_IMMODULE=0
   enable_gtk2_immodule=no
@@ -741,10 +622,6 @@ fi
 
 if test "$enable_gtk3_immodule" = "yes" -a "$SCIM_HAS_GTK3" = "yes"; then
   SCIM_BUILD_GTK3_IMMODULE=1
-  SCIM_BUILD_IMMODULE=1
-  enable_immodule=yes
-  SCIM_BUILD_IM_AGENT=1
-  enable_im_agent=yes
 else
   SCIM_BUILD_GTK3_IMMODULE=0
   enable_gtk3_immodule=no
@@ -752,59 +629,23 @@ fi
 
 if test "$enable_gtk4_immodule" = "yes" -a "$SCIM_HAS_GTK4" = "yes"; then
   SCIM_BUILD_GTK4_IMMODULE=1
-  SCIM_BUILD_IMMODULE=1
-  enable_immodule=yes
-  SCIM_BUILD_IM_AGENT=1
-  enable_im_agent=yes
 else
   SCIM_BUILD_GTK4_IMMODULE=0
   enable_gtk4_immodule=no
 fi
 
-if test "$enable_qt3_immodule" = "yes" -a "$SCIM_HAS_QT3" = "yes"; then
-  SCIM_BUILD_QT3_IMMODULE=1
-  SCIM_BUILD_IMMODULE=1
-  enable_immodule=yes
-  SCIM_BUILD_IM_AGENT=1
-  enable_im_agent=yes
-else
-  SCIM_BUILD_QT3_IMMODULE=0
-  enable_qt3_immodule=no
-fi
-
-if test "$enable_qt4_immodule" = "yes" -a "$SCIM_HAS_QT4" = "yes"; then
-  SCIM_BUILD_QT4_IMMODULE=1
-  SCIM_BUILD_IMMODULE=1
-  enable_immodule=yes
-  SCIM_BUILD_IM_AGENT=1
-  enable_im_agent=yes
-else
-  SCIM_BUILD_QT4_IMMODULE=0
-  enable_qt4_immodule=no
-fi
-
 if test "$enable_qt5_immodule" = "yes" -a "$SCIM_HAS_QT5" = "yes"; then
   SCIM_BUILD_QT5_IMMODULE=1
-  SCIM_BUILD_IMMODULE=1
-  enable_immodule=yes
-  SCIM_BUILD_IM_AGENT=1
-  enable_im_agent=yes
 else
   SCIM_BUILD_QT5_IMMODULE=0
   enable_qt5_immodule=no
 fi
 
-if test "$enable_clutter_immodule" = "yes" -a \
-	"$SCIM_HAS_CLUTTER" = "yes" -a \
-	"$SCIM_HAS_CLUTTERIMCONTEXT" = "yes" ; then
-  SCIM_BUILD_CLUTTER_IMMODULE=1
-  SCIM_BUILD_IMMODULE=1
-  enable_immodule=yes
-  SCIM_BUILD_IM_AGENT=1
-  enable_im_agent=yes
+if test "$enable_qt6_immodule" = "yes" -a "$SCIM_HAS_QT6" = "yes"; then
+  SCIM_BUILD_QT6_IMMODULE=1
 else
-  SCIM_BUILD_CLUTTER_IMMODULE=0
-  enable_clutter_immodule=no
+  SCIM_BUILD_QT6_IMMODULE=0
+  enable_qt6_immodule=no
 fi
 
 if test "$SCIM_HAS_GTK4" = "yes" -a "$SCIM_HAS_GTK3" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
@@ -936,38 +777,20 @@ AM_CONDITIONAL(SCIM_BUILD_IMENGINE_SOCKET,
 AM_CONDITIONAL(SCIM_BUILD_IMENGINE_RAWCODE,
 		[test "$enable_im_rawcode" = "yes"])
 
-AM_CONDITIONAL(SCIM_BUILD_ORIG_GTK2_IMMODULE,
-		[test "$enable_orig_gtk2_immodule" = "yes"])
-
-AM_CONDITIONAL(SCIM_BUILD_ORIG_GTK3_IMMODULE,
-		[test "$enable_orig_gtk3_immodule" = "yes"])
-
-AM_CONDITIONAL(SCIM_BUILD_IM_AGENT,
-        [test "$enable_im_agent" = "yes"])
-
 AM_CONDITIONAL(SCIM_BUILD_GTK2_IMMODULE,
-        [test "$enable_gtk2_immodule" = "yes"])
+		[test "$enable_gtk2_immodule" = "yes"])
 
 AM_CONDITIONAL(SCIM_BUILD_GTK3_IMMODULE,
-        [test "$enable_gtk3_immodule" = "yes"])
+		[test "$enable_gtk3_immodule" = "yes"])
 
 AM_CONDITIONAL(SCIM_BUILD_GTK4_IMMODULE,
-        [test "$enable_gtk4_immodule" = "yes"])
-
-AM_CONDITIONAL(SCIM_BUILD_QT3_IMMODULE,
-        [test "$enable_qt3_immodule" = "yes"])
-
-AM_CONDITIONAL(SCIM_BUILD_QT4_IMMODULE,
-        [test "$enable_qt4_immodule" = "yes"])
+		[test "$enable_gtk4_immodule" = "yes"])
 
 AM_CONDITIONAL(SCIM_BUILD_QT5_IMMODULE,
-        [test "$enable_qt5_immodule" = "yes"])
+		[test "$enable_qt5_immodule" = "yes"])
 
-AM_CONDITIONAL(SCIM_BUILD_CLUTTER_IMMODULE,
-        [test "$enable_clutter_immodule" = "yes"])
-
-AM_CONDITIONAL(SCIM_BUILD_IMMODULE,
-        [test "$enable_immodule" = "yes"])
+AM_CONDITIONAL(SCIM_BUILD_QT6_IMMODULE,
+		[test "$enable_qt6_immodule" = "yes"])
 
 AM_CONDITIONAL(SCIM_BUILD_FILTER_SCTC,
 		[test "$enable_filter_sctc" = "yes"])
@@ -998,21 +821,15 @@ AC_SUBST(SCIM_BUILD_IMENGINE_RAWCODE)
 AC_SUBST(SCIM_BUILD_IMENGINE_TABLE)
 AC_SUBST(SCIM_BUILD_IMENGINE_SOCKET)
 AC_SUBST(SCIM_BUILD_FILTER_SCTC)
-AC_SUBST(SCIM_BUILD_ORIG_GTK2_IMMODULE)
-AC_SUBST(SCIM_BUILD_ORIG_GTK3_IMMODULE)
 AC_SUBST(SCIM_BUILD_SCIM_SETUP)
 AC_SUBST(SCIM_BUILD_PANEL_GTK)
 AC_SUBST(SCIM_BUILD_GTK_UTILS)
 AC_SUBST(SCIM_BUILD_X11_UTILS)
-AC_SUBST(SCIM_BUILD_IM_AGENT)
 AC_SUBST(SCIM_BUILD_GTK2_IMMODULE)
 AC_SUBST(SCIM_BUILD_GTK3_IMMODULE)
 AC_SUBST(SCIM_BUILD_GTK4_IMMODULE)
-AC_SUBST(SCIM_BUILD_QT3_IMMODULE)
-AC_SUBST(SCIM_BUILD_QT4_IMMODULE)
 AC_SUBST(SCIM_BUILD_QT5_IMMODULE)
-AC_SUBST(SCIM_BUILD_CLUTTER_IMMODULE)
-AC_SUBST(SCIM_BUILD_IMMODULE)
+AC_SUBST(SCIM_BUILD_QT6_IMMODULE)
 
 
 # Output All necessary Paths.
@@ -1062,21 +879,12 @@ AC_CONFIG_FILES([Makefile
 		 extras/Makefile
 		 extras/gtk_immodule/gtk2/Makefile
 		 extras/gtk_immodule/gtk3/Makefile
+		 extras/gtk_immodule/gtk4/Makefile
+		 extras/gtk_immodule/qt5/Makefile
+		 extras/gtk_immodule/qt6/Makefile
 		 extras/setup/Makefile
 		 extras/setup/scim-setup
 		 extras/panel/Makefile
-		 extras/immodules/Makefile 
-		 extras/immodules/common/Makefile
-		 extras/immodules/agent/Makefile
-		 extras/immodules/client-common/Makefile
-		 extras/immodules/client-gtk/gtk2/Makefile
-		 extras/immodules/client-gtk/gtk3/Makefile
-		 extras/immodules/client-gtk/gtk4/Makefile
-		 extras/immodules/client-qt/qt3/Makefile
-		 extras/immodules/client-qt/qt4/Makefile
-		 extras/immodules/client-qt/qt5/Makefile
-		 extras/immodules/client-clutter/Makefile
-		 extras/immodules/doc/Makefile
 		 tests/Makefile
 		 scim.pc
 		 scim-gtkutils.pc
@@ -1122,24 +930,13 @@ Module options:
   GTK2 IMModule dir        $GTK2_IM_MODULEDIR
   GTK3 IMModule dir        $GTK3_IM_MODULEDIR
   GTK4 IMModule dir        $GTK4_IM_MODULEDIR
-  QT3 IMModule dir         $QT3_IM_MODULEDIR
-  QT4 IMModule dir         $QT4_IM_MODULEDIR
   QT5 IMModule dir         $QT5_IM_MODULEDIR
-  Clutter IMModule dir     $CLUTTER_IM_MODULEDIR
 
-  QT3 moc program          $QT3_MOC
-  QT4 moc program          $QT4_MOC
   QT5 moc program          $QT5_MOC
 
-  Original GTK2 IMModule   $enable_orig_gtk2_immodule
-  Original GTK3 IMModule   $enable_orig_gtk3_immodule
-
-  Scim IM Agent            $enable_im_agent
   GTK2 IMModule            $enable_gtk2_immodule
   GTK3 IMModule            $enable_gtk3_immodule
   GTK4 IMModule            $enable_gtk4_immodule
-  QT3 IMModule             $enable_qt3_immodule
-  QT4 IMModule             $enable_qt4_immodule
   QT5 IMModule             $enable_qt5_immodule
-  CLUTTER IMModule         $enable_clutter_immodule
+  QT6 IMModule             $enable_qt6_immodule
 ])

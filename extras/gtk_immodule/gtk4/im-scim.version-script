@@ -1,0 +1,11 @@
+IM_SCIM_GTK4_1.0 {
+    global:
+        extern "C" {
+            g_io_im_scim_load;
+            g_io_im_scim_unload;
+            g_io_im_scim_query;
+        };
+
+    local:
+        *;
+};

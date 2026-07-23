@@ -1,5 +1,5 @@
 MAINTAINERCLEANFILES 	= Makefile.in
-EXTRA_DIST		= ../im-scim.version-script
+EXTRA_DIST		= im-scim.version-script
 
 AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_builddir)/src \
@@ -18,7 +18,7 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -DSCIM_TEMPDIR=\"@SCIM_TEMPDIR@\" \
 			  -DSCIM_KEYBOARD_ICON_FILE=\"@SCIM_ICONDIR@/keyboard.png\"
 
-if SCIM_BUILD_ORIG_GTK3_IMMODULE
+if SCIM_BUILD_GTK3_IMMODULE
 CONFIG_GTK3_IMMODULE = im-scim-orig.la
 endif
 
@@ -27,16 +27,16 @@ X11_UTILS=$(top_builddir)/utils/libscim-x11utils@SCIM_EPOCH@.la
 endif
 
 if SCIM_LD_VERSION_SCRIPT
-LD_VERSION_SCRIPT_OPTION="-Wl,--version-script=$(srcdir)/../im-scim.version-script"
+LD_VERSION_SCRIPT_OPTION="-Wl,--version-script=$(srcdir)/im-scim.version-script"
 endif
 
-noinst_HEADERS = ../gtkimcontextscim.h
+noinst_HEADERS = gtkimcontextscim.h
 
 moduledir = @GTK3_IM_MODULEDIR@
 
 module_LTLIBRARIES = $(CONFIG_GTK3_IMMODULE)
 
-im_scim_orig_la_SOURCES = ../gtkimcontextscim.cpp ../imscim.cpp
+im_scim_orig_la_SOURCES = gtkimcontextscim.cpp imscim.cpp
 
 im_scim_orig_la_CXXFLAGS=@GTK3_CFLAGS@
 im_scim_orig_la_CFLAGS  =@GTK3_CFLAGS@
