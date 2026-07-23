@@ -137,8 +137,12 @@ configure module, Pinyin IM engine module, X11 frontend module:
 .IR /etc/scim/global ", " /etc/scim/config
 Configuration file for system wide settings
 .TP
-.IR ~/.scim/global ", " ~/.scim/config
-User specific settings
+.IR ~/.config/scim/global ", " ~/.config/scim/config
+User specific settings (honouring
+.IR $XDG_CONFIG_HOME ).
+A legacy
+.I ~/.scim
+directory is still used if it exists and the new location does not.
 .
 .SH "SEE ALSO"
 There is a brief English README giving some introduction and tips about SCIM,

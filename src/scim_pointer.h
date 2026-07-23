@@ -31,8 +31,7 @@
  * $Id: scim_pointer.h,v 1.11 2005/01/10 08:30:54 suzhe Exp $
  */
 
-#ifndef __SCIM_POINTER_H
-#define __SCIM_POINTER_H
+#pragma once
 
 namespace scim {
 
@@ -45,7 +44,7 @@ namespace scim {
  * @class Pointer 
  * @brief Smart pointer template class.
  * 
- * Pointer is a standard auto_ptr-like smart pointer for managing heap 
+ * Pointer is an intrusive, reference-counted smart pointer for managing heap
  * allocated reference counted objects. T must be a class derived from
  * scim::ReferencedObject.
  */
@@ -287,8 +286,6 @@ cast_static(const Pointer<From>& from)
 /** @} */
 
 } // namespace scim
-
-#endif //__SCIM_POINTER_H
 
 /*
 vi:ts=4:nowrap:ai:expandtab

@@ -52,9 +52,10 @@ The purpose of Socket FrontEnd is to listen and accept request
 on a local/inet socket. Socket IMEngine and Config module serve as clients of 
 Socket FrontEnd.
 
-The default socket address is local:/tmp/scim-socket-frontend, the prefix local:
-indicates that it's a unix/local socket. If you want to create a inet socket, use
-inet: prefix, e.g. inet:localhost:12345, 12345 is the port number.
+The default socket address is local:$XDG_RUNTIME_DIR/scim-socket-frontend (and
+local:/tmp/scim-socket-frontend when XDG_RUNTIME_DIR is not set); the prefix
+local: indicates that it's a unix/local socket. If you want to create a inet
+socket, use inet: prefix, e.g. inet:localhost:12345, 12345 is the port number.
 
 Use following command to start scim daemon to listen a socket:
 

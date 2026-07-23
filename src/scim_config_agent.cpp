@@ -144,7 +144,7 @@ int main (int argc, char *argv [])
                  << "                       use simple module by default.\n"
                  << "                       Use \"global\" instead of a real config module name,\n"
                  << "                       if you want to access the global configuration file.\n"
-                 << "                       (Normally they are /etc/scim/global and ~/.scim/global).\n"
+                 << "                       (Normally they are /etc/scim/global and ~/.config/scim/global).\n"
                  << "  --reload             Force the running scim to reload configuration.\n"
                  << "  --display display    The display which scim Panel is running on,\n"
                  << "                       it's only useful when --reload is used.\n"

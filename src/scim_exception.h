@@ -27,8 +27,7 @@
  * $Id: scim_exception.h,v 1.10 2005/01/10 08:30:53 suzhe Exp $
  */
 
-#ifndef __SCIM_EXCEPTION_H
-#define __SCIM_EXCEPTION_H
+#pragma once
 
 namespace scim {
 /**
@@ -47,15 +46,13 @@ class Exception: public std::exception
     String m_what;
 public:
     Exception (const String& what_arg) : m_what (what_arg) { }
-    ~Exception () throw () {}
-    virtual const char* what () const throw () { return m_what.c_str (); }
+    ~Exception () noexcept override {}
+    const char* what () const noexcept override { return m_what.c_str (); }
 };
 
 /** @} */
 
 } // namespace scim
-
-#endif //__SCIM_EXCEPTION_H
 /*
 vi:ts=4:nowrap:ai:expandtab
 */

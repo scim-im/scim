@@ -1136,9 +1136,26 @@ SocketClient::close ()
     m_connected = false;
 }
 
-#define SCIM_DEFAULT_SOCKET_FRONTEND_ADDRESS        "local:/tmp/scim-socket-frontend"
-#define SCIM_DEFAULT_PANEL_SOCKET_ADDRESS           "local:/tmp/scim-panel-socket"
-#define SCIM_DEFAULT_HELPER_MANAGER_SOCKET_ADDRESS  "local:/tmp/scim-helper-manager-socket"
+// Build the default address for a local (UNIX) socket. Modern systems provide
+// a per-user, mode-0700 runtime directory in $XDG_RUNTIME_DIR; use it when set
+// so the socket is no longer world-visible under /tmp. The socket is placed
+// directly in that directory (which is guaranteed to exist) to avoid having to
+// create an intermediate directory before bind(). When $XDG_RUNTIME_DIR is not
+// set (e.g. no logind session), fall back to the historical /tmp location.
+static String scim_default_local_socket_address (const char *name)
+{
+    const char *runtime = getenv ("XDG_RUNTIME_DIR");
+
+    if (runtime && *runtime)
+        return String ("local:") + String (runtime) +
+               String ("/scim-") + String (name);
+
+    return String ("local:/tmp/scim-") + String (name);
+}
+
+#define SCIM_DEFAULT_SOCKET_FRONTEND_ADDRESS        scim_default_local_socket_address ("socket-frontend")
+#define SCIM_DEFAULT_PANEL_SOCKET_ADDRESS           scim_default_local_socket_address ("panel-socket")
+#define SCIM_DEFAULT_HELPER_MANAGER_SOCKET_ADDRESS  scim_default_local_socket_address ("helper-manager-socket")
 
 String scim_get_default_socket_frontend_address ()
 {

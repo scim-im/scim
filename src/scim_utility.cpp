@@ -594,12 +594,35 @@ scim_get_user_name ()
     return String (uid_str);
 }
 
+// Base directory for per-user configuration, following the XDG Base Directory
+// specification: $XDG_CONFIG_HOME if set, otherwise ~/.config.
+static String
+scim_get_user_config_home ()
+{
+    const char *xdg = getenv ("XDG_CONFIG_HOME");
+
+    if (xdg && *xdg)
+        return String (xdg);
+
+    return scim_get_home_dir () + String ("/.config");
+}
+
 String
 scim_get_user_data_dir ()
 {
-    String dir = scim_get_home_dir () + String ("/.scim");
-    scim_make_dir (dir);
-    return dir;
+    String xdg_dir    = scim_get_user_config_home () + String ("/scim");
+    String legacy_dir = scim_get_home_dir () + String ("/.scim");
+
+    // Prefer the XDG location. If it does not exist yet but a legacy ~/.scim
+    // directory does, keep using the legacy directory in place -- we never
+    // migrate it automatically. Otherwise create and use the XDG location.
+    struct stat st;
+    if (::stat (xdg_dir.c_str (), &st) != 0 &&
+        ::stat (legacy_dir.c_str (), &st) == 0)
+        return legacy_dir;
+
+    scim_make_dir (xdg_dir);
+    return xdg_dir;
 }
 
 String
