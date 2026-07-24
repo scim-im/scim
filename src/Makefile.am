@@ -30,8 +30,7 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -DSCIM_SYSCONFDIR=\"@SCIM_SYSCONFDIR@\" \
 			  -DSCIM_LIBEXECDIR=\"@SCIM_LIBEXECDIR@\" \
 			  -DSCIM_ICONDIR=\"@SCIM_ICONDIR@\" \
-			  -DSCIM_MODULE_PATH=\"@SCIM_MODULE_PATH@\" \
-			  $(LTDLINCL)
+			  -DSCIM_MODULE_PATH=\"@SCIM_MODULE_PATH@\"
 
 
 noinst_HEADERS		= \
@@ -124,15 +123,12 @@ libscim@SCIM_EPOCH@_la_SOURCES = scim_backend.cpp \
 			  scim_transaction.cpp \
 			  scim_utility.cpp
 
-libscim@SCIM_EPOCH@_la_DEPENDENCIES = $(LTDLDEPS)
-
 libscim@SCIM_EPOCH@_la_LDFLAGS= -version-info $(SCIM_CURRENT):$(SCIM_REVISION):$(SCIM_AGE) \
 			  -export-dynamic \
 			  $(LD_VERSION_SCRIPT_OPTION) \
 			  @LIBTOOL_EXPORT_OPTIONS@ \
 			  @LIBICONV@ \
-			  @LTLIBINTL@ \
-			  $(LIBLTDL)
+			  @LTLIBINTL@
 
 
 bin_PROGRAMS		= scim scim-config-agent

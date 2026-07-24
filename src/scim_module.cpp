@@ -27,9 +27,7 @@
 #define Uses_STL_ALGORITHM
 #include "scim_private.h"
 #include "scim.h"
-extern "C" {
-  #include <ltdl.h>
-}
+#include <dlfcn.h>
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -42,16 +40,14 @@ typedef void (*ModuleExitFunc) (void);
 
 struct Module::ModuleImpl
 {
-#if SCIM_LTDLADVISE
-    lt_dladvise advise;
-#endif
-    lt_dlhandle handle;
+    void          *handle;
     ModuleInitFunc init;
     ModuleExitFunc exit;
-    String path;
-    String name;
+    String         path;
+    String         name;
+    bool           resident;
 
-    ModuleImpl () : handle (0), init (0), exit (0) { }
+    ModuleImpl () : handle (0), init (0), exit (0), resident (false) { }
 };
 
 static std::vector <ModuleInitFunc> _scim_modules;
@@ -134,22 +130,43 @@ Module::Module (const String &name, const String &type)
 
 void Module::init ()
 {
-    lt_dlinit ();
-#if SCIM_LTDLADVISE
-    lt_dladvise_init (&(m_impl->advise));
-    lt_dladvise_ext (&(m_impl->advise));
-    lt_dladvise_global (&(m_impl->advise));
-#endif
+    // Nothing to do: dlopen(3) needs no global initialization.
 }
 
 Module::~Module ()
 {
     unload ();
-#if SCIM_LTDLADVISE
-    lt_dladvise_destroy (&(m_impl->advise));
-#endif
-    lt_dlexit ();
     delete m_impl;
+}
+
+// Open a module given a base path (without extension), trying the shared
+// object suffix first, then the base name as given.
+//
+// RTLD_LOCAL keeps each module's symbols out of the global scope: modules
+// resolve libscim through their own DT_NEEDED, and their entry points are
+// looked up on the specific handle (and namespaced with the <name>_LTX_
+// prefix), so nothing relies on cross-module global symbol sharing.
+// RTLD_NOW surfaces unresolved symbols at load time rather than on first call.
+static const int _scim_dlopen_flags = RTLD_NOW | RTLD_LOCAL;
+
+static void *
+_scim_dlopen (const String &base, String &opened_path)
+{
+    String so = base + String (".so");
+
+    void *handle = dlopen (so.c_str (), _scim_dlopen_flags);
+    if (handle) {
+        opened_path = so;
+        return handle;
+    }
+
+    handle = dlopen (base.c_str (), _scim_dlopen_flags);
+    if (handle) {
+        opened_path = base;
+        return handle;
+    }
+
+    return 0;
 }
 
 static String
@@ -172,11 +189,12 @@ Module::load (const String &name, const String &type)
         return false;
 
     std::vector <String> paths;
-    std::vector <String>::iterator it; 
+    std::vector <String>::iterator it;
 
     String module_path;
+    String new_path;
 
-    lt_dlhandle    new_handle = 0;
+    void *new_handle = 0;
 
     ModuleInitFunc new_init;
     ModuleExitFunc new_exit;
@@ -185,22 +203,13 @@ Module::load (const String &name, const String &type)
 
     for (it = paths.begin (); it != paths.end (); ++it) {
         module_path = *it + String (SCIM_PATH_DELIM_STRING) + name;
-#if SCIM_LTDLADVISE
-        new_handle = lt_dlopenadvise (module_path.c_str (), m_impl->advise);
-#else
-        new_handle = lt_dlopenext (module_path.c_str ());
-#endif
+        new_handle = _scim_dlopen (module_path, new_path);
         if (new_handle)
             break;
     }
 
-    if (!new_handle) {
-#if SCIM_LTDLADVISE
-        new_handle = lt_dlopenadvise (name.c_str (), m_impl->advise);
-#else
-        new_handle = lt_dlopenext (name.c_str ());
-#endif
-    }
+    if (!new_handle)
+        new_handle = _scim_dlopen (name, new_path);
 
     if (!new_handle)
         return false;
@@ -209,60 +218,58 @@ Module::load (const String &name, const String &type)
 
     // Try to load the symbol scim_module_init
     symbol = "scim_module_init";
-    new_init = (ModuleInitFunc) lt_dlsym (new_handle, symbol.c_str ());
+    new_init = (ModuleInitFunc) dlsym (new_handle, symbol.c_str ());
 
     // If symbol load failed, try to add LTX prefix and load again.
-    // This will occurred when name.la is missing.
+    // Built-in modules export their entry points as <name>_LTX_scim_*.
     if (!new_init) {
         symbol = _concatenate_ltdl_prefix (name, symbol);
-        new_init = (ModuleInitFunc) lt_dlsym (new_handle, symbol.c_str ());
+        new_init = (ModuleInitFunc) dlsym (new_handle, symbol.c_str ());
 
         // Failed again? Try to prepend a under score to the symbol name.
         if (!new_init) {
             symbol.insert (symbol.begin (),'_');
-            new_init = (ModuleInitFunc) lt_dlsym (new_handle, symbol.c_str ());
+            new_init = (ModuleInitFunc) dlsym (new_handle, symbol.c_str ());
         }
     }
 
     // Could not load the module!
     if (!new_init) {
-        lt_dlclose (new_handle);
+        dlclose (new_handle);
         return false;
     }
 
     // Try to load the symbol scim_module_exit
     symbol = "scim_module_exit";
-    new_exit = (ModuleExitFunc) lt_dlsym (new_handle, symbol.c_str ());
+    new_exit = (ModuleExitFunc) dlsym (new_handle, symbol.c_str ());
 
     // If symbol load failed, try to add LTX prefix and load again.
-    // This will occurred when name.la is missing.
+    // Built-in modules export their entry points as <name>_LTX_scim_*.
     if (!new_exit) {
         symbol = _concatenate_ltdl_prefix (name, symbol);
-        new_exit = (ModuleExitFunc) lt_dlsym (new_handle, symbol.c_str ());
+        new_exit = (ModuleExitFunc) dlsym (new_handle, symbol.c_str ());
 
         // Failed again? Try to prepend a under score to the symbol name.
         if (!new_exit) {
             symbol.insert (symbol.begin (),'_');
-            new_exit = (ModuleExitFunc) lt_dlsym (new_handle, symbol.c_str ());
+            new_exit = (ModuleExitFunc) dlsym (new_handle, symbol.c_str ());
         }
     }
 
     //Check if the module is already loaded.
     if (std::find (_scim_modules.begin (), _scim_modules.end (), new_init)
         != _scim_modules.end ()) {
-        lt_dlclose (new_handle);
+        dlclose (new_handle);
         return false;
     }
 
     if (unload ()) {
         _scim_modules.push_back (new_init);
 
-        const lt_dlinfo *info = lt_dlgetinfo (new_handle);
-
         m_impl->handle = new_handle;
         m_impl->init   = new_init;
         m_impl->exit   = new_exit;
-        m_impl->path   = String (info->filename);
+        m_impl->path   = new_path;
         m_impl->name   = name;
 
         try {
@@ -272,7 +279,7 @@ Module::load (const String &name, const String &type)
             unload ();
         }
     } else {
-        lt_dlclose (new_handle);
+        dlclose (new_handle);
     }
 
     return false;
@@ -291,7 +298,7 @@ Module::unload ()
         try { m_impl->exit (); } catch (...) { }
     }
 
-    lt_dlclose (m_impl->handle);
+    dlclose (m_impl->handle);
 
     std::vector <ModuleInitFunc>::iterator it =
         std::find (_scim_modules.begin (), _scim_modules.end (), m_impl->init);
@@ -299,11 +306,12 @@ Module::unload ()
     if (it != _scim_modules.end ())
         _scim_modules.erase (it);
 
-    m_impl->handle = 0;
-    m_impl->init   = 0;
-    m_impl->exit   = 0;
-    m_impl->path   = String ();
-    m_impl->name   = String ();
+    m_impl->handle   = 0;
+    m_impl->init     = 0;
+    m_impl->exit     = 0;
+    m_impl->path     = String ();
+    m_impl->name     = String ();
+    m_impl->resident = false;
 
     return true;
 }
@@ -311,8 +319,11 @@ Module::unload ()
 bool
 Module::make_resident () const
 {
+    // dlopen(3) has no "resident" flag; emulate it so unload() refuses to
+    // release the module (the memory stays mapped for the process lifetime).
     if (m_impl->handle) {
-        return lt_dlmakeresident (m_impl->handle) == 0;
+        m_impl->resident = true;
+        return true;
     }
     return false;
 }
@@ -320,10 +331,7 @@ Module::make_resident () const
 bool
 Module::is_resident () const
 {
-    if (m_impl->handle) {
-        return lt_dlisresident (m_impl->handle) == 1;
-    }
-    return false;
+    return (m_impl->handle && m_impl->resident);
 }
 
 bool
@@ -345,13 +353,13 @@ Module::symbol (const String & sym) const
 
     if (m_impl->handle) {
         String symbol = sym;
-        func = lt_dlsym (m_impl->handle, symbol.c_str ());
+        func = dlsym (m_impl->handle, symbol.c_str ());
         if (!func) {
             symbol = _concatenate_ltdl_prefix (m_impl->name, symbol);
-            func = lt_dlsym (m_impl->handle, symbol.c_str ());
+            func = dlsym (m_impl->handle, symbol.c_str ());
             if (!func) {
                 symbol.insert (symbol.begin (), '_');
-                func = lt_dlsym (m_impl->handle, symbol.c_str ());
+                func = dlsym (m_impl->handle, symbol.c_str ());
             }
         }
     }
