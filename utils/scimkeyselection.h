@@ -28,7 +28,7 @@ typedef struct _ScimKeySelectionDialogClass  ScimKeySelectionDialogClass;
 
 struct _ScimKeySelection
 {
-    GtkVBox  vbox;
+    GtkBox  vbox;
 
     GtkWidget *toggle_ctrl;
     GtkWidget *toggle_alt;
@@ -49,7 +49,7 @@ struct _ScimKeySelection
 
 struct _ScimKeySelectionClass
 {
-    GtkVBoxClass parent_class;
+    GtkBoxClass parent_class;
 
     void (*changed) (ScimKeySelection *keyselection);
 };
@@ -60,12 +60,7 @@ struct _ScimKeySelectionDialog
 
     GtkWidget *keysel;
 
-#if GTK_CHECK_VERSION(3, 0, 0)
     GtkWidget *content_area;
-#else
-    GtkWidget *main_vbox;
-#endif
-    GtkWidget *action_area;
 
     GtkWidget *ok_button;
     GtkWidget *cancel_button;

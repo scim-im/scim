@@ -2,7 +2,7 @@
 #define __SCIM_STRING_VIEW_H__
 
 
-#include <gdk/gdk.h>
+#include <gtk/gtk.h>
 #include <pango/pango.h>
 
 G_BEGIN_DECLS
@@ -28,8 +28,6 @@ struct _ScimStringView
   guint16      text_max_length;
 
   /*< private >*/
-  GdkWindow   *text_area;
-  
   gint         current_pos;
   
   PangoLayout *cached_layout;

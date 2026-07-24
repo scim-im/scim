@@ -401,10 +401,10 @@ AC_ARG_WITH([qt5-im-module-dir],
 	[QT5_IM_MODULEDIR=$with_qt5_im_module_dir])
 
 AC_ARG_WITH([gtk-version],
-	[AS_HELP_STRING([--with-gtk-version=2 or 3], 
-		[Select gtk version if both gtk2 and gtk3 are available (default is 3)])],
+	[AS_HELP_STRING([--with-gtk-version=2, 3 or 4],
+		[Select gtk version for the GUI if several are available (default is 4)])],
 	[WANT_GTK_VERSION=$withval],
-	[WANT_GTK_VERSION=3])
+	[WANT_GTK_VERSION=4])
 
 AC_ARG_ENABLE([ld-version-script],
 	[AS_HELP_STRING([--enable-ld-version-script],
@@ -699,6 +699,14 @@ elif test "$USE_GTK_VERSION" = "2"; then
 else
   SCIM_HAS_GTK=no
 fi
+
+# pkg-config module name for the selected GTK (gtk4 dropped the "gtk+-" prefix).
+if test "$GTK_MAJOR_VERSION" = "4"; then
+  GTK_PC_NAME=gtk4
+else
+  GTK_PC_NAME="gtk+-${GTK_MAJOR_VERSION}.0"
+fi
+AC_SUBST(GTK_PC_NAME)
 
 if test "$enable_setup_ui" = "yes" -a "$SCIM_HAS_GTK" = "yes"; then
   SCIM_BUILD_SCIM_SETUP=1

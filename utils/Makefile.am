@@ -25,11 +25,6 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_srcdir)/data \
 			  -I$(top_srcdir)/utils
 
-if SCIM_BUILD_TRAY_ICON
-TRAY_ICON_HEADER=scimtrayicon.h
-TRAY_ICON_SOURCE=scimtrayicon.c
-endif
-
 if SCIM_BUILD_X11_UTILS
 libscimx11utilsincludedir = $(includedir)/scim@SCIM_EPOCH@/x11
 libscimx11utilsinclude_HEADERS = scim_x11_utils.h
@@ -38,15 +33,14 @@ endif
 
 if SCIM_BUILD_GTK_UTILS
 libscimgtkutilsincludedir = $(includedir)/scim@SCIM_EPOCH@/gtk
-libscimgtkutilsinclude_HEADERS = scimstringview.h scimkeyselection.h $(TRAY_ICON_HEADER)
+libscimgtkutilsinclude_HEADERS = scimstringview.h scimkeyselection.h
 GTK_UTILS = libscim-gtkutils@SCIM_EPOCH@.la
 endif
 
 lib_LTLIBRARIES = $(X11_UTILS) $(GTK_UTILS)
 
 libscim_gtkutils@SCIM_EPOCH@_la_SOURCES = scimstringview.c \
-				  scimkeyselection.cpp \
-				  $(TRAY_ICON_SOURCE)
+				  scimkeyselection.cpp
 
 libscim_gtkutils@SCIM_EPOCH@_la_CFLAGS = @GTK_CFLAGS@
 libscim_gtkutils@SCIM_EPOCH@_la_CXXFLAGS= @GTK_CFLAGS@
@@ -55,10 +49,9 @@ libscim_gtkutils@SCIM_EPOCH@_la_LDFLAGS= -version-info $(SCIM_CURRENT):$(SCIM_RE
 				  -export-dynamic \
 				  @LIBTOOL_EXPORT_OPTIONS@ \
 				  @LTLIBINTL@ \
-				  @GTK_LIBS@ \
-				  @X_LIBS@
+				  @GTK_LIBS@
 
-libscim_gtkutils@SCIM_EPOCH@_la_LIBADD= $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(X11_UTILS)
+libscim_gtkutils@SCIM_EPOCH@_la_LIBADD= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
 
 
 libscim_x11utils@SCIM_EPOCH@_la_SOURCES = scim_x11_utils.cpp
