@@ -290,157 +290,95 @@ create_setup_window ()
         GtkWidget *scrolledwindow;
         GtkWidget *button;
 
-#if GTK_CHECK_VERSION(2, 12, 0)
-#else
-        __widget_tooltips = gtk_tooltips_new ();
-#endif
-
         // Create the toplevel box.
-#if GTK_CHECK_VERSION(3, 2, 0)
         window = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-#else
-        window = gtk_vbox_new (FALSE, 0);
-#endif
-        gtk_widget_show (window);
 
         label = gtk_label_new (_("The installed input method services:"));
-#if GTK_CHECK_VERSION(3, 14, 0)
         gtk_widget_set_halign (label, GTK_ALIGN_START);
         gtk_widget_set_valign (label, GTK_ALIGN_CENTER);
-#else
-        gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
-#endif
-        gtk_widget_show (label);
-        gtk_box_pack_start (GTK_BOX (window), label, FALSE, FALSE, 0);
+        gtk_box_append (GTK_BOX (window), label);
 
-        scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
-        gtk_widget_show (scrolledwindow);
-        gtk_box_pack_start (GTK_BOX (window), scrolledwindow, TRUE, TRUE, 4);
+        scrolledwindow = gtk_scrolled_window_new ();
+        gtk_widget_set_vexpand (scrolledwindow, TRUE);
+        gtk_box_append (GTK_BOX (window), scrolledwindow);
         gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow),
                                         GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-        gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow),
-                                             GTK_SHADOW_NONE);
 
         // Create hotkey and filter button before factory list view, because
         // factory_list_selection_changed_callback may access these two buttons.
         __hotkey_button = gtk_button_new_with_mnemonic (_("Edit _Hotkeys"));
-        gtk_widget_show (__hotkey_button);
         gtk_widget_set_sensitive (__hotkey_button, FALSE);
 
         g_signal_connect ((gpointer) __hotkey_button, "clicked",
                           G_CALLBACK (on_hotkey_button_clicked),
                           NULL);
 
-#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (__hotkey_button,
                               _("Edit Hotkeys associated with the selected input method."));
-#else
-        gtk_tooltips_set_tip (__widget_tooltips, __hotkey_button,
-                              _("Edit Hotkeys associated with the selected input method."), NULL);
-#endif
 
         __filter_button = gtk_button_new_with_mnemonic (_("Select _Filters"));
-        gtk_widget_show (__filter_button);
         gtk_widget_set_sensitive (__filter_button, FALSE);
 
         g_signal_connect ((gpointer) __filter_button, "clicked",
                           G_CALLBACK (on_filter_button_clicked),
                           NULL);
 
-#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (__filter_button,
                               _("Select the Filters which will be attached to this input method."));
-#else
-        gtk_tooltips_set_tip (__widget_tooltips, __filter_button,
-                              _("Select the Filters which will be attached to this input method."), NULL);
-#endif
 
         view = create_factory_list_view ();
-        gtk_widget_show (view);
-        gtk_container_add (GTK_CONTAINER (scrolledwindow), view);
+        gtk_scrolled_window_set_child (GTK_SCROLLED_WINDOW (scrolledwindow), view);
 
-#if GTK_CHECK_VERSION(3, 2, 0)
         sep = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
-#else
-        sep = gtk_hseparator_new ();
-#endif
-        gtk_widget_show (sep);
-        gtk_box_pack_start (GTK_BOX (window), sep, FALSE, FALSE, 2);
+        gtk_box_append (GTK_BOX (window), sep);
 
-#if GTK_CHECK_VERSION(3, 2, 0)
         hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-#else
-        hbox = gtk_hbox_new (FALSE, 0);
-#endif
-        gtk_widget_show (hbox);
-        gtk_box_pack_start (GTK_BOX (window), hbox, FALSE, FALSE, 2);
+        gtk_box_append (GTK_BOX (window), hbox);
 
-        gtk_box_pack_end (GTK_BOX (hbox), __hotkey_button, FALSE, FALSE, 4);
-        gtk_box_pack_end (GTK_BOX (hbox), __filter_button, FALSE, FALSE, 4);
+        gtk_widget_set_hexpand (__hotkey_button, TRUE);
+        gtk_widget_set_halign (__hotkey_button, GTK_ALIGN_END);
+        gtk_box_append (GTK_BOX (hbox), __hotkey_button);
+        gtk_box_append (GTK_BOX (hbox), __filter_button);
 
         button = gtk_button_new_with_mnemonic (_("_Expand"));
-        gtk_widget_show (button);
-        gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 4);
+        gtk_box_append (GTK_BOX (hbox), button);
 
         g_signal_connect ((gpointer) button, "clicked",
                           G_CALLBACK (on_expand_button_clicked),
                           (gpointer) view);
 
-#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (button,
                               _("Expand all language categories."));
-#else
-        gtk_tooltips_set_tip (__widget_tooltips, button,
-                              _("Expand all language categories."), NULL);
-#endif
 
         button = gtk_button_new_with_mnemonic (_("_Collapse"));
-        gtk_widget_show (button);
-        gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 4);
+        gtk_box_append (GTK_BOX (hbox), button);
 
         g_signal_connect ((gpointer) button, "clicked",
                           G_CALLBACK (on_collapse_button_clicked),
                           (gpointer) view);
 
-#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (button,
                               _("Collapse all language categories."));
-#else
-        gtk_tooltips_set_tip (__widget_tooltips, button,
-                              _("Collapse all language categories."), NULL);
-#endif
 
         button = gtk_button_new_with_mnemonic (_("E_nable All"));
-        gtk_widget_show (button);
-        gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 4);
+        gtk_box_append (GTK_BOX (hbox), button);
 
         g_signal_connect ((gpointer) button, "clicked",
                           G_CALLBACK (on_toggle_all_button_clicked),
                           (gpointer) (1));
 
-#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (button,
                               _("Enable all input methods."));
-#else
-        gtk_tooltips_set_tip (__widget_tooltips, button,
-                              _("Enable all input methods."), NULL);
-#endif
 
         button = gtk_button_new_with_mnemonic (_("_Disable All"));
-        gtk_widget_show (button);
-        gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, FALSE, 4);
+        gtk_box_append (GTK_BOX (hbox), button);
 
         g_signal_connect ((gpointer) button, "clicked",
                           G_CALLBACK (on_toggle_all_button_clicked),
                           (gpointer) (0));
 
-#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (button,
                               _("Disable all input methods."));
-#else
-        gtk_tooltips_set_tip (__widget_tooltips, button,
-                              _("Disable all input methods."), NULL);
-#endif
     }
     return window;
 }
@@ -457,9 +395,6 @@ create_factory_list_view ()
     view = gtk_tree_view_new ();
     gtk_widget_show (view);
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), TRUE);
-#if !GTK_CHECK_VERSION(3, 14, 0)
-    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (view), TRUE);
-#endif
 
     // Name column
     column = gtk_tree_view_column_new ();
@@ -568,9 +503,6 @@ create_filter_list_view ()
     view = gtk_tree_view_new ();
     gtk_widget_show (view);
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (view), TRUE);
-#if !GTK_CHECK_VERSION(3, 14, 0)
-    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (view), TRUE);
-#endif
 
     // Enable column
     column = gtk_tree_view_column_new ();
@@ -1229,6 +1161,32 @@ on_filter_enable_box_clicked (GtkCellRendererToggle *cell, gchar *arg1, gpointer
     gtk_tree_path_free (path);
 }
 
+struct HotkeyDialogData {
+    gchar *old_hotkeys;
+};
+
+static void
+hotkey_dialog_response_cb (GtkDialog *dialog, gint response, gpointer user_data)
+{
+    HotkeyDialogData *d = static_cast<HotkeyDialogData *> (user_data);
+
+    if (response == GTK_RESPONSE_OK) {
+        const gchar *newkeys = scim_key_selection_dialog_get_keys (SCIM_KEY_SELECTION_DIALOG (dialog));
+        const gchar *hotkeys = d->old_hotkeys;
+
+        if ((newkeys && hotkeys && String (newkeys) != String (hotkeys)) || (newkeys || hotkeys)) {
+            gtk_tree_store_set (__factory_list_model, &__selected_factory,
+                                FACTORY_LIST_HOTKEYS, newkeys,
+                                -1);
+            __have_changed = true;
+        }
+    }
+
+    g_free (d->old_hotkeys);
+    delete d;
+    gtk_window_destroy (GTK_WINDOW (dialog));
+}
+
 static void
 on_hotkey_button_clicked (GtkButton *button, gpointer user_data)
 {
@@ -1247,7 +1205,7 @@ on_hotkey_button_clicked (GtkButton *button, gpointer user_data)
         snprintf (buf, 256, _("Edit Hotkeys for %s"), name);
 
         GtkWidget *dialog = scim_key_selection_dialog_new (buf);
-        gint result;
+        GtkRoot   *root = gtk_widget_get_root (GTK_WIDGET (button));
 
         if (hotkeys) {
             scim_key_selection_dialog_set_keys (
@@ -1255,20 +1213,16 @@ on_hotkey_button_clicked (GtkButton *button, gpointer user_data)
                 hotkeys);
         }
 
-        result = gtk_dialog_run (GTK_DIALOG (dialog));
+        HotkeyDialogData *d = new HotkeyDialogData;
+        d->old_hotkeys = hotkeys ? g_strdup (hotkeys) : NULL;
 
-        if (result == GTK_RESPONSE_OK) {
-            const gchar *newkeys = scim_key_selection_dialog_get_keys (SCIM_KEY_SELECTION_DIALOG (dialog));
+        if (root && GTK_IS_WINDOW (root))
+            gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (root));
+        gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
 
-            if ((newkeys && hotkeys && String (newkeys) != String (hotkeys)) || (newkeys || hotkeys)) {
-                gtk_tree_store_set (__factory_list_model, &__selected_factory,
-                                    FACTORY_LIST_HOTKEYS, newkeys,
-                                    -1);
-                __have_changed = true;
-            }
-        }
+        g_signal_connect (dialog, "response", G_CALLBACK (hotkey_dialog_response_cb), d);
 
-        gtk_widget_destroy (dialog);
+        gtk_window_present (GTK_WINDOW (dialog));
     }
 
     if (uuid) g_free (uuid);
@@ -1444,6 +1398,37 @@ get_filter_list_view_result (GtkTreeView *view, std::vector <String> &result, st
     } while (gtk_tree_model_iter_next (model, &iter));
 }
 
+struct FilterDialogData {
+    GtkWidget          *view;
+    String              filter_uuids_old;
+    std::vector<String> enabled_filters;
+};
+
+static void
+filter_dialog_response_cb (GtkDialog *dialog, gint response, gpointer user_data)
+{
+    FilterDialogData *d = static_cast<FilterDialogData *> (user_data);
+
+    if (response == GTK_RESPONSE_OK) {
+        std::vector <String> filter_names;
+
+        get_filter_list_view_result (GTK_TREE_VIEW (d->view), d->enabled_filters, filter_names);
+
+        String str = scim_combine_string_list (d->enabled_filters);
+
+        if (d->filter_uuids_old != str) {
+            gtk_tree_store_set (GTK_TREE_STORE (__factory_list_model), &__selected_factory,
+                                FACTORY_LIST_FILTER_NAMES, scim_combine_string_list (filter_names).c_str (),
+                                FACTORY_LIST_FILTER_UUIDS, str.c_str (),
+                                -1);
+            __have_changed = true;
+        }
+    }
+
+    delete d;
+    gtk_window_destroy (GTK_WINDOW (dialog));
+}
+
 static void
 on_filter_button_clicked (GtkButton *button, gpointer user_data)
 {
@@ -1480,88 +1465,51 @@ on_filter_button_clicked (GtkButton *button, gpointer user_data)
                                               _("_Cancel"), GTK_RESPONSE_CANCEL,
                                               NULL);
 
-#if GTK_CHECK_VERSION(2, 22, 0)
-#else
-        gtk_dialog_set_has_separator (GTK_DIALOG (dialog), TRUE);
-#endif
-
-        scrolledwindow = gtk_scrolled_window_new (NULL, NULL);
-        gtk_widget_show (scrolledwindow);
+        scrolledwindow = gtk_scrolled_window_new ();
+        gtk_widget_set_vexpand (scrolledwindow, TRUE);
         gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow),
                                         GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-        gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow),
-                                             GTK_SHADOW_NONE);
-
-#if GTK_CHECK_VERSION(3, 0, 0)
-        gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), scrolledwindow, TRUE, TRUE, 2);
-#else
-        gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dialog)->vbox), scrolledwindow, TRUE, TRUE, 2);
-#endif
+        gtk_box_append (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), scrolledwindow);
 
         view = create_filter_list_view ();
         set_filter_list_view_content (GTK_TREE_VIEW (view), __filter_infos, enabled_filters);
 
-        gtk_container_add (GTK_CONTAINER (scrolledwindow), view);
+        gtk_scrolled_window_set_child (GTK_SCROLLED_WINDOW (scrolledwindow), view);
 
-#if GTK_CHECK_VERSION(3, 2, 0)
         separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
-#else
-        separator = gtk_hseparator_new ();
-#endif
-        gtk_widget_show (separator);
-#if GTK_CHECK_VERSION(3, 0, 0)
-        gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), separator, FALSE, FALSE, 2);
-#else
-        gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dialog)->vbox), separator, FALSE, FALSE, 2);
-#endif
+        gtk_box_append (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), separator);
 
-#if GTK_CHECK_VERSION(3, 2, 0)
         hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 4);
-#else
-        hbox = gtk_hbox_new (FALSE, 4);
-#endif
-        gtk_widget_show (hbox);
-#if GTK_CHECK_VERSION(3, 0, 0)
-        gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), hbox, FALSE, FALSE, 2);
-#else
-        gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dialog)->vbox), hbox, FALSE, FALSE, 2);
-#endif
+        gtk_box_append (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), hbox);
 
         button = gtk_button_new_with_mnemonic (_("Move _Up"));
-        gtk_widget_show (button);
-        gtk_box_pack_end (GTK_BOX (hbox), button, FALSE, FALSE, 4);
+        gtk_widget_set_hexpand (button, TRUE);
+        gtk_widget_set_halign (button, GTK_ALIGN_END);
+        gtk_box_append (GTK_BOX (hbox), button);
         g_signal_connect ((gpointer) button, "clicked",
                           G_CALLBACK (on_filter_move_up_button_clicked),
                           (gpointer) view);
 
         button = gtk_button_new_with_mnemonic (_("Move _Down"));
-        gtk_widget_show (button);
-        gtk_box_pack_end (GTK_BOX (hbox), button, FALSE, FALSE, 4);
+        gtk_box_append (GTK_BOX (hbox), button);
         g_signal_connect ((gpointer) button, "clicked",
                           G_CALLBACK (on_filter_move_down_button_clicked),
                           (gpointer) view);
 
         gtk_window_set_default_size (GTK_WINDOW (dialog), 320, 240);
 
-        gint result = gtk_dialog_run (GTK_DIALOG (dialog));
+        GtkRoot *root = gtk_widget_get_root (GTK_WIDGET (__filter_button));
+        if (root && GTK_IS_WINDOW (root))
+            gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (root));
 
-        if (result == GTK_RESPONSE_OK) {
-            std::vector <String>  filter_names;
+        FilterDialogData *d = new FilterDialogData;
+        d->view             = view;
+        d->filter_uuids_old = String (filter_uuids ? filter_uuids : "");
+        d->enabled_filters  = enabled_filters;
 
-            get_filter_list_view_result (GTK_TREE_VIEW (view), enabled_filters, filter_names);
+        g_signal_connect (dialog, "response", G_CALLBACK (filter_dialog_response_cb), d);
 
-            String str = scim_combine_string_list (enabled_filters);
-
-            if (String (filter_uuids ? filter_uuids : "") != str) {
-                gtk_tree_store_set (GTK_TREE_STORE (__factory_list_model), &__selected_factory,
-                                    FACTORY_LIST_FILTER_NAMES, scim_combine_string_list (filter_names).c_str (),
-                                    FACTORY_LIST_FILTER_UUIDS, str.c_str (),
-                                    -1);
-                __have_changed = true;
-            }
-        }
-
-        gtk_widget_destroy (dialog);
+        gtk_window_present (GTK_WINDOW (dialog));
     }
 
     if (uuid) g_free (uuid);

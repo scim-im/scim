@@ -32,8 +32,15 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -DSCIM_MODULE_PATH=\"@SCIM_MODULE_PATH@\" \
 			  -DSCIM_TEMPDIR=\"@SCIM_TEMPDIR@\"
 
+if SCIM_BUILD_GTK3_LEGACY_SETUP
+GTK3_LEGACY_SUBDIR = gtk3
+endif
+
+SUBDIRS = $(GTK3_LEGACY_SUBDIR)
+
 noinst_HEADERS		= scim_setup_module.h \
-			  scim_setup_ui.h
+			  scim_setup_ui.h \
+			  scim_setup_classify.h
 
 if SCIM_BUILD_SCIM_SETUP
 CONFIG_SCIM_SETUP = scim-setup
@@ -48,15 +55,18 @@ module_LTLIBRARIES	= $(CONFIG_SCIM_SETUP_HELPER)
 
 setup_la_SOURCES	= scim_setup_ui.cpp \
 			  scim_setup_module.cpp \
+			  scim_setup_classify.cpp \
 			  scim_setup_helper.cpp
 
-setup_la_CXXFLAGS	= @GTK_CFLAGS@
+setup_la_CXXFLAGS	= @GTK_CFLAGS@ \
+			  @ELF_CFLAGS@
 
 setup_la_LDFLAGS	= -avoid-version \
 		     	  -rpath $(moduledir) \
 			  -module \
 			  @LIBTOOL_EXPORT_OPTIONS@ \
 			  @GTK_LIBS@ \
+			  @ELF_LIBS@ \
 			  @LTLIBINTL@
 
 setup_la_LIBADD		= $(top_builddir)/src/libscim@SCIM_EPOCH@.la

@@ -36,6 +36,7 @@
 #include "scim.h"
 #include "scim_setup_module.h"
 #include "scim_setup_ui.h"
+#include "scim_setup_classify.h"
 
 #define scim_module_init setup_LTX_scim_module_init
 #define scim_module_exit setup_LTX_scim_module_exit
@@ -84,20 +85,43 @@ extern "C" {
             SetupUI * setup_ui = new SetupUI (config, display, __helper_info);
 
             std::vector<String>  setup_list;
-
-            SetupModule         *setup_module = 0;
+            std::vector<String>  gtk3_legacy;
+            std::vector<String>  unsupported;
 
             scim_get_setup_module_list (setup_list);
 
+            // Classify each plugin by the GUI toolkit it links against BEFORE
+            // loading it: dlopening a foreign-toolkit plugin into this GTK4
+            // process would map an incompatible GTK and abort. Only GTK4
+            // plugins are embedded in-process; GTK3 plugins are handed to the
+            // separate frozen legacy helper, and anything else is listed as
+            // unsupported.
             for (size_t i = 0; i < setup_list.size (); ++ i) {
-                setup_module = new SetupModule (setup_list [i]);
+                SetupToolkit tk = scim_setup_classify_module (setup_list [i]);
 
-                if (setup_module && setup_module->valid ()) {
-                    setup_ui->add_module (setup_module);
-                } else if (setup_module) {
-                    delete setup_module;
+                if (tk == SETUP_TOOLKIT_GTK4) {
+                    SetupModule *setup_module = new SetupModule (setup_list [i]);
+                    if (setup_module && setup_module->valid ()) {
+                        setup_ui->add_module (setup_module);
+                    } else if (setup_module) {
+                        delete setup_module;
+                    }
+                } else if (tk == SETUP_TOOLKIT_GTK3) {
+                    gtk3_legacy.push_back (setup_list [i]);
+                } else {
+                    // GTK2 or unrecognised toolkit.
+                    unsupported.push_back (setup_list [i]);
                 }
             }
+
+#ifdef SCIM_ENABLE_GTK3_LEGACY_SETUP
+            setup_ui->add_legacy_gtk3_entry (gtk3_legacy, config->get_name (), display);
+#else
+            // No legacy helper was built; treat GTK3 plugins as unsupported.
+            for (size_t i = 0; i < gtk3_legacy.size (); ++ i)
+                unsupported.push_back (gtk3_legacy [i]);
+#endif
+            setup_ui->add_unsupported_notice (unsupported);
 
             setup_ui->run ();
             delete setup_ui;

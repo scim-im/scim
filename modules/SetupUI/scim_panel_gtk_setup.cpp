@@ -4,7 +4,7 @@
 
 /*
  * Smart Common Input Method
- * 
+ *
  * Copyright (c) 2002-2005 James Su <suzhe@tsinghua.org.cn>
  *
  *
@@ -97,7 +97,7 @@ extern "C" {
 
     String scim_setup_module_get_description (void)
     {
-        return String (_("A panel daemon based on GTK+-2.x library."));
+        return String (_("A panel daemon based on the GTK library."));
     }
 
     void scim_setup_module_load_config (const ConfigPointer &config)
@@ -151,11 +151,6 @@ static GtkWidget * __widget_default_sticked           = 0;
 static GtkWidget * __widget_show_tray_icon            = 0;
 static GtkWidget * __widget_font                      = 0;
 
-#if GTK_CHECK_VERSION(2, 12, 0)
-#else
-static GtkTooltips * __widget_tooltips                = 0;
-#endif
-
 enum ToolbarShowFlavourType {
     SCIM_TOOLBAR_SHOW_ALWAYS,
     SCIM_TOOLBAR_SHOW_ON_DEMAND,
@@ -170,7 +165,7 @@ static const char * __toolbar_show_behaviour_text[] = {
 
 // Declaration of internal functions.
 static void
-on_default_toggle_button_toggled     (GtkToggleButton *togglebutton,
+on_default_check_button_toggled      (GtkCheckButton  *checkbutton,
                                       gpointer         user_data);
 
 static void
@@ -202,164 +197,77 @@ create_setup_window ()
         GtkWidget *label;
         GtkWidget *hbox;
 
-#if GTK_CHECK_VERSION(2, 12, 0)
-#else
-        __widget_tooltips = gtk_tooltips_new ();
-#endif
-
         // Create the vbox for the first page.
-#if GTK_CHECK_VERSION(3, 0, 0)
         page = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-#else
-        page = gtk_vbox_new (FALSE, 0);
-#endif
-        gtk_widget_show (page);
 
         vbox = page;
 
         // Create the ToolBar setup block.
         frame = gtk_frame_new (_("ToolBar"));
-        gtk_widget_show (frame);
-        gtk_box_pack_start (GTK_BOX (vbox), frame, FALSE, FALSE, 0);
-        gtk_container_set_border_width (GTK_CONTAINER (frame), 4);
+        gtk_widget_set_margin_start (frame, 4);
+        gtk_widget_set_margin_end (frame, 4);
+        gtk_widget_set_margin_top (frame, 4);
+        gtk_widget_set_margin_bottom (frame, 4);
+        gtk_box_append (GTK_BOX (vbox), frame);
 
-#if GTK_CHECK_VERSION(3, 4, 0)
         table = gtk_grid_new();
         gtk_grid_set_row_spacing (GTK_GRID (table), 4);
         gtk_grid_set_column_spacing (GTK_GRID (table), 8);
-#else
-        table = gtk_table_new (4, 2, FALSE);
-        gtk_table_set_row_spacings (GTK_TABLE (table), 4);
-        gtk_table_set_col_spacings (GTK_TABLE (table), 8);
-#endif
-        gtk_widget_show (table);
-        gtk_container_add (GTK_CONTAINER (frame), table);
+        gtk_frame_set_child (GTK_FRAME (frame), table);
 
-#if GTK_CHECK_VERSION(3, 0, 0)
         hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-#else
-        hbox = gtk_hbox_new (FALSE, 0);
-#endif
-        gtk_widget_show (hbox);
-
-#if GTK_CHECK_VERSION(3, 4, 0)
-        gtk_widget_set_halign (hbox, GTK_ALIGN_FILL);
-        gtk_grid_attach(GTK_GRID (table), hbox, 0, 0, 1, 1);
-#else
-        gtk_table_attach (GTK_TABLE (table), hbox, 0, 1, 0, 1,
-                          (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                          (GtkAttachOptions) (GTK_EXPAND), 4, 0);
-#endif
+        gtk_widget_set_hexpand (hbox, TRUE);
+        gtk_grid_attach (GTK_GRID (table), hbox, 0, 0, 1, 1);
 
         label = gtk_label_new_with_mnemonic (_("_Show:"));
-        gtk_widget_show (label);
-        gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
-#if GTK_CHECK_VERSION(3, 14, 0)
         gtk_widget_set_margin_start (label, 4);
         gtk_widget_set_margin_end (label, 4);
-#else
-        gtk_misc_set_padding (GTK_MISC (label), 4, 0);
-#endif
- 
-#if GTK_CHECK_VERSION(2, 24, 0)
+        gtk_box_append (GTK_BOX (hbox), label);
+
         __widget_toolbar_show_behaviour = gtk_combo_box_text_new ();
-        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_toolbar_show_behaviour), 
+        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_toolbar_show_behaviour),
                                    _(__toolbar_show_behaviour_text[SCIM_TOOLBAR_SHOW_ALWAYS]));
         gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_toolbar_show_behaviour),
                                    _(__toolbar_show_behaviour_text[SCIM_TOOLBAR_SHOW_ON_DEMAND]));
         gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_toolbar_show_behaviour),
                                    _(__toolbar_show_behaviour_text[SCIM_TOOLBAR_SHOW_NEVER]));
-#else
-        __widget_toolbar_show_behaviour = gtk_combo_box_new_text ();
-        gtk_combo_box_append_text (GTK_COMBO_BOX (__widget_toolbar_show_behaviour), 
-                                   _(__toolbar_show_behaviour_text[SCIM_TOOLBAR_SHOW_ALWAYS]));
-        gtk_combo_box_append_text (GTK_COMBO_BOX (__widget_toolbar_show_behaviour),
-                                   _(__toolbar_show_behaviour_text[SCIM_TOOLBAR_SHOW_ON_DEMAND]));
-        gtk_combo_box_append_text (GTK_COMBO_BOX (__widget_toolbar_show_behaviour),
-                                   _(__toolbar_show_behaviour_text[SCIM_TOOLBAR_SHOW_NEVER]));
-#endif
-        gtk_widget_show (__widget_toolbar_show_behaviour);
-        gtk_box_pack_start (GTK_BOX (hbox), __widget_toolbar_show_behaviour, FALSE, FALSE, 0);
+        gtk_box_append (GTK_BOX (hbox), __widget_toolbar_show_behaviour);
         gtk_label_set_mnemonic_widget (GTK_LABEL (label), __widget_toolbar_show_behaviour);
 
         __widget_toolbar_auto_snap = gtk_check_button_new_with_mnemonic (_("Auto s_nap"));
-        gtk_widget_show (__widget_toolbar_auto_snap);
-
         __widget_toolbar_show_factory_icon = gtk_check_button_new_with_mnemonic (_("Show _input method icon"));
-        gtk_widget_show (__widget_toolbar_show_factory_icon);
-
         __widget_toolbar_show_factory_name = gtk_check_button_new_with_mnemonic (_("Show inp_ut method name"));
-        gtk_widget_show (__widget_toolbar_show_factory_name);
 
-#if GTK_CHECK_VERSION(3, 4, 0)
         gtk_widget_set_halign (__widget_toolbar_auto_snap, GTK_ALIGN_FILL);
-        gtk_grid_attach(GTK_GRID (table), __widget_toolbar_auto_snap, 0, 1, 1, 1);
+        gtk_grid_attach (GTK_GRID (table), __widget_toolbar_auto_snap, 0, 1, 1, 1);
 
         gtk_widget_set_halign (__widget_toolbar_show_factory_icon, GTK_ALIGN_FILL);
-        gtk_grid_attach(GTK_GRID (table), __widget_toolbar_show_factory_icon, 0, 2, 1, 1);
+        gtk_grid_attach (GTK_GRID (table), __widget_toolbar_show_factory_icon, 0, 2, 1, 1);
 
         gtk_widget_set_halign (__widget_toolbar_show_factory_name, GTK_ALIGN_FILL);
-        gtk_grid_attach(GTK_GRID (table), __widget_toolbar_show_factory_name, 0, 3, 1, 1);
-#else
-        gtk_table_attach (GTK_TABLE (table), __widget_toolbar_auto_snap, 0, 1, 1, 2,
-                          (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                          (GtkAttachOptions) (GTK_EXPAND), 4, 0);
-        gtk_table_attach (GTK_TABLE (table), __widget_toolbar_show_factory_icon, 0, 1, 2, 3,
-                          (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                          (GtkAttachOptions) (GTK_EXPAND), 4, 0);
-        gtk_table_attach (GTK_TABLE (table), __widget_toolbar_show_factory_name, 0, 1, 3, 4,
-                          (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                          (GtkAttachOptions) (GTK_EXPAND), 4, 0);
-#endif
+        gtk_grid_attach (GTK_GRID (table), __widget_toolbar_show_factory_name, 0, 3, 1, 1);
 
-
-
-#if GTK_CHECK_VERSION(3, 0, 0)
         hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-#else
-        hbox = gtk_hbox_new (FALSE, 0);
-#endif
-        gtk_widget_show (hbox);
-
-#if GTK_CHECK_VERSION(3, 4, 0)
-        gtk_widget_set_halign (hbox, GTK_ALIGN_FILL);
+        gtk_widget_set_hexpand (hbox, TRUE);
         gtk_grid_attach (GTK_GRID (table), hbox, 1, 0, 1, 1);
-#else
-        gtk_table_attach (GTK_TABLE (table), hbox, 1, 2, 0, 1,
-                          (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                          (GtkAttachOptions) (GTK_EXPAND), 4, 0);
-#endif
 
         label = gtk_label_new_with_mnemonic (_("Hide time_out:"));
-        gtk_widget_show (label);
-        gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
-#if GTK_CHECK_VERSION(3, 14, 0)
         gtk_widget_set_margin_start (label, 4);
         gtk_widget_set_margin_end (label, 4);
-#else
-        gtk_misc_set_padding (GTK_MISC (label), 4, 0);
-#endif
+        gtk_box_append (GTK_BOX (hbox), label);
 
         __widget_toolbar_hide_timeout = gtk_spin_button_new_with_range (0, 60, 1);
-        gtk_widget_show (__widget_toolbar_hide_timeout);
-        gtk_box_pack_start (GTK_BOX (hbox), __widget_toolbar_hide_timeout, FALSE, FALSE, 0);
+        gtk_box_append (GTK_BOX (hbox), __widget_toolbar_hide_timeout);
         gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (__widget_toolbar_hide_timeout), TRUE);
         gtk_spin_button_set_snap_to_ticks (GTK_SPIN_BUTTON (__widget_toolbar_hide_timeout), TRUE);
         gtk_spin_button_set_digits (GTK_SPIN_BUTTON (__widget_toolbar_hide_timeout), 0);
         gtk_label_set_mnemonic_widget (GTK_LABEL (label), __widget_toolbar_hide_timeout);
 
         __widget_toolbar_show_stick_icon = gtk_check_button_new_with_mnemonic (_("Show s_tick icon"));
-        gtk_widget_show (__widget_toolbar_show_stick_icon);
-
         __widget_toolbar_show_menu_icon = gtk_check_button_new_with_mnemonic (_("Show m_enu icon"));
-        gtk_widget_show (__widget_toolbar_show_menu_icon);
-
         __widget_toolbar_show_help_icon = gtk_check_button_new_with_mnemonic (_("Show _help icon"));
-        gtk_widget_show (__widget_toolbar_show_help_icon);
-
         __widget_toolbar_show_property_label = gtk_check_button_new_with_mnemonic (_("Show _property label"));
-        gtk_widget_show (__widget_toolbar_show_property_label);
-#if GTK_CHECK_VERSION(3, 4, 0)
+
         gtk_widget_set_halign (__widget_toolbar_show_stick_icon, GTK_ALIGN_FILL);
         gtk_grid_attach (GTK_GRID (table), __widget_toolbar_show_stick_icon, 1, 1, 1, 1);
 
@@ -371,95 +279,55 @@ create_setup_window ()
 
         gtk_widget_set_halign (__widget_toolbar_show_property_label, GTK_ALIGN_FILL);
         gtk_grid_attach (GTK_GRID (table), __widget_toolbar_show_property_label, 0, 4, 1, 1);
-#else
-        gtk_table_attach (GTK_TABLE (table), __widget_toolbar_show_stick_icon, 1, 2, 1, 2,
-                          (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                          (GtkAttachOptions) (GTK_EXPAND), 4, 0);
-        gtk_table_attach (GTK_TABLE (table), __widget_toolbar_show_menu_icon, 1, 2, 2, 3,
-                          (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                          (GtkAttachOptions) (GTK_EXPAND), 4, 0);
-        gtk_table_attach (GTK_TABLE (table), __widget_toolbar_show_help_icon, 1, 2, 3, 4,
-                          (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                          (GtkAttachOptions) (GTK_EXPAND), 4, 0);
-        gtk_table_attach (GTK_TABLE (table), __widget_toolbar_show_property_label, 0, 1, 4, 5,
-                          (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
-                          (GtkAttachOptions) (GTK_EXPAND), 4, 0);
-#endif
 
-
-#if GTK_CHECK_VERSION(3, 0, 0)
         hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
-#else
-        hbox = gtk_hbox_new (FALSE, 8);
-#endif
-        gtk_widget_show (hbox);
-        gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
+        gtk_box_append (GTK_BOX (vbox), hbox);
 
         // Create the Input Window setup block
         frame = gtk_frame_new (_("Input window"));
-        gtk_widget_show (frame);
-        gtk_container_set_border_width (GTK_CONTAINER (frame), 4);
-        gtk_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 0);
+        gtk_widget_set_margin_start (frame, 4);
+        gtk_widget_set_margin_end (frame, 4);
+        gtk_widget_set_margin_top (frame, 4);
+        gtk_widget_set_margin_bottom (frame, 4);
+        gtk_widget_set_hexpand (frame, TRUE);
+        gtk_box_append (GTK_BOX (hbox), frame);
 
-#if GTK_CHECK_VERSION(3, 0, 0)
         vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 4);
-#else
-        vbox = gtk_vbox_new (FALSE, 4);
-#endif
-        gtk_widget_show (vbox);
-        gtk_container_add (GTK_CONTAINER (frame), vbox);
+        gtk_frame_set_child (GTK_FRAME (frame), vbox);
 
         __widget_lookup_table_embedded = gtk_check_button_new_with_mnemonic (_("E_mbedded lookup table"));
-        gtk_widget_show (__widget_lookup_table_embedded);
-        gtk_box_pack_start (GTK_BOX (vbox), __widget_lookup_table_embedded, FALSE, FALSE, 0);
+        gtk_box_append (GTK_BOX (vbox), __widget_lookup_table_embedded);
 
         __widget_lookup_table_vertical = gtk_check_button_new_with_mnemonic (_("_Vertical lookup table"));
-        gtk_widget_show (__widget_lookup_table_vertical);
-        gtk_box_pack_start (GTK_BOX (vbox), __widget_lookup_table_vertical, FALSE, FALSE, 0);
+        gtk_box_append (GTK_BOX (vbox), __widget_lookup_table_vertical);
 
         frame = gtk_frame_new (_("Misc"));
-        gtk_widget_show (frame);
-        gtk_container_set_border_width (GTK_CONTAINER (frame), 4);
-        gtk_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 0);
+        gtk_widget_set_margin_start (frame, 4);
+        gtk_widget_set_margin_end (frame, 4);
+        gtk_widget_set_margin_top (frame, 4);
+        gtk_widget_set_margin_bottom (frame, 4);
+        gtk_widget_set_hexpand (frame, TRUE);
+        gtk_box_append (GTK_BOX (hbox), frame);
 
-#if GTK_CHECK_VERSION(3, 0, 0)
         vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 4);
-#else
-        vbox = gtk_vbox_new (FALSE, 4);
-#endif
-        gtk_widget_show (vbox);
-        gtk_container_add (GTK_CONTAINER (frame), vbox);
+        gtk_frame_set_child (GTK_FRAME (frame), vbox);
 
         __widget_show_tray_icon = gtk_check_button_new_with_mnemonic (_("Show tra_y icon"));
-        gtk_widget_show (__widget_show_tray_icon);
-        gtk_box_pack_start (GTK_BOX (vbox), __widget_show_tray_icon, FALSE, FALSE, 0);
+        gtk_box_append (GTK_BOX (vbox), __widget_show_tray_icon);
 
         __widget_default_sticked = gtk_check_button_new_with_mnemonic (_("Stick _windows"));
-        gtk_widget_show (__widget_default_sticked);
-        gtk_box_pack_start (GTK_BOX (vbox), __widget_default_sticked, FALSE, FALSE, 0);
+        gtk_box_append (GTK_BOX (vbox), __widget_default_sticked);
 
-#if GTK_CHECK_VERSION(3, 0, 0)
         hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-#else
-        hbox = gtk_hbox_new (FALSE, 0);
-#endif
-        gtk_widget_show (hbox);
-        gtk_box_pack_start (GTK_BOX (vbox), hbox, TRUE, TRUE, 0);
+        gtk_box_append (GTK_BOX (vbox), hbox);
 
         label = gtk_label_new_with_mnemonic (_("_Font:"));
-        gtk_widget_show (label);
-        gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
-#if GTK_CHECK_VERSION(3, 14, 0)
         gtk_widget_set_margin_start (label, 4);
         gtk_widget_set_margin_end (label, 4);
-#else
-        gtk_misc_set_padding (GTK_MISC (label), 4, 0);
-#endif
+        gtk_box_append (GTK_BOX (hbox), label);
 
         __widget_font = gtk_button_new_with_label ("default");
-        gtk_widget_show (__widget_font);
-        gtk_container_set_border_width (GTK_CONTAINER (__widget_font), 4);
-        gtk_box_pack_start (GTK_BOX (hbox), __widget_font, FALSE, FALSE, 0);
+        gtk_box_append (GTK_BOX (hbox), __widget_font);
         gtk_label_set_mnemonic_widget (GTK_LABEL (label), __widget_font);
 
         // Connect all signals.
@@ -468,7 +336,7 @@ create_setup_window ()
                           NULL);
 
         g_signal_connect ((gpointer) __widget_toolbar_auto_snap, "toggled",
-                          G_CALLBACK (on_default_toggle_button_toggled),
+                          G_CALLBACK (on_default_check_button_toggled),
                           &__config_toolbar_auto_snap);
 
         g_signal_connect ((gpointer) __widget_toolbar_hide_timeout, "value_changed",
@@ -476,43 +344,43 @@ create_setup_window ()
                           &__config_toolbar_hide_timeout);
 
         g_signal_connect ((gpointer) __widget_toolbar_show_factory_icon, "toggled",
-                          G_CALLBACK (on_default_toggle_button_toggled),
+                          G_CALLBACK (on_default_check_button_toggled),
                           &__config_toolbar_show_factory_icon);
 
         g_signal_connect ((gpointer) __widget_toolbar_show_factory_name, "toggled",
-                          G_CALLBACK (on_default_toggle_button_toggled),
+                          G_CALLBACK (on_default_check_button_toggled),
                           &__config_toolbar_show_factory_name);
 
         g_signal_connect ((gpointer) __widget_toolbar_show_stick_icon, "toggled",
-                          G_CALLBACK (on_default_toggle_button_toggled),
+                          G_CALLBACK (on_default_check_button_toggled),
                           &__config_toolbar_show_stick_icon);
 
         g_signal_connect ((gpointer) __widget_toolbar_show_menu_icon, "toggled",
-                          G_CALLBACK (on_default_toggle_button_toggled),
+                          G_CALLBACK (on_default_check_button_toggled),
                           &__config_toolbar_show_menu_icon);
 
         g_signal_connect ((gpointer) __widget_toolbar_show_help_icon, "toggled",
-                          G_CALLBACK (on_default_toggle_button_toggled),
+                          G_CALLBACK (on_default_check_button_toggled),
                           &__config_toolbar_show_help_icon);
 
         g_signal_connect ((gpointer) __widget_toolbar_show_property_label, "toggled",
-                          G_CALLBACK (on_default_toggle_button_toggled),
+                          G_CALLBACK (on_default_check_button_toggled),
                           &__config_toolbar_show_property_label);
 
         g_signal_connect ((gpointer) __widget_lookup_table_embedded, "toggled",
-                          G_CALLBACK (on_default_toggle_button_toggled),
+                          G_CALLBACK (on_default_check_button_toggled),
                           &__config_lookup_table_embedded);
 
         g_signal_connect ((gpointer) __widget_lookup_table_vertical, "toggled",
-                          G_CALLBACK (on_default_toggle_button_toggled),
+                          G_CALLBACK (on_default_check_button_toggled),
                           &__config_lookup_table_vertical);
 
         g_signal_connect ((gpointer) __widget_default_sticked, "toggled",
-                          G_CALLBACK (on_default_toggle_button_toggled),
+                          G_CALLBACK (on_default_check_button_toggled),
                           &__config_default_sticked);
 
         g_signal_connect ((gpointer) __widget_show_tray_icon, "toggled",
-                          G_CALLBACK (on_default_toggle_button_toggled),
+                          G_CALLBACK (on_default_check_button_toggled),
                           &__config_show_tray_icon);
 
         g_signal_connect ((gpointer) __widget_font, "clicked",
@@ -520,7 +388,6 @@ create_setup_window ()
                           NULL);
 
         // Set all tooltips.
-#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (__widget_toolbar_show_behaviour,
                               _("If option \"Always\" is selected, "
                                 "the toolbar will always be shown on the screen. "
@@ -588,76 +455,6 @@ create_setup_window ()
         gtk_widget_set_tooltip_text (__widget_font,
                               _("The font setting will be used in "
                                 "the input and lookup table windows."));
-#else
-        gtk_tooltips_set_tip (__widget_tooltips, __widget_toolbar_show_behaviour,
-                              _("If option \"Always\" is selected, "
-                                "the toolbar will always be shown on the screen. "
-                                "If option \"On demand\" is selected, it will only be shown when SCIM "
-                                "is activated. "
-                                "If option \"Never\" is selected, it will never be shown."), NULL);
-
-        gtk_tooltip_set_tip (__widget_tooltips, __widget_toolbar_auto_snap,
-                              _("If this option is checked, "
-                                "the toolbar will be snapped to "
-                                "the screen border.", NULL));
-
-
-        gtk_tooltip_set_tip (__widget_tooltips, __widget_toolbar_hide_timeout,
-                              _("The toolbar will be hidden out after "
-                                "this timeout is elapsed. "
-                                "This option is only valid when "
-                                "\"Always show\" is selected. "
-                                "Set to zero to disable this behavior.", NULL));
-
-        gtk_tooltip_set_tip (__widget_tooltips, __widget_toolbar_show_factory_icon,
-                              _("If this option is checked, "
-                                "the input method icon will be showed on the toolbar.", NULL));
-
-        gtk_tooltip_set_tip (__widget_tooltips, __widget_toolbar_show_factory_name,
-                              _("If this option is checked, "
-                                "the input method name will be showed on the toolbar.", NULL));
-
-        gtk_tooltip_set_tip (__widget_tooltips, __widget_toolbar_show_stick_icon,
-                              _("If this option is checked, "
-                                "the stick icon will be showed on the toolbar.", NULL));
-
-        gtk_tooltip_set_tip (__widget_tooltips, __widget_toolbar_show_menu_icon,
-                              _("If this option is checked, "
-                                "the menu icon will be showed on the toolbar.", NULL));
-
-        gtk_tooltip_set_tip (__widget_tooltips, __widget_toolbar_show_help_icon,
-                              _("If this option is checked, "
-                                "the help icon will be showed on the toolbar.", NULL));
-
-        gtk_tooltip_set_tip (__widget_tooltips, __widget_toolbar_show_property_label,
-                              _("If this option is checked, "
-                                "the text label of input method properties will be showed on the toolbar.", NULL));
-
-        gtk_tooltip_set_tip (__widget_tooltips, __widget_lookup_table_embedded,
-                              _("If this option is checked, "
-                                "the lookup table will be embedded into "
-                                "the input window.", NULL));
-
-        gtk_tooltip_set_tip (__widget_tooltips, __widget_lookup_table_vertical,
-                              _("If this option is checked, "
-                                "the lookup table will be displayed "
-                                "vertically.", NULL));
-
-        gtk_tooltip_set_tip (__widget_tooltips, __widget_show_tray_icon,
-                              _("If this option is checked, "
-                                "the tray icon will be showed on the desktop's taskbar.", NULL));
-
-        gtk_tooltip_set_tip (__widget_tooltips, __widget_default_sticked,
-                              _("If this option is checked, "
-                                "the toolbar, input and lookup table "
-                                "windows will be sticked to "
-                                "its original position.", NULL));
-
-        gtk_tooltip_set_tip (__widget_tooltips, __widget_font,
-                              _("The font setting will be used in "
-                                "the input and lookup table windows.", NULL));
-#endif
-
 
         window = page;
 
@@ -686,8 +483,8 @@ setup_widget_value ()
     }
 
     if (__widget_toolbar_auto_snap) {
-        gtk_toggle_button_set_active (
-            GTK_TOGGLE_BUTTON (__widget_toolbar_auto_snap),
+        gtk_check_button_set_active (
+            GTK_CHECK_BUTTON (__widget_toolbar_auto_snap),
             __config_toolbar_auto_snap);
     }
 
@@ -702,62 +499,62 @@ setup_widget_value ()
     }
 
     if (__widget_toolbar_show_factory_icon) {
-        gtk_toggle_button_set_active (
-            GTK_TOGGLE_BUTTON (__widget_toolbar_show_factory_icon),
+        gtk_check_button_set_active (
+            GTK_CHECK_BUTTON (__widget_toolbar_show_factory_icon),
             __config_toolbar_show_factory_icon);
     }
 
     if (__widget_toolbar_show_factory_name) {
-        gtk_toggle_button_set_active (
-            GTK_TOGGLE_BUTTON (__widget_toolbar_show_factory_name),
+        gtk_check_button_set_active (
+            GTK_CHECK_BUTTON (__widget_toolbar_show_factory_name),
             __config_toolbar_show_factory_name);
     }
 
     if (__widget_toolbar_show_stick_icon) {
-        gtk_toggle_button_set_active (
-            GTK_TOGGLE_BUTTON (__widget_toolbar_show_stick_icon),
+        gtk_check_button_set_active (
+            GTK_CHECK_BUTTON (__widget_toolbar_show_stick_icon),
             __config_toolbar_show_stick_icon);
     }
 
     if (__widget_toolbar_show_menu_icon) {
-        gtk_toggle_button_set_active (
-            GTK_TOGGLE_BUTTON (__widget_toolbar_show_menu_icon),
+        gtk_check_button_set_active (
+            GTK_CHECK_BUTTON (__widget_toolbar_show_menu_icon),
             __config_toolbar_show_menu_icon);
     }
 
     if (__widget_toolbar_show_help_icon) {
-        gtk_toggle_button_set_active (
-            GTK_TOGGLE_BUTTON (__widget_toolbar_show_help_icon),
+        gtk_check_button_set_active (
+            GTK_CHECK_BUTTON (__widget_toolbar_show_help_icon),
             __config_toolbar_show_help_icon);
     }
 
     if (__widget_toolbar_show_property_label) {
-        gtk_toggle_button_set_active (
-            GTK_TOGGLE_BUTTON (__widget_toolbar_show_property_label),
+        gtk_check_button_set_active (
+            GTK_CHECK_BUTTON (__widget_toolbar_show_property_label),
             __config_toolbar_show_property_label);
     }
 
     if (__widget_lookup_table_embedded) {
-        gtk_toggle_button_set_active (
-            GTK_TOGGLE_BUTTON (__widget_lookup_table_embedded),
+        gtk_check_button_set_active (
+            GTK_CHECK_BUTTON (__widget_lookup_table_embedded),
             __config_lookup_table_embedded);
     }
 
     if (__widget_lookup_table_vertical) {
-        gtk_toggle_button_set_active (
-            GTK_TOGGLE_BUTTON (__widget_lookup_table_vertical),
+        gtk_check_button_set_active (
+            GTK_CHECK_BUTTON (__widget_lookup_table_vertical),
             __config_lookup_table_vertical);
     }
 
     if (__widget_default_sticked) {
-        gtk_toggle_button_set_active (
-            GTK_TOGGLE_BUTTON (__widget_default_sticked),
+        gtk_check_button_set_active (
+            GTK_CHECK_BUTTON (__widget_default_sticked),
             __config_default_sticked);
     }
 
     if (__widget_show_tray_icon) {
-        gtk_toggle_button_set_active (
-            GTK_TOGGLE_BUTTON (__widget_show_tray_icon),
+        gtk_check_button_set_active (
+            GTK_CHECK_BUTTON (__widget_show_tray_icon),
             __config_show_tray_icon);
     }
 
@@ -882,13 +679,13 @@ on_default_spin_button_changed (GtkSpinButton *spinbutton,
 }
 
 static void
-on_default_toggle_button_toggled (GtkToggleButton *togglebutton,
-                                  gpointer         user_data)
+on_default_check_button_toggled (GtkCheckButton *checkbutton,
+                                 gpointer        user_data)
 {
     bool *toggle = static_cast<bool*> (user_data);
 
     if (toggle) {
-        *toggle = gtk_toggle_button_get_active (togglebutton);
+        *toggle = gtk_check_button_get_active (checkbutton);
         __have_changed = true;
     }
 }
@@ -972,60 +769,48 @@ on_toolbar_show_behaviour_changed (GtkComboBox *combobox,
 }
 
 static void
+font_dialog_response_cb (GtkDialog *dialog,
+                         gint       response,
+                         gpointer   user_data)
+{
+    if (response == GTK_RESPONSE_OK) {
+        gchar *fontname = gtk_font_chooser_get_font (GTK_FONT_CHOOSER (dialog));
+
+        if (fontname) {
+            __config_font = String (fontname);
+            g_free (fontname);
+
+            gtk_button_set_label (
+                GTK_BUTTON (__widget_font),
+                __config_font.c_str ());
+
+            __have_changed = true;
+        }
+    }
+
+    gtk_window_destroy (GTK_WINDOW (dialog));
+}
+
+static void
 on_font_selection_clicked (GtkButton *button,
                            gpointer   user_data)
 {
-#if GTK_CHECK_VERSION(3, 2, 0)
     GtkWidget *font_selection = gtk_font_chooser_dialog_new (_("Select Interface Font"), NULL);
-    gint result;
+    GtkRoot   *root = gtk_widget_get_root (GTK_WIDGET (button));
 
     if (__config_font != "default") {
-        gtk_font_chooser_set_font(
+        gtk_font_chooser_set_font (
             GTK_FONT_CHOOSER (font_selection),
             __config_font.c_str ());
     }
 
-    result = gtk_dialog_run (GTK_DIALOG (font_selection));
+    if (root && GTK_IS_WINDOW (root))
+        gtk_window_set_transient_for (GTK_WINDOW (font_selection), GTK_WINDOW (root));
+    gtk_window_set_modal (GTK_WINDOW (font_selection), TRUE);
 
-    if (result == GTK_RESPONSE_OK) {
-        gchar *fontname = gtk_font_chooser_get_font ( GTK_FONT_CHOOSER (font_selection));
-        __config_font = String (fontname);
-        g_free(fontname);
+    g_signal_connect (font_selection, "response", G_CALLBACK (font_dialog_response_cb), NULL);
 
-        gtk_button_set_label (
-            GTK_BUTTON (__widget_font),
-            __config_font.c_str ());
-
-        __have_changed = true;
-    }
-
-    gtk_widget_destroy (font_selection);
-#else
-    GtkWidget *font_selection = gtk_font_selection_dialog_new (_("Select Interface Font"));
-    gint result;
-
-    if (__config_font != "default") {
-        gtk_font_selection_dialog_set_font_name (
-            GTK_FONT_SELECTION_DIALOG (font_selection),
-            __config_font.c_str ());
-    }
-
-    result = gtk_dialog_run (GTK_DIALOG (font_selection));
-
-    if (result == GTK_RESPONSE_OK) {
-        __config_font = String (
-                            gtk_font_selection_dialog_get_font_name (
-                                GTK_FONT_SELECTION_DIALOG (font_selection)));
-
-        gtk_button_set_label (
-            GTK_BUTTON (__widget_font),
-            __config_font.c_str ());
-
-        __have_changed = true;
-    }
-
-    gtk_widget_destroy (font_selection);
-#endif
+    gtk_window_present (GTK_WINDOW (font_selection));
 }
 
 /*

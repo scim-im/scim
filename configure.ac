@@ -517,8 +517,14 @@ AC_ARG_ENABLE([panel-gtk],
 AC_ARG_ENABLE([setup-ui],
 	[AS_HELP_STRING([--disable-setup-ui],
 		[Do not build Setup UI])],
-	[], 
+	[],
 	[enable_setup_ui=yes])
+
+AC_ARG_ENABLE([gtk3-legacy-setup],
+	[AS_HELP_STRING([--disable-gtk3-legacy-setup],
+		[Do not build the frozen GTK3 legacy setup helper (enabled when GTK3 is present and the setup host is GTK4)])],
+	[],
+	[enable_gtk3_legacy_setup=check])
 
 if test "$have_x" = "yes"; then
   SCIM_BUILD_X11_UTILS=1
@@ -716,6 +722,45 @@ else
   enable_setup_ui=no
 fi
 
+# libelf is used ONLY by the setup host (extras/setup) to classify SetupUI
+# plugins by their DT_NEEDED before loading them. It is not a dependency of
+# libscim or any other component.
+SCIM_HAS_ELF=no
+ELF_CFLAGS=""
+ELF_LIBS=""
+if test "$enable_setup_ui" = "yes"; then
+  PKG_CHECK_MODULES(ELF, [libelf],
+			[SCIM_HAS_ELF=yes],
+			[SCIM_HAS_ELF=no])
+  if test "$SCIM_HAS_ELF" = "no"; then
+    AC_CHECK_LIB([elf], [elf_begin],
+			[SCIM_HAS_ELF=yes; ELF_LIBS="-lelf"],
+			[SCIM_HAS_ELF=no])
+    AC_CHECK_HEADER([libelf.h], [], [SCIM_HAS_ELF=no])
+  fi
+  if test "$SCIM_HAS_ELF" = "no"; then
+    AC_MSG_ERROR([libelf (with development headers) is required to build the setup UI; install libelf-dev / elfutils-libelf-devel, or configure with --disable-setup-ui])
+  fi
+fi
+AC_SUBST(ELF_CFLAGS)
+AC_SUBST(ELF_LIBS)
+
+# The frozen GTK3 legacy setup helper hosts third-party GTK3 setup plugins that
+# cannot be embedded in the GTK4 host. It is a separate GTK3-linked program and
+# only makes sense when the host itself is GTK4 and GTK3 is available.
+SCIM_BUILD_GTK3_LEGACY_SETUP=0
+if test "$enable_gtk3_legacy_setup" != "no"; then
+  if test "$enable_setup_ui" = "yes" -a "$USE_GTK_VERSION" = "4" -a "$SCIM_HAS_GTK3" = "yes"; then
+    SCIM_BUILD_GTK3_LEGACY_SETUP=1
+    enable_gtk3_legacy_setup=yes
+    AC_DEFINE(SCIM_ENABLE_GTK3_LEGACY_SETUP,1,[Build the frozen GTK3 legacy setup helper.])
+  else
+    enable_gtk3_legacy_setup=no
+  fi
+fi
+AC_SUBST(GTK3_CFLAGS)
+AC_SUBST(GTK3_LIBS)
+
 if test "$SCIM_HAS_GTK" = "yes"; then
   enable_gtk_utils=yes
   SCIM_BUILD_GTK_UTILS=1
@@ -789,6 +834,9 @@ AM_CONDITIONAL(SCIM_BUILD_QT6_IMMODULE,
 
 AM_CONDITIONAL(SCIM_BUILD_FILTER_SCTC,
 		[test "$enable_filter_sctc" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_GTK3_LEGACY_SETUP,
+		[test "$SCIM_BUILD_GTK3_LEGACY_SETUP" = "1"])
 
 AM_CONDITIONAL(SCIM_BUILD_SCIM_SETUP,
 		[test "$enable_setup_ui" = "yes"])
@@ -877,6 +925,7 @@ AC_CONFIG_FILES([Makefile
 		 extras/gtk_immodule/qt5/Makefile
 		 extras/gtk_immodule/qt6/Makefile
 		 extras/setup/Makefile
+		 extras/setup/gtk3/Makefile
 		 extras/setup/scim-setup
 		 extras/panel/Makefile
 		 tests/Makefile
@@ -915,6 +964,7 @@ Module options:
   GTK Version              $USE_GTK_VERSION
 
   GUI Setup Utility        $enable_setup_ui
+  GTK3 legacy setup helper $enable_gtk3_legacy_setup
 
   GTK Panel GUI            $enable_panel_gtk
 

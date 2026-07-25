@@ -119,11 +119,6 @@ struct KeyboardConfigData
 
 static bool           __config_on_the_spot       = true;
 
-#if GTK_CHECK_VERSION(2, 12, 0)
-#else
-static GtkTooltips   * __widget_tooltips         = 0;
-#endif
-
 static bool           __config_shared_input_method = false;
 
 static KeyboardLayout __config_keyboard_layout   = SCIM_KEYBOARD_Unknown;
@@ -280,7 +275,7 @@ on_keyboard_layout_changed           (GtkComboBox     *combobox,
                                       gpointer         user_data);
 
 static void
-on_default_toggle_button_toggled     (GtkToggleButton *togglebutton,
+on_default_check_button_toggled      (GtkCheckButton  *checkbutton,
                                       gpointer         user_data);
 
 static void
@@ -300,61 +295,36 @@ create_setup_window ()
         GtkWidget *label;
         int i;
 
-#if GTK_CHECK_VERSION(2, 12, 0)
-#else
-        __widget_tooltips = gtk_tooltips_new ();
-#endif
-
         // Create the toplevel box.
-#if GTK_CHECK_VERSION(3, 2, 0)
         window = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-#else
-        window = gtk_vbox_new (FALSE, 0);
-#endif
-        gtk_widget_show (window);
 
         frame = gtk_frame_new (_("Options"));
-        gtk_widget_show (frame);
-        gtk_container_set_border_width (GTK_CONTAINER (frame), 4);
-        gtk_box_pack_start (GTK_BOX (window), frame, FALSE, FALSE, 0);
+        gtk_widget_set_margin_start (frame, 4);
+        gtk_widget_set_margin_end (frame, 4);
+        gtk_widget_set_margin_top (frame, 4);
+        gtk_widget_set_margin_bottom (frame, 4);
+        gtk_box_append (GTK_BOX (window), frame);
 
-#if GTK_CHECK_VERSION(3, 2, 0)
         vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 4);
-#else
-        vbox = gtk_vbox_new (FALSE, 4);
-#endif
-        gtk_widget_show (vbox);
-        gtk_container_set_border_width (GTK_CONTAINER (vbox), 4);
-        gtk_container_add (GTK_CONTAINER (frame), vbox);
+        gtk_widget_set_margin_start (vbox, 4);
+        gtk_widget_set_margin_end (vbox, 4);
+        gtk_widget_set_margin_top (vbox, 4);
+        gtk_widget_set_margin_bottom (vbox, 4);
+        gtk_frame_set_child (GTK_FRAME (frame), vbox);
 
         // Keyboard Layout.
-#if GTK_CHECK_VERSION(3, 2, 0)
         hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 4);
-#else
-        hbox = gtk_hbox_new (FALSE, 4);
-#endif
-        gtk_widget_show (hbox);
-        gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
+        gtk_box_append (GTK_BOX (vbox), hbox);
 
         label = gtk_label_new_with_mnemonic (_("_Keyboard Layout:"));
-        gtk_widget_show (label);
-        gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+        gtk_box_append (GTK_BOX (hbox), label);
 
-#if GTK_CHECK_VERSION(2,24,0)
         __widget_keyboard_layout = gtk_combo_box_text_new ();
-#else
-        __widget_keyboard_layout = gtk_combo_box_new_text ();
-#endif
-        gtk_widget_show (__widget_keyboard_layout);
 
         gtk_label_set_mnemonic_widget (GTK_LABEL (label), __widget_keyboard_layout);
 
         for (size_t i = 0; i < SCIM_KEYBOARD_NUM_LAYOUTS; ++i) {
-#if GTK_CHECK_VERSION(2,24,0)
             gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_keyboard_layout),
-#else
-            gtk_combo_box_append_text (GTK_COMBO_BOX (__widget_keyboard_layout),
-#endif
                 scim_keyboard_layout_get_display_name (static_cast<KeyboardLayout> (i)).c_str ());
         }
 
@@ -362,128 +332,69 @@ create_setup_window ()
                           G_CALLBACK (on_keyboard_layout_changed),
                           NULL);
 
-        gtk_box_pack_start (GTK_BOX (hbox), __widget_keyboard_layout, TRUE, TRUE, 0);
+        gtk_widget_set_hexpand (__widget_keyboard_layout, TRUE);
+        gtk_box_append (GTK_BOX (hbox), __widget_keyboard_layout);
 
-#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (__widget_keyboard_layout,
                               _("You should choose your currently used keyboard layout here "
                                 "so that input methods, who care about keyboard layout, could work correctly."));
-#else
-        gtk_tooltips_set_tip (__widget_tooltips, __widget_keyboard_layout,
-                              _("You should choose your currently used keyboard layout here "
-                                "so that input methods, who care about keyboard layout, could work correctly."), NULL);
-#endif
 
         // On The Spot.
         __widget_on_the_spot = gtk_check_button_new_with_mnemonic (_("_Embed Preedit String into client window"));
-        gtk_widget_show (__widget_on_the_spot);
-        gtk_box_pack_start (GTK_BOX (vbox), __widget_on_the_spot, FALSE, FALSE, 0);
+        gtk_box_append (GTK_BOX (vbox), __widget_on_the_spot);
 
-#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (__widget_on_the_spot,
                               _("If this option is checked, "
                                 "the preedit string will be displayed directly in the client input window, "
                                 "rather than in a independent float window."));
-#else
-        gtk_tooltips_set_tip (__widget_tooltips, __widget_on_the_spot,
-                              _("If this option is checked, "
-                                "the preedit string will be displayed directly in the client input window, "
-                                "rather than in a independent float window."), NULL);
-#endif
 
         g_signal_connect ((gpointer) __widget_on_the_spot, "toggled",
-                          G_CALLBACK (on_default_toggle_button_toggled),
+                          G_CALLBACK (on_default_check_button_toggled),
                           &__config_on_the_spot);
 
         // Shared input method.
         __widget_shared_input_method = gtk_check_button_new_with_mnemonic (_("_Share the same input method among all applications"));
-        gtk_widget_show (__widget_shared_input_method);
-        gtk_box_pack_start (GTK_BOX (vbox), __widget_shared_input_method, FALSE, FALSE, 0);
+        gtk_box_append (GTK_BOX (vbox), __widget_shared_input_method);
 
-#if GTK_CHECK_VERSION(2, 12, 0)
         gtk_widget_set_tooltip_text (__widget_shared_input_method,
                               _("If this option is checked, "
                                 "then only one input method could be used by all applications at the same time."
                                 "Otherwise different input method could be used by each application."));
-#else
-        gtk_tooltips_set_tip (__widget_tooltips, __widget_shared_input_method,
-                              _("If this option is checked, "
-                                "then only one input method could be used by all applications at the same time."
-                                "Otherwise different input method could be used by each application."), NULL);
-#endif
 
         g_signal_connect ((gpointer) __widget_shared_input_method, "toggled",
-                          G_CALLBACK (on_default_toggle_button_toggled),
+                          G_CALLBACK (on_default_check_button_toggled),
                           &__config_shared_input_method);
 
         frame = gtk_frame_new (_("Hotkeys"));
-        gtk_widget_show (frame);
-        gtk_container_set_border_width (GTK_CONTAINER (frame), 4);
-        gtk_box_pack_start (GTK_BOX (window), frame, TRUE, TRUE, 0);
+        gtk_widget_set_margin_start (frame, 4);
+        gtk_widget_set_margin_end (frame, 4);
+        gtk_widget_set_margin_top (frame, 4);
+        gtk_widget_set_margin_bottom (frame, 4);
+        gtk_widget_set_vexpand (frame, TRUE);
+        gtk_box_append (GTK_BOX (window), frame);
 
-#if GTK_CHECK_VERSION(3, 4, 0)
         table = gtk_grid_new();
-#else
-        table = gtk_table_new (3, 3, FALSE);
-#endif
-        gtk_widget_show (table);
-        gtk_container_add (GTK_CONTAINER (frame), table);
-#if GTK_CHECK_VERSION(3, 4, 0)
+        gtk_frame_set_child (GTK_FRAME (frame), table);
         gtk_grid_set_row_spacing (GTK_GRID (table), 0);
         gtk_grid_set_column_spacing (GTK_GRID (table), 8);
-#else
-        gtk_table_set_row_spacings (GTK_TABLE (table), 0);
-        gtk_table_set_col_spacings (GTK_TABLE (table), 8);
-#endif
 
         for (i = 0; __config_keyboards [i].key; ++ i) {
             label = gtk_label_new (NULL);
             gtk_label_set_text_with_mnemonic (GTK_LABEL (label), _(__config_keyboards[i].label));
-            gtk_widget_show (label);
-#if GTK_CHECK_VERSION(3, 14, 0)
             gtk_widget_set_halign (label, GTK_ALIGN_END);
             gtk_widget_set_valign (label, GTK_ALIGN_CENTER);
             gtk_widget_set_margin_start (label, 4);
             gtk_widget_set_margin_end (label, 4);
-#else
-            gtk_misc_set_alignment (GTK_MISC (label), 1.0, 0.5);
-            gtk_misc_set_padding (GTK_MISC (label), 4, 0);
-#endif
-#if GTK_CHECK_VERSION(3, 4, 0)
-            gtk_widget_set_halign (label, GTK_ALIGN_FILL);
-            gtk_widget_set_valign (label, GTK_ALIGN_FILL);
             gtk_grid_attach (GTK_GRID (table), label, 0, i, 1, 1);
-#else
-            gtk_table_attach (GTK_TABLE (table), label, 0, 1, i, i+1,
-                              (GtkAttachOptions) (GTK_FILL),
-                              (GtkAttachOptions) (GTK_FILL), 4, 2);
-#endif
 
             __config_keyboards [i].entry = gtk_entry_new ();
-            gtk_widget_show (__config_keyboards [i].entry);
-#if GTK_CHECK_VERSION(3, 4, 0)
-            gtk_widget_set_halign (__config_keyboards [i].entry, GTK_ALIGN_FILL);
-            gtk_widget_set_valign (__config_keyboards [i].entry, GTK_ALIGN_FILL);
+            gtk_widget_set_hexpand (__config_keyboards [i].entry, TRUE);
             gtk_grid_attach (GTK_GRID (table), __config_keyboards [i].entry,
                               1, i, 1, 1);
-#else
-            gtk_table_attach (GTK_TABLE (table), __config_keyboards [i].entry, 1, 2, i, i+1,
-                              (GtkAttachOptions) (GTK_FILL|GTK_EXPAND),
-                              (GtkAttachOptions) (GTK_FILL), 4, 2);
-#endif
             gtk_editable_set_editable (GTK_EDITABLE (__config_keyboards[i].entry), FALSE);
 
             __config_keyboards[i].button = gtk_button_new_with_label ("...");
-            gtk_widget_show (__config_keyboards[i].button);
-#if GTK_CHECK_VERSION(3, 4, 0)
-            gtk_widget_set_halign (__config_keyboards [i].button, GTK_ALIGN_FILL);
-            gtk_widget_set_valign (__config_keyboards [i].button, GTK_ALIGN_FILL);
             gtk_grid_attach (GTK_GRID (table), __config_keyboards[i].button, 2, i, 1, 1);
-#else
-            gtk_table_attach (GTK_TABLE (table), __config_keyboards[i].button, 2, 3, i, i+1,
-                              (GtkAttachOptions) (GTK_FILL),
-                              (GtkAttachOptions) (GTK_FILL), 4, 2);
-#endif
             gtk_label_set_mnemonic_widget (GTK_LABEL (label), __config_keyboards[i].button);
         }
 
@@ -497,13 +408,8 @@ create_setup_window ()
         }
 
         for (i = 0; __config_keyboards [i].key; ++ i) {
-#if GTK_CHECK_VERSION(2, 12, 0)
             gtk_widget_set_tooltip_text (__config_keyboards [i].entry,
                                   _(__config_keyboards [i].tooltip));
-#else
-            gtk_tooltips_set_tip (__widget_tooltips, __config_keyboards [i].entry,
-                                  _(__config_keyboards [i].tooltip), NULL);
-#endif
         }
 
         setup_widget_value ();
@@ -517,21 +423,21 @@ setup_widget_value ()
 {
     for (int i = 0; __config_keyboards [i].key; ++ i) {
         if (__config_keyboards [i].entry) {
-            gtk_entry_set_text (
-                GTK_ENTRY (__config_keyboards [i].entry),
+            gtk_editable_set_text (
+                GTK_EDITABLE (__config_keyboards [i].entry),
                 __config_keyboards [i].data.c_str ());
         }
     }
 
     if (__widget_on_the_spot) {
-        gtk_toggle_button_set_active (
-            GTK_TOGGLE_BUTTON (__widget_on_the_spot),
+        gtk_check_button_set_active (
+            GTK_CHECK_BUTTON (__widget_on_the_spot),
             __config_on_the_spot);
     }
 
     if (__widget_shared_input_method) {
-        gtk_toggle_button_set_active (
-            GTK_TOGGLE_BUTTON (__widget_shared_input_method),
+        gtk_check_button_set_active (
+            GTK_CHECK_BUTTON (__widget_shared_input_method),
             __config_shared_input_method);
     }
 
@@ -606,9 +512,29 @@ on_default_editable_changed (GtkEditable *editable,
     String *str = static_cast <String *> (user_data);
 
     if (str) {
-        *str = String (gtk_entry_get_text (GTK_ENTRY (editable)));
+        *str = String (gtk_editable_get_text (editable));
         __have_changed = true;
     }
+}
+
+static void
+key_selection_response_cb (GtkDialog *dialog,
+                           gint       response,
+                           gpointer   user_data)
+{
+    KeyboardConfigData *data = static_cast <KeyboardConfigData *> (user_data);
+
+    if (response == GTK_RESPONSE_OK && data) {
+        const gchar *keys = scim_key_selection_dialog_get_keys (
+                        SCIM_KEY_SELECTION_DIALOG (dialog));
+
+        if (!keys) keys = "";
+
+        if (String (keys) != data->data)
+            gtk_editable_set_text (GTK_EDITABLE (data->entry), keys);
+    }
+
+    gtk_window_destroy (GTK_WINDOW (dialog));
 }
 
 static void
@@ -619,36 +545,30 @@ on_default_key_selection_clicked (GtkButton *button,
 
     if (data) {
         GtkWidget *dialog = scim_key_selection_dialog_new (_(data->title));
-        gint result;
+        GtkRoot   *root = gtk_widget_get_root (GTK_WIDGET (button));
 
         scim_key_selection_dialog_set_keys (
             SCIM_KEY_SELECTION_DIALOG (dialog),
             data->data.c_str ());
 
-        result = gtk_dialog_run (GTK_DIALOG (dialog));
+        if (root && GTK_IS_WINDOW (root))
+            gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (root));
+        gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
 
-        if (result == GTK_RESPONSE_OK) {
-            const gchar *keys = scim_key_selection_dialog_get_keys (
-                            SCIM_KEY_SELECTION_DIALOG (dialog));
+        g_signal_connect (dialog, "response", G_CALLBACK (key_selection_response_cb), data);
 
-            if (!keys) keys = "";
-
-            if (String (keys) != data->data)
-                gtk_entry_set_text (GTK_ENTRY (data->entry), keys);
-        }
-
-        gtk_widget_destroy (dialog);
+        gtk_window_present (GTK_WINDOW (dialog));
     }
 }
 
 static void
-on_default_toggle_button_toggled (GtkToggleButton *togglebutton,
-                                  gpointer         user_data)
+on_default_check_button_toggled (GtkCheckButton *checkbutton,
+                                 gpointer        user_data)
 {
     bool *toggle = static_cast<bool*> (user_data);
 
     if (toggle) {
-        *toggle = gtk_toggle_button_get_active (togglebutton);
+        *toggle = gtk_check_button_get_active (checkbutton);
         __have_changed = true;
     }
 }
@@ -664,4 +584,3 @@ on_keyboard_layout_changed (GtkComboBox *combobox,
 /*
 vi:ts=4:nowrap:expandtab
 */
-
