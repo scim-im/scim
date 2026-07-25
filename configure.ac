@@ -178,7 +178,7 @@ AM_CONDITIONAL(HAVE_DOCBOOK, test x$DOCBOOK_XSL != xno)
 AM_CONDITIONAL(BUILD_MANUAL, test x$XSLTPROC != xno -a x$DOCBOOK_XSL != xno)
 
 # Checks for libraries.
-AC_CHECK_HEADERS([langinfo.h libintl.h string.h dirent.h hash_map ext/hash_map])
+AC_CHECK_HEADERS([langinfo.h libintl.h string.h dirent.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -427,14 +427,14 @@ AC_ARG_ENABLE([tests],
 AC_ARG_ENABLE([documents],
 	[AS_HELP_STRING([--enable-documents],
 		[build documents])],
-	[], 
+	[],
 	[enable_documents=no])
 
-AC_ARG_ENABLE([hash-map],
-	[AS_HELP_STRING([--enable-hash-map],
-		[Use hash_map instead of std::map internally])],
+AC_ARG_ENABLE([ordered-map],
+	[AS_HELP_STRING([--enable-ordered-map],
+		[Use std::map/std::set instead of the unordered hash containers internally])],
 	[],
-	[enable_hash_map=no])
+	[enable_ordered_map=no])
 
 AC_ARG_ENABLE([config-simple],
 	[AS_HELP_STRING([--disable-config-simple],
@@ -534,16 +534,16 @@ else
   enable_x11_utils=no
 fi
 
-if test "$enable_hash_map" = "yes"; then
-  AC_DEFINE(ENABLE_HASH_MAP,1,[Use hash map instead of map in libscim])
-fi
-
 if test "$enable_debug" = "yes"; then
   AC_DEFINE(ENABLE_DEBUG,1,[Define this to enable the debug facility in libscim])
   CFLAGS="$CFLAGS -g"
   CXXFLAGS="$CXXFLAGS -g"
 else
   enable_debug=no
+fi
+
+if test "$enable_ordered_map" = "yes"; then
+  AC_DEFINE(SCIM_USE_ORDERED_MAP,1,[Use std::map/std::set instead of unordered hash containers in libscim])
 fi
 
 if test "$enable_tests" = "yes"; then
@@ -944,6 +944,7 @@ Build options:
   Enable debug             $enable_debug
   Enable ld version script $enable_ld_version_script
   Build documents          $enable_documents
+  Ordered (std::map) mode  $enable_ordered_map
 
 Module options:           
   Simple config module     $enable_config_simple

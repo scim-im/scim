@@ -117,6 +117,8 @@ public:
                     m_data = (struct sockaddr*) new struct sockaddr_in;
                     len = sizeof (sockaddr_in);
                     break;
+                case SCIM_SOCKET_UNKNOWN:
+                    break;
             }
 
             if (len && m_data) memcpy (m_data, other.m_data, len);
@@ -968,7 +970,7 @@ SocketServer::shutdown ()
 
         m_impl->running = false;
 
-        for (int i = 0; i<m_impl->ext_fds.size (); i++)
+        for (size_t i = 0; i < m_impl->ext_fds.size (); i++)
             FD_CLR (m_impl->ext_fds [i], &m_impl->active_fds);
 
         for (int i = 0; i<m_impl->max_fd + 1; i++) {

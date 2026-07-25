@@ -57,13 +57,7 @@ struct ClientInfo {
     ClientType type;
 };
 
-#if SCIM_USE_STL_EXT_HASH_MAP
-typedef __gnu_cxx::hash_map <int, ClientInfo, __gnu_cxx::hash <int> >       ClientRepository;
-#elif SCIM_USE_STL_HASH_MAP
-typedef std::hash_map <int, ClientInfo, std::hash <int> >                   ClientRepository;
-#else
-typedef std::map <int, ClientInfo>                                          ClientRepository;
-#endif
+typedef scim_map <int, ClientInfo>                                ClientRepository;
 
 typedef std::vector < std::pair <HelperInfo, String> >                      HelperRepository;
 

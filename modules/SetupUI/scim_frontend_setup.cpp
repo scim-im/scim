@@ -199,10 +199,10 @@ static KeyboardConfigData __config_keyboards [] =
         NULL,
         // button
         NULL,
-        // data
-        "Control+Alt+Down,"
-        "Control+Shift_R,"
-        "Control+Shift_L"
+        // data -- keep in step with __scim_frontend_hotkey_defaults in
+        // src/scim_hotkey.cpp, which this shadows as the config fallback.
+        "Control+Shift+Shift_L+KeyRelease,"
+        "Control+Shift+Shift_R+KeyRelease"
     },
     {
         // key
@@ -219,9 +219,8 @@ static KeyboardConfigData __config_keyboards [] =
         // button
         NULL,
         // data
-        "Control+Alt+Up,"
-        "Shift+Control_R,"
-        "Shift+Control_L"
+        "Control+Shift+Control_L+KeyRelease,"
+        "Control+Shift+Control_R+KeyRelease"
     },
     {
         // key
@@ -237,11 +236,9 @@ static KeyboardConfigData __config_keyboards [] =
         NULL,
         // button
         NULL,
-        // data
-        "Control+Alt+l,"
-        "Control+Alt+m,"
-        "Control+Alt+s,"
-        "Control+Alt+Right,"
+        // data -- unbound by default: the panel offers this menu from its
+        // tray icon, and in tray mode the hotkey draws nothing anyway.
+        ""
     },
     {
         // key

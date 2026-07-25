@@ -102,25 +102,11 @@ struct HelperClientStub {
     HelperClientStub (int i = 0, int r = 0) : id (i), ref (r) { }
 };
 
-#if SCIM_USE_STL_EXT_HASH_MAP
-typedef __gnu_cxx::hash_map <int, ClientInfo, __gnu_cxx::hash <int> >       ClientRepository;
-typedef __gnu_cxx::hash_map <int, HelperInfo, __gnu_cxx::hash <int> >       HelperInfoRepository;
-typedef __gnu_cxx::hash_map <uint32, String, __gnu_cxx::hash <unsigned int> > ClientContextUUIDRepository;
-typedef __gnu_cxx::hash_map <String, HelperClientStub, scim_hash_string>    HelperClientIndex;
-typedef __gnu_cxx::hash_map <String, std::vector < std::pair <uint32, String> >, scim_hash_string>    StartHelperICIndex;
-#elif SCIM_USE_STL_HASH_MAP
-typedef std::hash_map <int, ClientInfo, std::hash <int> >                   ClientRepository;
-typedef std::hash_map <int, HelperInfo, std::hash <int> >                   HelperInfoRepository;
-typedef std::hash_map <uint32, String, std::hash <unsigned int> >           ClientContextUUIDRepository;
-typedef std::hash_map <String, HelperClientStub, scim_hash_string>          HelperClientIndex;
-typedef std::hash_map <String, std::vector < std::pair <uint32, String> >, scim_hash_string>          StartHelperICIndex;
-#else
-typedef std::map <int, ClientInfo>                                          ClientRepository;
-typedef std::map <int, HelperInfo>                                          HelperInfoRepository;
-typedef std::map <uint32, String>                                           ClientContextUUIDRepository;
-typedef std::map <String, HelperClientStub>                                 HelperClientIndex;
-typedef std::map <String, std::vector < std::pair <uint32, String> > >                                StartHelperICIndex;
-#endif
+typedef scim_map <int, ClientInfo>                                ClientRepository;
+typedef scim_map <int, HelperInfo>                                HelperInfoRepository;
+typedef scim_map <uint32, String>                                 ClientContextUUIDRepository;
+typedef scim_map <String, HelperClientStub>                       HelperClientIndex;
+typedef scim_map <String, std::vector < std::pair <uint32, String> > >                      StartHelperICIndex;
 
 static uint32
 get_helper_ic (int client, uint32 context)
@@ -214,8 +200,8 @@ public:
           m_socket_timeout (scim_get_default_socket_timeout ()),
           m_current_socket_client (-1), m_current_client_context (0),
           m_last_socket_client (-1), m_last_client_context (0),
-          m_defaultFactoryInfo (PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE))),
-          m_currentFactoryInfo (PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE)))
+          m_currentFactoryInfo (PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE))),
+          m_defaultFactoryInfo (PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE)))
     {
         m_socket_server.signal_connect_accept (slot (this, &PanelAgentImpl::socket_accept_callback));
         m_socket_server.signal_connect_receive (slot (this, &PanelAgentImpl::socket_receive_callback));

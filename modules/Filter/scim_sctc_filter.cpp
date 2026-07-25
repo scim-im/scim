@@ -44,13 +44,7 @@
 using namespace scim;
 
 // Private datatype definition.
-#if SCIM_USE_STL_EXT_HASH_MAP
-typedef __gnu_cxx::hash_map <unsigned short, unsigned short, __gnu_cxx::hash <unsigned short> > UUMap;
-#elif SCIM_USE_STL_HASH_MAP
-typedef std::hash_map <unsigned short, unsigned short, std::hash <unsigned short> >             UUMap;
-#else
-typedef std::map <unsigned short, unsigned short>                                               UUMap;
-#endif
+typedef scim_map <unsigned short, unsigned short>                                     UUMap;
 
 // Private data definition.
 static FilterInfo   __filter_info (String ("adb861a9-76da-454c-941b-1957e644a94e"),

@@ -26,8 +26,7 @@
  * $Id: scim_module.h,v 1.19 2005/01/10 08:30:54 suzhe Exp $
  */
 
-#ifndef __SCIM_MODULE_H
-#define __SCIM_MODULE_H
+#pragma once
 
 namespace scim {
 
@@ -56,7 +55,22 @@ public:
     Module (const String &name, const String &type);
     ~Module ();
 
+    /**
+     * @brief Load a module, sharing it with any other holder in this process.
+     *
+     * Several Module objects may hold the same module at once; they share one
+     * mapping, and the module's scim_module_init () runs only for the first of
+     * them. scim_module_exit () runs when the last one unloads, so a module's
+     * global state outlives every individual holder.
+     */
     bool load (const String &name, const String &type);
+
+    /**
+     * @brief Release this holder's claim on the module.
+     *
+     * Finalizes the module only if this was the last holder.  Refuses, and
+     * returns false, if the module was made resident.
+     */
     bool unload ();
 
     bool valid () const;
@@ -76,8 +90,6 @@ int scim_get_module_list (std::vector <String>& mod_list, const String& type = "
 /** @} */
 
 } // namespace scim
-
-#endif //__SCIM_MODULE_H
 
 /*
 vi:ts=4:ai:nowrap:expandtab

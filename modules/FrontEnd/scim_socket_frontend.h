@@ -27,8 +27,7 @@
  * $Id: scim_socket_frontend.h,v 1.26 2005/04/14 17:01:56 suzhe Exp $
  */
 
-#if !defined (__SCIM_SOCKET_FRONTEND_H)
-#define __SCIM_SOCKET_FRONTEND_H
+#pragma once
 
 #include "scim_stl_map.h"
 
@@ -52,13 +51,7 @@ class SocketFrontEnd : public FrontEndBase
      */
     typedef std::vector <std::pair <int, int> > SocketInstanceRepository;
 
-#if SCIM_USE_STL_EXT_HASH_MAP
-    typedef __gnu_cxx::hash_map <int, ClientInfo, __gnu_cxx::hash <int> >   SocketClientRepository;
-#elif SCIM_USE_STL_HASH_MAP
-    typedef std::hash_map <int, ClientInfo, std::hash <int> >               SocketClientRepository;
-#else
-    typedef std::map <int, ClientInfo>                                      SocketClientRepository;
-#endif
+    typedef scim_map <int, ClientInfo>                            SocketClientRepository;
 
     ConfigPointer     m_config;
 
@@ -182,8 +175,6 @@ private:
 
     void reload_config_callback (const ConfigPointer &config);
 };
-
-#endif
 
 /*
 vi:ts=4:nowrap:ai:expandtab

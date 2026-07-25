@@ -27,8 +27,7 @@
  * $Id: scim_x11_frontend.h,v 1.56 2005/06/26 16:35:12 suzhe Exp $
  */
 
-#if !defined (__SCIM_X11_FRONTEND_H)
-#define __SCIM_X11_FRONTEND_H
+#pragma once
 
 #include "scim_stl_map.h"
 
@@ -38,13 +37,7 @@ class X11FrontEnd : public FrontEndBase
 {
 // first = UUID.
 // second= siid.
-#if SCIM_USE_STL_EXT_HASH_MAP
-    typedef __gnu_cxx::hash_map <String, int, scim_hash_string> DefaultInstanceMap;
-#elif SCIM_USE_STL_HASH_MAP
-    typedef std::hash_map <String, int, scim_hash_string>       DefaultInstanceMap;
-#else
-    typedef std::map <String, int>                              DefaultInstanceMap;
-#endif
+    typedef scim_map <String, int>                    DefaultInstanceMap;
 
     X11ICManager            m_ic_manager;
     XIMS                    m_xims;
@@ -219,8 +212,6 @@ private:
 
     static bool validate_ic (const X11IC * ic) { return ic && ic->icid > 0 && ic->siid >= 0; }
 };
-
-#endif
 
 /*
 vi:ts=4:nowrap:ai:expandtab

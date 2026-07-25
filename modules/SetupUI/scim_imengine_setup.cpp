@@ -134,19 +134,9 @@ enum
     FILTER_LIST_NUM_COLUMNS
 };
 
-#if SCIM_USE_STL_EXT_HASH_MAP
-typedef __gnu_cxx::hash_map <String, std::vector <size_t>, scim_hash_string>        MapStringVectorSizeT;
-typedef __gnu_cxx::hash_map <String, KeyEventList, scim_hash_string>                MapStringKeyEventList;
-typedef __gnu_cxx::hash_map <String, std::vector <FilterInfo>, scim_hash_string>    MapStringVectorFilterInfo;
-#elif SCIM_USE_STL_HASH_MAP
-typedef std::hash_map <String, std::vector <size_t>, scim_hash_string>              MapStringVectorSizeT;
-typedef std::hash_map <String, KeyEventList, scim_hash_string>                      MapStringKeyEventList;
-typedef std::hash_map <String, std::vector <FilterInfo>, scim_hash_string>          MapStringVectorFilterInfo;
-#else
-typedef std::map <String, std::vector <size_t> >                                    MapStringVectorSizeT;
-typedef std::map <String, KeyEventList>                                             MapStringKeyEventList;
-typedef std::map <String, std::vector <FilterInfo> >                                MapStringVectorFilterInfo;
-#endif
+typedef scim_map <String, std::vector <size_t> >                          MapStringVectorSizeT;
+typedef scim_map <String, KeyEventList>                                   MapStringKeyEventList;
+typedef scim_map <String, std::vector <FilterInfo> >                       MapStringVectorFilterInfo;
 
 // Internal data declaration.
 static bool           __have_changed         = false;

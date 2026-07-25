@@ -58,13 +58,7 @@ using namespace scim;
 
 class scim::SocketIMEngineGlobal
 {
-#if SCIM_USE_STL_EXT_HASH_MAP
-typedef __gnu_cxx::hash_map <String, String, scim_hash_string> IconRepository;
-#elif SCIM_USE_STL_HASH_MAP
-typedef std::hash_map <String, String, scim_hash_string> IconRepository;
-#else
-typedef std::map <String, String> IconRepository;
-#endif
+typedef scim_map <String, String> IconRepository;
 
     SocketClient             m_socket_client;
     SocketAddress            m_socket_address;

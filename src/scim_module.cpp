@@ -50,7 +50,36 @@ struct Module::ModuleImpl
     ModuleImpl () : handle (0), init (0), exit (0), resident (false) { }
 };
 
-static std::vector <ModuleInitFunc> _scim_modules;
+// The modules loaded in this process, with the number of Module objects
+// holding each one.
+//
+// scim_module_init () / scim_module_exit () bracket state that belongs to the
+// module rather than to one holder -- the socket IMEngine's single backend
+// connection, for instance -- so the pair has to run exactly once per process
+// however many holders there are. One process really can have several: a
+// Chromium browser loads the GTK IM module for text input and the Qt plugin
+// for theming, and each builds its own backend. Refusing the second load left
+// whichever came second with no engines at all.
+struct ModuleRegistryEntry
+{
+    ModuleInitFunc init;
+    unsigned int   refcount;
+};
+
+static std::vector <ModuleRegistryEntry> _scim_modules;
+
+// The init function is unique per module, so it identifies one.
+static std::vector <ModuleRegistryEntry>::iterator
+_scim_find_module (ModuleInitFunc init)
+{
+    std::vector <ModuleRegistryEntry>::iterator it = _scim_modules.begin ();
+
+    for (; it != _scim_modules.end (); ++it)
+        if (it->init == init)
+            break;
+
+    return it;
+}
 
 static void
 _scim_get_module_paths (std::vector <String> &paths, const String &type)
@@ -256,30 +285,40 @@ Module::load (const String &name, const String &type)
         }
     }
 
-    //Check if the module is already loaded.
-    if (std::find (_scim_modules.begin (), _scim_modules.end (), new_init)
-        != _scim_modules.end ()) {
+    // Let go of whatever this object held before taking on the new module.
+    if (!unload ()) {
         dlclose (new_handle);
         return false;
     }
 
-    if (unload ()) {
-        _scim_modules.push_back (new_init);
+    m_impl->handle = new_handle;
+    m_impl->init   = new_init;
+    m_impl->exit   = new_exit;
+    m_impl->path   = new_path;
+    m_impl->name   = name;
 
-        m_impl->handle = new_handle;
-        m_impl->init   = new_init;
-        m_impl->exit   = new_exit;
-        m_impl->path   = new_path;
-        m_impl->name   = name;
+    // dlopen(3) refcounts the mapping by itself, so a repeat load shares one
+    // mapping and every holder still owes it a dlclose (). Only the module's
+    // own initializer has to be held back, having already run for this module.
+    std::vector <ModuleRegistryEntry>::iterator holder = _scim_find_module (new_init);
 
-        try {
-            m_impl->init ();
-            return true;
-        } catch (...) {
-            unload ();
-        }
-    } else {
-        dlclose (new_handle);
+    if (holder != _scim_modules.end ()) {
+        ++(holder->refcount);
+        return true;
+    }
+
+    ModuleRegistryEntry entry;
+
+    entry.init     = new_init;
+    entry.refcount = 1;
+
+    _scim_modules.push_back (entry);
+
+    try {
+        m_impl->init ();
+        return true;
+    } catch (...) {
+        unload ();
     }
 
     return false;
@@ -294,17 +333,27 @@ Module::unload ()
     if (is_resident ())
         return false;
 
-    if (m_impl->exit) {
+    std::vector <ModuleRegistryEntry>::iterator it = _scim_find_module (m_impl->init);
+
+    bool last_holder = true;
+
+    if (it != _scim_modules.end ()) {
+        if (it->refcount > 1) {
+            --(it->refcount);
+            last_holder = false;
+        } else {
+            _scim_modules.erase (it);
+        }
+    }
+
+    // Finalize only once the last holder lets go: scim_module_exit () tears
+    // down state that the other holders' factories and instances still point
+    // at. A module made resident never releases, so it never finalizes.
+    if (last_holder && m_impl->exit) {
         try { m_impl->exit (); } catch (...) { }
     }
 
     dlclose (m_impl->handle);
-
-    std::vector <ModuleInitFunc>::iterator it =
-        std::find (_scim_modules.begin (), _scim_modules.end (), m_impl->init);
-
-    if (it != _scim_modules.end ())
-        _scim_modules.erase (it);
 
     m_impl->handle   = 0;
     m_impl->init     = 0;

@@ -140,16 +140,8 @@ struct HelperPropertyInfo {
     HelperPropertyInfo () : holder (0) { }
 };
 
-#if SCIM_USE_STL_EXT_HASH_MAP
-typedef __gnu_cxx::hash_map <int, HelperPropertyInfo, __gnu_cxx::hash <int> > HelperPropertyRepository;
-typedef __gnu_cxx::hash_map <String, std::vector <size_t>, scim_hash_string>  MapStringVectorSizeT;
-#elif SCIM_USE_STL_HASH_MAP
-typedef std::hash_map <int, HelperPropertyInfo, std::hash <int> >             HelperPropertyRepository;
-typedef std::hash_map <String, std::vector <size_t>, scim_hash_string>        MapStringVectorSizeT;
-#else
-typedef std::map <int, HelperPropertyInfo>                                    HelperPropertyRepository;
-typedef std::map <String, std::vector <size_t> >                              MapStringVectorSizeT;
-#endif
+typedef scim_map <int, HelperPropertyInfo>                          HelperPropertyRepository;
+typedef scim_map <String, std::vector <size_t> >                    MapStringVectorSizeT;
 
 // Snapshot of a LookupTable's current-page contents, so that it can be
 // marshaled to the main thread (LookupTable itself is non-copyable).

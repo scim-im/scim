@@ -26,8 +26,7 @@
  * $Id: scim_x11_ic.h,v 1.10 2005/06/26 16:35:12 suzhe Exp $
  */
 
-#if !defined (__SCIM_X11_IC_H)
-#define __SCIM_X11_IC_H
+#pragma once
 
 #include "scim_stl_map.h"
 
@@ -109,13 +108,7 @@ struct X11IC
 
 class X11ICManager
 {
-#if SCIM_USE_STL_EXT_HASH_MAP
-    typedef __gnu_cxx::hash_map <int, String, __gnu_cxx::hash <int> > ConnectionLocaleMap;
-#elif SCIM_USE_STL_HASH_MAP
-    typedef std::hash_map <int, String, std::hash <int> >             ConnectionLocaleMap;
-#else
-    typedef std::map <int, String>                                    ConnectionLocaleMap;
-#endif
+    typedef scim_map <int, String>                          ConnectionLocaleMap;
 
     X11IC *m_ic_list;
     X11IC *m_free_list;
@@ -173,7 +166,6 @@ public:
     uint32 set_ic_values (IMChangeICStruct *call_data);
 };
 
-#endif // _SCIM_X11_IC_H
 
 /*
 vi:ts=4:nowrap:ai:expandtab

@@ -35,13 +35,7 @@ struct scim_hash_keyevent {
     }
 };
 
-#if SCIM_USE_STL_EXT_HASH_MAP
-typedef __gnu_cxx::hash_map <KeyEvent, int, scim_hash_keyevent> HotkeyRepository;
-#elif SCIM_USE_STL_HASH_MAP
-typedef std::hash_map <KeyEvent, int, scim_hash_keyevent>       HotkeyRepository;
-#else
-typedef std::map <KeyEvent, int>                                HotkeyRepository;
-#endif
+typedef scim_map <KeyEvent, int, scim_hash_keyevent> HotkeyRepository;
 
 class HotkeyMatcher::HotkeyMatcherImpl
 {
@@ -332,9 +326,14 @@ static const char *__scim_frontend_hotkey_defaults [] =
     "Control+space",
     "",
     "",
-    "Control+Alt+Down,Control+Shift+Shift_L+KeyRelease,Control+Shift+Shift_R+KeyRelease",
-    "Control+Alt+Up,Control+Shift+Control_L+KeyRelease,Control+Shift+Control_R+KeyRelease",
-    "Control+Alt+Right",
+    // No Control+Alt+arrow defaults: GNOME and XFCE both bind all four to
+    // workspace switching, and a compositor grab takes the key before any
+    // frontend can see it. The Control+Shift chord is free everywhere and
+    // gives both directions from one two-key gesture -- whichever of the two
+    // is released last picks the direction.
+    "Control+Shift+Shift_L+KeyRelease,Control+Shift+Shift_R+KeyRelease",
+    "Control+Shift+Control_L+KeyRelease,Control+Shift+Control_R+KeyRelease",
+    "",
     0
 };
 

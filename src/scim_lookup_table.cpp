@@ -144,7 +144,7 @@ LookupTable::page_up ()
 bool
 LookupTable::page_down ()
 {
-    if (m_impl->m_current_page_start + m_impl->m_page_size >= number_of_candidates ())
+    if (m_impl->m_current_page_start + m_impl->m_page_size >= (int) number_of_candidates ())
         return false;
 
     m_impl->m_current_page_start += m_impl->m_page_size;
@@ -180,7 +180,7 @@ LookupTable::cursor_up ()
 bool
 LookupTable::cursor_down ()
 {
-    if (m_impl->m_cursor_pos + 1 >= number_of_candidates ())
+    if (m_impl->m_cursor_pos + 1 >= (int) number_of_candidates ())
         return false;
 
     if (!m_impl->m_cursor_visible)
@@ -222,7 +222,7 @@ LookupTable::is_page_size_fixed () const
 void
 LookupTable::set_cursor_pos (int pos)
 {
-    if (pos < 0 || pos >= number_of_candidates ()) return;
+    if (pos < 0 || pos >= (int) number_of_candidates ()) return;
 
     if (!m_impl->m_cursor_visible)
         m_impl->m_cursor_visible = true;
@@ -252,7 +252,7 @@ LookupTable::set_cursor_pos_in_current_page (int pos)
 WideString
 LookupTable::get_candidate_label (int page_index) const
 {
-    if (page_index >= 0 && page_index < get_current_page_size () && page_index < m_impl->m_candidate_labels.size ())
+    if (page_index >= 0 && page_index < (int) get_current_page_size () && page_index < (int) m_impl->m_candidate_labels.size ())
         return m_impl->m_candidate_labels [page_index];
     return WideString ();
 }
@@ -364,14 +364,14 @@ CommonLookupTable::append_candidate (ucs4_t               cand,
 WideString
 CommonLookupTable::get_candidate (int index) const
 {
-    if (index < 0 || index >= number_of_candidates ())
+    if (index < 0 || index >= (int) number_of_candidates ())
         return WideString ();
 
     std::vector <ucs4_t>::const_iterator start, end;
 
     start = m_impl->m_buffer.begin () + m_impl->m_index [index];
 
-    if (index < number_of_candidates () - 1)
+    if (index < (int) number_of_candidates () - 1)
         end = m_impl->m_buffer.begin () + m_impl->m_index [index+1];
     else
         end = m_impl->m_buffer.end ();
@@ -382,14 +382,14 @@ CommonLookupTable::get_candidate (int index) const
 AttributeList
 CommonLookupTable::get_attributes (int index) const
 {
-    if (index < 0 || index >= number_of_candidates ())
+    if (index < 0 || index >= (int) number_of_candidates ())
         return AttributeList ();
 
     AttributeList::const_iterator start, end;
 
     start = m_impl->m_attributes.begin () + m_impl->m_attrs_index [index];
 
-    if (index < number_of_candidates () - 1)
+    if (index < (int) number_of_candidates () - 1)
         end = m_impl->m_attributes.begin () + m_impl->m_attrs_index [index+1];
     else
         end = m_impl->m_attributes.end ();

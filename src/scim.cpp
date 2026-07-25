@@ -120,8 +120,8 @@ int main (int argc, char *argv [])
 
     //parse command options
     i = 0;
-    while (i<argc) {
-        if (++i >= argc) break;
+    while (i < (size_t) argc) {
+        if (++i >= (size_t) argc) break;
 
         if (String ("-l") == argv [i] ||
             String ("--list") == argv [i]) {
@@ -147,7 +147,7 @@ int main (int argc, char *argv [])
 
         if (String ("-f") == argv [i] ||
             String ("--frontend") == argv [i]) {
-            if (++i >= argc) {
+            if (++i >= (size_t) argc) {
                 cerr << "No argument for option " << argv [i-1] << endl;
                 return -1;
             }
@@ -157,7 +157,7 @@ int main (int argc, char *argv [])
 
         if (String ("-c") == argv [i] ||
             String ("--config") == argv [i]) {
-            if (++i >= argc) {
+            if (++i >= (size_t) argc) {
                 cerr << "No argument for option " << argv [i-1] << endl;
                 return -1;
             }
@@ -188,7 +188,7 @@ int main (int argc, char *argv [])
 
         if (String ("-e") == argv [i] || String ("-s") == argv [i] ||
             String ("--engines") == argv [i] || String ("--servers") == argv [i]) {
-            if (++i >= argc) {
+            if (++i >= (size_t) argc) {
                 cerr << "No argument for option " << argv [i-1] << endl;
                 return -1;
             }
@@ -199,7 +199,7 @@ int main (int argc, char *argv [])
 
         if (String ("-ne") == argv [i] || String ("-ns") == argv [i] ||
             String ("--no-engines") == argv [i] || String ("-no-servers") == argv [i]) {
-            if (++i >= argc) {
+            if (++i >= (size_t) argc) {
                 cerr << "No argument for option " << argv [i-1] << endl;
                 return -1;
             }
@@ -221,7 +221,7 @@ int main (int argc, char *argv [])
     } //End of command line parsing.
 
     // Store the rest argvs into new_argv.
-    for (++i; i < argc; ++i) {
+    for (++i; i < (size_t) argc; ++i) {
         new_argv [new_argc ++] = argv [i];
     }
 

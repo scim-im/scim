@@ -26,8 +26,7 @@
  * $Id: scim_simple_config.h,v 1.22 2005/07/06 03:57:04 suzhe Exp $
  */
 
-#if !defined (__SCIM_SIMPLE_CONFIG_H)
-#define __SCIM_SIMPLE_CONFIG_H
+#pragma once
 
 #include <sys/time.h>
 #include "scim_stl_map.h"
@@ -38,13 +37,7 @@ const int SCIM_MAX_CONFIG_LINE_LENGTH = 16384;
 
 class SimpleConfig : public ConfigBase
 {
-#if SCIM_USE_STL_EXT_HASH_MAP
-typedef __gnu_cxx::hash_map <String, String, scim_hash_string> KeyValueRepository;
-#elif SCIM_USE_STL_HASH_MAP
-typedef std::hash_map <String, String, scim_hash_string> KeyValueRepository;
-#else
-typedef std::map <String, String> KeyValueRepository;
-#endif
+typedef scim_map <String, String> KeyValueRepository;
 
     KeyValueRepository       m_config;
     KeyValueRepository       m_new_config;
@@ -115,8 +108,6 @@ private:
 };
 
 } // namespace scim
-
-#endif
 
 /*
 vi:ts=4:nowrap:ai:expandtab

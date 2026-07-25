@@ -39,13 +39,7 @@
 
 namespace scim {
 
-#if SCIM_USE_STL_EXT_HASH_MAP
-typedef __gnu_cxx::hash_map <String, String, scim_hash_string> KeyValueRepository;
-#elif SCIM_USE_STL_HASH_MAP
-typedef std::hash_map <String, String, scim_hash_string> KeyValueRepository;
-#else
-typedef std::map <String, String> KeyValueRepository;
-#endif
+typedef scim_map <String, String> KeyValueRepository;
 
 class GlobalConfigRepository
 {

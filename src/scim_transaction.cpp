@@ -150,7 +150,7 @@ Transaction::read_from_socket (const Socket &socket, int timeout)
         int nbytes;
 
         nbytes = socket.read_with_timeout (buf, sizeof (uint32) * 2, timeout);
-        if (nbytes < sizeof (uint32) * 2)
+        if (nbytes < (int) (sizeof (uint32) * 2))
             return false;
 
         sign1 = scim_bytestouint32 (buf);
@@ -161,7 +161,7 @@ Transaction::read_from_socket (const Socket &socket, int timeout)
 
         if (sign2 == SCIM_TRANS_MAGIC) {
             nbytes = socket.read_with_timeout (buf, sizeof (uint32), timeout);
-            if (nbytes < sizeof (uint32))
+            if (nbytes < (int) sizeof (uint32))
                 return false;
             size = scim_bytestouint32 (buf);
         } else {
@@ -169,7 +169,7 @@ Transaction::read_from_socket (const Socket &socket, int timeout)
         }
 
         nbytes = socket.read_with_timeout (buf, sizeof (uint32), timeout);
-        if (nbytes < sizeof (uint32))
+        if (nbytes < (int) sizeof (uint32))
             return false;
 
         checksum = scim_bytestouint32 (buf);
@@ -406,7 +406,7 @@ Transaction::put_data (const LookupTable &table)
 
     //Can be page down.
     if (table.get_current_page_start () + table.get_current_page_size () <
-        table.number_of_candidates ())
+        (int) table.number_of_candidates ())
         stat |= 2;
 
     //Cursor is visible.
@@ -423,11 +423,11 @@ Transaction::put_data (const LookupTable &table)
     m_holder->m_buffer [m_holder->m_write_pos++] = (unsigned char) table.get_cursor_pos_in_current_page ();
 
     // Store page labels.
-    for (i = 0; i < table.get_current_page_size (); ++i)
+    for (i = 0; i < (size_t) table.get_current_page_size (); ++i)
         put_data (table.get_candidate_label (i));
 
     // Store page candidates, attributes.
-    for (i = 0; i < table.get_current_page_size (); ++i) {
+    for (i = 0; i < (size_t) table.get_current_page_size (); ++i) {
         put_data (table.get_candidate_in_current_page (i));
         put_data (table.get_attributes_in_current_page (i));
     }

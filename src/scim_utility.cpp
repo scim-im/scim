@@ -240,7 +240,7 @@ utf8_mbstowcs (const char *str, int len)
 
         if (len < 0) len = strlen (str);
 
-        while (sn < len && *str != 0 && (un=utf8_mbtowc (&wc, (const unsigned char *)str, len - sn)) > 0) {
+        while (sn < (unsigned int) len && *str != 0 && (un=utf8_mbtowc (&wc, (const unsigned char *)str, len - sn)) > 0) {
             wstr.push_back (wc);
             str += un;
             sn += un;
@@ -274,7 +274,7 @@ utf8_wcstombs (const ucs4_t *wstr, int len)
 
     if (wstr) {
         if (len < 0)
-            for (len = 0; wstr [len]; ++len) NULL;
+            for (len = 0; wstr [len]; ++len) {}
 
         for (int i = 0; i < len; ++i) {
             un = utf8_wctomb ((unsigned char*)utf8, wstr [i], 6);
@@ -997,7 +997,6 @@ int  scim_launch (bool          daemon,
 
     int   new_argc = 0;
     char *new_argv [40];
-    char verbose_buf [10];
 
     new_argv [new_argc ++] = strdup (SCIM_LAUNCHER);
 

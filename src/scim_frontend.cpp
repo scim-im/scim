@@ -26,16 +26,11 @@
 #define Uses_SCIM_FRONTEND
 #include "scim_private.h"
 #include "scim.h"
+#include "scim_stl_map.h"
 
 namespace scim {
 
-#if SCIM_USE_STL_EXT_HASH_MAP
-typedef __gnu_cxx::hash_map <int, IMEngineInstancePointer, __gnu_cxx::hash <int> >  IMEngineInstanceRepository;
-#elif SCIM_USE_STL_HASH_MAP
-typedef std::hash_map <int, IMEngineInstancePointer, std::::hash <int> >            IMEngineInstanceRepository;
-#else
-typedef std::map <int, IMEngineInstancePointer>                                     IMEngineInstanceRepository;
-#endif
+typedef scim_map <int, IMEngineInstancePointer>                          IMEngineInstanceRepository;
 
 class FrontEndBase::FrontEndBaseImpl
 {

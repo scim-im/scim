@@ -35,13 +35,7 @@
 
 namespace scim {
 
-#if SCIM_USE_STL_EXT_HASH_MAP
-typedef __gnu_cxx::hash_map <String, IMEngineFactoryPointer, scim_hash_string >     IMEngineFactoryRepository;
-#elif SCIM_USE_STL_HASH_MAP
-typedef std::hash_map <String, IMEngineFactoryPointer, scim_hash_string >           IMEngineFactoryRepository;
-#else
-typedef std::map <String, IMEngineFactoryPointer>                                   IMEngineFactoryRepository;
-#endif
+typedef scim_map <String, IMEngineFactoryPointer>                         IMEngineFactoryRepository;
 
 typedef std::vector <IMEngineFactoryPointer>                                        IMEngineFactoryPointerVector;
 
