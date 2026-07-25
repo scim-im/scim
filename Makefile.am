@@ -26,11 +26,7 @@ AUX_DIST                = $(ac_aux_dir)/config.guess \
 
 EXTRA_DIST		= config.rpath THANKS \
 			  mkinstalldirs \
-			  bootstrap \
-			  scim.spec \
-			  intltool-extract.in \
-			  intltool-merge.in \
-			  intltool-update.in
+			  bootstrap
 
 AUTOMAKE_OPTIONS 	= gnu
 SUBDIRS 		= src utils modules configs po extras data docs tests
@@ -41,7 +37,7 @@ MAINTAINERCLEANFILES 	= Makefile.in \
 			  config.h.in \
 			  $(AUX_DIST)
 
-DISTCLEANFILES		= scim.pc scim-gtkutils.pc intltool-extract intltool-merge intltool-update
+DISTCLEANFILES		= scim.pc scim-gtkutils.pc
 
 CLEANFILES		= *.bak *.tar.*
 

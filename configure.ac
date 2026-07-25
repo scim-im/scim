@@ -931,8 +931,7 @@ AC_CONFIG_FILES([Makefile
 		 tests/Makefile
 		 scim.pc
 		 scim-gtkutils.pc
-		 scim-x11utils.pc
-		 scim.spec])
+		 scim-x11utils.pc])
 AC_OUTPUT
 
 AC_MSG_RESULT([

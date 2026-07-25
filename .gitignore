@@ -63,7 +63,6 @@ Makefile.in
 /scim.pc
 /scim-gtkutils.pc
 /scim-x11utils.pc
-/scim.spec
 /src/scim_types.h
 /docs/scim.cfg
 /extras/setup/scim-setup
