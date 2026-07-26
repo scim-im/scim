@@ -216,6 +216,17 @@ FrontEndBase::get_factory_list_for_encoding (std::vector<String>& uuids, const S
     return uuids.size ();
 }
 
+void
+FrontEndBase::reload_disabled_factories ()
+{
+    // The reload logic lives on CommonBackEnd; other BackEndBase subclasses
+    // have no disabled-factory list to re-apply.
+    BackEndBase   *backend = m_impl->m_backend;   // Pointer<> -> raw
+    CommonBackEnd *cb      = dynamic_cast <CommonBackEnd *> (backend);
+    if (cb)
+        cb->reload_disabled_factories ();
+}
+
 uint32
 FrontEndBase::get_factory_list_for_language (std::vector<String>& uuids, const String &language) const
 {

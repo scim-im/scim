@@ -34,6 +34,7 @@
 #include <errno.h>
 #include <cstring>
 #include <sys/select.h>
+#include <poll.h>
 
 #include "scim_private.h"
 #include "scim.h"
@@ -44,6 +45,9 @@
 #define scim_module_exit           wayland_LTX_scim_module_exit
 #define scim_frontend_module_init  wayland_LTX_scim_frontend_module_init
 #define scim_frontend_module_run   wayland_LTX_scim_frontend_module_run
+#define scim_frontend_module_poll_fds       wayland_LTX_scim_frontend_module_poll_fds
+#define scim_frontend_module_process_events wayland_LTX_scim_frontend_module_process_events
+#define scim_frontend_module_has_exited     wayland_LTX_scim_frontend_module_has_exited
 
 #define SCIM_CONFIG_FRONTEND_WAYLAND_LANGUAGE  "/FrontEnd/Wayland/Language"
 
@@ -91,6 +95,22 @@ extern "C" {
             SCIM_DEBUG_FRONTEND(1) << "Starting Wayland FrontEnd module...\n";
             _scim_frontend->run ();
         }
+    }
+
+    bool scim_frontend_module_poll_fds (std::vector<int> &fds)
+    {
+        return !_scim_frontend.null () ? _scim_frontend->poll_fds (fds) : false;
+    }
+
+    void scim_frontend_module_process_events (void)
+    {
+        if (!_scim_frontend.null ())
+            _scim_frontend->process_events ();
+    }
+
+    bool scim_frontend_module_has_exited (void)
+    {
+        return !_scim_frontend.null () ? _scim_frontend->has_exited () : false;
     }
 }
 
@@ -240,6 +260,44 @@ WaylandFrontEnd::init (int /*argc*/, char ** /*argv*/)
     wl_display_roundtrip (m_display);
 }
 
+bool
+WaylandFrontEnd::poll_fds (std::vector<int> &fds)
+{
+    if (m_display)
+        fds.push_back (wl_display_get_fd (m_display));
+    return true;
+}
+
+void
+WaylandFrontEnd::process_events ()
+{
+    if (!m_display)
+        return;
+
+    // Non-blocking dispatch: dispatch anything already queued, then read from
+    // the fd only if data is actually available (this method may be called by
+    // the shared loop when another frontend's fd woke the select).
+    if (wl_display_prepare_read (m_display) == 0) {
+        struct pollfd pfd;
+        pfd.fd = wl_display_get_fd (m_display);
+        pfd.events = POLLIN;
+        pfd.revents = 0;
+        if (poll (&pfd, 1, 0) > 0 && (pfd.revents & POLLIN))
+            wl_display_read_events (m_display);
+        else
+            wl_display_cancel_read (m_display);
+    } else {
+        wl_display_dispatch_pending (m_display);
+    }
+
+    if (wl_display_dispatch_pending (m_display) < 0) {
+        m_should_exit = true;
+        return;
+    }
+    if (wl_display_flush (m_display) < 0 && errno != EAGAIN)
+        m_should_exit = true;
+}
+
 void
 WaylandFrontEnd::run ()
 {
@@ -249,11 +307,28 @@ WaylandFrontEnd::run ()
     m_should_exit = false;
 
     while (!m_should_exit) {
-        // Flush outgoing requests, then block for the next batch of events.
-        if (wl_display_flush (m_display) < 0 && errno != EAGAIN)
+        process_events ();
+        if (m_should_exit)
             break;
-        if (wl_display_dispatch (m_display) < 0)
+
+        std::vector<int> fds;
+        poll_fds (fds);
+        if (fds.empty ())
             break;
+
+        fd_set read_fds;
+        FD_ZERO (&read_fds);
+        int max_fd = -1;
+        for (size_t i = 0; i < fds.size (); ++i) {
+            FD_SET (fds[i], &read_fds);
+            if (fds[i] > max_fd) max_fd = fds[i];
+        }
+
+        if (select (max_fd + 1, &read_fds, NULL, NULL, NULL) < 0) {
+            if (errno == EINTR)
+                continue;
+            break;
+        }
     }
 }
 

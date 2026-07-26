@@ -60,6 +60,9 @@
 #define scim_module_exit x11_LTX_scim_module_exit
 #define scim_frontend_module_init x11_LTX_scim_frontend_module_init
 #define scim_frontend_module_run x11_LTX_scim_frontend_module_run
+#define scim_frontend_module_poll_fds x11_LTX_scim_frontend_module_poll_fds
+#define scim_frontend_module_process_events x11_LTX_scim_frontend_module_process_events
+#define scim_frontend_module_has_exited x11_LTX_scim_frontend_module_has_exited
 
 #define SCIM_CONFIG_FRONTEND_X11_BROKEN_WCHAR    "/FrontEnd/X11/BrokenWchar"
 #define SCIM_CONFIG_FRONTEND_X11_DYNAMIC         "/FrontEnd/X11/Dynamic"
@@ -107,6 +110,22 @@ extern "C" {
             SCIM_DEBUG_FRONTEND(1) << "Starting X11 FrontEnd module...\n";
             _scim_frontend->run ();
         }
+    }
+
+    bool scim_frontend_module_poll_fds (std::vector<int> &fds)
+    {
+        return !_scim_frontend.null () ? _scim_frontend->poll_fds (fds) : false;
+    }
+
+    void scim_frontend_module_process_events (void)
+    {
+        if (!_scim_frontend.null ())
+            _scim_frontend->process_events ();
+    }
+
+    bool scim_frontend_module_has_exited (void)
+    {
+        return !_scim_frontend.null () ? _scim_frontend->has_exited () : false;
     }
 }
 
@@ -518,6 +537,55 @@ X11FrontEnd::init (int argc, char **argv)
     m_fallback_instance->signal_connect_commit_string (slot (this, &X11FrontEnd::fallback_commit_string_cb));
 }
 
+bool
+X11FrontEnd::poll_fds (std::vector<int> &fds)
+{
+    if (m_display)
+        fds.push_back (ConnectionNumber (m_display));
+
+    int panel_fd = m_panel_client.get_connection_number ();
+    if (panel_fd >= 0)
+        fds.push_back (panel_fd);
+
+#ifdef SCIM_HAS_PANEL_UI
+    int panel_ui_fd = m_panel_ui.connection_number ();
+    if (panel_ui_fd >= 0)
+        fds.push_back (panel_ui_fd);
+#endif
+
+    return true;
+}
+
+void
+X11FrontEnd::process_events ()
+{
+    if (!m_display)
+        return;
+
+    // Drain events already queued from the X server.
+    XEvent event;
+    while (XPending (m_display)) {
+        XNextEvent (m_display, &event);
+        XFilterEvent (&event, None);
+    }
+
+#ifdef SCIM_HAS_PANEL_UI
+    m_panel_ui.process_events ();
+#endif
+
+    // Handle panel-daemon socket, reconnecting if the connection dropped.
+    if (m_panel_client.is_connected () && m_panel_client.has_pending_event ()) {
+        if (!m_panel_client.filter_event ()) {
+            SCIM_DEBUG_FRONTEND(1) << "X11 -- Lost connection with panel daemon, re-establish it!\n";
+            m_panel_client.close_connection ();
+            if (m_panel_client.open_connection (m_config->get_name (), m_display_name) < 0)
+                SCIM_DEBUG_FRONTEND(1) << "X11 -- Can't re-establish connection with panel daemon!\n";
+        }
+    }
+
+    XFlush (m_display);
+}
+
 void
 X11FrontEnd::run ()
 {
@@ -526,80 +594,33 @@ X11FrontEnd::run ()
         return;
     }
 
-    XEvent event;
-
-    fd_set read_fds, active_fds;
-
-    int panel_fd = m_panel_client.get_connection_number ();
-    int xserver_fd = ConnectionNumber (m_display);
-    int max_fd = (panel_fd > xserver_fd) ? panel_fd : xserver_fd;
-
-    FD_ZERO (&active_fds);
-    FD_SET (panel_fd, &active_fds);
-    FD_SET (xserver_fd, &active_fds);
-
-#ifdef SCIM_HAS_PANEL_UI
-    int panel_ui_fd = m_panel_ui.connection_number ();
-    if (panel_ui_fd >= 0) {
-        FD_SET (panel_ui_fd, &active_fds);
-        if (panel_ui_fd > max_fd) max_fd = panel_ui_fd;
-    }
-#endif
-
     m_should_exit = false;
 
-    // Select between the X Server and the Panel GUI.
+    // Select between the X Server, the Panel GUI and the Cairo renderer.
     while (!m_should_exit) {
-        int ret;
+        // Handle anything already buffered, then block for the next batch.
+        process_events ();
+        if (m_should_exit)
+            break;
 
-        read_fds = active_fds;
+        std::vector<int> fds;
+        poll_fds (fds);
 
-        // Process the events which are already send to me from the X Server
-        // before calling select.
-        while (XPending (m_display)) {
-            XNextEvent (m_display, &event);
-            XFilterEvent (&event, None);
+        fd_set read_fds;
+        FD_ZERO (&read_fds);
+        int max_fd = -1;
+        for (size_t i = 0; i < fds.size (); ++i) {
+            FD_SET (fds[i], &read_fds);
+            if (fds[i] > max_fd) max_fd = fds[i];
         }
 
-#ifdef SCIM_HAS_PANEL_UI
-        // Drain any buffered events on the renderer's own X connection.
-        if (panel_ui_fd >= 0)
-            m_panel_ui.process_events ();
-#endif
-
-        if ((ret = select (max_fd + 1, &read_fds, NULL, NULL, NULL)) < 0) {
+        if (select (max_fd + 1, &read_fds, NULL, NULL, NULL) < 0) {
+            if (errno == EINTR)
+                continue;
             SCIM_DEBUG_FRONTEND(1) << "X11 -- Error when watching events!\n";
             return;
         }
-
-        if (m_should_exit) break;
-
-#ifdef SCIM_HAS_PANEL_UI
-        if (panel_ui_fd >= 0 && FD_ISSET (panel_ui_fd, &read_fds))
-            m_panel_ui.process_events ();
-#endif
-
-        if (FD_ISSET (panel_fd, &read_fds)) {
-            if (!m_panel_client.filter_event ()) {
-                SCIM_DEBUG_FRONTEND(1) << "X11 -- Lost connection with panel daemon, re-establish it!\n";
-
-                m_panel_client.close_connection ();
-
-                max_fd = xserver_fd;
-                FD_ZERO (&active_fds);
-                FD_SET (xserver_fd, &active_fds);
-
-                if (m_panel_client.open_connection (m_config->get_name (), m_display_name) >= 0) {
-                    panel_fd = m_panel_client.get_connection_number ();
-                    FD_SET (panel_fd, &active_fds);
-                    max_fd = (panel_fd > xserver_fd) ? panel_fd : xserver_fd;
-                } else {
-                    panel_fd = -1;
-                    SCIM_DEBUG_FRONTEND(1) << "X11 -- Lost connection with panel daemon, can't re-establish it!\n";
-                }
-            }
-        }
-        // X Events will be processed at beginning of the loop.
+        // Ready events are handled by process_events() at the top of the loop.
     }
 }
 

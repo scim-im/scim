@@ -22,6 +22,9 @@ SCIM_SETUP_PNG = scim-setup.png
 endif
 
 pixmapsdir = $(datadir)/pixmaps
-pixmaps_DATA = $(SCIM_SETUP_PNG)
+# scim.png is the trademark logo under the name the desktop entries reference as
+# Icon=scim. Without it in an icon-theme search path that name resolves to
+# nothing, so those entries show a generic placeholder.
+pixmaps_DATA = $(SCIM_SETUP_PNG) scim.png
 
-EXTRA_DIST = scim-setup.png
+EXTRA_DIST = scim-setup.png scim.png

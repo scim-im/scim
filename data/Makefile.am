@@ -19,3 +19,10 @@ MAINTAINERCLEANFILES	= Makefile.in
 CLEANFILES		= *.bak
 
 SUBDIRS			= icons pixmaps
+
+# XDG autostart entry: launches "scim -d" at login. scim detects the
+# environment and becomes the native IM daemon or the GNOME/ibus sync
+# coordinator (see src/scim.cpp).
+autostartdir		= $(sysconfdir)/xdg/autostart
+autostart_DATA		= scim.desktop
+EXTRA_DIST		= scim.desktop

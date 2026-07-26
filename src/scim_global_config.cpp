@@ -425,6 +425,32 @@ scim_global_config_flush ()
     return false;
 }
 
+void
+scim_global_config_reload ()
+{
+    if (!__config_repository.initialized) {
+        __initialize_config ();
+        return;
+    }
+
+    // Preserve pending (not-yet-flushed) in-process changes across the reload,
+    // mirroring the merge policy in scim_global_config_flush ().
+    KeyValueRepository backup_usr     = __config_repository.usr;
+    KeyValueRepository backup_updated = __config_repository.updated;
+
+    __initialize_config ();   // re-read sys + usr from disk
+
+    for (KeyValueRepository::iterator it = backup_updated.begin ();
+         it != backup_updated.end (); ++it) {
+        if (it->second == "updated")
+            __config_repository.usr [it->first] = backup_usr [it->first];
+        else if (it->second == "erased")
+            __config_repository.usr.erase (it->first);
+    }
+
+    __config_repository.updated = backup_updated;
+}
+
 } // namespace scim
 
 /*

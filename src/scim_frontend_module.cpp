@@ -31,7 +31,10 @@ namespace scim {
 
 FrontEndModule::FrontEndModule ()
     : m_frontend_init (0),
-      m_frontend_run (0)
+      m_frontend_run (0),
+      m_frontend_poll_fds (0),
+      m_frontend_process_events (0),
+      m_frontend_has_exited (0)
 {
 }
 
@@ -41,7 +44,10 @@ FrontEndModule::FrontEndModule (const String &name,
                                 int argc,
                                 char **argv)
     : m_frontend_init (0),
-      m_frontend_run (0)
+      m_frontend_run (0),
+      m_frontend_poll_fds (0),
+      m_frontend_process_events (0),
+      m_frontend_has_exited (0)
 {
     load (name, backend, config, argc, argv);
 }
@@ -67,6 +73,14 @@ FrontEndModule::load (const String &name,
             return false;
         }
 
+        // Optional cooperative-run interface (may be absent).
+        m_frontend_poll_fds =
+            (FrontEndModulePollFdsFunc) m_module.symbol ("scim_frontend_module_poll_fds");
+        m_frontend_process_events =
+            (FrontEndModuleProcessEventsFunc) m_module.symbol ("scim_frontend_module_process_events");
+        m_frontend_has_exited =
+            (FrontEndModuleHasExitedFunc) m_module.symbol ("scim_frontend_module_has_exited");
+
         m_frontend_init (backend, config, argc, argv);
     } catch (...) {
         /* Don't unload FrontEnd module to avoid possible crash, when the
@@ -75,6 +89,9 @@ FrontEndModule::load (const String &name,
          */
         m_frontend_init = 0;
         m_frontend_run = 0;
+        m_frontend_poll_fds = 0;
+        m_frontend_process_events = 0;
+        m_frontend_has_exited = 0;
         return false;
     }
 
@@ -92,6 +109,35 @@ FrontEndModule::run () const
 {
     if (valid ())
         m_frontend_run ();
+}
+
+bool
+FrontEndModule::supports_cooperative_run () const
+{
+    return valid () && m_frontend_poll_fds && m_frontend_process_events;
+}
+
+bool
+FrontEndModule::poll_fds (std::vector<int> &fds) const
+{
+    if (m_frontend_poll_fds)
+        return m_frontend_poll_fds (fds);
+    return false;
+}
+
+void
+FrontEndModule::process_events () const
+{
+    if (m_frontend_process_events)
+        m_frontend_process_events ();
+}
+
+bool
+FrontEndModule::has_exited () const
+{
+    if (m_frontend_has_exited)
+        return m_frontend_has_exited ();
+    return false;
 }
 
 int scim_get_frontend_module_list (std::vector <String>& mod_list)

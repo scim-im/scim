@@ -32,12 +32,13 @@
 #include "scim_private.h"
 #include "scim.h"
 #include <sys/types.h>
+#include <sys/select.h>
 #include <unistd.h>
 #include <signal.h>
+#include <errno.h>
 
 using namespace scim;
 
-FrontEndModule *frontend_module = 0;
 ConfigModule   *config_module = 0;
 ConfigPointer   config;
 
@@ -52,6 +53,49 @@ void signalhandler(int sig)
     exit (0);
 }
 
+// Service several frontends in one process via a shared select() loop, so a
+// Wayland session can run wayland.so (native apps) and x11.so (XWayland apps)
+// against one backend. Each frontend drains its own fds non-blocking.
+static void
+run_frontends_cooperatively (const std::vector<FrontEndModule *> &modules)
+{
+    bool exited = false;
+
+    while (!exited) {
+        std::vector<int> fds;
+
+        // Drain anything already buffered, then gather the fds to watch.
+        for (size_t i = 0; i < modules.size (); ++i) {
+            modules[i]->process_events ();
+            if (modules[i]->has_exited ())
+                exited = true;
+        }
+        if (exited)
+            break;
+
+        for (size_t i = 0; i < modules.size (); ++i)
+            modules[i]->poll_fds (fds);
+
+        if (fds.empty ())
+            break;
+
+        fd_set read_fds;
+        FD_ZERO (&read_fds);
+        int max_fd = -1;
+        for (size_t i = 0; i < fds.size (); ++i) {
+            FD_SET (fds[i], &read_fds);
+            if (fds[i] > max_fd) max_fd = fds[i];
+        }
+
+        if (select (max_fd + 1, &read_fds, NULL, NULL, NULL) < 0) {
+            if (errno == EINTR)
+                continue;
+            break;
+        }
+        // Ready events are handled by process_events() at the top of the loop.
+    }
+}
+
 int main (int argc, char *argv [])
 {
     BackEndPointer      backend;
@@ -59,7 +103,7 @@ int main (int argc, char *argv [])
     std::vector<String> engine_list;
 
     String config_name   ("simple");
-    String frontend_name ("socket");
+    String frontend_name ("socket");   // may be a comma-separated list
 
     int   new_argc = 0;
     char *new_argv [40];
@@ -201,12 +245,51 @@ int main (int argc, char *argv [])
         std::cerr << "Creating backend ...\n";
         backend = new CommonBackEnd (config, engine_list);
 
-        //load FrontEnd module
-        std::cerr << "Loading " << frontend_name << " FrontEnd module ...\n";
-        frontend_module = new FrontEndModule (frontend_name, backend, config, new_argc, new_argv);
+        //load FrontEnd module(s) -- "-f" may name several, comma-separated,
+        //to run e.g. wayland + x11 concurrently against one backend.
+        std::vector<String> frontend_names;
+        scim_split_string_list (frontend_names, frontend_name, ',');
 
-        if (!frontend_module || !frontend_module->valid ()) {
-            std::cerr << "Failed to load " << frontend_name << " FrontEnd module.\n";
+        // When several frontends are requested (e.g. "wayland,x11"), one that
+        // cannot initialize on this session is skipped rather than fatal, so
+        // the list degrades gracefully (e.g. wayland.so is dropped on a pure
+        // X11 or GNOME session, leaving x11.so). A lone frontend that fails is
+        // still a hard error.
+        bool multi = frontend_names.size () > 1;
+
+        std::vector<FrontEndModule *> frontend_modules;
+        for (size_t n = 0; n < frontend_names.size (); ++n) {
+            std::cerr << "Loading " << frontend_names[n] << " FrontEnd module ...\n";
+            FrontEndModule *fem =
+                new FrontEndModule (frontend_names[n], backend, config, new_argc, new_argv);
+
+            if (!fem || !fem->valid ()) {
+                std::cerr << "Failed to load " << frontend_names[n]
+                          << " FrontEnd module" << (multi ? " (skipping).\n" : ".\n");
+                delete fem;
+                if (!multi) return 1;
+                continue;
+            }
+            frontend_modules.push_back (fem);
+        }
+
+        if (frontend_modules.empty ()) {
+            std::cerr << "No FrontEnd module could be loaded.\n";
+            return 1;
+        }
+
+        // Running several frontends at once requires each to support the
+        // cooperative (poll-fds / process-events) interface.
+        bool cooperative = frontend_modules.size () > 1;
+        for (size_t n = 0; n < frontend_modules.size (); ++n) {
+            if (!frontend_modules[n]->supports_cooperative_run ())
+                cooperative = false;
+        }
+        if (frontend_modules.size () > 1 && !cooperative) {
+            std::cerr << "Cannot run the requested frontends together: at least "
+                         "one does not support cooperative running.\n";
+            for (size_t j = 0; j < frontend_modules.size (); ++j)
+                delete frontend_modules[j];
             return 1;
         }
 
@@ -225,7 +308,10 @@ int main (int argc, char *argv [])
             std::cerr << "Starting SCIM ...\n";
         }
 
-        frontend_module->run ();
+        if (cooperative)
+            run_frontends_cooperatively (frontend_modules);
+        else
+            frontend_modules[0]->run ();
     } catch (const std::exception & err) {
         std::cerr << err.what () << "\n";
         return 1;

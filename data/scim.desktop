@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=SCIM Input Method
+GenericName=Input Method
+Comment=Start the Smart Common Input Method platform
+Exec=scim -d
+Icon=scim
+Terminal=false
+Categories=Utility;
+# Runs on every session: scim -d detects the environment and either becomes the
+# native input-method daemon (X11/KDE/wlroots) or the GNOME/ibus engine-list
+# sync coordinator, supervising and restarting its child on crash.

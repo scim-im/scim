@@ -225,6 +225,16 @@ protected:
      */
     String get_all_locales () const;
 
+    /**
+     * @brief Re-apply the disabled IMEngine factory list.
+     *
+     * Asks the backend to re-read /DisabledIMEngineFactories and reconcile its
+     * loaded factories (see CommonBackEnd::reload_disabled_factories). A no-op
+     * for backends that are not a CommonBackEnd. Lets a frontend refresh the
+     * enabled-engine set without restarting when the config changes.
+     */
+    void reload_disabled_factories ();
+
     // IMEngine instance related functions.
 
     /**

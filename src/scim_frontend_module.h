@@ -26,8 +26,7 @@
  * $Id: scim_frontend_module.h,v 1.16 2005/01/10 08:30:54 suzhe Exp $
  */
 
-#ifndef __SCIM_FRONTEND_MODULE_H
-#define __SCIM_FRONTEND_MODULE_H
+#pragma once
 
 namespace scim {
 
@@ -63,17 +62,45 @@ typedef void (*FrontEndModuleInitFunc) (const BackEndPointer &backend,
 typedef void (*FrontEndModuleRunFunc)  (void);
 
 /**
+ * @brief Collect the file descriptors a frontend needs watched.
+ *
+ * Optional. A frontend that can run cooperatively in a shared event loop
+ * (alongside other frontends in one process) provides a function called
+ * "scim_frontend_module_poll_fds" which appends its fds to @a fds and returns
+ * true. Frontends without it can only run as the sole frontend via run().
+ */
+typedef bool (*FrontEndModulePollFdsFunc) (std::vector<int> &fds);
+
+/**
+ * @brief Non-blocking dispatch of a frontend's pending events.
+ *
+ * Optional companion to the poll-fds function ("scim_frontend_module_process_events").
+ * Drains and handles whatever is ready on the frontend's fds and flushes.
+ */
+typedef void (*FrontEndModuleProcessEventsFunc) (void);
+
+/**
+ * @brief Whether a cooperatively-run frontend has asked to stop.
+ *
+ * Optional ("scim_frontend_module_has_exited").
+ */
+typedef bool (*FrontEndModuleHasExitedFunc) (void);
+
+/**
  * @brief The class to manipulate the frontend modules.
  *
  * This is a wrapper of scim::Module class, which is specially
  * for manipulating the frontend modules.
  */
-class FrontEndModule 
+class FrontEndModule
 {
     Module       m_module;
 
     FrontEndModuleInitFunc m_frontend_init;
     FrontEndModuleRunFunc m_frontend_run;
+    FrontEndModulePollFdsFunc       m_frontend_poll_fds;
+    FrontEndModuleProcessEventsFunc m_frontend_process_events;
+    FrontEndModuleHasExitedFunc     m_frontend_has_exited;
 
     FrontEndModule (const FrontEndModule &);
     FrontEndModule & operator= (const FrontEndModule &);
@@ -129,6 +156,28 @@ public:
      * @brief run this FrontEnd module.
      */
     void run () const;
+
+    /**
+     * @brief Whether this frontend can run cooperatively in a shared loop
+     *        (i.e. it exports the poll-fds / process-events functions).
+     */
+    bool supports_cooperative_run () const;
+
+    /**
+     * @brief Append this frontend's watched fds to @a fds.
+     * @return true if the frontend supports cooperative running.
+     */
+    bool poll_fds (std::vector<int> &fds) const;
+
+    /**
+     * @brief Non-blocking dispatch of this frontend's pending events.
+     */
+    void process_events () const;
+
+    /**
+     * @brief Whether this frontend has asked the shared loop to stop.
+     */
+    bool has_exited () const;
 };
 
 /**
@@ -141,8 +190,6 @@ int scim_get_frontend_module_list (std::vector <String>& mod_list);
 /** @} */
 
 } // namespace scim
-
-#endif //__SCIM_FRONTEND_MODULE_H
 
 /*
 vi:ts=4:ai:nowrap:expandtab

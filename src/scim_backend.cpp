@@ -299,6 +299,18 @@ public:
         return false;
     }
 
+    bool remove_factory (const String &uuid)
+    {
+        IMEngineFactoryRepository::iterator it = m_factory_repository.find (uuid);
+
+        if (it != m_factory_repository.end ()) {
+            m_factory_repository.erase (it);
+            return true;
+        }
+
+        return false;
+    }
+
 private:
     void sort_factories (std::vector<IMEngineFactoryPointer> &factories) const
     {
@@ -370,6 +382,12 @@ BackEndBase::add_factory (const IMEngineFactoryPointer &factory)
     return m_impl->add_factory (factory);
 }
 
+bool
+BackEndBase::remove_factory (const String &uuid)
+{
+    return m_impl->remove_factory (uuid);
+}
+
 void
 BackEndBase::clear ()
 {
@@ -380,6 +398,8 @@ BackEndBase::clear ()
 struct CommonBackEnd::CommonBackEndImpl {
     IMEngineModule      *m_engine_modules;
     FilterManager       *m_filter_manager;
+    ConfigPointer        m_config;         // kept for on-demand module reload
+    std::vector<String>  m_modules;        // module names, indexes m_engine_modules
 
     CommonBackEndImpl () : m_engine_modules (0), m_filter_manager (0) { }
 };
@@ -418,6 +438,12 @@ CommonBackEnd::CommonBackEnd (const ConfigPointer       &config,
         std::cerr << err.what () << "\n";
         return;
     }
+
+    // Keep what reload_disabled_factories () needs to re-apply the disabled
+    // list later: the config (to reload an unloaded module) and the module
+    // names (same indexing as m_engine_modules).
+    m_impl->m_config  = config;
+    m_impl->m_modules = new_modules;
 
     //load IMEngine modules
     for (size_t i = 0; i < new_modules.size (); ++i) {
@@ -493,6 +519,107 @@ CommonBackEnd::~CommonBackEnd ()
     delete [] m_impl->m_engine_modules;
     delete m_impl->m_filter_manager;
     delete m_impl;
+}
+
+void
+CommonBackEnd::reload_disabled_factories ()
+{
+    if (!m_impl || !m_impl->m_engine_modules)
+        return;
+
+    // Pick up changes written by another process (e.g. scim-setup) and fetch
+    // the fresh disabled-factory list.
+    scim_global_config_reload ();
+
+    std::vector<String> disabled;
+    disabled = scim_global_config_read (SCIM_GLOBAL_CONFIG_DISABLED_IMENGINE_FACTORIES, disabled);
+
+    // Disable phase: drop any currently-loaded factory that is now disabled.
+    std::vector<IMEngineFactoryPointer> current;
+    get_factories_for_encoding (current, String ());
+    for (size_t i = 0; i < current.size (); ++i) {
+        String uuid = current [i]->get_uuid ();
+        if (std::find (disabled.begin (), disabled.end (), uuid) != disabled.end ())
+            remove_factory (uuid);
+    }
+
+    // Enable phase: add any installed-but-newly-enabled factory.
+    IMEngineFactoryPointer factory;
+    for (size_t i = 0; i < m_impl->m_modules.size (); ++i) {
+        const String &name = m_impl->m_modules [i];
+
+        // A module whose factories were all disabled at load time was
+        // unloaded; reload it on demand so a now-enabled factory can serve.
+        bool was_loaded = m_impl->m_engine_modules [i].valid ();
+        if (!was_loaded)
+            m_impl->m_engine_modules [i].load (name, m_impl->m_config);
+
+        if (!m_impl->m_engine_modules [i].valid ())
+            continue;
+
+        int added = 0;
+        for (size_t j = 0; j < m_impl->m_engine_modules [i].number_of_factories (); ++j) {
+            try {
+                factory = m_impl->m_engine_modules [i].create_factory (j);
+            } catch (const std::exception & err) {
+                std::cerr << err.what () << "\n";
+                factory.reset ();
+            }
+
+            if (factory.null ())
+                continue;
+
+            String uuid = factory->get_uuid ();
+
+            // Skip if disabled, or already loaded (add_factory would no-op but
+            // avoid re-wrapping/re-creating an active factory).
+            if (std::find (disabled.begin (), disabled.end (), uuid) != disabled.end () ||
+                !get_factory (uuid).null ()) {
+                factory.reset ();
+                continue;
+            }
+
+            // Only load filter for none socket IMEngines.
+            if (name != "socket")
+                factory = m_impl->m_filter_manager->attach_filters_to_factory (factory);
+
+            if (add_factory (factory))
+                ++added;
+        }
+
+        // If we freshly loaded this module for the reload but nothing came of
+        // it, drop it again (matches constructor behaviour). Never unload a
+        // module that was already resident: live IMEngine instances may still
+        // reference its factories.
+        if (!was_loaded && added == 0)
+            m_impl->m_engine_modules [i].unload ();
+    }
+
+    // Keep the built-in Compose key factory in sync. It is always kept as a
+    // fallback when no other factory is enabled (mirrors the constructor).
+    {
+        IMEngineFactoryPointer compose = new ComposeKeyFactory ();
+        String compose_uuid = compose->get_uuid ();
+
+        std::vector<IMEngineFactoryPointer> loaded;
+        get_factories_for_encoding (loaded, String ());
+        size_t non_compose = 0;
+        for (size_t i = 0; i < loaded.size (); ++i)
+            if (loaded [i]->get_uuid () != compose_uuid)
+                ++non_compose;
+
+        bool compose_disabled =
+            std::find (disabled.begin (), disabled.end (), compose_uuid) != disabled.end ();
+
+        if (non_compose == 0 || !compose_disabled) {
+            if (get_factory (compose_uuid).null ()) {
+                compose = m_impl->m_filter_manager->attach_filters_to_factory (compose);
+                add_factory (compose);
+            }
+        } else {
+            remove_factory (compose_uuid);
+        }
+    }
 }
 
 

@@ -124,6 +124,12 @@ public:
     virtual void init (int argc, char **argv);
     virtual void run ();
 
+    // Cooperative-run interface: lets the launcher service this frontend in a
+    // shared select() loop alongside other frontends (e.g. x11 for XWayland).
+    bool poll_fds (std::vector<int> &fds);
+    void process_events ();
+    bool has_exited () const { return m_should_exit; }
+
 private:
     void reload_config_callback (const ConfigPointer &config);
 

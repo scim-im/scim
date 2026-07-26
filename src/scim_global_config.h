@@ -160,6 +160,16 @@ void scim_global_config_reset (const String &key);
  */
 bool scim_global_config_flush ();
 
+/**
+ * @brief Reload the global config from disk.
+ *
+ * Re-reads the system and user global config files, so changes written by
+ * another process (e.g. scim-setup toggling the disabled IMEngine list) become
+ * visible.  Any pending, not-yet-flushed writes made in this process are
+ * preserved on top of the reloaded values.
+ */
+void scim_global_config_reload ();
+
 /** @} */
 } // namespace scim
 

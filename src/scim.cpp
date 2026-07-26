@@ -32,13 +32,63 @@
 #include "scim_private.h"
 #include <scim.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 #include <signal.h>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <functional>
 
 using namespace scim;
 using std::cout;
 using std::cerr;
 using std::endl;
+
+#ifndef SCIM_IBUS_SYNC_PROGRAM
+  #define SCIM_IBUS_SYNC_PROGRAM  (SCIM_LIBEXECDIR "/scim-ibus-sync")
+#endif
+
+// fork+exec a program and wait for it; returns its exit status, or -1 if it
+// died on a signal / could not be run.
+static int spawn_wait (const char *program, char *const argv [])
+{
+    pid_t pid = fork ();
+    if (pid < 0) return -1;
+    if (pid == 0) {
+        execv (program, argv);
+        _exit (127);
+    }
+    int status;
+    if (waitpid (pid, &status, 0) == pid && WIFEXITED (status))
+        return WEXITSTATUS (status);
+    return -1;
+}
+
+// Run @launch (which blocks until the child exits, returning its status). When
+// @supervise is set, restart a crashed child with exponential backoff; a clean
+// exit (status 0) stops supervision. Without @supervise, run once and return.
+static int run_supervised (bool supervise, const std::function<int ()> &launch)
+{
+    unsigned backoff = 1;
+    for (;;) {
+        time_t start = time (0);
+        int rc = launch ();
+        if (!supervise)
+            return rc;
+        if (rc == 0) {
+            cerr << "SCIM: supervised child exited cleanly; stopping.\n";
+            return 0;
+        }
+        if (time (0) - start >= 3)
+            backoff = 1;   // ran a while before dying: reset the backoff
+        cerr << "SCIM: supervised child died (rc=" << rc << "); restarting in "
+             << backoff << "s.\n";
+        sleep (backoff);
+        if (backoff < 30)
+            backoff *= 2;
+    }
+}
 
 bool check_socket_frontend ()
 {
@@ -80,6 +130,8 @@ int main (int argc, char *argv [])
     bool daemon = false;
     bool socket = true;
     bool manual = false;
+    bool ibus_session = false;    // GNOME / ibus: run the sync coordinator
+    bool frontend_forced = false; // an explicit -f overrides env detection
 
     int   new_argc = 0;
     char *new_argv [80];
@@ -92,13 +144,44 @@ int main (int argc, char *argv [])
     scim_get_imengine_module_list (engine_list);
     scim_get_config_module_list   (config_list);
 
-    //Use x11 FrontEnd as default if available.
+    //Choose the default FrontEnd(s) from the environment.
     if (frontend_list.size ()) {
-        def_frontend = String ("x11");
-        if (std::find (frontend_list.begin (),
-                       frontend_list.end (),
-                       def_frontend) == frontend_list.end ())
+        bool have_x11 = std::find (frontend_list.begin (), frontend_list.end (),
+                                   String ("x11")) != frontend_list.end ();
+        bool have_wayland = std::find (frontend_list.begin (), frontend_list.end (),
+                                       String ("wayland")) != frontend_list.end ();
+
+        const char *wl_display = getenv ("WAYLAND_DISPLAY");
+        const char *session    = getenv ("XDG_SESSION_TYPE");
+        bool wayland_session = (wl_display && *wl_display) ||
+                               (session && String (session) == "wayland");
+
+        // On a Wayland session prefer running wayland.so (native apps) and
+        // x11.so (XWayland apps) together in one daemon. The launcher skips
+        // wayland.so if it can't bind input-method-v2 (e.g. GNOME), leaving
+        // x11.so, so "wayland,x11" is safe to default to everywhere.
+        if (wayland_session && have_wayland)
+            def_frontend = have_x11 ? String ("wayland,x11") : String ("wayland");
+        else if (have_x11)
+            def_frontend = String ("x11");
+        else
             def_frontend = frontend_list [0];
+    }
+
+    // GNOME (and any ibus session) serves the IME through ibus.so, launched by
+    // ibus-daemon -- not through our own frontends. There, this process's job
+    // is the persistent, backend-free engine-list sync coordinator instead. If
+    // the user explicitly forces our GTK module (GTK_IM_MODULE=scim), honour
+    // that and stay a normal daemon.
+    {
+        const char *desktop   = getenv ("XDG_CURRENT_DESKTOP");
+        const char *gtk_im    = getenv ("GTK_IM_MODULE");
+        const char *ibus_addr = getenv ("IBUS_ADDRESS");
+        bool force_scim = gtk_im && String (gtk_im) == "scim";
+        ibus_session = !force_scim &&
+            ((desktop   && strstr (desktop, "GNOME")) ||
+             (gtk_im    && String (gtk_im) == "ibus") ||
+             (ibus_addr && *ibus_addr));
     }
 
     //Add a dummy config module, it's not really a module!
@@ -152,6 +235,7 @@ int main (int argc, char *argv [])
                 return -1;
             }
             def_frontend = argv [i];
+            frontend_forced = true;
             continue;
         }
 
@@ -239,6 +323,27 @@ int main (int argc, char *argv [])
         }
     }
 
+    // GNOME / any ibus session: the IME is served by ibus.so via ibus-daemon,
+    // so we run the persistent, backend-free engine-list sync coordinator
+    // instead of our own frontends. It needs no frontend/config module, so it
+    // is decided BEFORE those availability checks. (Skipped when -f was given
+    // explicitly, or when the coordinator binary is not installed.)
+    {
+        const char *coord_env = getenv ("SCIM_IBUS_SYNC_PROGRAM");
+        String coord_prog = (coord_env && *coord_env) ? String (coord_env)
+                                                      : String (SCIM_IBUS_SYNC_PROGRAM);
+        if (ibus_session && !frontend_forced &&
+            access (coord_prog.c_str (), X_OK) == 0) {
+            cerr << "GNOME/ibus session: running the SCIM engine-list sync coordinator...\n";
+            if (daemon)
+                scim_daemon ();   // background ourselves; become the supervisor
+            char *coord_argv [] = { const_cast<char*> (coord_prog.c_str ()), 0 };
+            run_supervised (daemon,
+                            [&] () { return spawn_wait (coord_prog.c_str (), coord_argv); });
+            return 0;
+        }
+    }
+
     if (!def_frontend.length ()) {
         cerr << "No FrontEnd module is available!\n";
         return -1;
@@ -248,6 +353,12 @@ int main (int argc, char *argv [])
         cerr << "No Config module is available!\n";
         return -1;
     }
+
+    // Native path: become the supervisor -- in daemon mode background ourselves
+    // once, then hold and restart the frontend worker below (run with
+    // daemon=false so it stays our child and we can waitpid it).
+    if (daemon)
+        scim_daemon ();
 
     // If you try to use the socket feature manually,
     // then let you do it by yourself.
@@ -293,25 +404,20 @@ int main (int argc, char *argv [])
 
     cerr << "Launching a SCIM process with " << def_frontend << "...\n";
 
-    // Launch the scim process.
-    if (scim_launch (daemon,
-                     def_config,
-                     (load_engine_list.size () ? scim_combine_string_list (load_engine_list, ',') : "all"),
-                     def_frontend,
-                     new_argv) == 0) {
-        if (daemon)
-            cerr << "SCIM has been successfully launched.\n";
-        else
-            cerr << "SCIM has exited successfully.\n";
+    // Launch (and, in daemon mode, supervise) the frontend worker. The worker
+    // runs with daemon=false so it stays our child; we restart it on a crash.
+    String engines = load_engine_list.size ()
+                     ? scim_combine_string_list (load_engine_list, ',') : "all";
+    int rc = run_supervised (daemon, [&] () {
+        return scim_launch (false, def_config, engines, def_frontend, new_argv);
+    });
 
+    if (rc == 0) {
+        cerr << "SCIM has exited successfully.\n";
         return 0;
     }
 
-    if (daemon)
-        cerr << "Failed to launch SCIM.\n";
-    else
-        cerr << "SCIM has exited abnormally.\n";
-
+    cerr << "SCIM has exited abnormally.\n";
     return 1;
 }
 

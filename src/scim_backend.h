@@ -169,6 +169,8 @@ protected:
 
     bool add_factory (const IMEngineFactoryPointer &factory);
 
+    bool remove_factory (const String &uuid);
+
     void clear ();
 };
 
@@ -198,6 +200,21 @@ public:
                    const std::vector<String> &modules);
 
     virtual ~CommonBackEnd ();
+
+    /**
+     * @brief Re-apply the disabled IMEngine factory list.
+     *
+     * Reloads the global config from disk (picking up changes made by another
+     * process, e.g. scim-setup), then reconciles the loaded factories with the
+     * fresh /DisabledIMEngineFactories list: factories that became disabled are
+     * dropped, and factories that became enabled are (re)loaded from their
+     * IMEngine module -- including modules that were unloaded at startup
+     * because all of their factories were disabled.
+     *
+     * Existing IMEngine instances are not affected; the change takes effect for
+     * subsequently created instances.
+     */
+    void reload_disabled_factories ();
 };
 
 } // namespace scim
