@@ -175,6 +175,10 @@ WaylandFrontEnd::WaylandFrontEnd (const BackEndPointer &backend,
 {
     if (!_scim_frontend.null () && _scim_frontend != this)
         throw FrontEndError (String ("Wayland -- only one frontend can be created!"));
+
+#ifdef SCIM_HAS_KIMPANEL
+    m_use_kimpanel = false;
+#endif
 }
 
 WaylandFrontEnd::~WaylandFrontEnd ()
@@ -238,9 +242,28 @@ WaylandFrontEnd::init (int /*argc*/, char ** /*argv*/)
 
     start_grab ();
 
+#ifdef SCIM_HAS_KIMPANEL
+    // Prefer KDE kimpanel when running on Plasma (config override or desktop
+    // detection). When it connects it replaces the Cairo popup for candidates.
+    bool want_kimpanel =
+        m_config->read (String ("/Panel/UseKimpanel"),
+                        KimpanelAgent::desktop_prefers_kimpanel ());
+    if (want_kimpanel && m_kimpanel.connect ()) {
+        m_use_kimpanel = true;
+        m_kimpanel.signal_connect_select_candidate (
+            [this] (int idx) { if (m_instance >= 0 && m_focused) select_candidate (m_instance, idx); });
+        m_kimpanel.signal_connect_page_up (
+            [this] () { if (m_instance >= 0 && m_focused) lookup_table_page_up (m_instance); });
+        m_kimpanel.signal_connect_page_down (
+            [this] () { if (m_instance >= 0 && m_focused) lookup_table_page_down (m_instance); });
+        m_kimpanel.signal_connect_move_preedit_caret (
+            [this] (int pos) { if (m_instance >= 0 && m_focused) move_preedit_caret (m_instance, pos); });
+    }
+#endif
+
 #ifdef SCIM_HAS_PANEL_UI_WAYLAND
     // Cairo renderer on an input-popup-surface-v2 for aux + candidates.
-    if (m_compositor && m_shm &&
+    if (!use_kimpanel_ui () && m_compositor && m_shm &&
         m_panel_ui.init (m_display, m_compositor, m_shm, m_input_method, m_seat)) {
         m_panel_ui.signal_connect_candidate_selected (
             [this] (int idx) { panel_ui_select_candidate (idx); });
@@ -265,12 +288,24 @@ WaylandFrontEnd::poll_fds (std::vector<int> &fds)
 {
     if (m_display)
         fds.push_back (wl_display_get_fd (m_display));
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ()) {
+        int kfd = m_kimpanel.connection_number ();
+        if (kfd >= 0)
+            fds.push_back (kfd);
+    }
+#endif
     return true;
 }
 
 void
 WaylandFrontEnd::process_events ()
 {
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ())
+        m_kimpanel.process_events ();
+#endif
+
     if (!m_display)
         return;
 
@@ -423,6 +458,10 @@ WaylandFrontEnd::im_activate ()
     m_preedit_str = WideString ();
     m_preedit_caret = 0;
     m_focused = true;
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ())
+        m_kimpanel.enable (true);
+#endif
     focus_in (m_instance);
 }
 
@@ -438,6 +477,13 @@ WaylandFrontEnd::im_deactivate ()
     m_focused = false;
     m_preedit_str = WideString ();
     m_preedit_caret = 0;
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ()) {
+        m_kimpanel.show_aux_string (false);
+        m_kimpanel.show_lookup_table (false);
+        m_kimpanel.enable (false);
+    }
+#endif
 #ifdef SCIM_HAS_PANEL_UI_WAYLAND
     if (m_panel_ui.is_ready ()) {
         m_panel_ui.ui ().hide_aux_string ();
@@ -676,7 +722,7 @@ WaylandFrontEnd::forward_key_event (int id, const KeyEvent & /*key*/)
 }
 
 /* ------------------------------------------------------------------ */
-/* Aux + candidate lookup table -> input-popup-surface renderer        */
+/* Aux + candidate lookup table -> popup renderer or kimpanel           */
 /* ------------------------------------------------------------------ */
 
 #ifdef SCIM_HAS_PANEL_UI_WAYLAND
@@ -719,56 +765,102 @@ WaylandFrontEnd::panel_ui_page_down ()
         lookup_table_page_down (m_instance);
 }
 
+#endif // SCIM_HAS_PANEL_UI_WAYLAND
+
+#if defined(SCIM_HAS_PANEL_UI_WAYLAND) || defined(SCIM_HAS_KIMPANEL)
+
 void
 WaylandFrontEnd::update_aux_string (int id, const WideString & str,
                                     const AttributeList & attrs)
 {
-    if (id != m_instance || !m_panel_ui.is_ready ()) return;
-    m_panel_ui.ui ().update_aux_string (str, attrs);
-    refresh_panel_ui ();
+    if (id != m_instance) return;
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ()) { m_kimpanel.update_aux_string (str); return; }
+#endif
+#ifdef SCIM_HAS_PANEL_UI_WAYLAND
+    if (m_panel_ui.is_ready ()) {
+        m_panel_ui.ui ().update_aux_string (str, attrs);
+        refresh_panel_ui ();
+    }
+#endif
 }
 
 void
 WaylandFrontEnd::show_aux_string (int id)
 {
-    if (id != m_instance || !m_panel_ui.is_ready ()) return;
-    m_panel_ui.ui ().show_aux_string ();
-    refresh_panel_ui ();
+    if (id != m_instance) return;
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ()) { m_kimpanel.show_aux_string (true); return; }
+#endif
+#ifdef SCIM_HAS_PANEL_UI_WAYLAND
+    if (m_panel_ui.is_ready ()) {
+        m_panel_ui.ui ().show_aux_string ();
+        refresh_panel_ui ();
+    }
+#endif
 }
 
 void
 WaylandFrontEnd::hide_aux_string (int id)
 {
-    if (id != m_instance || !m_panel_ui.is_ready ()) return;
-    m_panel_ui.ui ().hide_aux_string ();
-    refresh_panel_ui ();
+    if (id != m_instance) return;
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ()) { m_kimpanel.show_aux_string (false); return; }
+#endif
+#ifdef SCIM_HAS_PANEL_UI_WAYLAND
+    if (m_panel_ui.is_ready ()) {
+        m_panel_ui.ui ().hide_aux_string ();
+        refresh_panel_ui ();
+    }
+#endif
 }
 
 void
 WaylandFrontEnd::update_lookup_table (int id, const LookupTable & table)
 {
-    if (id != m_instance || !m_panel_ui.is_ready ()) return;
-    m_panel_ui.ui ().update_lookup_table (table);
-    refresh_panel_ui ();
+    if (id != m_instance) return;
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ()) { m_kimpanel.update_lookup_table (table); return; }
+#endif
+#ifdef SCIM_HAS_PANEL_UI_WAYLAND
+    if (m_panel_ui.is_ready ()) {
+        m_panel_ui.ui ().update_lookup_table (table);
+        refresh_panel_ui ();
+    }
+#endif
 }
 
 void
 WaylandFrontEnd::show_lookup_table (int id)
 {
-    if (id != m_instance || !m_panel_ui.is_ready ()) return;
-    m_panel_ui.ui ().show_lookup_table ();
-    refresh_panel_ui ();
+    if (id != m_instance) return;
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ()) { m_kimpanel.show_lookup_table (true); return; }
+#endif
+#ifdef SCIM_HAS_PANEL_UI_WAYLAND
+    if (m_panel_ui.is_ready ()) {
+        m_panel_ui.ui ().show_lookup_table ();
+        refresh_panel_ui ();
+    }
+#endif
 }
 
 void
 WaylandFrontEnd::hide_lookup_table (int id)
 {
-    if (id != m_instance || !m_panel_ui.is_ready ()) return;
-    m_panel_ui.ui ().hide_lookup_table ();
-    refresh_panel_ui ();
+    if (id != m_instance) return;
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ()) { m_kimpanel.show_lookup_table (false); return; }
+#endif
+#ifdef SCIM_HAS_PANEL_UI_WAYLAND
+    if (m_panel_ui.is_ready ()) {
+        m_panel_ui.ui ().hide_lookup_table ();
+        refresh_panel_ui ();
+    }
+#endif
 }
 
-#endif // SCIM_HAS_PANEL_UI_WAYLAND
+#endif // SCIM_HAS_PANEL_UI_WAYLAND || SCIM_HAS_KIMPANEL
 
 /* ------------------------------------------------------------------ */
 /* Static listener trampolines                                         */

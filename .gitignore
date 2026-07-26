@@ -73,6 +73,9 @@ Makefile.in
 /protocols/*-protocol.c
 /protocols/*-client-protocol.h
 
+# Generated IBus component manifest (from scim.xml.in)
+/modules/FrontEnd/scim.xml
+
 # Built executables
 /src/scim
 /src/scim-launcher

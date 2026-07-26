@@ -44,6 +44,10 @@
 #include "scim_panel_ui_wayland.h"
 #endif
 
+#ifdef SCIM_HAS_KIMPANEL
+#include "scim_kimpanel_agent.h"
+#endif
+
 using namespace scim;
 
 class WaylandFrontEnd : public FrontEndBase
@@ -96,6 +100,13 @@ class WaylandFrontEnd : public FrontEndBase
     PanelUIWayland  m_panel_ui;
 #endif
 
+#ifdef SCIM_HAS_KIMPANEL
+    // KDE delegated candidate UI (D-Bus). When active it replaces the Cairo
+    // popup for aux + lookup; preedit still goes to the app.
+    KimpanelAgent   m_kimpanel;
+    bool            m_use_kimpanel;
+#endif
+
 public:
     WaylandFrontEnd (const BackEndPointer &backend,
                      const ConfigPointer  &config);
@@ -110,8 +121,9 @@ protected:
     virtual void commit_string         (int id, const WideString & str);
     virtual void forward_key_event     (int id, const KeyEvent & key);
 
-#ifdef SCIM_HAS_PANEL_UI_WAYLAND
-    // Aux string + candidate lookup table -> the input-popup-surface renderer.
+#if defined(SCIM_HAS_PANEL_UI_WAYLAND) || defined(SCIM_HAS_KIMPANEL)
+    // Aux string + candidate lookup table -> the input-popup-surface renderer
+    // or (on KDE) the kimpanel D-Bus backend.
     virtual void update_aux_string     (int id, const WideString & str, const AttributeList & attrs);
     virtual void show_aux_string       (int id);
     virtual void hide_aux_string       (int id);
@@ -156,6 +168,12 @@ private:
     void send_preedit ();
     KeyEvent wayland_key_to_scim (uint32_t key, uint32_t state) const;
     void forward_current_key ();
+
+#ifdef SCIM_HAS_KIMPANEL
+    bool use_kimpanel_ui () const { return m_use_kimpanel; }
+#else
+    bool use_kimpanel_ui () const { return false; }
+#endif
 
 #ifdef SCIM_HAS_PANEL_UI_WAYLAND
     void refresh_panel_ui ();

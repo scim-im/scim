@@ -17,6 +17,20 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 CLEANFILES		= *.bak
+EXTRA_DIST		= scim.xml.in
+
+# IBus component manifest: fill in the installed scim path and version, then
+# install into ibus-daemon's component directory.
+if SCIM_BUILD_FRONTEND_IBUS
+componentdir		= @IBUS_COMPONENT_DIR@
+component_DATA		= scim.xml
+CLEANFILES		+= scim.xml
+
+scim.xml: scim.xml.in Makefile
+	$(AM_V_GEN) $(SED) -e 's|@bindir[@]|$(bindir)|g' \
+	                   -e 's|@VERSION[@]|$(VERSION)|g' \
+	                   $(srcdir)/scim.xml.in > $@
+endif
 
 AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_builddir)/src \
@@ -47,6 +61,13 @@ PANEL_UI_LIBS		= $(top_builddir)/panel-ui/libscimpanelui.la \
 			  @CAIRO_LIBS@ @CAIRO_XLIB_LIBS@
 endif
 
+# Delegate candidates to KDE kimpanel over D-Bus when it was built.
+if SCIM_BUILD_KIMPANEL
+KIMPANEL_CFLAGS		= -DSCIM_HAS_KIMPANEL \
+			  -I$(top_srcdir)/panel-ui @DBUS_CFLAGS@
+KIMPANEL_LIBS		= $(top_builddir)/panel-ui/libscimkimpanel.la @DBUS_LIBS@
+endif
+
 if SCIM_BUILD_FRONTEND_SOCKET
 CONFIG_FRONTEND_SOCKET_MODULE	= socket.la
 endif
@@ -55,23 +76,29 @@ if SCIM_BUILD_FRONTEND_WAYLAND
 CONFIG_FRONTEND_WAYLAND_MODULE	= wayland.la
 endif
 
+if SCIM_BUILD_FRONTEND_IBUS
+CONFIG_FRONTEND_IBUS_MODULE	= ibus.la
+endif
+
 noinst_HEADERS		= scim_x11_ic.h \
 		  	  scim_x11_frontend.h \
 			  scim_socket_frontend.h \
-			  scim_wayland_frontend.h
+			  scim_wayland_frontend.h \
+			  scim_ibus_frontend.h
 
 moduledir		= $(libdir)/scim@SCIM_EPOCH@/$(SCIM_BINARY_VERSION)/FrontEnd
 
 module_LTLIBRARIES	= $(CONFIG_FRONTEND_X11_MODULE) \
 		     	  $(CONFIG_FRONTEND_SOCKET_MODULE) \
-		     	  $(CONFIG_FRONTEND_WAYLAND_MODULE)
+		     	  $(CONFIG_FRONTEND_WAYLAND_MODULE) \
+		     	  $(CONFIG_FRONTEND_IBUS_MODULE)
 
 x11_la_SOURCES 		= scim_x11_frontend.cpp \
 			  scim_x11_ic.cpp
 
-x11_la_CFLAGS		= @X_CFLAGS@ $(PANEL_UI_CFLAGS)
+x11_la_CFLAGS		= @X_CFLAGS@ $(PANEL_UI_CFLAGS) $(KIMPANEL_CFLAGS)
 
-x11_la_CXXFLAGS		= @X_CFLAGS@ $(PANEL_UI_CFLAGS)
+x11_la_CXXFLAGS		= @X_CFLAGS@ $(PANEL_UI_CFLAGS) $(KIMPANEL_CFLAGS)
 
 x11_la_LDFLAGS		= -avoid-version \
 		     	  -rpath $(moduledir) \
@@ -83,7 +110,8 @@ x11_la_LDFLAGS		= -avoid-version \
 x11_la_LIBADD		= IMdkit/libXimd.la \
 			  $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
 			  $(top_builddir)/utils/libscim-x11utils@SCIM_EPOCH@.la \
-			  $(PANEL_UI_LIBS)
+			  $(PANEL_UI_LIBS) \
+			  $(KIMPANEL_LIBS)
 
 socket_la_SOURCES 	= scim_socket_frontend.cpp
 
@@ -94,17 +122,34 @@ socket_la_LDFLAGS	= -avoid-version \
 
 socket_la_LIBADD	= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
 
+ibus_la_SOURCES 	= scim_ibus_frontend.cpp
+
+ibus_la_CFLAGS		= @IBUS_CFLAGS@ -DSCIM_BINDIR='"$(bindir)"'
+
+ibus_la_CXXFLAGS	= @IBUS_CFLAGS@ -DSCIM_BINDIR='"$(bindir)"'
+
+ibus_la_LDFLAGS		= -avoid-version \
+		     	  -rpath $(moduledir) \
+			  -module \
+			  @LIBTOOL_EXPORT_OPTIONS@ \
+			  @IBUS_LIBS@ \
+			  @LTLIBINTL@
+
+ibus_la_LIBADD		= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
+
 wayland_la_SOURCES 	= scim_wayland_frontend.cpp
 
 wayland_la_CFLAGS	= @WAYLAND_CFLAGS@ @CAIRO_CFLAGS@ \
 			  -DSCIM_HAS_PANEL_UI_WAYLAND \
 			  -I$(top_builddir)/protocols \
-			  -I$(top_srcdir)/panel-ui
+			  -I$(top_srcdir)/panel-ui \
+			  $(KIMPANEL_CFLAGS)
 
 wayland_la_CXXFLAGS	= @WAYLAND_CFLAGS@ @CAIRO_CFLAGS@ \
 			  -DSCIM_HAS_PANEL_UI_WAYLAND \
 			  -I$(top_builddir)/protocols \
-			  -I$(top_srcdir)/panel-ui
+			  -I$(top_srcdir)/panel-ui \
+			  $(KIMPANEL_CFLAGS)
 
 wayland_la_LDFLAGS	= -avoid-version \
 		     	  -rpath $(moduledir) \
@@ -116,5 +161,6 @@ wayland_la_LDFLAGS	= -avoid-version \
 
 wayland_la_LIBADD	= $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
 			  $(top_builddir)/protocols/libscimwlprotocols.la \
-			  $(top_builddir)/panel-ui/libscimpanelui-wayland.la
+			  $(top_builddir)/panel-ui/libscimpanelui-wayland.la \
+			  $(KIMPANEL_LIBS)
 

@@ -35,6 +35,10 @@
 #include "scim_panel_ui_x11.h"
 #endif
 
+#ifdef SCIM_HAS_KIMPANEL
+#include "scim_kimpanel_agent.h"
+#endif
+
 using namespace scim;
 
 class X11FrontEnd : public FrontEndBase
@@ -57,6 +61,13 @@ class X11FrontEnd : public FrontEndBase
     // open it draws the cursor-relative panel instead of forwarding those
     // updates to scim-panel-gtk; the panel process keeps the chrome.
     PanelUIX11              m_panel_ui;
+#endif
+
+#ifdef SCIM_HAS_KIMPANEL
+    // KDE delegated candidate UI (D-Bus). When active it takes the
+    // preedit/aux/lookup updates instead of the Cairo renderer or the panel.
+    KimpanelAgent           m_kimpanel;
+    bool                    m_use_kimpanel;
 #endif
 
     X11IC                  *m_focus_ic;
@@ -221,6 +232,16 @@ private:
     void reload_config_callback (const ConfigPointer &config);
 
     void fallback_commit_string_cb (IMEngineInstanceBase * si, const WideString & str);
+
+#ifdef SCIM_HAS_KIMPANEL
+    bool use_kimpanel_ui () const { return m_use_kimpanel; }
+    void kimpanel_select_candidate (int cand_index);
+    void kimpanel_page_up ();
+    void kimpanel_page_down ();
+    void kimpanel_move_preedit_caret (int pos);
+#else
+    bool use_kimpanel_ui () const { return false; }
+#endif
 
 #ifdef SCIM_HAS_PANEL_UI
     bool use_panel_ui () const { return m_panel_ui.is_open (); }

@@ -379,6 +379,15 @@ fi
 PKG_CHECK_MODULES(IBUS, [ibus-1.0 >= 1.5],
 			[SCIM_HAS_IBUS=yes],
 			[SCIM_HAS_IBUS=no])
+if test "$SCIM_HAS_IBUS" = "yes"; then
+  IBUS_COMPONENT_DIR=`$PKG_CONFIG --variable=pkgdatadir ibus-1.0 2>/dev/null`/component
+  AC_SUBST(IBUS_COMPONENT_DIR)
+fi
+
+# D-Bus, for the KDE kimpanel candidate UI backend.
+PKG_CHECK_MODULES(DBUS, [dbus-1],
+			[SCIM_HAS_DBUS=yes],
+			[SCIM_HAS_DBUS=no])
 
 
 # Checks for X11 header files.
@@ -494,10 +503,16 @@ AC_ARG_ENABLE([frontend-ibus],
 	[],
 	[enable_frontend_ibus=check])
 
+AC_ARG_ENABLE([kimpanel],
+	[AS_HELP_STRING([--enable-kimpanel],
+		[Build the KDE kimpanel D-Bus candidate UI backend (default: auto)])],
+	[],
+	[enable_kimpanel=check])
+
 AC_ARG_ENABLE([im-rawcode],
 	[AS_HELP_STRING([--disable-im-rawcode],
 		[Do not build RawCode IMEngine module])],
-	[], 
+	[],
 	[enable_im_rawcode=yes])
 
 AC_ARG_ENABLE([im-socket],
@@ -661,6 +676,21 @@ if test "$SCIM_HAS_CAIRO" = "yes" -a "$SCIM_HAS_CAIRO_XLIB" = "yes" -a "$have_x"
 else
   SCIM_BUILD_PANEL_UI=0
   enable_panel_ui=no
+fi
+
+# kimpanel D-Bus candidate UI backend: needs dbus-1.
+if test "$enable_kimpanel" != "no"; then
+  if test "$SCIM_HAS_DBUS" = "yes"; then
+    SCIM_BUILD_KIMPANEL=1
+    enable_kimpanel=yes
+  elif test "$enable_kimpanel" = "yes"; then
+    AC_MSG_ERROR([--enable-kimpanel requires dbus-1])
+  else
+    SCIM_BUILD_KIMPANEL=0
+    enable_kimpanel=no
+  fi
+else
+  SCIM_BUILD_KIMPANEL=0
 fi
 
 if test "$enable_im_rawcode" = "yes"; then
@@ -895,6 +925,9 @@ AM_CONDITIONAL(SCIM_BUILD_FRONTEND_IBUS,
 AM_CONDITIONAL(SCIM_BUILD_PANEL_UI,
 		[test "$enable_panel_ui" = "yes"])
 
+AM_CONDITIONAL(SCIM_BUILD_KIMPANEL,
+		[test "$enable_kimpanel" = "yes"])
+
 AM_CONDITIONAL(SCIM_BUILD_IMENGINE_SOCKET,
 		[test "$enable_im_socket" = "yes"])
 
@@ -946,6 +979,7 @@ AC_SUBST(SCIM_BUILD_FRONTEND_SOCKET)
 AC_SUBST(SCIM_BUILD_FRONTEND_WAYLAND)
 AC_SUBST(SCIM_BUILD_FRONTEND_IBUS)
 AC_SUBST(SCIM_BUILD_PANEL_UI)
+AC_SUBST(SCIM_BUILD_KIMPANEL)
 AC_SUBST(SCIM_BUILD_IMENGINE_RAWCODE)
 AC_SUBST(SCIM_BUILD_IMENGINE_TABLE)
 AC_SUBST(SCIM_BUILD_IMENGINE_SOCKET)
@@ -1045,6 +1079,7 @@ Module options:
   IBus FrontEnd module     $enable_frontend_ibus
 
   Cairo panel renderer     $enable_panel_ui
+  kimpanel D-Bus UI        $enable_kimpanel
 
   RawCode IMEngine module  $enable_im_rawcode
   Socket IMEngine module   $enable_im_socket
