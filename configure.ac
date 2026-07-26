@@ -358,6 +358,28 @@ if test "$SCIM_HAS_QT6" = "yes"; then
   AC_LANG_POP
 fi
 
+# Wayland input-method-v2 FrontEnd + Cairo/Pango candidate renderer dependencies.
+PKG_CHECK_MODULES(WAYLAND, [wayland-client >= 1.20 xkbcommon],
+			[SCIM_HAS_WAYLAND=yes],
+			[SCIM_HAS_WAYLAND=no])
+AC_PATH_PROG(WAYLAND_SCANNER, wayland-scanner)
+PKG_CHECK_MODULES(CAIRO, [cairo pango pangocairo],
+			[SCIM_HAS_CAIRO=yes],
+			[SCIM_HAS_CAIRO=no])
+# cairo-xlib is needed by the X11 surface shim of the Cairo candidate renderer.
+PKG_CHECK_MODULES(CAIRO_XLIB, [cairo-xlib],
+			[SCIM_HAS_CAIRO_XLIB=yes],
+			[SCIM_HAS_CAIRO_XLIB=no])
+if test "$SCIM_HAS_WAYLAND" = "yes"; then
+  WAYLAND_PROTOCOLS_DIR=`$PKG_CONFIG --variable=pkgdatadir wayland-protocols 2>/dev/null`
+  AC_SUBST(WAYLAND_PROTOCOLS_DIR)
+fi
+
+# IBus engine FrontEnd (GNOME).
+PKG_CHECK_MODULES(IBUS, [ibus-1.0 >= 1.5],
+			[SCIM_HAS_IBUS=yes],
+			[SCIM_HAS_IBUS=no])
+
 
 # Checks for X11 header files.
 AC_PATH_XTRA
@@ -457,8 +479,20 @@ AC_ARG_ENABLE([frontend-x11],
 AC_ARG_ENABLE([frontend-socket],
 	[AS_HELP_STRING([--disable-frontend-socket],
 		[Do not build Socket FrontEnd module])],
-	[], 
+	[],
 	[enable_frontend_socket=yes])
+
+AC_ARG_ENABLE([frontend-wayland],
+	[AS_HELP_STRING([--enable-frontend-wayland],
+		[Build the Wayland input-method-v2 FrontEnd module (default: auto)])],
+	[],
+	[enable_frontend_wayland=check])
+
+AC_ARG_ENABLE([frontend-ibus],
+	[AS_HELP_STRING([--enable-frontend-ibus],
+		[Build the IBus engine FrontEnd module for GNOME (default: auto)])],
+	[],
+	[enable_frontend_ibus=check])
 
 AC_ARG_ENABLE([im-rawcode],
 	[AS_HELP_STRING([--disable-im-rawcode],
@@ -586,6 +620,47 @@ if test "$enable_frontend_socket" = "yes" -a "$socket_ok" = "yes"; then
 else
   SCIM_BUILD_FRONTEND_SOCKET=0
   enable_frontend_socket=no
+fi
+
+# Wayland FrontEnd: needs wayland-client, xkbcommon, cairo/pango, wayland-scanner.
+if test "$enable_frontend_wayland" != "no"; then
+  if test "$SCIM_HAS_WAYLAND" = "yes" -a "$SCIM_HAS_CAIRO" = "yes" -a -n "$WAYLAND_SCANNER"; then
+    SCIM_BUILD_FRONTEND_WAYLAND=1
+    enable_frontend_wayland=yes
+  elif test "$enable_frontend_wayland" = "yes"; then
+    AC_MSG_ERROR([--enable-frontend-wayland requires wayland-client, xkbcommon, cairo/pango and wayland-scanner])
+  else
+    SCIM_BUILD_FRONTEND_WAYLAND=0
+    enable_frontend_wayland=no
+  fi
+else
+  SCIM_BUILD_FRONTEND_WAYLAND=0
+fi
+
+# IBus FrontEnd: needs ibus-1.0.
+if test "$enable_frontend_ibus" != "no"; then
+  if test "$SCIM_HAS_IBUS" = "yes"; then
+    SCIM_BUILD_FRONTEND_IBUS=1
+    enable_frontend_ibus=yes
+  elif test "$enable_frontend_ibus" = "yes"; then
+    AC_MSG_ERROR([--enable-frontend-ibus requires ibus-1.0])
+  else
+    SCIM_BUILD_FRONTEND_IBUS=0
+    enable_frontend_ibus=no
+  fi
+else
+  SCIM_BUILD_FRONTEND_IBUS=0
+fi
+
+# Cairo+Pango input-panel renderer (own-Cairo candidate UI).  The core needs
+# cairo/pango; the X11 surface shim additionally needs cairo-xlib and X11.
+# Built whenever those are present (shared by the x11/wayland frontends).
+if test "$SCIM_HAS_CAIRO" = "yes" -a "$SCIM_HAS_CAIRO_XLIB" = "yes" -a "$have_x" = "yes"; then
+  SCIM_BUILD_PANEL_UI=1
+  enable_panel_ui=yes
+else
+  SCIM_BUILD_PANEL_UI=0
+  enable_panel_ui=no
 fi
 
 if test "$enable_im_rawcode" = "yes"; then
@@ -811,6 +886,15 @@ AM_CONDITIONAL(SCIM_BUILD_FRONTEND_X11,
 AM_CONDITIONAL(SCIM_BUILD_FRONTEND_SOCKET,
 		[test "$enable_frontend_socket" = "yes"])
 
+AM_CONDITIONAL(SCIM_BUILD_FRONTEND_WAYLAND,
+		[test "$enable_frontend_wayland" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_FRONTEND_IBUS,
+		[test "$enable_frontend_ibus" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_PANEL_UI,
+		[test "$enable_panel_ui" = "yes"])
+
 AM_CONDITIONAL(SCIM_BUILD_IMENGINE_SOCKET,
 		[test "$enable_im_socket" = "yes"])
 
@@ -859,6 +943,9 @@ AC_SUBST(SCIM_BUILD_CONFIG_SIMPLE)
 AC_SUBST(SCIM_BUILD_CONFIG_SOCKET)
 AC_SUBST(SCIM_BUILD_FRONTEND_X11)
 AC_SUBST(SCIM_BUILD_FRONTEND_SOCKET)
+AC_SUBST(SCIM_BUILD_FRONTEND_WAYLAND)
+AC_SUBST(SCIM_BUILD_FRONTEND_IBUS)
+AC_SUBST(SCIM_BUILD_PANEL_UI)
 AC_SUBST(SCIM_BUILD_IMENGINE_RAWCODE)
 AC_SUBST(SCIM_BUILD_IMENGINE_TABLE)
 AC_SUBST(SCIM_BUILD_IMENGINE_SOCKET)
@@ -901,6 +988,8 @@ AC_SUBST(SCIM_LIBDIR)
 AC_SUBST(ac_aux_dir)
 AC_CONFIG_FILES([Makefile
 		 po/Makefile.in
+		 protocols/Makefile
+		 panel-ui/Makefile
 		 src/Makefile
 		 src/scim_types.h
 		 utils/Makefile
@@ -952,6 +1041,10 @@ Module options:
 
   X11 FrontEnd module      $enable_frontend_x11
   Socket FrontEnd module   $enable_frontend_socket
+  Wayland FrontEnd module  $enable_frontend_wayland
+  IBus FrontEnd module     $enable_frontend_ibus
+
+  Cairo panel renderer     $enable_panel_ui
 
   RawCode IMEngine module  $enable_im_rawcode
   Socket IMEngine module   $enable_im_socket

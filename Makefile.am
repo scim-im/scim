@@ -29,7 +29,7 @@ EXTRA_DIST		= config.rpath THANKS \
 			  bootstrap
 
 AUTOMAKE_OPTIONS 	= gnu
-SUBDIRS 		= src utils modules configs po extras data docs tests
+SUBDIRS 		= src utils protocols panel-ui modules configs po extras data docs tests
 
 MAINTAINERCLEANFILES 	= Makefile.in \
 			  aclocal.m4 \

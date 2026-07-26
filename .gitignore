@@ -69,6 +69,10 @@ Makefile.in
 /extras/setup/scim-setup.desktop
 /extras/setup/gtk3/scim-setup-gtk3-host
 
+# Generated Wayland protocol glue (wayland-scanner output)
+/protocols/*-protocol.c
+/protocols/*-client-protocol.h
+
 # Built executables
 /src/scim
 /src/scim-launcher
