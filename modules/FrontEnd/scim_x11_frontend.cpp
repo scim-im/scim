@@ -187,6 +187,12 @@ X11FrontEnd::show_preedit_string (int siid)
     if (is_inputing_ic (siid)) {
         if (ims_is_preedit_callback_mode (m_focus_ic))
             ims_preedit_callback_start (m_focus_ic);
+#ifdef SCIM_HAS_PANEL_UI
+        else if (use_panel_ui ()) {
+            m_panel_ui.ui ().show_preedit_string ();
+            refresh_panel_ui ();
+        }
+#endif
         else
             m_panel_client.show_preedit_string (m_focus_ic->icid);
     }
@@ -197,8 +203,16 @@ X11FrontEnd::show_aux_string (int siid)
 {
     SCIM_DEBUG_FRONTEND(2) << " Show aux string, siid=" << siid << "\n";
 
-    if (is_inputing_ic (siid))
+    if (is_inputing_ic (siid)) {
+#ifdef SCIM_HAS_PANEL_UI
+        if (use_panel_ui ()) {
+            m_panel_ui.ui ().show_aux_string ();
+            refresh_panel_ui ();
+            return;
+        }
+#endif
         m_panel_client.show_aux_string (m_focus_ic->icid);
+    }
 }
 
 void
@@ -206,8 +220,16 @@ X11FrontEnd::show_lookup_table (int siid)
 {
     SCIM_DEBUG_FRONTEND(2) << " Show lookup table, siid=" << siid << "\n";
 
-    if (is_inputing_ic (siid))
+    if (is_inputing_ic (siid)) {
+#ifdef SCIM_HAS_PANEL_UI
+        if (use_panel_ui ()) {
+            m_panel_ui.ui ().show_lookup_table ();
+            refresh_panel_ui ();
+            return;
+        }
+#endif
         m_panel_client.show_lookup_table (m_focus_ic->icid);
+    }
 }
 
 void
@@ -218,6 +240,12 @@ X11FrontEnd::hide_preedit_string (int siid)
     if (is_focused_ic (siid)) {
         if (ims_is_preedit_callback_mode (m_focus_ic))
             ims_preedit_callback_done (m_focus_ic);
+#ifdef SCIM_HAS_PANEL_UI
+        else if (use_panel_ui ()) {
+            m_panel_ui.ui ().hide_preedit_string ();
+            refresh_panel_ui ();
+        }
+#endif
         else
             m_panel_client.hide_preedit_string (m_focus_ic->icid);
     }
@@ -228,8 +256,16 @@ X11FrontEnd::hide_aux_string (int siid)
 {
     SCIM_DEBUG_FRONTEND(2) << " Hide aux string, siid=" << siid << "\n";
 
-    if (is_focused_ic (siid))
+    if (is_focused_ic (siid)) {
+#ifdef SCIM_HAS_PANEL_UI
+        if (use_panel_ui ()) {
+            m_panel_ui.ui ().hide_aux_string ();
+            refresh_panel_ui ();
+            return;
+        }
+#endif
         m_panel_client.hide_aux_string (m_focus_ic->icid);
+    }
 }
 
 void
@@ -237,8 +273,16 @@ X11FrontEnd::hide_lookup_table (int siid)
 {
     SCIM_DEBUG_FRONTEND(2) << " Hide lookup table, siid=" << siid << "\n";
 
-    if (is_focused_ic (siid))
+    if (is_focused_ic (siid)) {
+#ifdef SCIM_HAS_PANEL_UI
+        if (use_panel_ui ()) {
+            m_panel_ui.ui ().hide_lookup_table ();
+            refresh_panel_ui ();
+            return;
+        }
+#endif
         m_panel_client.hide_lookup_table (m_focus_ic->icid);
+    }
 }
 
 void
@@ -249,6 +293,12 @@ X11FrontEnd::update_preedit_caret (int siid, int caret)
     if (is_inputing_ic (siid)) {
         if (ims_is_preedit_callback_mode (m_focus_ic))
             ims_preedit_callback_caret (m_focus_ic, caret);
+#ifdef SCIM_HAS_PANEL_UI
+        else if (use_panel_ui ()) {
+            m_panel_ui.ui ().update_preedit_caret (caret);
+            refresh_panel_ui ();
+        }
+#endif
         else
             m_panel_client.update_preedit_caret (m_focus_ic->icid, caret);
     }
@@ -262,8 +312,14 @@ X11FrontEnd::update_preedit_string (int siid, const WideString & str, const Attr
     if (is_inputing_ic (siid)) {
         if (ims_is_preedit_callback_mode (m_focus_ic))
             ims_preedit_callback_draw (m_focus_ic, str, attrs);
+#ifdef SCIM_HAS_PANEL_UI
+        else if (use_panel_ui ()) {
+            m_panel_ui.ui ().update_preedit_string (str, attrs);
+            refresh_panel_ui ();
+        }
+#endif
         else
-            m_panel_client.update_preedit_string (m_focus_ic->icid, str, attrs); 
+            m_panel_client.update_preedit_string (m_focus_ic->icid, str, attrs);
     }
 }
 
@@ -272,8 +328,16 @@ X11FrontEnd::update_aux_string (int siid, const WideString & str, const Attribut
 {
     SCIM_DEBUG_FRONTEND(2) << " Update aux string, siid=" << siid << "\n";
 
-    if (is_inputing_ic (siid))
-        m_panel_client.update_aux_string (m_focus_ic->icid, str, attrs); 
+    if (is_inputing_ic (siid)) {
+#ifdef SCIM_HAS_PANEL_UI
+        if (use_panel_ui ()) {
+            m_panel_ui.ui ().update_aux_string (str, attrs);
+            refresh_panel_ui ();
+            return;
+        }
+#endif
+        m_panel_client.update_aux_string (m_focus_ic->icid, str, attrs);
+    }
 }
 
 void
@@ -281,8 +345,16 @@ X11FrontEnd::update_lookup_table (int siid, const LookupTable & table)
 {
     SCIM_DEBUG_FRONTEND(2) << " Update lookup table, siid=" << siid << "\n";
 
-    if (is_inputing_ic (siid))
+    if (is_inputing_ic (siid)) {
+#ifdef SCIM_HAS_PANEL_UI
+        if (use_panel_ui ()) {
+            m_panel_ui.ui ().update_lookup_table (table);
+            refresh_panel_ui ();
+            return;
+        }
+#endif
         m_panel_client.update_lookup_table (m_focus_ic->icid, table);
+    }
 }
 
 void
@@ -414,6 +486,23 @@ X11FrontEnd::init (int argc, char **argv)
 
     m_display_name = init_ims ();
 
+#ifdef SCIM_HAS_PANEL_UI
+    // Bring up the in-process Cairo candidate/preedit/aux renderer. If it
+    // cannot open we fall back to forwarding those updates to scim-panel-gtk.
+    if (m_panel_ui.open (m_display_name)) {
+        m_panel_ui.signal_connect_candidate_selected (
+            [this] (int idx) { panel_ui_select_candidate (idx); });
+        m_panel_ui.signal_connect_page_up (
+            [this] () { panel_ui_page_up (); });
+        m_panel_ui.signal_connect_page_down (
+            [this] () { panel_ui_page_down (); });
+        configure_panel_ui ();
+    } else {
+        SCIM_DEBUG_FRONTEND (1) << "X11 -- Cairo panel renderer unavailable, "
+                                   "using scim-panel-gtk for candidates.\n";
+    }
+#endif
+
     SCIM_DEBUG_FRONTEND (1) << "X11 -- Connecting to panel daemon.\n";
 
     if (m_panel_client.open_connection (m_config->get_name (), m_display_name) < 0)
@@ -449,6 +538,14 @@ X11FrontEnd::run ()
     FD_SET (panel_fd, &active_fds);
     FD_SET (xserver_fd, &active_fds);
 
+#ifdef SCIM_HAS_PANEL_UI
+    int panel_ui_fd = m_panel_ui.connection_number ();
+    if (panel_ui_fd >= 0) {
+        FD_SET (panel_ui_fd, &active_fds);
+        if (panel_ui_fd > max_fd) max_fd = panel_ui_fd;
+    }
+#endif
+
     m_should_exit = false;
 
     // Select between the X Server and the Panel GUI.
@@ -464,12 +561,23 @@ X11FrontEnd::run ()
             XFilterEvent (&event, None);
         }
 
+#ifdef SCIM_HAS_PANEL_UI
+        // Drain any buffered events on the renderer's own X connection.
+        if (panel_ui_fd >= 0)
+            m_panel_ui.process_events ();
+#endif
+
         if ((ret = select (max_fd + 1, &read_fds, NULL, NULL, NULL)) < 0) {
             SCIM_DEBUG_FRONTEND(1) << "X11 -- Error when watching events!\n";
             return;
         }
 
         if (m_should_exit) break;
+
+#ifdef SCIM_HAS_PANEL_UI
+        if (panel_ui_fd >= 0 && FD_ISSET (panel_ui_fd, &read_fds))
+            m_panel_ui.process_events ();
+#endif
 
         if (FD_ISSET (panel_fd, &read_fds)) {
             if (!m_panel_client.filter_event ()) {
@@ -1542,9 +1650,19 @@ X11FrontEnd::start_ic (X11IC *ic)
         panel_req_update_factory_info (ic);
 
         m_panel_client.turn_on (ic->icid);
-        m_panel_client.hide_preedit_string (ic->icid);
-        m_panel_client.hide_aux_string (ic->icid);
-        m_panel_client.hide_lookup_table (ic->icid);
+#ifdef SCIM_HAS_PANEL_UI
+        if (use_panel_ui ()) {
+            m_panel_ui.ui ().hide_preedit_string ();
+            m_panel_ui.ui ().hide_aux_string ();
+            m_panel_ui.ui ().hide_lookup_table ();
+            refresh_panel_ui ();
+        } else
+#endif
+        {
+            m_panel_client.hide_preedit_string (ic->icid);
+            m_panel_client.hide_aux_string (ic->icid);
+            m_panel_client.hide_lookup_table (ic->icid);
+        }
 
         if (ic->shared_siid) reset (ic->siid);
 
@@ -1561,6 +1679,11 @@ X11FrontEnd::stop_ic (X11IC *ic)
 
         if (ims_is_preedit_callback_mode (ic))
             ims_preedit_callback_done (ic);
+
+#ifdef SCIM_HAS_PANEL_UI
+        if (use_panel_ui ())
+            m_panel_ui.hide ();
+#endif
 
         panel_req_update_factory_info (ic);
         m_panel_client.turn_off (ic->icid);
@@ -1931,9 +2054,71 @@ X11FrontEnd::panel_req_update_spot_location (const X11IC *ic)
                 xwa.height,
                 &spot_x, &spot_y, &child);
         }
+#ifdef SCIM_HAS_PANEL_UI
+        if (use_panel_ui ())
+            m_panel_ui.move (spot_x, spot_y);
+        else
+#endif
         m_panel_client.update_spot_location (ic->icid, spot_x, spot_y);
     }
 }
+
+#ifdef SCIM_HAS_PANEL_UI
+void
+X11FrontEnd::refresh_panel_ui ()
+{
+    // TODO(5a): coalesce redraws. Every sub-update (preedit/caret/aux/lookup)
+    // calls this, so a keystroke can repaint several times. Add a deferred
+    // flush once there is a batch/sync signal from the backend.
+    if (!use_panel_ui ())
+        return;
+    if (m_panel_ui.ui ().is_visible ())
+        m_panel_ui.show ();     // measures, positions, maps and redraws
+    else
+        m_panel_ui.hide ();
+}
+
+void
+X11FrontEnd::configure_panel_ui ()
+{
+    if (!use_panel_ui ())
+        return;
+    // Share the panel's configured font so both UIs look consistent.
+    String font = m_config->read (String ("/Panel/Gtk/Font"), String ());
+    if (font.length ())
+        m_panel_ui.ui ().set_font (font);
+}
+
+void
+X11FrontEnd::panel_ui_select_candidate (int cand_index)
+{
+    if (validate_ic (m_focus_ic)) {
+        m_panel_client.prepare (m_focus_ic->icid);
+        select_candidate (m_focus_ic->siid, cand_index);
+        m_panel_client.send ();
+    }
+}
+
+void
+X11FrontEnd::panel_ui_page_up ()
+{
+    if (validate_ic (m_focus_ic)) {
+        m_panel_client.prepare (m_focus_ic->icid);
+        lookup_table_page_up (m_focus_ic->siid);
+        m_panel_client.send ();
+    }
+}
+
+void
+X11FrontEnd::panel_ui_page_down ()
+{
+    if (validate_ic (m_focus_ic)) {
+        m_panel_client.prepare (m_focus_ic->icid);
+        lookup_table_page_down (m_focus_ic->siid);
+        m_panel_client.send ();
+    }
+}
+#endif
 
 void
 X11FrontEnd::reload_config_callback (const ConfigPointer &config)

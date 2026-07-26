@@ -38,25 +38,40 @@ CONFIG_FRONTEND_X11_MODULE	= x11.la
 SUBDIRS				= IMdkit
 endif
 
+# Draw candidates in-process with the Cairo renderer when it was built.
+if SCIM_BUILD_PANEL_UI
+PANEL_UI_CFLAGS		= -DSCIM_HAS_PANEL_UI \
+			  -I$(top_srcdir)/panel-ui \
+			  @CAIRO_CFLAGS@ @CAIRO_XLIB_CFLAGS@
+PANEL_UI_LIBS		= $(top_builddir)/panel-ui/libscimpanelui.la \
+			  @CAIRO_LIBS@ @CAIRO_XLIB_LIBS@
+endif
+
 if SCIM_BUILD_FRONTEND_SOCKET
 CONFIG_FRONTEND_SOCKET_MODULE	= socket.la
 endif
 
+if SCIM_BUILD_FRONTEND_WAYLAND
+CONFIG_FRONTEND_WAYLAND_MODULE	= wayland.la
+endif
+
 noinst_HEADERS		= scim_x11_ic.h \
 		  	  scim_x11_frontend.h \
-			  scim_socket_frontend.h
+			  scim_socket_frontend.h \
+			  scim_wayland_frontend.h
 
 moduledir		= $(libdir)/scim@SCIM_EPOCH@/$(SCIM_BINARY_VERSION)/FrontEnd
 
 module_LTLIBRARIES	= $(CONFIG_FRONTEND_X11_MODULE) \
-		     	  $(CONFIG_FRONTEND_SOCKET_MODULE)
+		     	  $(CONFIG_FRONTEND_SOCKET_MODULE) \
+		     	  $(CONFIG_FRONTEND_WAYLAND_MODULE)
 
 x11_la_SOURCES 		= scim_x11_frontend.cpp \
 			  scim_x11_ic.cpp
 
-x11_la_CFLAGS		= @X_CFLAGS@
+x11_la_CFLAGS		= @X_CFLAGS@ $(PANEL_UI_CFLAGS)
 
-x11_la_CXXFLAGS		= @X_CFLAGS@
+x11_la_CXXFLAGS		= @X_CFLAGS@ $(PANEL_UI_CFLAGS)
 
 x11_la_LDFLAGS		= -avoid-version \
 		     	  -rpath $(moduledir) \
@@ -67,7 +82,8 @@ x11_la_LDFLAGS		= -avoid-version \
 
 x11_la_LIBADD		= IMdkit/libXimd.la \
 			  $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
-			  $(top_builddir)/utils/libscim-x11utils@SCIM_EPOCH@.la
+			  $(top_builddir)/utils/libscim-x11utils@SCIM_EPOCH@.la \
+			  $(PANEL_UI_LIBS)
 
 socket_la_SOURCES 	= scim_socket_frontend.cpp
 
@@ -77,4 +93,28 @@ socket_la_LDFLAGS	= -avoid-version \
 			  @LIBTOOL_EXPORT_OPTIONS@
 
 socket_la_LIBADD	= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
+
+wayland_la_SOURCES 	= scim_wayland_frontend.cpp
+
+wayland_la_CFLAGS	= @WAYLAND_CFLAGS@ @CAIRO_CFLAGS@ \
+			  -DSCIM_HAS_PANEL_UI_WAYLAND \
+			  -I$(top_builddir)/protocols \
+			  -I$(top_srcdir)/panel-ui
+
+wayland_la_CXXFLAGS	= @WAYLAND_CFLAGS@ @CAIRO_CFLAGS@ \
+			  -DSCIM_HAS_PANEL_UI_WAYLAND \
+			  -I$(top_builddir)/protocols \
+			  -I$(top_srcdir)/panel-ui
+
+wayland_la_LDFLAGS	= -avoid-version \
+		     	  -rpath $(moduledir) \
+			  -module \
+			  @LIBTOOL_EXPORT_OPTIONS@ \
+			  @WAYLAND_LIBS@ \
+			  @CAIRO_LIBS@ \
+			  @LTLIBINTL@
+
+wayland_la_LIBADD	= $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
+			  $(top_builddir)/protocols/libscimwlprotocols.la \
+			  $(top_builddir)/panel-ui/libscimpanelui-wayland.la
 

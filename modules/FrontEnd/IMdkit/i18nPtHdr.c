@@ -619,6 +619,11 @@ static void GetIMValueFromName (Xi18n i18n_core,
 {
     register int i;
 
+    /* Set unconditionally: the branches below cover only two attribute names,
+       and a caller sizes an allocation from this. Leaving it untouched for any
+       other name meant malloc () and memset () on an uninitialised int. */
+    *length = 0;
+
     if (strcmp (name, XNQueryInputStyle) == 0)
     {
         XIMStyles *styles = (XIMStyles *) &i18n_core->address.input_styles;
@@ -679,7 +684,7 @@ static XIMAttribute *MakeIMAttributeList (Xi18n i18n_core,
     int list_len = i18n_core->address.im_attr_num;
     register int i;
     register int j;
-    int value_length;
+    int value_length = 0;
     int number_ret = 0;
 
     *length = 0;
@@ -721,13 +726,21 @@ static XIMAttribute *MakeIMAttributeList (Xi18n i18n_core,
                                     attr[j].name,
                                     &value_length);
                 attrib_list[list_num].value_length = value_length;
-                attrib_list[list_num].value = (void *) malloc (value_length);
-                memset(attrib_list[list_num].value, 0, value_length);
-                GetIMValueFromName (i18n_core,
-                                    connect_id,
-                                    attrib_list[list_num].value,
-                                    attr[j].name,
-                                    &value_length);
+                if (value_length > 0)
+                {
+                    attrib_list[list_num].value =
+                        (void *) malloc (value_length);
+                    if (!attrib_list[list_num].value)
+                        break;
+                    /*endif*/
+                    memset (attrib_list[list_num].value, 0, value_length);
+                    GetIMValueFromName (i18n_core,
+                                        connect_id,
+                                        attrib_list[list_num].value,
+                                        attr[j].name,
+                                        &value_length);
+                }
+                /*endif*/
                 *length += sizeof (CARD16)*2;
                 *length += value_length;
                 *length += IMPAD (value_length);

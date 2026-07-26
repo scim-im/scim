@@ -31,6 +31,10 @@
 
 #include "scim_stl_map.h"
 
+#ifdef SCIM_HAS_PANEL_UI
+#include "scim_panel_ui_x11.h"
+#endif
+
 using namespace scim;
 
 class X11FrontEnd : public FrontEndBase
@@ -47,6 +51,13 @@ class X11FrontEnd : public FrontEndBase
     String                  m_display_name;
 
     PanelClient             m_panel_client;
+
+#ifdef SCIM_HAS_PANEL_UI
+    // In-process Cairo candidate/preedit/aux renderer (own-Cairo UI). When
+    // open it draws the cursor-relative panel instead of forwarding those
+    // updates to scim-panel-gtk; the panel process keeps the chrome.
+    PanelUIX11              m_panel_ui;
+#endif
 
     X11IC                  *m_focus_ic;
 
@@ -204,6 +215,20 @@ private:
     void reload_config_callback (const ConfigPointer &config);
 
     void fallback_commit_string_cb (IMEngineInstanceBase * si, const WideString & str);
+
+#ifdef SCIM_HAS_PANEL_UI
+    bool use_panel_ui () const { return m_panel_ui.is_open (); }
+    // Re-measure/redraw or hide the Cairo panel from the renderer's state.
+    void refresh_panel_ui ();
+    // Apply the configured font/colors to the renderer.
+    void configure_panel_ui ();
+    // Pointer callbacks from the Cairo panel, routed to the focused IC.
+    void panel_ui_select_candidate (int cand_index);
+    void panel_ui_page_up ();
+    void panel_ui_page_down ();
+#else
+    bool use_panel_ui () const { return false; }
+#endif
 
 private:
     static int ims_protocol_handler (XIMS ims, IMProtocol *call_data);

@@ -94,7 +94,10 @@ typedef struct _FrameIter
     Iter iter;
     Bool counting;
     unsigned int counter;
-    int end;
+    /* Unsigned like the counter it is compared with, and like the CARD8/16/32
+       it is read from: as an int, a wire value above INT_MAX turned negative
+       and the >= below could then never be satisfied. */
+    unsigned int end;
     struct _FrameIter* next;
 } FrameIterRec, *FrameIter;
 
@@ -176,7 +179,7 @@ static int _FrameInstDecrement(XimFrame frame, int count);
 static int _FrameInstGetItemSize(FrameInst fi, int cur_no);
 static Bool FrameInstIsIterLoopEnd(FrameInst fi);
 
-static FrameIter _FrameMgrAppendIter(FrameMgr fm, Iter it, int end);
+static FrameIter _FrameMgrAppendIter(FrameMgr fm, Iter it, unsigned int end);
 static FrameIter _FrameIterCounterIncr(FrameIter fitr, int i);
 static void _FrameMgrRemoveIter(FrameMgr fm, FrameIter it);
 static Bool _FrameMgrIsIterLoopEnd(FrameMgr fm);
@@ -284,26 +287,25 @@ FmStatus _FrameMgrPutToken (FrameMgr fm, void *data, int data_size)
     if (type & COUNTER_MASK)
     {
         unsigned long input_length;
+        /* NO_VALUE is an int, so test for it before widening. Checking after
+           the value has been stored in an unsigned long only works while both
+           sides happen to convert alike, and one of the two producers below is
+           a macro whose type comes from a struct field. */
+        int counted;
 
         if (info.counter.is_byte_len)
-        {
-            if ((input_length = IterGetTotalSize (info.counter.iter))
-                    == NO_VALUE)
-            {
-                return FmCannotCalc;
-            }
-            /*endif*/
-        }
+            counted = IterGetTotalSize (info.counter.iter);
         else
+            counted = IterGetIterCount (info.counter.iter);
+        /*endif*/
+
+        if (counted == NO_VALUE)
         {
-            if ((input_length = IterGetIterCount (info.counter.iter))
-                == NO_VALUE)
-            {
-                return FmCannotCalc;
-            }
-            /*endif*/
+            return FmCannotCalc;
         }
         /*endif*/
+
+        input_length = (unsigned long) counted;
         switch (type)
         {
         case COUNTER_BIT8:
@@ -501,7 +503,7 @@ FmStatus _FrameMgrGetToken (FrameMgr fm , void* data, int data_size)
 
     if (type & COUNTER_MASK)
     {
-        int end=0;
+        unsigned int end=0;
         FrameIter client_data;
 
         type &= ~COUNTER_MASK;
@@ -1217,7 +1219,7 @@ static Bool FrameInstIsIterLoopEnd (FrameInst fi)
     return (ret);
 }
 
-static FrameIter _FrameMgrAppendIter (FrameMgr fm, Iter it, int end)
+static FrameIter _FrameMgrAppendIter (FrameMgr fm, Iter it, unsigned int end)
 {
     FrameIter p = fm->iters;
 

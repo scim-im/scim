@@ -500,10 +500,10 @@ static int SetXi18nSelectionOwner(Xi18n i18n_core)
     Atom realtype;
     int realformat;
     unsigned long bytesafter;
-    long *data=NULL;
+    Atom *data=NULL;
     unsigned long length;
     Atom atom;
-    int i;
+    unsigned long i;
     int found;
     int forse = False;
     char buf[256];
@@ -589,10 +589,11 @@ static int DeleteXi18nAtom(Xi18n i18n_core)
     Atom realtype;
     int realformat;
     unsigned long bytesafter;
-    long *data=NULL;
+    Atom *data=NULL;
     unsigned long length;
     Atom atom;
-    int i, ret;
+    unsigned long i;
+    int ret;
     int found;
     char buf[256];
 

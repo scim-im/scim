@@ -572,7 +572,9 @@ PanelUI::update_lookup_table (const LookupTable &table)
         d->m_cand_label.push_back (table.get_candidate_label (i));
     }
 
-    d->m_lookup_vertical = false;   // orientation set separately if needed
+    // TODO(5a): vertical orientation. LookupTable exposes no orientation getter
+    // at this layer; wire from config/engine hint. Horizontal for now.
+    d->m_lookup_vertical = false;
     d->m_cursor_in_page =
         table.is_cursor_visible () ? table.get_cursor_pos_in_current_page () : -1;
 
@@ -660,6 +662,10 @@ PanelUI::draw (cairo_t *cr)
 
     for (size_t i = 0; i < d->m_cells.size (); ++i)
         d->paint_item (cr, d->m_cells[i].item, t.fg);
+
+    // TODO(5a): draw prev/next-page arrows when has_prev_page/has_next_page and
+    // report them from hit_test() as HIT_PREV_PAGE/HIT_NEXT_PAGE (wheel paging
+    // already works; this adds click targets). Also HiDPI: scale by output scale.
 
     // Border.
     if (t.border_width > 0) {
