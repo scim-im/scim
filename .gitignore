@@ -82,5 +82,6 @@ Makefile.in
 /src/scim-config-agent
 /src/scim-helper-launcher
 /src/scim-helper-manager
+/src/scim-ibus-sync
 /extras/panel/scim-panel-gtk
 /extras/immodules/agent/scim-im-agent

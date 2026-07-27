@@ -388,6 +388,17 @@ if test "$SCIM_HAS_IBUS" = "yes"; then
   AC_SUBST(IBUS_COMPONENT_DIR)
 fi
 
+# GIO (GSettings + GFileMonitor), used by the ibus engine-list sync agent to
+# watch the config file and mirror the GNOME/ibus input-source list. Optional:
+# without it the ibus frontend still works, only the automatic sync is dropped.
+PKG_CHECK_MODULES(GIO, [gio-2.0 >= 2.26],
+			[SCIM_HAS_GSETTINGS=yes],
+			[SCIM_HAS_GSETTINGS=no])
+if test "$SCIM_HAS_GSETTINGS" = "yes"; then
+  AC_DEFINE(SCIM_HAS_GSETTINGS, 1,
+	    [Define if GIO/GSettings is available for the ibus engine-list sync.])
+fi
+
 # D-Bus, for the KDE kimpanel candidate UI backend.
 PKG_CHECK_MODULES(DBUS, [dbus-1],
 			[SCIM_HAS_DBUS=yes],
@@ -948,6 +959,15 @@ AM_CONDITIONAL(SCIM_BUILD_FRONTEND_WAYLAND,
 
 AM_CONDITIONAL(SCIM_BUILD_FRONTEND_IBUS,
 		[test "$enable_frontend_ibus" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_GSETTINGS,
+		[test "$SCIM_HAS_GSETTINGS" = "yes"])
+
+# The ibus engine-list sync coordinator needs both GSettings (to watch the
+# input-source list) and ibus (to read the installed engine set from the
+# component manifest).
+AM_CONDITIONAL(SCIM_BUILD_IBUS_SYNC,
+		[test "$SCIM_HAS_GSETTINGS" = "yes" -a "$SCIM_HAS_IBUS" = "yes"])
 
 AM_CONDITIONAL(SCIM_BUILD_PANEL_UI,
 		[test "$enable_panel_ui" = "yes"])

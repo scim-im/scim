@@ -1,0 +1,139 @@
+/** @file scim_ibus_sync.h
+ * @brief Keep the enabled SCIM engine set and the GNOME/ibus input-source list
+ *        in sync, and re-apply the disabled list live on config changes.
+ */
+
+/*
+ * Smart Common Input Method
+ *
+ * Copyright (c) 2026 SCIM developers
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ */
+
+#pragma once
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#ifdef SCIM_HAS_GSETTINGS
+
+#define Uses_SCIM_TYPES
+#include <scim.h>
+
+#include <glib.h>
+#include <gio/gio.h>
+#include <functional>
+#include <vector>
+#include <utility>
+
+namespace scim {
+
+/** A (type, id) input-source entry, mirroring GNOME's a(ss) "sources". */
+typedef std::pair<String, String> InputSource;
+
+/* --------------------------------------------------------------------------
+ * Pure reconcile helpers (no GSettings / GLib) -- unit-testable.
+ * ------------------------------------------------------------------------ */
+
+/**
+ * @brief Compute the disabled-factory list that mirrors a GNOME source list.
+ *
+ * disabled = all_installed - gnome_scim  (every installed SCIM engine that the
+ * user did NOT keep in the input-source list becomes disabled).
+ */
+std::vector<String>
+scim_sync_compute_disabled (const std::vector<String> &all_installed,
+                            const std::vector<String> &gnome_scim);
+
+/**
+ * @brief Compute the new input-source list that mirrors the enabled set.
+ *
+ * Non-SCIM entries (xkb layouts, other ibus engines) are preserved in place.
+ * SCIM entries are made to equal @a enabled: disabled ones are dropped, and
+ * newly-enabled ones are appended as ("ibus", uuid).
+ *
+ * @param current      the current source list.
+ * @param enabled      the enabled SCIM factory uuids.
+ * @param all_installed all installed SCIM factory uuids (to tell SCIM entries
+ *                      apart from other ibus engines).
+ */
+std::vector<InputSource>
+scim_sync_compute_sources (const std::vector<InputSource> &current,
+                           const std::vector<String>      &enabled,
+                           const std::vector<String>      &all_installed);
+
+/* --------------------------------------------------------------------------
+ * The live sync agent.
+ * ------------------------------------------------------------------------ */
+
+class ScimIBusSync
+{
+public:
+    /** @brief return ALL installed SCIM factory uuids (enabled or not). */
+    typedef std::function<std::vector<String> ()> AllInstalledFunc;
+    /** @brief called after the disabled list is changed (may be a no-op). */
+    typedef std::function<void ()>                ReloadFunc;
+
+    ScimIBusSync (AllInstalledFunc all_installed, ReloadFunc reload);
+    ~ScimIBusSync ();
+
+    /**
+     * @brief Start watching the config file and the input-source list.
+     *
+     * Creates a GFileMonitor on the global config file and a GSettings watch on
+     * the input-source list, attaching to the current (thread-default)
+     * GMainContext, then runs an initial sync. Safe to call once.
+     */
+    void start ();
+    void stop ();
+
+private:
+    AllInstalledFunc     m_all_installed;
+    ReloadFunc           m_reload;
+
+    GFileMonitor        *m_config_monitor;
+    gulong               m_config_handler;
+
+    GSettings           *m_sources;          // GNOME input-sources schema, or 0
+    gulong               m_sources_handler;
+
+    std::vector<String>  m_last_disabled;    // memo: skip our own config write
+
+    // config / GNOME accessors
+    std::vector<String>       current_disabled ();
+    std::vector<String>       all_installed ();     // = m_all_installed()
+    std::vector<String>       enabled ();           // = all_installed - disabled
+    std::vector<InputSource>  read_sources ();
+    void                      write_sources (const std::vector<InputSource> &s);
+
+    // sync directions
+    void initial_union_sync ();     // startup: union both sides (never removes)
+    void on_config_changed ();      // config file -> reload + push to GNOME
+    void on_sources_changed ();     // GNOME sources -> disabled list + reload
+    void push_scim_to_gnome ();
+
+    static void cb_config_changed (GFileMonitor *, GFile *, GFile *,
+                                   GFileMonitorEvent, gpointer);
+    static void cb_sources_changed (GSettings *, gchar *, gpointer);
+
+    ScimIBusSync (const ScimIBusSync &);
+    ScimIBusSync & operator = (const ScimIBusSync &);
+};
+
+} // namespace scim
+
+#endif // SCIM_HAS_GSETTINGS
+
+/*
+vi:ts=4:nowrap:ai:expandtab
+*/
