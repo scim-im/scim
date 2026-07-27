@@ -22,6 +22,8 @@
 #define Uses_SCIM_LOOKUP_TABLE
 #define Uses_SCIM_ATTRIBUTE
 #define Uses_SCIM_UTILITY
+#define Uses_SCIM_CONFIG_BASE
+#define Uses_SCIM_CONFIG_PATH
 #include "scim_private.h"
 #include <scim.h>
 
@@ -67,6 +69,40 @@ PanelUITheme::dark ()
     t.border_width = 1;
     t.padding      = 6;
     t.spacing      = 6;
+    return t;
+}
+
+// Parse a CSS/X11 color string ("gray92", "light blue", "#rrggbb") into an
+// RGBA color, using Pango (no GDK dependency). Alpha defaults to 1.
+static PanelUIColor
+parse_color (const String &s, const PanelUIColor &fallback)
+{
+    PangoColor pc;
+    if (s.length () && pango_color_parse (&pc, s.c_str ())) {
+        PanelUIColor c = { pc.red / 65535.0, pc.green / 65535.0, pc.blue / 65535.0, 1.0 };
+        return c;
+    }
+    return fallback;
+}
+
+PanelUITheme
+scim_panel_ui_theme_from_config (const ConfigPointer &config)
+{
+    PanelUITheme t = PanelUITheme::light ();
+    if (config.null ())
+        return t;
+
+    // Same keys the legacy GTK panel uses (defined privately there, so use the
+    // literal paths here) for a consistent, backward-compatible appearance.
+    String font = config->read (String ("/Panel/Gtk/Font"), String ());
+    if (font.length () && font != String ("default"))
+        t.font = font;
+
+    t.bg           = parse_color (config->read (String ("/Panel/Gtk/Color/NormalBackground"), String ("gray92")),     t.bg);
+    t.fg           = parse_color (config->read (String ("/Panel/Gtk/Color/NormalText"),       String ("black")),      t.fg);
+    t.highlight_bg = parse_color (config->read (String ("/Panel/Gtk/Color/ActiveBackground"), String ("light blue")), t.highlight_bg);
+    t.highlight_fg = parse_color (config->read (String ("/Panel/Gtk/Color/ActiveText"),       String ("black")),      t.highlight_fg);
+    // label/border have no legacy keys; keep the light() defaults.
     return t;
 }
 

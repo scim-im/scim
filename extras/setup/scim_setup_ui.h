@@ -95,7 +95,11 @@ private:
     GtkTreeIter create_category (const char *category, const char *label);
 
     void request_quit ();
-    void show_restart_hint_then_quit ();
+
+    // Kept for a future setting that cannot be applied live; see the commented
+    // definitions in scim_setup_ui.cpp. Nothing calls these today.
+    // void show_restart_hint_then_quit ();
+    // static void restart_hint_response_cb (GObject *source, GAsyncResult *res, gpointer user_data);
 
     static void module_list_selection_changed_callback (GtkTreeSelection *selection, gpointer user_data);
 
@@ -109,7 +113,6 @@ private:
 
     static gboolean query_changed_timeout_cb (gpointer data);
 
-    static void restart_hint_response_cb (GObject *source, GAsyncResult *res, gpointer user_data);
 
     static gboolean module_list_hide_widget_iter_func (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data);
 

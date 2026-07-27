@@ -39,6 +39,9 @@
 #ifndef Uses_SCIM_LOOKUP_TABLE
 #define Uses_SCIM_LOOKUP_TABLE
 #endif
+#ifndef Uses_SCIM_CONFIG_BASE
+#define Uses_SCIM_CONFIG_BASE
+#endif
 #include <scim.h>
 #include <cairo.h>
 
@@ -77,6 +80,17 @@ struct PanelUITheme {
     /** @brief A sane dark-theme default. */
     static PanelUITheme dark ();
 };
+
+/**
+ * @brief Build a theme from the SCIM config, matching the legacy GTK panel.
+ *
+ * Reads /Panel/Gtk/Font and /Panel/Gtk/Color/{NormalText,NormalBackground,
+ * ActiveText,ActiveBackground} (CSS/X11 color strings) into a PanelUITheme, so
+ * every in-process renderer honours the user's configured font and colors the
+ * same way. Falls back to PanelUITheme::light() for missing/unparsable values.
+ * The PanelUI class itself stays config-agnostic; this is the shared bridge.
+ */
+PanelUITheme scim_panel_ui_theme_from_config (const ConfigPointer &config);
 
 /**
  * @brief Backend-agnostic layout/draw of the input panel.

@@ -583,8 +583,16 @@ SetupUI::apply_button_clicked_callback (GtkButton *button, gpointer user_data)
         ui->m_current_module->save_config (ui->m_config);
 
         ui->m_config->flush ();
+        scim_global_config_flush ();
 
         ui->m_changes_applied = true;
+
+        // Tell the session now, not only when this window closes. A config
+        // reload is pull-only -- every process has to call reload () on its own
+        // config object, and nothing pushes it -- so until this was sent, the
+        // running frontends went on using the values they started with and Apply
+        // looked as though it had done nothing at all.
+        ui->m_helper_agent.reload_config ();
 
         gtk_widget_set_sensitive (ui->m_apply_button, FALSE);
         gtk_widget_set_sensitive (ui->m_restore_button, FALSE);
@@ -639,6 +647,11 @@ SetupUI::ok_button_clicked_callback (GtkButton *button, gpointer user_data)
                                 module_list_save_config_iter_func,
                                 user_data);
         ui->m_config->flush ();
+
+        // OK saves every page, so it changes the configuration just as much as
+        // Apply does. Without this, run () skipped the reload it sends on the way
+        // out and closing with OK quietly failed to take effect.
+        ui->m_changes_applied = true;
     }
 
     ui->request_quit ();
@@ -714,36 +727,41 @@ SetupUI::query_changed_timeout_cb (gpointer data)
     return TRUE;
 }
 
+// Kept for the day a setting turns up that genuinely cannot be applied live.
+// Everything the setup pages write today -- engine enable/disable, filters,
+// hotkeys, frontend and panel options -- is picked up by the running daemon,
+// frontends and panel through the config reload, so nothing gates this and it
+// has no caller. To bring it back: uncomment these and their declarations,
+// snapshot the non-reloadable key around the save paths, and call
+// show_restart_hint_then_quit () from request_quit () when it changed.
+//
+// void
+// SetupUI::show_restart_hint_then_quit ()
+// {
+//     GtkAlertDialog *dialog = gtk_alert_dialog_new ("%s",
+//                             _("Not all configuration can be reloaded on the fly. "
+//                               "Don't forget to restart SCIM in order to let all of "
+//                               "the new configuration take effect."));
+//
+//     gtk_alert_dialog_choose (dialog, GTK_WINDOW (m_main_window), NULL,
+//                              SetupUI::restart_hint_response_cb, this);
+//     g_object_unref (dialog);
+// }
+//
+// void
+// SetupUI::restart_hint_response_cb (GObject *source, GAsyncResult *res, gpointer user_data)
+// {
+//     SetupUI *ui = (SetupUI *) user_data;
+//
+//     gtk_alert_dialog_choose_finish (GTK_ALERT_DIALOG (source), res, NULL);
+//
+//     g_main_loop_quit (ui->m_loop);
+// }
+
 void
 SetupUI::request_quit ()
 {
-    if (m_changes_applied)
-        show_restart_hint_then_quit ();
-    else
-        g_main_loop_quit (m_loop);
-}
-
-void
-SetupUI::show_restart_hint_then_quit ()
-{
-    GtkAlertDialog *dialog = gtk_alert_dialog_new ("%s",
-                            _("Not all configuration can be reloaded on the fly. "
-                              "Don't forget to restart SCIM in order to let all of "
-                              "the new configuration take effect."));
-
-    gtk_alert_dialog_choose (dialog, GTK_WINDOW (m_main_window), NULL,
-                             SetupUI::restart_hint_response_cb, this);
-    g_object_unref (dialog);
-}
-
-void
-SetupUI::restart_hint_response_cb (GObject *source, GAsyncResult *res, gpointer user_data)
-{
-    SetupUI *ui = (SetupUI *) user_data;
-
-    gtk_alert_dialog_choose_finish (GTK_ALERT_DIALOG (source), res, NULL);
-
-    g_main_loop_quit (ui->m_loop);
+    g_main_loop_quit (m_loop);
 }
 
 /*

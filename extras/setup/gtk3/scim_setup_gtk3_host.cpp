@@ -75,20 +75,28 @@ save_all_changed ()
         _config->flush ();
 }
 
-static void
-show_restart_hint ()
-{
-    GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (_window),
-                            GTK_DIALOG_MODAL,
-                            GTK_MESSAGE_INFO,
-                            GTK_BUTTONS_OK,
-                            _("Not all configuration can be reloaded on the fly. "
-                              "Don't forget to restart SCIM in order to let all of "
-                              "the new configuration take effect."));
-
-    gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
-}
+// Kept for the day a setting turns up that genuinely cannot be applied live.
+// Everything the setup pages write today -- engine enable/disable, filters,
+// hotkeys, frontend and panel options -- is picked up by the running daemon,
+// frontends and panel through the config reload, so nothing gates this and it
+// has no caller. To bring it back: uncomment, decide which key is not
+// reloadable, snapshot that key around save_all_changed () and call this from
+// ok_button_clicked_cb () when it changed.
+//
+// static void
+// show_restart_hint ()
+// {
+//     GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW (_window),
+//                             GTK_DIALOG_MODAL,
+//                             GTK_MESSAGE_INFO,
+//                             GTK_BUTTONS_OK,
+//                             _("Not all configuration can be reloaded on the fly. "
+//                               "Don't forget to restart SCIM in order to let all of "
+//                               "the new configuration take effect."));
+//
+//     gtk_dialog_run (GTK_DIALOG (dialog));
+//     gtk_widget_destroy (dialog);
+// }
 
 static void
 apply_button_clicked_cb (GtkButton *, gpointer)
@@ -100,8 +108,6 @@ static void
 ok_button_clicked_cb (GtkButton *, gpointer)
 {
     save_all_changed ();
-    if (_changes_applied)
-        show_restart_hint ();
     gtk_main_quit ();
 }
 

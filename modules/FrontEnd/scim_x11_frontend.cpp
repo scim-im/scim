@@ -2196,10 +2196,8 @@ X11FrontEnd::configure_panel_ui ()
 {
     if (!use_panel_ui ())
         return;
-    // Share the panel's configured font so both UIs look consistent.
-    String font = m_config->read (String ("/Panel/Gtk/Font"), String ());
-    if (font.length ())
-        m_panel_ui.ui ().set_font (font);
+    // Apply the configured font AND colors, matching the legacy GTK panel.
+    m_panel_ui.ui ().set_theme (scim_panel_ui_theme_from_config (m_config));
 }
 
 void
