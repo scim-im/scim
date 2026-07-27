@@ -295,9 +295,17 @@ String scim_get_home_dir ();
 String scim_get_user_name ();
 
 /**
- * @brief Get SCIM data dir of current user.
+ * @brief Get SCIM data (configuration) dir of current user ($XDG_CONFIG_HOME).
  */
 String scim_get_user_data_dir ();
+
+/**
+ * @brief Get SCIM state dir of current user ($XDG_STATE_HOME).
+ *
+ * For volatile per-user state (window positions, etc.) kept separate from the
+ * portable configuration. No legacy fallback and no migration.
+ */
+String scim_get_user_state_dir ();
 
 /**
  * @brief Load a file into memory.
@@ -409,8 +417,6 @@ int  scim_launch (bool          daemon,
  *                      otherwise the current process will be stopped until 
  *                      the newly created process exit.
  * @param config        The Config module to be used.
- * @param display       The display name on which the panel runs.
- *                      eg. for X11 : localhost:0.0
  * @param argv          Additional arguments passed to the new process's FrontEnd. Must
  *                      terminated by a NULL pointer.
  *
@@ -419,7 +425,6 @@ int  scim_launch (bool          daemon,
  */
 int scim_launch_panel (bool          daemon,
                        const String &config,
-                       const String &display,
                        char * const  argv [] = 0);
 
 /**

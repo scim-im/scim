@@ -121,6 +121,9 @@ public:
      *
      * @return true if the PanelAgent is initialized correctly and ready to run.
      */
+    /* @param display Display on which helper GUIs should be launched. It has
+     * no part in the panel socket address, which is derived per session by
+     * scim_get_default_panel_socket_address(). */
     bool initialize (const String &config, const String &display, bool resident = false);
 
     /**

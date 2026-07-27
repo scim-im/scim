@@ -86,13 +86,12 @@ HelperAgent::~HelperAgent ()
 }
 
 int
-HelperAgent::open_connection (const HelperInfo &info,
-                              const String     &display)
+HelperAgent::open_connection (const HelperInfo &info)
 {
     if (m_impl->socket.is_connected ())
         close_connection ();
 
-    SocketAddress address (scim_get_default_panel_socket_address (display));
+    SocketAddress address (scim_get_default_panel_socket_address ());
     int timeout = scim_get_default_socket_timeout ();
     uint32 magic;
 

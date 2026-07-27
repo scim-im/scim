@@ -36,6 +36,7 @@
 #include <sys/un.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <unistd.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -1222,7 +1223,39 @@ String scim_get_default_socket_config_address ()
     return address;
 }
 
-String scim_get_default_panel_socket_address (const String &display)
+// Instance discriminator for the panel socket.
+//
+// $XDG_RUNTIME_DIR is per-user, not per-session, so every concurrent login of
+// the same user shares it. Without a discriminator two sessions would collide
+// on bind(), and a frontend in one session could rendezvous with the panel of
+// another. The logind session id answers exactly that question ("which
+// concurrent login?") and is unambiguous on X11 and Wayland alike.
+//
+// Derived here and nowhere else. Callers used to pass their own idea of a
+// "display" name, and the rules differed between them: on Wayland the frontends
+// preferred $DISPLAY (":0") while a panel started without --display took GDK's
+// name ("wayland-0"), so the two computed different socket paths and never met.
+// Keeping the derivation in one place makes disagreement impossible, whatever
+// the key happens to be.
+static String scim_panel_socket_instance_id ()
+{
+    const char *id = getenv ("XDG_SESSION_ID");
+
+    if (id && *id)
+        return String (id);
+
+    // No logind session: fall back to the compositor or X display name. Any
+    // value serves, as long as everyone computes it identically -- which is now
+    // guaranteed, since this is the only place it is computed.
+    id = getenv ("WAYLAND_DISPLAY");
+
+    if (!id || !*id)
+        id = getenv ("DISPLAY");
+
+    return id ? String (id) : String ();
+}
+
+String scim_get_default_panel_socket_address ()
 {
     String address (SCIM_DEFAULT_PANEL_SOCKET_ADDRESS);
 
@@ -1242,31 +1275,21 @@ String scim_get_default_panel_socket_address (const String &display)
     if (!sockaddr.valid ())
         return String ();
 
-    String::size_type colon_pos = display.rfind (':');
-    String disp_name = display;
-    int    disp_num  = 0;
-
-    // Maybe It's a X11 DISPLAY name
-    if (colon_pos != String::npos) {
-        String::size_type dot_pos = display.find ('.', colon_pos+1);
-        // It has screen number
-        if (dot_pos != String::npos) {
-            disp_name = display.substr (0, dot_pos);
-        }
-        // FIXME: ignore remote X Server name.
-        disp_num = atoi (display.substr (colon_pos + 1, String::npos).c_str());
-    }
+    String instance = scim_panel_socket_instance_id ();
 
     if (sockaddr.get_family () == SCIM_SOCKET_LOCAL) {
-        for (size_t i = 0; i < disp_name.length(); ++i) {
-            if (disp_name[i] == '/') disp_name[i] = '_';
+        for (size_t i = 0; i < instance.length (); ++i) {
+            unsigned char c = static_cast<unsigned char> (instance[i]);
+            if (!isalnum (c) && c != '-' && c != '_' && c != '.')
+                instance[i] = '_';
         }
-        address = address + disp_name;
+        if (instance.length ())
+            address = address + String ("-") + instance;
     } else if (sockaddr.get_family () == SCIM_SOCKET_INET) {
         std::vector <String> varlist;
         scim_split_string_list (varlist, address, ':');
         if (varlist.size () == 3) {
-            int port = atoi (varlist [2].c_str ()) + disp_num;
+            int port = atoi (varlist [2].c_str ()) + atoi (instance.c_str ());
             char buf [10];
             snprintf (buf, 10, "%d", port);
             varlist [2] = String (buf);

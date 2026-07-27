@@ -625,6 +625,29 @@ scim_get_user_data_dir ()
     return xdg_dir;
 }
 
+static String
+scim_get_user_state_home ()
+{
+    const char *xdg = getenv ("XDG_STATE_HOME");
+
+    if (xdg && *xdg)
+        return String (xdg);
+
+    return scim_get_home_dir () + String ("/.local/state");
+}
+
+String
+scim_get_user_state_dir ()
+{
+    // Volatile state (window positions, etc.) lives under $XDG_STATE_HOME,
+    // separate from the portable configuration under $XDG_CONFIG_HOME. There
+    // is no legacy location and no migration -- a missing state dir just means
+    // defaults are used.
+    String dir = scim_get_user_state_home () + String ("/scim");
+    scim_make_dir (dir);
+    return dir;
+}
+
 String
 scim_get_current_locale ()
 {
@@ -1051,7 +1074,6 @@ int  scim_launch (bool          daemon,
 
 int scim_launch_panel (bool          daemon,
                        const String &config,
-                       const String &display,
                        char * const  argv [])
 {
     if (!config.length ())
@@ -1076,9 +1098,6 @@ int scim_launch_panel (bool          daemon,
     char *new_argv [80];
 
     new_argv [new_argc ++] = strdup (panel_program.c_str ());
-
-    new_argv [new_argc ++] = strdup ("--display");
-    new_argv [new_argc ++] = strdup (display.c_str ());
 
     new_argv [new_argc ++] = strdup ("-c");
     new_argv [new_argc ++] = strdup (config.c_str ());

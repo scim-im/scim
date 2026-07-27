@@ -90,9 +90,9 @@ public:
     {
     }
 
-    int  open_connection        (const String &config, const String &display)
+    int  open_connection        (const String &config)
     {
-        SocketAddress addr (scim_get_default_panel_socket_address (display));
+        SocketAddress addr (scim_get_default_panel_socket_address ());
 
         if (m_socket.is_connected ()) close_connection ();
 
@@ -103,7 +103,7 @@ public:
         while (1) {
             if ((ret = m_socket.connect (addr)) == false) {
                 scim_usleep (100000);
-                launch_panel (config, display);
+                launch_panel (config);
                 for (int i = 0; i < 200; ++i) {
                     if (m_socket.connect (addr)) {
                         ret = true;
@@ -555,10 +555,10 @@ public:
         return m_signal_change_factory.connect (slot);
     }
 private:
-    void launch_panel (const String &config, const String &display) const
+    void launch_panel (const String &config) const
     {
         char * my_argv [2] = {const_cast<char*> ("--no-stay"), 0};
-        scim_launch_panel (true, config, display, my_argv);
+        scim_launch_panel (true, config, my_argv);
     }
 };
 
@@ -573,9 +573,9 @@ PanelClient::~PanelClient ()
 }
 
 int
-PanelClient::open_connection (const String &config, const String &display)
+PanelClient::open_connection (const String &config)
 {
-    return m_impl->open_connection (config, display);
+    return m_impl->open_connection (config);
 }
 
 void

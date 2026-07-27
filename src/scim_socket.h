@@ -555,8 +555,14 @@ String scim_get_default_socket_config_address ();
  *
  * The panel running on local host should listen on this address by default.
  * All FrontEnds which need panel should connect to this address by default.
+ *
+ * The address carries a per-session discriminator (the logind session id, see
+ * the implementation) so that concurrent logins of the same user, which share
+ * $XDG_RUNTIME_DIR, get one panel each. It is derived internally: callers must
+ * not pass a display or session name of their own, or the two sides could
+ * disagree and never rendezvous.
  */
-String scim_get_default_panel_socket_address (const String &display);
+String scim_get_default_panel_socket_address ();
 
 /**
  * @brief Get the default socket address of Helper Manager Server running on localhost.

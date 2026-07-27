@@ -95,14 +95,12 @@ public:
      *
      * This method would try to launch the panel daemon and make connection again,
      * if the connection could not be established successfully.
-     * So this method should always success, unless the panel could not be started on
-     * the certain display.
+     * So this method should always success, unless the panel could not be started.
      *
      * @param config  The config module name which should be used by launching the panel daemon.
-     * @param display The display name which the panel daemon should run on.
      * @return The id of the socket connection, -1 means connection is failed.
      */
-    int  open_connection        (const String &config, const String &display);
+    int  open_connection        (const String &config);
 
     /**
      * @brief Close the connection to Panel.

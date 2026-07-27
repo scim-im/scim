@@ -1,9 +1,17 @@
 /SupportedUnicodeLocales = en_US.UTF-8
 /DefaultPanelProgram = scim-panel-gtk
 /DefaultConfigModule = simple
-/DefaultSocketFrontEndAddress = local:/tmp/scim-socket-frontend
-/DefaultSocketIMEngineAddress = local:/tmp/scim-socket-frontend
-/DefaultSocketConfigAddress = local:/tmp/scim-socket-frontend
-/DefaultPanelSocketAddress = local:/tmp/scim-panel-socket
-/DefaultHelperManagerSocketAddress = local:/tmp/scim-helper-manager-socket
+
+# Socket addresses. "default" means "whatever the library computes", which is
+# $XDG_RUNTIME_DIR/scim-<name> when a runtime directory exists and
+# /tmp/scim-<name> otherwise. Spelling the /tmp paths out here used to override
+# that computation unconditionally, so the runtime-directory support never took
+# effect and the sockets stayed world-visible under /tmp.
+#
+# Only set a literal address here to pin sockets somewhere specific.
+/DefaultSocketFrontEndAddress = default
+/DefaultSocketIMEngineAddress = default
+/DefaultSocketConfigAddress = default
+/DefaultPanelSocketAddress = default
+/DefaultHelperManagerSocketAddress = default
 /DefaultSocketTimeout = 5000

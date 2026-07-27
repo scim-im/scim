@@ -84,7 +84,7 @@ SetupUI::SetupUI (const ConfigPointer &config, const String &display, const Help
 
     m_query_changed_timeout = g_timeout_add (200, query_changed_timeout_cb, this);
 
-    m_helper_agent.open_connection (helper_info, display);
+    m_helper_agent.open_connection (helper_info);
 }
 
 SetupUI::~SetupUI ()

@@ -93,6 +93,12 @@ private:
     String get_userconf_dir ();
     String get_sysconf_filename ();
     String get_userconf_filename ();
+    String get_userstate_dir ();
+    String get_userstate_filename ();
+
+    // Keys under "/State/" are volatile state, stored in the state file
+    // ($XDG_STATE_HOME) rather than the config file ($XDG_CONFIG_HOME).
+    static bool is_state_key (const String &key);
 
     String trim_blank (const String &str);
     String get_param_portion (const String &str);
@@ -100,7 +106,9 @@ private:
 
     void parse_config (std::istream &is, KeyValueRepository &config);
 
-    void save_config (std::ostream &os);
+    // Write the config keys (state_only=false) or the state keys
+    // (state_only=true) from m_config to the stream.
+    void save_config (std::ostream &os, bool state_only);
 
     bool load_all_config ();
 

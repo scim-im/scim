@@ -369,49 +369,72 @@ SimpleConfig::flush()
     if (!m_new_config.size () && !m_erased_keys.size ())
         return true;
 
-    String userconf     = get_userconf_filename ();
-    String userconf_dir = get_userconf_dir ();
+    // Classify the pending changes: config keys (-> config file, bumps the
+    // update timestamp) vs. state keys (-> state file). A state-only change
+    // must not rewrite or re-stamp the config file.
+    bool config_changed = false;
+    bool state_changed  = false;
 
-    if (access (userconf_dir.c_str (), R_OK | W_OK) != 0) {
-        mkdir (userconf_dir.c_str (), S_IRUSR | S_IWUSR | S_IXUSR);
-        if (access (userconf_dir.c_str (), R_OK | W_OK) != 0)
-            return false;
-    }
-
-    if (userconf.length ()) {
-        // Reload config to ensure user made modification won't lost.
-        load_all_config ();
-
+    {
         KeyValueRepository::iterator i;
         std::vector<String>::iterator j;
-
-        // Merge new config with old ones.
         for (i = m_new_config.begin (); i != m_new_config.end (); ++i)
-            m_config [i->first] = i->second;
+            (is_state_key (i->first) ? state_changed : config_changed) = true;
+        for (j = m_erased_keys.begin (); j != m_erased_keys.end (); ++j)
+            (is_state_key (*j) ? state_changed : config_changed) = true;
+    }
 
-        // Remove all erased keys.
-        for (j = m_erased_keys.begin (); j != m_erased_keys.end (); ++j) {
-            if ((i = m_config.find (*j)) != m_config.end ())
-                m_config.erase (i);
-        }
+    // The dir helpers create the directories as a side effect.
+    String userconf  = get_userconf_filename ();
+    String userstate = get_userstate_filename ();
 
-        m_new_config.clear ();
-        m_erased_keys.clear ();
+    if (!userconf.length ())
+        return false;
 
+    // Reload config+state to ensure concurrent modifications aren't lost.
+    load_all_config ();
+
+    KeyValueRepository::iterator i;
+    std::vector<String>::iterator j;
+
+    // Merge new values with the reloaded ones.
+    for (i = m_new_config.begin (); i != m_new_config.end (); ++i)
+        m_config [i->first] = i->second;
+
+    // Remove all erased keys.
+    for (j = m_erased_keys.begin (); j != m_erased_keys.end (); ++j) {
+        if ((i = m_config.find (*j)) != m_config.end ())
+            m_config.erase (i);
+    }
+
+    m_new_config.clear ();
+    m_erased_keys.clear ();
+
+    bool ok = true;
+
+    if (config_changed) {
         gettimeofday (&m_update_timestamp, 0);
 
         char buf [128];
         snprintf (buf, 128, "%lu:%lu", m_update_timestamp.tv_sec, m_update_timestamp.tv_usec);
-
         m_config [String (SCIM_CONFIG_UPDATE_TIMESTAMP)] = String (buf);
 
         std::ofstream os (userconf.c_str ());
-        if (!os) return false;
-        save_config (os);
-        return true;
+        if (os)
+            save_config (os, false);
+        else
+            ok = false;
     }
 
-    return false;
+    if (state_changed) {
+        std::ofstream os (userstate.c_str ());
+        if (os)
+            save_config (os, true);
+        else
+            ok = false;
+    }
+
+    return ok;
 }
 
 // delete entries
@@ -492,6 +515,20 @@ SimpleConfig::get_userconf_filename ()
 }
 
 String
+SimpleConfig::get_userstate_dir ()
+{
+    return scim_get_user_state_dir ();
+}
+
+String
+SimpleConfig::get_userstate_filename ()
+{
+    return get_userstate_dir () +
+           String (SCIM_PATH_DELIM_STRING) +
+           String ("state");
+}
+
+String
 SimpleConfig::trim_blank (const String &str)
 {
     String::size_type begin, len;
@@ -565,12 +602,20 @@ SimpleConfig::parse_config (std::istream &is, KeyValueRepository &config)
 }
 
 void
-SimpleConfig::save_config (std::ostream &os)
+SimpleConfig::save_config (std::ostream &os, bool state_only)
 {
     KeyValueRepository::iterator i;
     for (i = m_config.begin (); i != m_config.end (); ++i) {
+        if (is_state_key (i->first) != state_only)
+            continue;
         os << i->first << " = " << i->second << "\n";
     }
+}
+
+bool
+SimpleConfig::is_state_key (const String &key)
+{
+    return key.compare (0, 7, "/State/") == 0;
 }
 
 bool
@@ -586,6 +631,17 @@ SimpleConfig::load_all_config ()
         if (is) {
             SCIM_DEBUG_CONFIG(1) << "Parsing user config file: "
                                  << userconf << "\n";
+            parse_config (is, config);
+        }
+    }
+
+    // Volatile state (/State/*) lives in a separate state file.
+    String userstate = get_userstate_filename ();
+    if (userstate.length ()) {
+        std::ifstream is (userstate.c_str ());
+        if (is) {
+            SCIM_DEBUG_CONFIG(1) << "Parsing user state file: "
+                                 << userstate << "\n";
             parse_config (is, config);
         }
     }

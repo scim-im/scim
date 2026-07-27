@@ -214,7 +214,7 @@ public:
         m_display_name = display;
         m_should_resident = resident;
 
-        m_socket_address = scim_get_default_panel_socket_address (display);
+        m_socket_address = scim_get_default_panel_socket_address ();
 
         m_socket_server.shutdown ();
 

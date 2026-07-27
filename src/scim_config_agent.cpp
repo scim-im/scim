@@ -453,7 +453,7 @@ int main (int argc, char *argv [])
 
         int          id;
 
-        id = helper_agent.open_connection (helper_info, display);
+        id = helper_agent.open_connection (helper_info);
 
         if (id < 0) {
             cerr << "Unable to open the connection to scim Panel.\n";

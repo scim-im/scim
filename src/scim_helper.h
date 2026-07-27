@@ -170,13 +170,11 @@ public:
      * screen of this Helper. The ic and ic_uuid parameters are invalid here.
      *
      * @param info The information of this Helper object.
-     * @param display The display which this Helper object should run on.
      *
      * @return The connection socket id. -1 means failed to create
      *         the connection.
      */
-    int  open_connection        (const HelperInfo   &info,
-                                 const String       &display);
+    int  open_connection        (const HelperInfo   &info);
 
     /**
      * @brief Close the socket connection to Panel.
