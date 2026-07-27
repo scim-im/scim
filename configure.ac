@@ -390,8 +390,33 @@ PKG_CHECK_MODULES(DBUS, [dbus-1],
 			[SCIM_HAS_DBUS=no])
 
 
+# X11/XWayland support is controlled by --enable-frontend-x11 (default: auto --
+# built when X11 is detected). Disabling it drops the whole X11 build (the XIM
+# frontend, x11utils, the cairo-xlib panel shim and the gtk2/gtk3 IM modules)
+# for a Wayland-only system. Declared here, ahead of the other frontend
+# toggles, so the X11 decision is settled for everything below.
+AC_ARG_ENABLE([frontend-x11],
+	[AS_HELP_STRING([--disable-frontend-x11],
+		[Do not build X11/XWayland support (for Wayland-only systems)])],
+	[],
+	[enable_frontend_x11=check])
+
 # Checks for X11 header files.
 AC_PATH_XTRA
+
+# --disable-frontend-x11 behaves as if X11 were absent; an explicit
+# --enable-frontend-x11 with no X11 present is an error.
+if test "$enable_frontend_x11" = "no"; then
+  have_x=no
+elif test "$enable_frontend_x11" = "yes" -a "$have_x" != "yes"; then
+  AC_MSG_ERROR([--enable-frontend-x11 requires X11 headers/libraries (use --disable-frontend-x11 for a Wayland-only build)])
+fi
+if test "$have_x" = "yes"; then
+  enable_frontend_x11=yes
+  AC_DEFINE([SCIM_ENABLE_X11], [1], [Define to 1 if X11/XWayland support is enabled.])
+else
+  enable_frontend_x11=no
+fi
 
 # Add -lX11 to X_LIBS
 if test "$have_x" = "yes"; then
@@ -479,11 +504,6 @@ AC_ARG_ENABLE([config-socket],
 	[],
 	[enable_config_socket=yes])
 
-AC_ARG_ENABLE([frontend-x11],
-	[AS_HELP_STRING([--disable-frontend-x11],
-		[Do not build X11 FrontEnd module])],
-	[],
-	[enable_frontend_x11=yes])
 
 AC_ARG_ENABLE([frontend-socket],
 	[AS_HELP_STRING([--disable-frontend-socket],
@@ -492,8 +512,8 @@ AC_ARG_ENABLE([frontend-socket],
 	[enable_frontend_socket=yes])
 
 AC_ARG_ENABLE([frontend-wayland],
-	[AS_HELP_STRING([--enable-frontend-wayland],
-		[Build the Wayland input-method-v2 FrontEnd module (default: auto)])],
+	[AS_HELP_STRING([--disable-frontend-wayland],
+		[Do not build Wayland support (for X11-only systems; default: auto)])],
 	[],
 	[enable_frontend_wayland=check])
 
@@ -642,6 +662,7 @@ if test "$enable_frontend_wayland" != "no"; then
   if test "$SCIM_HAS_WAYLAND" = "yes" -a "$SCIM_HAS_CAIRO" = "yes" -a -n "$WAYLAND_SCANNER"; then
     SCIM_BUILD_FRONTEND_WAYLAND=1
     enable_frontend_wayland=yes
+    AC_DEFINE([SCIM_ENABLE_WAYLAND], [1], [Define to 1 if Wayland support is enabled.])
   elif test "$enable_frontend_wayland" = "yes"; then
     AC_MSG_ERROR([--enable-frontend-wayland requires wayland-client, xkbcommon, cairo/pango and wayland-scanner])
   else
@@ -714,14 +735,16 @@ else
   enable_filter_sctc=no
 fi
 
-if test "$enable_gtk2_immodule" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
+# The gtk2/gtk3 IM modules are the X11/XWayland integration path and use the
+# x11utils keymask helpers, so they need X11.
+if test "$enable_gtk2_immodule" = "yes" -a "$SCIM_HAS_GTK2" = "yes" -a "$have_x" = "yes"; then
   SCIM_BUILD_GTK2_IMMODULE=1
 else
   SCIM_BUILD_GTK2_IMMODULE=0
   enable_gtk2_immodule=no
 fi
 
-if test "$enable_gtk3_immodule" = "yes" -a "$SCIM_HAS_GTK3" = "yes"; then
+if test "$enable_gtk3_immodule" = "yes" -a "$SCIM_HAS_GTK3" = "yes" -a "$have_x" = "yes"; then
   SCIM_BUILD_GTK3_IMMODULE=1
 else
   SCIM_BUILD_GTK3_IMMODULE=0
@@ -1069,13 +1092,13 @@ Build options:
   Build documents          $enable_documents
   Ordered (std::map) mode  $enable_ordered_map
 
-Module options:           
+Module options:
   Simple config module     $enable_config_simple
   Socket config module     $enable_config_socket
 
-  X11 FrontEnd module      $enable_frontend_x11
+  X11/XWayland support     $enable_frontend_x11
+  Wayland support          $enable_frontend_wayland
   Socket FrontEnd module   $enable_frontend_socket
-  Wayland FrontEnd module  $enable_frontend_wayland
   IBus FrontEnd module     $enable_frontend_ibus
 
   Cairo panel renderer     $enable_panel_ui

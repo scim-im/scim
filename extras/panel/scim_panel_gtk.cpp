@@ -25,6 +25,10 @@
  * $Id: scim_panel_gtk.cpp,v 1.118.2.15 2007/04/11 11:30:31 suzhe Exp $
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -34,7 +38,7 @@
 #include <glib.h>
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
-#ifdef GDK_WINDOWING_X11
+#if defined(GDK_WINDOWING_X11) && defined(SCIM_ENABLE_X11)
 #include <gdk/x11/gdkx.h>
 #include <X11/Xlib.h>
 #endif
@@ -695,7 +699,7 @@ panel_window_move (GtkWidget *w, int x, int y)
 {
     if (!w) return;
 
-#ifdef GDK_WINDOWING_X11
+#if defined(GDK_WINDOWING_X11) && defined(SCIM_ENABLE_X11)
     GdkDisplay *display = gtk_widget_get_display (w);
     if (display && GDK_IS_X11_DISPLAY (display)) {
         if (!gtk_widget_get_realized (w))
