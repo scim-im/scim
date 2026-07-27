@@ -297,8 +297,12 @@ fi
 
 
 
-# Check if we should build the scim Qt input-method module
-PKG_CHECK_MODULES(QT5, [xproto, xcb-keysyms, Qt5X11Extras >= 5.0, Qt5Widgets >= 5.0],
+# Check if we should build the scim Qt input-method module.
+# The module is a QPlatformInputContext plugin that uses only Qt's abstracted
+# APIs (QGuiApplication, QInputMethod, qe->nativeVirtualKey()), so it needs
+# just Qt5Gui -- no X11/xcb/Qt5X11Extras (those were a stale coupling and are
+# dropped so the plugin works the same on X11 and Wayland).
+PKG_CHECK_MODULES(QT5, [Qt5Gui >= 5.0],
             [SCIM_HAS_QT5=yes],
             [SCIM_HAS_QT5=no])
 
