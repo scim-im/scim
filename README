@@ -120,7 +120,7 @@ directory (`pkg-config --variable=pkgdatadir ibus-1.0`/component, typically
 To expose every *enabled* SCIM engine as its own IBus entry, regenerate the
 manifest from the actually-enabled engines:
 
-  scim -f ibus --xml > /usr/share/ibus/component/scim.xml
+  scim -f ibus -- --xml > /usr/share/ibus/component/scim.xml
 
 The generator enumerates the engines visible in the environment it runs in, so
 run it as the identity whose engines you want to appear.  ibus-daemon scans the
@@ -134,7 +134,7 @@ Regenerate the system manifest whenever the set of installed SCIM IMEngine
 packages changes -- i.e. watch the IMEngine module directory
 (`$(libdir)/scim-1.0/*/IMEngine/`) and, on any install or removal, run
 
-  scim -f ibus --xml > /usr/share/ibus/component/scim.xml
+  scim -f ibus -- --xml > /usr/share/ibus/component/scim.xml
 
 Wire this to your package manager's hooks: a dpkg trigger, an rpm file trigger,
 or a pacman hook on that directory.  Run it as root, so it enumerates only the
@@ -149,11 +149,14 @@ you installed for your user, or a licensed engine that cannot be installed
 system-wide -- is invisible to the system generator.  To use it under IBus,
 generate your own manifest and point ibus-daemon at it:
 
-  1. Generate a personal manifest as yourself (this enumerates your FULL
-     enabled set -- the system engines PLUS your own):
+  1. Generate a personal manifest as yourself.  Run as you, the generator sees
+     both the system-wide engines AND the ones in your home, so your personal
+     manifest lists your full ENABLED set from both -- a superset of the system
+     manifest in that sense (it still lists only enabled engines, not disabled
+     ones; see the note below):
 
        mkdir -p ~/.local/share/ibus/component
-       scim -f ibus --xml > ~/.local/share/ibus/component/scim.xml
+       scim -f ibus -- --xml > ~/.local/share/ibus/component/scim.xml
 
   2. Tell ibus-daemon to scan that directory by exporting IBUS_COMPONENT_PATH
      BEFORE ibus-daemon starts (in your login shell profile or systemd user
@@ -163,9 +166,16 @@ generate your own manifest and point ibus-daemon at it:
 
   3. Restart the session (or ibus-daemon) so it re-scans.
 
-The personal manifest is a superset that SUBSTITUTES for the system one for
-your session; it is not meant to be merged with it.  Regenerate it whenever you
-enable/disable engines or install a new user-level engine.
+The personal manifest SUBSTITUTES for the system one for your session (it is
+not merged with it), so it must carry every engine you want, both system and
+personal.  Regenerate it whenever you enable/disable engines or install a new
+user-level engine.
+
+Why enabled-only?  The manifest lists the engines SCIM currently offers, which
+is what the input-source coordinator keeps in sync with GNOME.  To expose an
+engine you have turned off, enable it in scim-setup first, then regenerate.
+Disabled engines are deliberately left out so GNOME does not offer engines the
+coordinator would not treat as available.
 
 
 Tips

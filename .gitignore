@@ -76,6 +76,9 @@ Makefile.in
 # Generated IBus component manifest (from scim.xml.in)
 /modules/FrontEnd/scim.xml
 
+# Generated KWin virtual-keyboard entry (from scim-virtual-keyboard.desktop.in)
+/data/scim-virtual-keyboard.desktop
+
 # Built executables
 /src/scim
 /src/scim-launcher
@@ -84,4 +87,3 @@ Makefile.in
 /src/scim-helper-manager
 /src/scim-ibus-sync
 /extras/panel/scim-panel-gtk
-/extras/immodules/agent/scim-im-agent

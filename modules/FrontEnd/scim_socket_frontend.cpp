@@ -779,6 +779,17 @@ SocketFrontEnd::socket_new_instance (int client_id)
         m_receive_trans.get_data (encoding)) {
         int siid = new_instance (sfid, encoding);
 
+        // The requested factory may have just been enabled -- it was in the
+        // disabled list when this daemon loaded, so the backend dropped it.
+        // Re-apply the disabled list and retry once before giving up. This is
+        // the daemon-side equivalent of ibus.so's lazy create-engine reload,
+        // which a relay-mode client (its backend is the socket proxy, not the
+        // real CommonBackEnd) cannot do itself.
+        if (siid < 0) {
+            reload_disabled_factories ();
+            siid = new_instance (sfid, encoding);
+        }
+
         // Instance created OK.
         if (siid >= 0) {
             SocketInstanceRepository::iterator it =

@@ -1226,33 +1226,70 @@ String scim_get_default_socket_config_address ()
 // Instance discriminator for the panel socket.
 //
 // $XDG_RUNTIME_DIR is per-user, not per-session, so every concurrent login of
-// the same user shares it. Without a discriminator two sessions would collide
-// on bind(), and a frontend in one session could rendezvous with the panel of
-// another. The logind session id answers exactly that question ("which
-// concurrent login?") and is unambiguous on X11 and Wayland alike.
+// the same user shares it. Without a discriminator two logins would collide on
+// bind(), and a frontend could rendezvous with the wrong panel.
 //
-// Derived here and nowhere else. Callers used to pass their own idea of a
-// "display" name, and the rules differed between them: on Wayland the frontends
-// preferred $DISPLAY (":0") while a panel started without --display took GDK's
-// name ("wayland-0"), so the two computed different socket paths and never met.
-// Keeping the derivation in one place makes disagreement impossible, whatever
-// the key happens to be.
+// The panel is a per-display resource: every client drawing on one display has
+// to find the same panel, no matter how the client was started. The logind
+// session id looked like the right question ("which concurrent login?") but
+// scopes it too tightly -- an application launched from another session on the
+// same display (ssh, tmux, or a systemd user unit, which has no session id at
+// all) computed a different path, failed to connect, and started a second panel
+// with its own tray icon.
+//
+// So key on the display, canonicalised. Derived here and nowhere else: callers
+// used to pass their own idea of a display name and the rules differed between
+// them, on Wayland the frontends preferring $DISPLAY (":0") while a panel
+// started without --display took GDK's name ("wayland-0"), so the two never met.
+// $DISPLAY is consulted first, and on a Wayland session that is deliberate.
+// XWayland clients and native clients share one desktop and must share one
+// panel, and $DISPLAY is the variable both of them carry -- whereas
+// $WAYLAND_DISPLAY is missing from anything started before the compositor
+// exported it, which is exactly how a session ends up with a panel on
+// "wayland-0" and a socket frontend on "0" that never meet.
+//
+// The consequence is that nested compositors sharing a $DISPLAY also share a
+// panel. Set $SCIM_PANEL_SOCKET_ADDRESS to separate them deliberately.
 static String scim_panel_socket_instance_id ()
 {
-    const char *id = getenv ("XDG_SESSION_ID");
+    const char *dpy = getenv ("DISPLAY");
 
-    if (id && *id)
-        return String (id);
+    if (!dpy || !*dpy) {
+        // No X server at all: a pure Wayland session, where the compositor
+        // socket is the only display identity available.
+        const char *wl = getenv ("WAYLAND_DISPLAY");
 
-    // No logind session: fall back to the compositor or X display name. Any
-    // value serves, as long as everyone computes it identically -- which is now
-    // guaranteed, since this is the only place it is computed.
-    id = getenv ("WAYLAND_DISPLAY");
+        if (!wl || !*wl)
+            return String ();
 
-    if (!id || !*id)
-        id = getenv ("DISPLAY");
+        String id (wl);
 
-    return id ? String (id) : String ();
+        // May be an absolute path; the socket's own name identifies the
+        // compositor just as well and keeps the key short.
+        String::size_type slash = id.rfind ('/');
+
+        if (slash != String::npos)
+            id.erase (0, slash + 1);
+
+        return id;
+    }
+
+    String id (dpy);
+
+    // "host:display.screen" -> "display". The host is irrelevant to a local
+    // socket, and a second X screen does not warrant a panel of its own; what
+    // matters is that ":0", ":0.0" and "host:0" all agree on one key.
+    String::size_type colon = id.rfind (':');
+
+    if (colon != String::npos)
+        id.erase (0, colon + 1);
+
+    String::size_type dot = id.find ('.');
+
+    if (dot != String::npos)
+        id.erase (dot);
+
+    return id;
 }
 
 String scim_get_default_panel_socket_address ()

@@ -1,0 +1,25 @@
+[Desktop Entry]
+Type=Application
+Name=SCIM Input Method
+GenericName=Input Method
+Comment=Smart Common Input Method, as the compositor's input method
+Exec=@SCIM_LIBEXECDIR@/scim-launcher -c socket -e socket -f wayland
+Icon=scim
+Terminal=false
+NoDisplay=true
+X-KDE-Wayland-VirtualKeyboard=true
+# Offers scim to KWin as the session's input method, selectable under
+# System Settings -> Keyboard -> Virtual Keyboard.
+#
+# wayland.so speaks both input-method protocol generations and binds whichever
+# the compositor offers, so this entry needs no per-desktop knowledge: KWin gets
+# input-method-v1, a wlroots compositor would get v2.
+#
+# The input method has to be launched by KWin: it hands out zwp_input_method_v1
+# only to the process it started for this role, so the autostart entry
+# (scim.desktop) cannot obtain it.
+# The launcher is exec'd directly rather than through "scim -f wayland": KWin
+# hands the input method a pre-connected wayland fd in WAYLAND_SOCKET, and the
+# wrapper would fork and exec a second time, after which the fd is no longer
+# there to inherit. -c socket -e socket adopts the warm backend that scim -d
+# supervises instead of loading every engine again.

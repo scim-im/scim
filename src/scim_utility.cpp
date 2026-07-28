@@ -37,6 +37,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <time.h>
 #include <errno.h>
@@ -1171,8 +1172,22 @@ scim_usleep (unsigned int usec)
 void scim_daemon ()
 {
 #if HAVE_DAEMON
-    if (daemon (0, 0) == -1)
+    // noclose=1 so stderr survives: under systemd and gnome-session it is wired
+    // to the journal, and discarding it hides supervisor restart loops (a child
+    // that fails to load can respawn forever with nothing logged anywhere).
+    // stdin/stdout are still detached below so we do not hold on to a terminal.
+    if (daemon (0, 1) == -1) {
         std::cerr << "Error to make SCIM into a daemon!\n";
+        return;
+    }
+
+    int fd = open ("/dev/null", O_RDWR);
+    if (fd >= 0) {
+        dup2 (fd, STDIN_FILENO);
+        dup2 (fd, STDOUT_FILENO);
+        if (fd > STDERR_FILENO)
+            close (fd);
+    }
 
     return;
 #else        

@@ -16,7 +16,7 @@ scim \(em smart common input method
 .RB [ \-\-no\-socket ]
 .RB [ \-d ]
 .br
-.B scim \-f ibus \-\-xml
+.B scim \-f ibus \-\- \-\-xml
 .br
 .B scim \-h
 .
@@ -70,16 +70,16 @@ three groups \(em FrontEnd, Config and IMEngine.
 Do not start a socket FrondEnd module.
 .TP
 .B \-\-xml
-Only meaningful together with \fB\-f ibus\fR: print the IBus component manifest
-(one \fB<engine>\fR entry per enabled SCIM engine) to standard output and exit,
-without connecting to IBus.
+A frontend argument, so pass it after \fB\-\-\fR and only with \fB\-f ibus\fR:
+print the IBus component manifest (one \fB<engine>\fR entry per enabled SCIM
+engine) to standard output and exit, without connecting to IBus.
 Use it to (re)generate the installed component, e.g.
 .RS
 .IP
-.B scim \-f ibus \-\-xml > /usr/share/ibus/component/scim.xml
+.B scim \-f ibus \-\- \-\-xml > /usr/share/ibus/component/scim.xml
 .RE
 .IP
-after the set of installed or enabled engines changes.
+after the set of enabled engines changes.
 .TP
 .B \-\-ibus
 Only meaningful together with \fB\-f ibus\fR: run as an embedded IBus engine

@@ -25,4 +25,19 @@ SUBDIRS			= icons pixmaps
 # coordinator (see src/scim.cpp).
 autostartdir		= $(sysconfdir)/xdg/autostart
 autostart_DATA		= scim.desktop
-EXTRA_DIST		= scim.desktop
+
+# Offered to KWin as a selectable input method (System Settings -> Keyboard ->
+# Virtual Keyboard). Plasma only grants zwp_input_method_manager_v2 to the
+# process it launches for that role, so the wayland frontend needs this entry.
+desktopdir		= $(datadir)/applications
+desktop_DATA		= scim-virtual-keyboard.desktop
+
+# Substituted at make time, not by config.status: SCIM_LIBEXECDIR still holds an
+# unexpanded ${exec_prefix}, which make resolves but a .desktop parser would not.
+scim-virtual-keyboard.desktop: scim-virtual-keyboard.desktop.in Makefile
+	$(AM_V_GEN) sed -e 's|@SCIM_LIBEXECDIR[@]|$(SCIM_LIBEXECDIR)|g' \
+		$(srcdir)/scim-virtual-keyboard.desktop.in > $@
+
+CLEANFILES		+= scim-virtual-keyboard.desktop
+
+EXTRA_DIST		= scim.desktop scim-virtual-keyboard.desktop.in

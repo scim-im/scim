@@ -45,26 +45,6 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-#ifndef SCIM_IBUS_SYNC_PROGRAM
-  #define SCIM_IBUS_SYNC_PROGRAM  (SCIM_LIBEXECDIR "/scim-ibus-sync")
-#endif
-
-// fork+exec a program and wait for it; returns its exit status, or -1 if it
-// died on a signal / could not be run.
-static int spawn_wait (const char *program, char *const argv [])
-{
-    pid_t pid = fork ();
-    if (pid < 0) return -1;
-    if (pid == 0) {
-        execv (program, argv);
-        _exit (127);
-    }
-    int status;
-    if (waitpid (pid, &status, 0) == pid && WIFEXITED (status))
-        return WEXITSTATUS (status);
-    return -1;
-}
-
 // Run @launch (which blocks until the child exits, returning its status). When
 // @supervise is set, restart a crashed child with exponential backoff; a clean
 // exit (status 0) stops supervision. Without @supervise, run once and return.
@@ -264,8 +244,9 @@ int main (int argc, char *argv [])
                  << "                          its children; on a GNOME/IBus session it runs the\n"
                  << "                          input-source coordinator instead of a frontend).\n"
                  << "  --no-socket             Do not try to start a SCIM SocketFrontEnd daemon.\n"
-                 << "  --xml                   With '-f ibus', print the IBus component manifest\n"
-                 << "                          for the enabled engines and exit.\n"
+                 << "  --xml                   With '-f ibus' and passed after '--', print the\n"
+                 << "                          IBus component manifest for the enabled engines\n"
+                 << "                          and exit.\n"
                  << "  -h, --help              Show this help message.\n";
             return 0;
         }
@@ -330,23 +311,34 @@ int main (int argc, char *argv [])
     }
 
     // GNOME / any ibus session: the IME is served by ibus.so via ibus-daemon,
-    // so we run the persistent, backend-free engine-list sync coordinator
-    // instead of our own frontends. It needs no frontend/config module, so it
-    // is decided BEFORE those availability checks. (Skipped when -f was given
-    // explicitly, or when the coordinator binary is not installed.)
-    {
-        const char *coord_env = getenv ("SCIM_IBUS_SYNC_PROGRAM");
-        String coord_prog = (coord_env && *coord_env) ? String (coord_env)
-                                                      : String (SCIM_IBUS_SYNC_PROGRAM);
-        if (ibus_session && !frontend_forced &&
-            access (coord_prog.c_str (), X_OK) == 0) {
-            cerr << "GNOME/ibus session: running the SCIM engine-list sync coordinator...\n";
+    // not by our own input frontends. Here this process runs the shared backend
+    // daemon that ibus.so relays to: a SocketFrontEnd (a warm backend, so engine
+    // activation is instant and learned state survives ibus-daemon killing and
+    // relaunching ibus.so) plus the "ibussync" coordinator frontend, which keeps
+    // the enabled engines in sync with GNOME's input-source list off that same
+    // backend directly. Both run in one daemon over one backend. This is decided
+    // BEFORE the frontend/config availability checks; skipped when -f was given.
+    if (ibus_session && !frontend_forced) {
+        bool have_socket =
+            std::find (frontend_list.begin (), frontend_list.end (),
+                       String ("socket")) != frontend_list.end ();
+        bool have_ibussync =
+            std::find (frontend_list.begin (), frontend_list.end (),
+                       String ("ibussync")) != frontend_list.end ();
+
+        String fe;
+        if (have_socket)   fe = String ("socket");
+        if (have_ibussync) fe += (fe.length () ? String (",") : String ()) + String ("ibussync");
+
+        if (fe.length ()) {
+            cerr << "GNOME/ibus session: running the shared SCIM backend daemon ("
+                 << fe << ")...\n";
             if (daemon)
                 scim_daemon ();   // background ourselves; become the supervisor
-            char *coord_argv [] = { const_cast<char*> (coord_prog.c_str ()), 0 };
-            run_supervised (daemon,
-                            [&] () { return spawn_wait (coord_prog.c_str (), coord_argv); });
-            return 0;
+            int rc = run_supervised (daemon, [&] () {
+                return scim_launch (false, def_config, "all", fe, new_argv);
+            });
+            return rc == 0 ? 0 : rc;
         }
     }
 

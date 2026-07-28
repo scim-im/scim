@@ -143,25 +143,13 @@ scim_config_agent_LDFLAGS = @LTLIBINTL@
 
 libexecdir		= $(libdir)/scim@SCIM_EPOCH@
 
-if SCIM_BUILD_IBUS_SYNC
-IBUS_SYNC_PROGRAM	= scim-ibus-sync
-endif
-
-libexec_PROGRAMS        = scim-launcher scim-helper-launcher scim-helper-manager \
-			  $(IBUS_SYNC_PROGRAM)
+libexec_PROGRAMS        = scim-launcher scim-helper-launcher scim-helper-manager
 
 scim_launcher_SOURCES 	= scim_launcher.cpp
 scim_launcher_LDADD	= libscim@SCIM_EPOCH@.la
 scim_launcher_LDFLAGS	= @LTLIBINTL@
 
-# Persistent, backend-free coordinator for GNOME/ibus sessions.
-scim_ibus_sync_SOURCES	= scim_ibus_sync_server.cpp scim_ibus_sync.cpp scim_ibus_sync.h
-scim_ibus_sync_CXXFLAGS	= @GIO_CFLAGS@ @IBUS_CFLAGS@ \
-			  -DSCIM_BINDIR='"$(bindir)"'
-scim_ibus_sync_LDADD	= libscim@SCIM_EPOCH@.la @GIO_LIBS@ @IBUS_LIBS@
-scim_ibus_sync_LDFLAGS	= @LTLIBINTL@
-
-scim_helper_launcher_SOURCES 	= scim_helper_launcher.cpp 
+scim_helper_launcher_SOURCES 	= scim_helper_launcher.cpp
 scim_helper_launcher_LDADD	= libscim@SCIM_EPOCH@.la
 scim_helper_launcher_LDFLAGS	= @LTLIBINTL@
 

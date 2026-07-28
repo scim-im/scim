@@ -963,9 +963,9 @@ AM_CONDITIONAL(SCIM_BUILD_FRONTEND_IBUS,
 AM_CONDITIONAL(SCIM_BUILD_GSETTINGS,
 		[test "$SCIM_HAS_GSETTINGS" = "yes"])
 
-# The ibus engine-list sync coordinator needs both GSettings (to watch the
-# input-source list) and ibus (to read the installed engine set from the
-# component manifest).
+# The ibussync coordinator frontend needs both GSettings (to watch the GNOME
+# input-source list) and ibus (to read the installed engine set live via
+# ibus_bus_list_engines()).
 AM_CONDITIONAL(SCIM_BUILD_IBUS_SYNC,
 		[test "$SCIM_HAS_GSETTINGS" = "yes" -a "$SCIM_HAS_IBUS" = "yes"])
 

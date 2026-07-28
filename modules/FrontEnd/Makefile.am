@@ -80,18 +80,24 @@ if SCIM_BUILD_FRONTEND_IBUS
 CONFIG_FRONTEND_IBUS_MODULE	= ibus.la
 endif
 
+if SCIM_BUILD_IBUS_SYNC
+CONFIG_FRONTEND_IBUSSYNC_MODULE	= ibussync.la
+endif
+
 noinst_HEADERS		= scim_x11_ic.h \
 		  	  scim_x11_frontend.h \
 			  scim_socket_frontend.h \
 			  scim_wayland_frontend.h \
-			  scim_ibus_frontend.h
+			  scim_ibus_frontend.h \
+			  scim_ibus_sync.h
 
 moduledir		= $(libdir)/scim@SCIM_EPOCH@/$(SCIM_BINARY_VERSION)/FrontEnd
 
 module_LTLIBRARIES	= $(CONFIG_FRONTEND_X11_MODULE) \
 		     	  $(CONFIG_FRONTEND_SOCKET_MODULE) \
 		     	  $(CONFIG_FRONTEND_WAYLAND_MODULE) \
-		     	  $(CONFIG_FRONTEND_IBUS_MODULE)
+		     	  $(CONFIG_FRONTEND_IBUS_MODULE) \
+		     	  $(CONFIG_FRONTEND_IBUSSYNC_MODULE)
 
 x11_la_SOURCES 		= scim_x11_frontend.cpp \
 			  scim_x11_ic.cpp
@@ -136,6 +142,23 @@ ibus_la_LDFLAGS		= -avoid-version \
 			  @LTLIBINTL@
 
 ibus_la_LIBADD		= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
+
+ibussync_la_SOURCES	= scim_ibussync_frontend.cpp \
+			  scim_ibus_sync.cpp
+
+ibussync_la_CFLAGS	= @GIO_CFLAGS@ @IBUS_CFLAGS@
+
+ibussync_la_CXXFLAGS	= @GIO_CFLAGS@ @IBUS_CFLAGS@
+
+ibussync_la_LDFLAGS	= -avoid-version \
+			  -rpath $(moduledir) \
+			  -module \
+			  @LIBTOOL_EXPORT_OPTIONS@ \
+			  @GIO_LIBS@ \
+			  @IBUS_LIBS@ \
+			  @LTLIBINTL@
+
+ibussync_la_LIBADD	= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
 
 wayland_la_SOURCES 	= scim_wayland_frontend.cpp
 

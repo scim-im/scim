@@ -6,7 +6,7 @@
      engine). To expose every enabled SCIM engine as its own IBus entry,
      regenerate this file from the actually-enabled engines:
 
-         scim -f ibus --xml > THIS_FILE
+         scim -f ibus -- --xml > THIS_FILE
 
      (run it again whenever the set of enabled SCIM engines changes).
 
@@ -21,7 +21,7 @@
      cannot be installed system-wide) are not visible to the system generator.
      A user who has such engines runs the SAME command as themselves:
 
-         scim -f ibus --xml > ~/.local/share/ibus/component/scim.xml
+         scim -f ibus -- --xml > ~/.local/share/ibus/component/scim.xml
 
      and exports IBUS_COMPONENT_PATH to that directory BEFORE ibus-daemon
      starts (login shell or systemd user environment; ibus scans component
@@ -33,7 +33,7 @@
 <component>
     <name>org.freedesktop.IBus.SCIM</name>
     <description>Smart Common Input Method</description>
-    <exec>@bindir@/scim -f ibus --no-socket -- --ibus</exec>
+    <exec>@bindir@/scim -f ibus -- --ibus</exec>
     <version>@VERSION@</version>
     <author>SCIM developers</author>
     <license>LGPL</license>
