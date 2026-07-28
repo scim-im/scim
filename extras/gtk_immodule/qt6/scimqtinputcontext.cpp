@@ -59,6 +59,15 @@
 #include "scim_private.h"
 #include "scim.h"
 
+#ifdef SCIM_HAS_CANDIDATES
+#include "scim_candidates.h"
+#include <QtGui/QRasterWindow>
+#include <QtGui/QPainter>
+#include <QtGui/QImage>
+#include <QtGui/QMouseEvent>
+#include <cairo.h>
+#endif
+
 #include "scimqtinputcontext.h"
 
 using namespace scim;
@@ -638,11 +647,125 @@ static void slot_show_aux_string (IMEngineInstanceBase *si)
         _panel_client.show_aux_string (ic->impl->id);
 }
 
+#ifdef SCIM_HAS_CANDIDATES
+static void candidates_route_click (CandidatesUI::HitType hit, int idx);
+
+// Cairo candidate renderer hosted in a QtGui-only raster window (no QtWidgets
+// dependency). Drawn by blitting the shared CandidatesUI's Cairo output.
+class ScimCandidatesWindow : public QRasterWindow
+{
+public:
+    CandidatesUI ui;
+    ScimCandidatesWindow () { setFlags (Qt::ToolTip | Qt::FramelessWindowHint); }
+
+    void refresh () {
+        int w = 0, h = 0;
+        ui.measure (w, h);
+        if (w > 0 && h > 0) resize (w, h);
+        requestUpdate ();
+    }
+
+protected:
+    void paintEvent (QPaintEvent *) override {
+        int w = (int) width (), h = (int) height ();
+        if (w <= 0 || h <= 0) return;
+        cairo_surface_t *surf = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, w, h);
+        cairo_t *cr = cairo_create (surf);
+        ui.draw (cr);
+        cairo_surface_flush (surf);
+        QImage img (cairo_image_surface_get_data (surf), w, h,
+                    cairo_image_surface_get_stride (surf),
+                    QImage::Format_ARGB32_Premultiplied);
+        QPainter p (this);
+        p.drawImage (0, 0, img);
+        cairo_destroy (cr);
+        cairo_surface_destroy (surf);
+    }
+
+    void mousePressEvent (QMouseEvent *ev) override {
+        int idx = -1;
+        CandidatesUI::HitType hit = ui.hit_test ((int) ev->position ().x (),
+                                                 (int) ev->position ().y (), idx);
+        candidates_route_click (hit, idx);
+    }
+};
+
+static ScimCandidatesWindow *_candidates_window = 0;
+
+static void candidates_route_click (CandidatesUI::HitType hit, int idx)
+{
+    if (!_focused_ic || !_focused_ic->impl || _focused_ic->impl->si.null ())
+        return;
+    IMEngineInstancePointer si = _focused_ic->impl->si;
+    _panel_client.prepare (_focused_ic->impl->id);
+    if (hit == CandidatesUI::HIT_CANDIDATE && idx >= 0)
+        si->select_candidate (idx);
+    else if (hit == CandidatesUI::HIT_PREV_PAGE)
+        si->lookup_table_page_up ();
+    else if (hit == CandidatesUI::HIT_NEXT_PAGE)
+        si->lookup_table_page_down ();
+    _panel_client.send ();
+}
+
+static void candidates_ensure ()
+{
+    if (!_candidates_window) {
+        _candidates_window = new ScimCandidatesWindow ();
+        if (!_config.null ())
+            _candidates_window->ui.set_theme (scim_candidates_theme_from_config (_config));
+    }
+}
+
+static void candidates_show (ScimQtInputContext *ic)
+{
+    candidates_ensure ();
+    // cursor_x/y are window-local. On X11 map to global via the focus window's
+    // origin. On Wayland a client cannot set absolute positions: the window is
+    // an xdg_popup anchored to the transient parent, so keep the parent-relative
+    // (window-local) offset and let the compositor place it.
+    QWindow *fw = QGuiApplication::focusWindow ();
+    QPoint pos (ic->impl->cursor_x, ic->impl->cursor_y);
+    if (fw) {
+        _candidates_window->setTransientParent (fw);
+        if (!QGuiApplication::platformName ().startsWith (QLatin1String ("wayland")))
+            pos = fw->position () + pos;
+    }
+    _candidates_window->refresh ();
+    _candidates_window->setPosition (pos);
+    _candidates_window->show ();
+}
+
+static void candidates_hide ()
+{
+    if (_candidates_window) _candidates_window->hide ();
+}
+
+static void candidates_update (const LookupTable &table)
+{
+    candidates_ensure ();
+    _candidates_window->ui.update_lookup_table (table);
+    _candidates_window->refresh ();
+}
+
+static void candidates_finalize ()
+{
+    if (_candidates_window) {
+        delete _candidates_window;
+        _candidates_window = 0;
+    }
+}
+#endif // SCIM_HAS_CANDIDATES
+
 static void slot_show_lookup_table (IMEngineInstanceBase *si)
 {
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
-    if (ic && ic->impl && _focused_ic == ic)
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        candidates_show (ic);
+#else
         _panel_client.show_lookup_table (ic->impl->id);
+#endif
+    }
 }
 
 static void slot_hide_preedit_string (IMEngineInstanceBase *si)
@@ -668,8 +791,13 @@ static void slot_hide_aux_string (IMEngineInstanceBase *si)
 static void slot_hide_lookup_table (IMEngineInstanceBase *si)
 {
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
-    if (ic && ic->impl && _focused_ic == ic)
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        candidates_hide ();
+#else
         _panel_client.hide_lookup_table (ic->impl->id);
+#endif
+    }
 }
 
 static void slot_update_preedit_caret (IMEngineInstanceBase *si, int caret)
@@ -732,8 +860,13 @@ static void slot_forward_key_event (IMEngineInstanceBase *si, const KeyEvent &ke
 static void slot_update_lookup_table (IMEngineInstanceBase *si, const LookupTable &table)
 {
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
-    if (ic && ic->impl && _focused_ic == ic)
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        candidates_update (table);
+#else
         _panel_client.update_lookup_table (ic->impl->id, table);
+#endif
+    }
 }
 
 static void slot_register_properties (IMEngineInstanceBase *si, const PropertyList &properties)
@@ -1084,6 +1217,9 @@ static void finalize (void)
     _fallback_instance.reset ();
     _fallback_factory.reset ();
 
+#ifdef SCIM_HAS_CANDIDATES
+    candidates_finalize ();
+#endif
     panel_finalize ();
 
     _backend.reset ();
@@ -1208,8 +1344,8 @@ void ScimQtInputContext::update (Qt::InputMethodQueries queries)
     if (impl->cursor_x != x || impl->cursor_y != y) {
         impl->cursor_x = x;
         impl->cursor_y = y;
-        // TODO(wayland): these are window-local; absolute placement / anchoring
-        // to the text widget is handled with the Wayland work.
+        // Window-local coords; candidates_show maps them per platform (absolute
+        // on X11, parent-relative for the Wayland xdg_popup).
         _panel_client.prepare (impl->id);
         panel_req_update_spot_location (this);
         _panel_client.send ();

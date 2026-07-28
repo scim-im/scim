@@ -62,6 +62,9 @@
 #ifdef GDK_WINDOWING_X11 
 #include "scim_x11_utils.h"
 #endif
+#ifdef SCIM_HAS_CANDIDATES
+#include "scim_candidates.h"
+#endif
 
 #define SEND_EVENT_MASK 0x02
 
@@ -93,6 +96,8 @@ struct _GtkIMContextSCIMImpl
     gint                     preedit_caret;
     gint                     cursor_x;
     gint                     cursor_y;
+    gint                     cand_x;
+    gint                     cand_y;
     gboolean                 use_preedit;
     bool                     is_on;
     bool                     shared_si;
@@ -313,6 +318,12 @@ static GIOChannel                                      *_panel_iochannel        
 static guint                                            _panel_iochannel_read_source= 0;
 static guint                                            _panel_iochannel_err_source = 0;
 static guint                                            _panel_iochannel_hup_source = 0;
+
+#ifdef SCIM_HAS_CANDIDATES
+static CandidatesUI                                     _candidates_ui;
+static GtkWidget                                       *_candidates_popover          = 0;
+static GtkWidget                                       *_candidates_area             = 0;
+#endif
 
 static bool                                             _on_the_spot                = true;
 static bool                                             _shared_input_method        = false;
@@ -569,6 +580,8 @@ gtk_im_context_scim_init (GtkIMContextSCIM      *context_scim,
     context_scim->impl->preedit_caret = 0;
     context_scim->impl->cursor_x = 0;
     context_scim->impl->cursor_y = 0;
+    context_scim->impl->cand_x = 0;
+    context_scim->impl->cand_y = 0;
     context_scim->impl->is_on = FALSE;
     context_scim->impl->shared_si = _shared_input_method;
     context_scim->impl->use_preedit = _on_the_spot;
@@ -856,6 +869,8 @@ gtk_im_context_scim_set_cursor_location (GtkIMContext *context,
             context_scim->impl->cursor_y != y + area->y + area->height + 8) {
             context_scim->impl->cursor_x = x + area->x + area->width;
             context_scim->impl->cursor_y = y + area->y + area->height + 8;
+            context_scim->impl->cand_x = area->x + area->width;
+            context_scim->impl->cand_y = area->y + area->height + 8;
             _panel_client.prepare (context_scim->id);
             panel_req_update_spot_location (context_scim);
             _panel_client.send ();
@@ -1473,6 +1488,112 @@ panel_iochannel_handler (GIOChannel *source, GIOCondition condition, gpointer us
     return TRUE;
 }
 
+#ifdef SCIM_HAS_CANDIDATES
+// The lookup table is drawn in-process with a GtkPopover (works on both X11
+// and native Wayland: the toolkit/compositor positions it, so no global
+// coordinates are needed). The Cairo renderer draws into the popover's
+// GtkDrawingArea; clicks are hit-tested and routed back to the engine.
+static void
+candidates_route_click (CandidatesUI::HitType hit, int idx)
+{
+    if (!_focused_ic || !_focused_ic->impl || _focused_ic->impl->si.null ())
+        return;
+    _panel_client.prepare (_focused_ic->id);
+    if (hit == CandidatesUI::HIT_CANDIDATE && idx >= 0)
+        _focused_ic->impl->si->select_candidate (idx);
+    else if (hit == CandidatesUI::HIT_PREV_PAGE)
+        _focused_ic->impl->si->lookup_table_page_up ();
+    else if (hit == CandidatesUI::HIT_NEXT_PAGE)
+        _focused_ic->impl->si->lookup_table_page_down ();
+    _panel_client.send ();
+}
+
+static gboolean
+candidates_draw_cb (GtkWidget *, cairo_t *cr, gpointer)
+{
+    _candidates_ui.draw (cr);
+    return FALSE;
+}
+
+static gboolean
+candidates_button_cb (GtkWidget *, GdkEventButton *ev, gpointer)
+{
+    int idx = -1;
+    CandidatesUI::HitType hit = _candidates_ui.hit_test ((int) ev->x, (int) ev->y, idx);
+    candidates_route_click (hit, idx);
+    return TRUE;
+}
+
+static bool
+candidates_ensure (GtkWidget *relative_to)
+{
+    if (!relative_to)
+        return false;
+    if (!_candidates_popover) {
+        _candidates_popover = gtk_popover_new (relative_to);
+        g_object_ref_sink (_candidates_popover);
+        gtk_popover_set_modal (GTK_POPOVER (_candidates_popover), FALSE);
+        _candidates_area = gtk_drawing_area_new ();
+        gtk_widget_add_events (_candidates_area, GDK_BUTTON_PRESS_MASK);
+        g_signal_connect (_candidates_area, "draw",
+                          G_CALLBACK (candidates_draw_cb), 0);
+        g_signal_connect (_candidates_area, "button-press-event",
+                          G_CALLBACK (candidates_button_cb), 0);
+        gtk_container_add (GTK_CONTAINER (_candidates_popover), _candidates_area);
+        gtk_widget_show (_candidates_area);
+        if (!_config.null ())
+            _candidates_ui.set_theme (scim_candidates_theme_from_config (_config));
+    } else {
+        gtk_popover_set_relative_to (GTK_POPOVER (_candidates_popover), relative_to);
+    }
+    return true;
+}
+
+static void
+candidates_resize ()
+{
+    if (!_candidates_area)
+        return;
+    int w = 0, h = 0;
+    _candidates_ui.measure (w, h);
+    if (w > 0 && h > 0)
+        gtk_widget_set_size_request (_candidates_area, w, h);
+    gtk_widget_queue_draw (_candidates_area);
+}
+
+static void
+candidates_show (GtkIMContextSCIM *ic)
+{
+    if (!ic || !ic->impl || !ic->impl->client_window)
+        return;
+    GtkWidget *widget = 0;
+    gdk_window_get_user_data (ic->impl->client_window, (gpointer *) &widget);
+    if (!candidates_ensure (widget))
+        return;
+    GdkRectangle rect = { ic->impl->cand_x, ic->impl->cand_y, 1, 1 };
+    gtk_popover_set_pointing_to (GTK_POPOVER (_candidates_popover), &rect);
+    candidates_resize ();
+    gtk_popover_popup (GTK_POPOVER (_candidates_popover));
+}
+
+static void
+candidates_hide ()
+{
+    if (_candidates_popover)
+        gtk_popover_popdown (GTK_POPOVER (_candidates_popover));
+}
+
+static void
+candidates_finalize ()
+{
+    if (_candidates_popover) {
+        g_object_unref (_candidates_popover);
+        _candidates_popover = 0;
+        _candidates_area = 0;
+    }
+}
+#endif // SCIM_HAS_CANDIDATES
+
 static void
 turn_on_ic (GtkIMContextSCIM *ic)
 {
@@ -1912,6 +2033,9 @@ finalize (void)
 
     _scim_initialized = false;
 
+#ifdef SCIM_HAS_CANDIDATES
+    candidates_finalize ();
+#endif
     panel_finalize ();
 }
 
@@ -2097,8 +2221,13 @@ slot_show_lookup_table (IMEngineInstanceBase *si)
 
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
-    if (ic && ic->impl && _focused_ic == ic)
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        candidates_show (ic);
+#else
         _panel_client.show_lookup_table (ic->id);
+#endif
+    }
 }
 
 static void 
@@ -2146,8 +2275,13 @@ slot_hide_lookup_table (IMEngineInstanceBase *si)
 
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
-    if (ic && ic->impl && _focused_ic == ic)
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        candidates_hide ();
+#else
         _panel_client.hide_lookup_table (ic->id);
+#endif
+    }
 }
 
 static void 
@@ -2255,8 +2389,14 @@ slot_update_lookup_table (IMEngineInstanceBase *si,
 
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
-    if (ic && ic->impl && _focused_ic == ic)
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        _candidates_ui.update_lookup_table (table);
+        candidates_resize ();
+#else
         _panel_client.update_lookup_table (ic->id, table);
+#endif
+    }
 }
 
 static void 

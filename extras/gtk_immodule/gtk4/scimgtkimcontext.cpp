@@ -52,6 +52,10 @@
 #include "scim_private.h"
 #include "scim.h"
 
+#ifdef SCIM_HAS_CANDIDATES
+#include "scim_candidates.h"
+#endif
+
 using namespace scim;
 
 #include "scimgtkimcontext.h"
@@ -287,6 +291,15 @@ static IMEngineFactoryPointer                           _fallback_factory;
 static IMEngineInstancePointer                          _fallback_instance;
 
 static PanelClient                                      _panel_client;
+
+#ifdef SCIM_HAS_CANDIDATES
+// In-process lookup table, drawn in a GtkPopover anchored to the text widget.
+// Unlike the X11 backend this needs no global coordinates, so it works on both
+// X11 and Wayland (the compositor/toolkit positions the popover).
+static CandidatesUI                                     _candidates_ui;
+static GtkWidget                                       *_candidates_popover         = 0;
+static GtkWidget                                       *_candidates_area            = 0;
+#endif
 
 static GIOChannel                                      *_panel_iochannel            = 0;
 static guint                                            _panel_iochannel_read_source= 0;
@@ -1378,6 +1391,112 @@ filter_hotkeys (GtkIMContextSCIM *ic, const KeyEvent &key)
     return ret;
 }
 
+#ifdef SCIM_HAS_CANDIDATES
+static void
+candidates_draw_cb (GtkDrawingArea *, cairo_t *cr, int, int, gpointer)
+{
+    _candidates_ui.draw (cr);
+}
+
+static void
+candidates_click_cb (GtkGestureClick *, gint, gdouble x, gdouble y, gpointer)
+{
+    if (!_focused_ic || !_focused_ic->impl)
+        return;
+    int idx = -1;
+    CandidatesUI::HitType hit = _candidates_ui.hit_test ((int) x, (int) y, idx);
+    IMEngineInstancePointer si = _focused_ic->impl->si;
+    _panel_client.prepare (_focused_ic->id);
+    if (hit == CandidatesUI::HIT_CANDIDATE && idx >= 0)
+        si->select_candidate (idx);
+    else if (hit == CandidatesUI::HIT_PREV_PAGE)
+        si->lookup_table_page_up ();
+    else if (hit == CandidatesUI::HIT_NEXT_PAGE)
+        si->lookup_table_page_down ();
+    _panel_client.send ();
+}
+
+// Create the popover lazily and (re)parent it to the current text widget.
+static bool
+candidates_ensure (GtkWidget *parent)
+{
+    if (!parent)
+        return false;
+
+    if (!_candidates_popover) {
+        _candidates_popover = gtk_popover_new ();
+        g_object_ref_sink (_candidates_popover);
+        gtk_popover_set_autohide  (GTK_POPOVER (_candidates_popover), FALSE);
+        gtk_popover_set_has_arrow (GTK_POPOVER (_candidates_popover), FALSE);
+
+        _candidates_area = gtk_drawing_area_new ();
+        gtk_drawing_area_set_draw_func (GTK_DRAWING_AREA (_candidates_area),
+                                        candidates_draw_cb, 0, 0);
+        gtk_popover_set_child (GTK_POPOVER (_candidates_popover), _candidates_area);
+
+        GtkGesture *click = gtk_gesture_click_new ();
+        g_signal_connect (click, "released", G_CALLBACK (candidates_click_cb), 0);
+        gtk_widget_add_controller (_candidates_area, GTK_EVENT_CONTROLLER (click));
+
+        if (!_config.null ())
+            _candidates_ui.set_theme (scim_candidates_theme_from_config (_config));
+    }
+
+    GtkWidget *cur = gtk_widget_get_parent (_candidates_popover);
+    if (cur != parent) {
+        gtk_popover_popdown (GTK_POPOVER (_candidates_popover));
+        if (cur)
+            gtk_widget_unparent (_candidates_popover);
+        gtk_widget_set_parent (_candidates_popover, parent);
+    }
+    return true;
+}
+
+static void
+candidates_resize ()
+{
+    if (!_candidates_area)
+        return;
+    int w = 0, h = 0;
+    _candidates_ui.measure (w, h);
+    if (w > 0 && h > 0) {
+        gtk_drawing_area_set_content_width  (GTK_DRAWING_AREA (_candidates_area), w);
+        gtk_drawing_area_set_content_height (GTK_DRAWING_AREA (_candidates_area), h);
+    }
+    gtk_widget_queue_draw (_candidates_area);
+}
+
+static void
+candidates_show (GtkIMContextSCIM *ic)
+{
+    if (!candidates_ensure (ic->impl->client_widget))
+        return;
+    GdkRectangle rect = { ic->impl->cursor_x, ic->impl->cursor_y, 1, 1 };
+    gtk_popover_set_pointing_to (GTK_POPOVER (_candidates_popover), &rect);
+    candidates_resize ();
+    gtk_popover_popup (GTK_POPOVER (_candidates_popover));
+}
+
+static void
+candidates_hide ()
+{
+    if (_candidates_popover)
+        gtk_popover_popdown (GTK_POPOVER (_candidates_popover));
+}
+
+static void
+candidates_finalize ()
+{
+    if (_candidates_popover) {
+        if (gtk_widget_get_parent (_candidates_popover))
+            gtk_widget_unparent (_candidates_popover);
+        g_object_unref (_candidates_popover);
+        _candidates_popover = 0;
+        _candidates_area = 0;
+    }
+}
+#endif // SCIM_HAS_CANDIDATES
+
 static bool
 panel_initialize ()
 {
@@ -1781,6 +1900,9 @@ finalize (void)
 
     _scim_initialized = false;
 
+#ifdef SCIM_HAS_CANDIDATES
+    candidates_finalize ();
+#endif
     panel_finalize ();
 }
 
@@ -1966,8 +2088,13 @@ slot_show_lookup_table (IMEngineInstanceBase *si)
 
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
-    if (ic && ic->impl && _focused_ic == ic)
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        candidates_show (ic);
+#else
         _panel_client.show_lookup_table (ic->id);
+#endif
+    }
 }
 
 static void 
@@ -2015,8 +2142,13 @@ slot_hide_lookup_table (IMEngineInstanceBase *si)
 
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
-    if (ic && ic->impl && _focused_ic == ic)
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        candidates_hide ();
+#else
         _panel_client.hide_lookup_table (ic->id);
+#endif
+    }
 }
 
 static void 
@@ -2117,8 +2249,14 @@ slot_update_lookup_table (IMEngineInstanceBase *si,
 
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
-    if (ic && ic->impl && _focused_ic == ic)
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        _candidates_ui.update_lookup_table (table);
+        candidates_resize ();
+#else
         _panel_client.update_lookup_table (ic->id, table);
+#endif
+    }
 }
 
 static void 

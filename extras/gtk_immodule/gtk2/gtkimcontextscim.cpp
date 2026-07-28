@@ -59,8 +59,11 @@
 #include "scim_private.h"
 #include "scim.h"
 
-#ifdef GDK_WINDOWING_X11 
+#ifdef GDK_WINDOWING_X11
 #include "scim_x11_utils.h"
+#endif
+#ifdef SCIM_HAS_CANDIDATES
+#include "scim_candidates_x11.h"
 #endif
 
 #define SEND_EVENT_MASK 0x02
@@ -313,6 +316,15 @@ static GIOChannel                                      *_panel_iochannel        
 static guint                                            _panel_iochannel_read_source= 0;
 static guint                                            _panel_iochannel_err_source = 0;
 static guint                                            _panel_iochannel_hup_source = 0;
+
+// In-process candidate window: the lookup table is drawn here (own-Cairo, at
+// the cursor) instead of being delegated to scim-panel-gtk. This is what lets
+// candidate positioning work in-app; the panel keeps status/properties.
+#ifdef SCIM_HAS_CANDIDATES
+static CandidatesUIX11                                  _candidates_ui;
+static GIOChannel                                      *_candidates_iochannel        = 0;
+static guint                                            _candidates_iochannel_source  = 0;
+#endif
 
 static bool                                             _on_the_spot                = true;
 static bool                                             _shared_input_method        = false;
@@ -1473,6 +1485,71 @@ panel_iochannel_handler (GIOChannel *source, GIOCondition condition, gpointer us
     return TRUE;
 }
 
+#ifdef SCIM_HAS_CANDIDATES
+static gboolean
+candidates_iochannel_handler (GIOChannel *, GIOCondition, gpointer)
+{
+    _candidates_ui.process_events ();
+    return TRUE;
+}
+
+static void
+candidates_initialize ()
+{
+    String display_name;
+    const char *p = gdk_display_get_name (gdk_display_get_default ());
+    if (p) display_name = String (p);
+
+    if (!_candidates_ui.open (display_name))
+        return;
+
+    if (!_config.null ())
+        _candidates_ui.ui ().set_theme (scim_candidates_theme_from_config (_config));
+
+    // Route clicks/paging back to the focused instance.
+    _candidates_ui.signal_connect_candidate_selected ([] (int index) {
+        if (_focused_ic && _focused_ic->impl) {
+            _panel_client.prepare (_focused_ic->id);
+            _focused_ic->impl->si->select_candidate (index);
+            _panel_client.send ();
+        }
+    });
+    _candidates_ui.signal_connect_page_up ([] () {
+        if (_focused_ic && _focused_ic->impl) {
+            _panel_client.prepare (_focused_ic->id);
+            _focused_ic->impl->si->lookup_table_page_up ();
+            _panel_client.send ();
+        }
+    });
+    _candidates_ui.signal_connect_page_down ([] () {
+        if (_focused_ic && _focused_ic->impl) {
+            _panel_client.prepare (_focused_ic->id);
+            _focused_ic->impl->si->lookup_table_page_down ();
+            _panel_client.send ();
+        }
+    });
+
+    int fd = _candidates_ui.connection_number ();
+    if (fd >= 0) {
+        _candidates_iochannel = g_io_channel_unix_new (fd);
+        _candidates_iochannel_source =
+            g_io_add_watch (_candidates_iochannel, G_IO_IN, candidates_iochannel_handler, 0);
+    }
+}
+
+static void
+candidates_finalize ()
+{
+    if (_candidates_iochannel) {
+        g_source_remove (_candidates_iochannel_source);
+        g_io_channel_unref (_candidates_iochannel);
+        _candidates_iochannel = 0;
+        _candidates_iochannel_source = 0;
+    }
+    _candidates_ui.close ();
+}
+#endif // SCIM_HAS_CANDIDATES
+
 static void
 turn_on_ic (GtkIMContextSCIM *ic)
 {
@@ -1865,6 +1942,12 @@ initialize (void)
     if (!panel_initialize ()) {
         fprintf (stderr, "GTK IM Module SCIM: Cannot connect to Panel!\n");
     }
+
+#ifdef SCIM_HAS_CANDIDATES
+    // Draw the lookup table in-process (own-Cairo, at the cursor) rather than
+    // delegating it to the panel. Non-fatal if it can't open.
+    candidates_initialize ();
+#endif
 }
 
 static void
@@ -1912,6 +1995,9 @@ finalize (void)
 
     _scim_initialized = false;
 
+#ifdef SCIM_HAS_CANDIDATES
+    candidates_finalize ();
+#endif
     panel_finalize ();
 }
 
@@ -2097,8 +2183,14 @@ slot_show_lookup_table (IMEngineInstanceBase *si)
 
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
-    if (ic && ic->impl && _focused_ic == ic)
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        _candidates_ui.move (ic->impl->cursor_x, ic->impl->cursor_y);
+        _candidates_ui.show ();
+#else
         _panel_client.show_lookup_table (ic->id);
+#endif
+    }
 }
 
 static void 
@@ -2146,8 +2238,13 @@ slot_hide_lookup_table (IMEngineInstanceBase *si)
 
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
-    if (ic && ic->impl && _focused_ic == ic)
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        _candidates_ui.hide ();
+#else
         _panel_client.hide_lookup_table (ic->id);
+#endif
+    }
 }
 
 static void 
@@ -2255,8 +2352,14 @@ slot_update_lookup_table (IMEngineInstanceBase *si,
 
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
-    if (ic && ic->impl && _focused_ic == ic)
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        _candidates_ui.ui ().update_lookup_table (table);
+        _candidates_ui.update ();
+#else
         _panel_client.update_lookup_table (ic->id, table);
+#endif
+    }
 }
 
 static void 

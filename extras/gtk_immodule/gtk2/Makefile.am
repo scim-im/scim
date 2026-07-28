@@ -26,6 +26,15 @@ if SCIM_BUILD_X11_UTILS
 X11_UTILS=$(top_builddir)/utils/libscim-x11utils@SCIM_EPOCH@.la
 endif
 
+# Draw the lookup table in-process with the Cairo candidate renderer.
+if SCIM_BUILD_CANDIDATES
+CANDIDATES_CFLAGS = -DSCIM_HAS_CANDIDATES \
+		    -I$(top_srcdir)/utils/candidates \
+		    @CAIRO_CFLAGS@ @CAIRO_XLIB_CFLAGS@
+CANDIDATES_LIBS   = $(top_builddir)/utils/candidates/libscim-candidates-x11@SCIM_EPOCH@.la \
+		    @CAIRO_LIBS@ @CAIRO_XLIB_LIBS@
+endif
+
 if SCIM_LD_VERSION_SCRIPT
 LD_VERSION_SCRIPT_OPTION="-Wl,--version-script=$(srcdir)/im-scim.version-script"
 endif
@@ -38,8 +47,8 @@ module_LTLIBRARIES = $(CONFIG_GTK2_IMMODULE)
 
 im_scim_orig_la_SOURCES = gtkimcontextscim.cpp imscim.cpp
 
-im_scim_orig_la_CXXFLAGS=@GTK2_CFLAGS@
-im_scim_orig_la_CFLAGS  =@GTK2_CFLAGS@
+im_scim_orig_la_CXXFLAGS=@GTK2_CFLAGS@ $(CANDIDATES_CFLAGS)
+im_scim_orig_la_CFLAGS  =@GTK2_CFLAGS@ $(CANDIDATES_CFLAGS)
 
 im_scim_orig_la_LDFLAGS = -rpath $(moduledir) \
 		     -avoid-version \
@@ -47,4 +56,4 @@ im_scim_orig_la_LDFLAGS = -rpath $(moduledir) \
 		     $(LD_VERSION_SCRIPT_OPTION) \
 		     @GTK2_LIBS@
 
-im_scim_orig_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(X11_UTILS)
+im_scim_orig_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(X11_UTILS) $(CANDIDATES_LIBS)

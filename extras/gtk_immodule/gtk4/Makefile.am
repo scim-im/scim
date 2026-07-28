@@ -26,6 +26,17 @@ if SCIM_LD_VERSION_SCRIPT
 LD_VERSION_SCRIPT_OPTION="-Wl,--version-script=$(srcdir)/im-scim.version-script"
 endif
 
+# Draw the lookup table in-process with the Cairo candidate renderer, hosted in
+# a GtkPopover (works on X11 and Wayland). Links the core lib only -- the popover
+# is the surface, so no X11 surface backend is needed.
+if SCIM_BUILD_CANDIDATES
+CANDIDATES_CFLAGS = -DSCIM_HAS_CANDIDATES \
+		    -I$(top_srcdir)/utils/candidates \
+		    @CAIRO_CFLAGS@
+CANDIDATES_LIBS   = $(top_builddir)/utils/candidates/libscim-candidates@SCIM_EPOCH@.la \
+		    @CAIRO_LIBS@
+endif
+
 noinst_HEADERS = scimgtkimcontext.h
 
 moduledir = @GTK4_IM_MODULEDIR@
@@ -34,8 +45,8 @@ module_LTLIBRARIES = $(CONFIG_GTK4_IMMODULE)
 
 libim_scim_la_SOURCES = scimgtkimcontext.cpp imscim.cpp
 
-libim_scim_la_CXXFLAGS = @GTK4_CFLAGS@
-libim_scim_la_CFLAGS   = @GTK4_CFLAGS@
+libim_scim_la_CXXFLAGS = @GTK4_CFLAGS@ $(CANDIDATES_CFLAGS)
+libim_scim_la_CFLAGS   = @GTK4_CFLAGS@ $(CANDIDATES_CFLAGS)
 
 libim_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     -avoid-version \
@@ -43,4 +54,4 @@ libim_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     $(LD_VERSION_SCRIPT_OPTION) \
 		     @GTK4_LIBS@
 
-libim_scim_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la
+libim_scim_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(CANDIDATES_LIBS)
