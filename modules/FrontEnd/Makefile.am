@@ -53,11 +53,11 @@ SUBDIRS				= IMdkit
 endif
 
 # Draw candidates in-process with the Cairo renderer when it was built.
-if SCIM_BUILD_PANEL_UI
-PANEL_UI_CFLAGS		= -DSCIM_HAS_PANEL_UI \
-			  -I$(top_srcdir)/panel-ui \
+if SCIM_BUILD_CANDIDATES
+PANEL_UI_CFLAGS		= -DSCIM_HAS_CANDIDATES \
+			  -I$(top_srcdir)/utils/candidates \
 			  @CAIRO_CFLAGS@ @CAIRO_XLIB_CFLAGS@
-PANEL_UI_LIBS		= $(top_builddir)/panel-ui/libscimpanelui.la \
+PANEL_UI_LIBS		= $(top_builddir)/utils/candidates/libscim-candidates-x11@SCIM_EPOCH@.la \
 			  @CAIRO_LIBS@ @CAIRO_XLIB_LIBS@
 endif
 
@@ -140,15 +140,15 @@ ibus_la_LIBADD		= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
 wayland_la_SOURCES 	= scim_wayland_frontend.cpp
 
 wayland_la_CFLAGS	= @WAYLAND_CFLAGS@ @CAIRO_CFLAGS@ \
-			  -DSCIM_HAS_PANEL_UI_WAYLAND \
+			  -DSCIM_HAS_CANDIDATES_WAYLAND \
 			  -I$(top_builddir)/protocols \
-			  -I$(top_srcdir)/panel-ui \
+			  -I$(top_srcdir)/utils/candidates \
 			  $(KIMPANEL_CFLAGS)
 
 wayland_la_CXXFLAGS	= @WAYLAND_CFLAGS@ @CAIRO_CFLAGS@ \
-			  -DSCIM_HAS_PANEL_UI_WAYLAND \
+			  -DSCIM_HAS_CANDIDATES_WAYLAND \
 			  -I$(top_builddir)/protocols \
-			  -I$(top_srcdir)/panel-ui \
+			  -I$(top_srcdir)/utils/candidates \
 			  $(KIMPANEL_CFLAGS)
 
 wayland_la_LDFLAGS	= -avoid-version \
@@ -161,6 +161,6 @@ wayland_la_LDFLAGS	= -avoid-version \
 
 wayland_la_LIBADD	= $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
 			  $(top_builddir)/protocols/libscimwlprotocols.la \
-			  $(top_builddir)/panel-ui/libscimpanelui-wayland.la \
+			  $(top_builddir)/utils/candidates/libscim-candidates-wayland.la \
 			  $(KIMPANEL_LIBS)
 

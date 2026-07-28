@@ -40,8 +40,8 @@
 #include "input-method-unstable-v2-client-protocol.h"
 #include "virtual-keyboard-unstable-v1-client-protocol.h"
 
-#ifdef SCIM_HAS_PANEL_UI_WAYLAND
-#include "scim_panel_ui_wayland.h"
+#ifdef SCIM_HAS_CANDIDATES_WAYLAND
+#include "scim_candidates_wayland.h"
 #endif
 
 #ifdef SCIM_HAS_KIMPANEL
@@ -93,11 +93,11 @@ class WaylandFrontEnd : public FrontEndBase
 
     bool            m_should_exit;
 
-#ifdef SCIM_HAS_PANEL_UI_WAYLAND
+#ifdef SCIM_HAS_CANDIDATES_WAYLAND
     // In-process Cairo renderer drawn onto an input-popup-surface-v2 for the
     // aux string and candidate lookup table. Preedit still goes to the app via
     // set_preedit_string.
-    PanelUIWayland  m_panel_ui;
+    CandidatesWayland  m_candidates_ui;
 #endif
 
 #ifdef SCIM_HAS_KIMPANEL
@@ -121,7 +121,7 @@ protected:
     virtual void commit_string         (int id, const WideString & str);
     virtual void forward_key_event     (int id, const KeyEvent & key);
 
-#if defined(SCIM_HAS_PANEL_UI_WAYLAND) || defined(SCIM_HAS_KIMPANEL)
+#if defined(SCIM_HAS_CANDIDATES_WAYLAND) || defined(SCIM_HAS_KIMPANEL)
     // Aux string + candidate lookup table -> the input-popup-surface renderer
     // or (on KDE) the kimpanel D-Bus backend.
     virtual void update_aux_string     (int id, const WideString & str, const AttributeList & attrs);
@@ -175,12 +175,12 @@ private:
     bool use_kimpanel_ui () const { return false; }
 #endif
 
-#ifdef SCIM_HAS_PANEL_UI_WAYLAND
-    void refresh_panel_ui ();
-    void configure_panel_ui ();
-    void panel_ui_select_candidate (int cand_index);
-    void panel_ui_page_up ();
-    void panel_ui_page_down ();
+#ifdef SCIM_HAS_CANDIDATES_WAYLAND
+    void refresh_candidates_ui ();
+    void configure_candidates_ui ();
+    void candidates_ui_select_candidate (int cand_index);
+    void candidates_ui_page_up ();
+    void candidates_ui_page_down ();
 #endif
 
 public:

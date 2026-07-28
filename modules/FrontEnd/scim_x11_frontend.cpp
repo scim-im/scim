@@ -214,10 +214,10 @@ X11FrontEnd::show_preedit_string (int siid)
         else if (use_kimpanel_ui ())
             m_kimpanel.show_preedit_string (true);
 #endif
-#ifdef SCIM_HAS_PANEL_UI
-        else if (use_panel_ui ()) {
-            m_panel_ui.ui ().show_preedit_string ();
-            refresh_panel_ui ();
+#ifdef SCIM_HAS_CANDIDATES
+        else if (use_candidates_ui ()) {
+            m_candidates_ui.ui ().show_preedit_string ();
+            refresh_candidates_ui ();
         }
 #endif
         else
@@ -234,10 +234,10 @@ X11FrontEnd::show_aux_string (int siid)
 #ifdef SCIM_HAS_KIMPANEL
         if (use_kimpanel_ui ()) { m_kimpanel.show_aux_string (true); return; }
 #endif
-#ifdef SCIM_HAS_PANEL_UI
-        if (use_panel_ui ()) {
-            m_panel_ui.ui ().show_aux_string ();
-            refresh_panel_ui ();
+#ifdef SCIM_HAS_CANDIDATES
+        if (use_candidates_ui ()) {
+            m_candidates_ui.ui ().show_aux_string ();
+            refresh_candidates_ui ();
             return;
         }
 #endif
@@ -254,10 +254,10 @@ X11FrontEnd::show_lookup_table (int siid)
 #ifdef SCIM_HAS_KIMPANEL
         if (use_kimpanel_ui ()) { m_kimpanel.show_lookup_table (true); return; }
 #endif
-#ifdef SCIM_HAS_PANEL_UI
-        if (use_panel_ui ()) {
-            m_panel_ui.ui ().show_lookup_table ();
-            refresh_panel_ui ();
+#ifdef SCIM_HAS_CANDIDATES
+        if (use_candidates_ui ()) {
+            m_candidates_ui.ui ().show_lookup_table ();
+            refresh_candidates_ui ();
             return;
         }
 #endif
@@ -277,10 +277,10 @@ X11FrontEnd::hide_preedit_string (int siid)
         else if (use_kimpanel_ui ())
             m_kimpanel.show_preedit_string (false);
 #endif
-#ifdef SCIM_HAS_PANEL_UI
-        else if (use_panel_ui ()) {
-            m_panel_ui.ui ().hide_preedit_string ();
-            refresh_panel_ui ();
+#ifdef SCIM_HAS_CANDIDATES
+        else if (use_candidates_ui ()) {
+            m_candidates_ui.ui ().hide_preedit_string ();
+            refresh_candidates_ui ();
         }
 #endif
         else
@@ -297,10 +297,10 @@ X11FrontEnd::hide_aux_string (int siid)
 #ifdef SCIM_HAS_KIMPANEL
         if (use_kimpanel_ui ()) { m_kimpanel.show_aux_string (false); return; }
 #endif
-#ifdef SCIM_HAS_PANEL_UI
-        if (use_panel_ui ()) {
-            m_panel_ui.ui ().hide_aux_string ();
-            refresh_panel_ui ();
+#ifdef SCIM_HAS_CANDIDATES
+        if (use_candidates_ui ()) {
+            m_candidates_ui.ui ().hide_aux_string ();
+            refresh_candidates_ui ();
             return;
         }
 #endif
@@ -317,10 +317,10 @@ X11FrontEnd::hide_lookup_table (int siid)
 #ifdef SCIM_HAS_KIMPANEL
         if (use_kimpanel_ui ()) { m_kimpanel.show_lookup_table (false); return; }
 #endif
-#ifdef SCIM_HAS_PANEL_UI
-        if (use_panel_ui ()) {
-            m_panel_ui.ui ().hide_lookup_table ();
-            refresh_panel_ui ();
+#ifdef SCIM_HAS_CANDIDATES
+        if (use_candidates_ui ()) {
+            m_candidates_ui.ui ().hide_lookup_table ();
+            refresh_candidates_ui ();
             return;
         }
 #endif
@@ -340,10 +340,10 @@ X11FrontEnd::update_preedit_caret (int siid, int caret)
         else if (use_kimpanel_ui ())
             m_kimpanel.update_preedit_caret (caret);
 #endif
-#ifdef SCIM_HAS_PANEL_UI
-        else if (use_panel_ui ()) {
-            m_panel_ui.ui ().update_preedit_caret (caret);
-            refresh_panel_ui ();
+#ifdef SCIM_HAS_CANDIDATES
+        else if (use_candidates_ui ()) {
+            m_candidates_ui.ui ().update_preedit_caret (caret);
+            refresh_candidates_ui ();
         }
 #endif
         else
@@ -363,10 +363,10 @@ X11FrontEnd::update_preedit_string (int siid, const WideString & str, const Attr
         else if (use_kimpanel_ui ())
             m_kimpanel.update_preedit_string (str);
 #endif
-#ifdef SCIM_HAS_PANEL_UI
-        else if (use_panel_ui ()) {
-            m_panel_ui.ui ().update_preedit_string (str, attrs);
-            refresh_panel_ui ();
+#ifdef SCIM_HAS_CANDIDATES
+        else if (use_candidates_ui ()) {
+            m_candidates_ui.ui ().update_preedit_string (str, attrs);
+            refresh_candidates_ui ();
         }
 #endif
         else
@@ -383,10 +383,10 @@ X11FrontEnd::update_aux_string (int siid, const WideString & str, const Attribut
 #ifdef SCIM_HAS_KIMPANEL
         if (use_kimpanel_ui ()) { m_kimpanel.update_aux_string (str); return; }
 #endif
-#ifdef SCIM_HAS_PANEL_UI
-        if (use_panel_ui ()) {
-            m_panel_ui.ui ().update_aux_string (str, attrs);
-            refresh_panel_ui ();
+#ifdef SCIM_HAS_CANDIDATES
+        if (use_candidates_ui ()) {
+            m_candidates_ui.ui ().update_aux_string (str, attrs);
+            refresh_candidates_ui ();
             return;
         }
 #endif
@@ -403,10 +403,10 @@ X11FrontEnd::update_lookup_table (int siid, const LookupTable & table)
 #ifdef SCIM_HAS_KIMPANEL
         if (use_kimpanel_ui ()) { m_kimpanel.update_lookup_table (table); return; }
 #endif
-#ifdef SCIM_HAS_PANEL_UI
-        if (use_panel_ui ()) {
-            m_panel_ui.ui ().update_lookup_table (table);
-            refresh_panel_ui ();
+#ifdef SCIM_HAS_CANDIDATES
+        if (use_candidates_ui ()) {
+            m_candidates_ui.ui ().update_lookup_table (table);
+            refresh_candidates_ui ();
             return;
         }
 #endif
@@ -562,18 +562,18 @@ X11FrontEnd::init (int argc, char **argv)
     }
 #endif
 
-#ifdef SCIM_HAS_PANEL_UI
+#ifdef SCIM_HAS_CANDIDATES
     // Bring up the in-process Cairo candidate/preedit/aux renderer (unless
     // kimpanel is handling candidates). If it cannot open we fall back to
     // forwarding those updates to scim-panel-gtk.
-    if (!use_kimpanel_ui () && m_panel_ui.open (m_display_name)) {
-        m_panel_ui.signal_connect_candidate_selected (
-            [this] (int idx) { panel_ui_select_candidate (idx); });
-        m_panel_ui.signal_connect_page_up (
-            [this] () { panel_ui_page_up (); });
-        m_panel_ui.signal_connect_page_down (
-            [this] () { panel_ui_page_down (); });
-        configure_panel_ui ();
+    if (!use_kimpanel_ui () && m_candidates_ui.open (m_display_name)) {
+        m_candidates_ui.signal_connect_candidate_selected (
+            [this] (int idx) { candidates_ui_select_candidate (idx); });
+        m_candidates_ui.signal_connect_page_up (
+            [this] () { candidates_ui_page_up (); });
+        m_candidates_ui.signal_connect_page_down (
+            [this] () { candidates_ui_page_down (); });
+        configure_candidates_ui ();
     } else {
         SCIM_DEBUG_FRONTEND (1) << "X11 -- Cairo panel renderer unavailable, "
                                    "using scim-panel-gtk for candidates.\n";
@@ -605,10 +605,10 @@ X11FrontEnd::poll_fds (std::vector<int> &fds)
     if (panel_fd >= 0)
         fds.push_back (panel_fd);
 
-#ifdef SCIM_HAS_PANEL_UI
-    int panel_ui_fd = m_panel_ui.connection_number ();
-    if (panel_ui_fd >= 0)
-        fds.push_back (panel_ui_fd);
+#ifdef SCIM_HAS_CANDIDATES
+    int candidates_ui_fd = m_candidates_ui.connection_number ();
+    if (candidates_ui_fd >= 0)
+        fds.push_back (candidates_ui_fd);
 #endif
 
 #ifdef SCIM_HAS_KIMPANEL
@@ -635,8 +635,8 @@ X11FrontEnd::process_events ()
         XFilterEvent (&event, None);
     }
 
-#ifdef SCIM_HAS_PANEL_UI
-    m_panel_ui.process_events ();
+#ifdef SCIM_HAS_CANDIDATES
+    m_candidates_ui.process_events ();
 #endif
 
 #ifdef SCIM_HAS_KIMPANEL
@@ -1750,12 +1750,12 @@ X11FrontEnd::start_ic (X11IC *ic)
             m_kimpanel.show_lookup_table (false);
         } else
 #endif
-#ifdef SCIM_HAS_PANEL_UI
-        if (use_panel_ui ()) {
-            m_panel_ui.ui ().hide_preedit_string ();
-            m_panel_ui.ui ().hide_aux_string ();
-            m_panel_ui.ui ().hide_lookup_table ();
-            refresh_panel_ui ();
+#ifdef SCIM_HAS_CANDIDATES
+        if (use_candidates_ui ()) {
+            m_candidates_ui.ui ().hide_preedit_string ();
+            m_candidates_ui.ui ().hide_aux_string ();
+            m_candidates_ui.ui ().hide_lookup_table ();
+            refresh_candidates_ui ();
         } else
 #endif
         {
@@ -1788,9 +1788,9 @@ X11FrontEnd::stop_ic (X11IC *ic)
             m_kimpanel.enable (false);
         }
 #endif
-#ifdef SCIM_HAS_PANEL_UI
-        if (use_panel_ui ())
-            m_panel_ui.hide ();
+#ifdef SCIM_HAS_CANDIDATES
+        if (use_candidates_ui ())
+            m_candidates_ui.hide ();
 #endif
 
         panel_req_update_factory_info (ic);
@@ -2167,41 +2167,41 @@ X11FrontEnd::panel_req_update_spot_location (const X11IC *ic)
             m_kimpanel.update_spot_location (spot_x, spot_y);
         else
 #endif
-#ifdef SCIM_HAS_PANEL_UI
-        if (use_panel_ui ())
-            m_panel_ui.move (spot_x, spot_y);
+#ifdef SCIM_HAS_CANDIDATES
+        if (use_candidates_ui ())
+            m_candidates_ui.move (spot_x, spot_y);
         else
 #endif
         m_panel_client.update_spot_location (ic->icid, spot_x, spot_y);
     }
 }
 
-#ifdef SCIM_HAS_PANEL_UI
+#ifdef SCIM_HAS_CANDIDATES
 void
-X11FrontEnd::refresh_panel_ui ()
+X11FrontEnd::refresh_candidates_ui ()
 {
     // TODO(5a): coalesce redraws. Every sub-update (preedit/caret/aux/lookup)
     // calls this, so a keystroke can repaint several times. Add a deferred
     // flush once there is a batch/sync signal from the backend.
-    if (!use_panel_ui ())
+    if (!use_candidates_ui ())
         return;
-    if (m_panel_ui.ui ().is_visible ())
-        m_panel_ui.show ();     // measures, positions, maps and redraws
+    if (m_candidates_ui.ui ().is_visible ())
+        m_candidates_ui.show ();     // measures, positions, maps and redraws
     else
-        m_panel_ui.hide ();
+        m_candidates_ui.hide ();
 }
 
 void
-X11FrontEnd::configure_panel_ui ()
+X11FrontEnd::configure_candidates_ui ()
 {
-    if (!use_panel_ui ())
+    if (!use_candidates_ui ())
         return;
     // Apply the configured font AND colors, matching the legacy GTK panel.
-    m_panel_ui.ui ().set_theme (scim_panel_ui_theme_from_config (m_config));
+    m_candidates_ui.ui ().set_theme (scim_candidates_theme_from_config (m_config));
 }
 
 void
-X11FrontEnd::panel_ui_select_candidate (int cand_index)
+X11FrontEnd::candidates_ui_select_candidate (int cand_index)
 {
     if (validate_ic (m_focus_ic)) {
         m_panel_client.prepare (m_focus_ic->icid);
@@ -2211,7 +2211,7 @@ X11FrontEnd::panel_ui_select_candidate (int cand_index)
 }
 
 void
-X11FrontEnd::panel_ui_page_up ()
+X11FrontEnd::candidates_ui_page_up ()
 {
     if (validate_ic (m_focus_ic)) {
         m_panel_client.prepare (m_focus_ic->icid);
@@ -2221,7 +2221,7 @@ X11FrontEnd::panel_ui_page_up ()
 }
 
 void
-X11FrontEnd::panel_ui_page_down ()
+X11FrontEnd::candidates_ui_page_down ()
 {
     if (validate_ic (m_focus_ic)) {
         m_panel_client.prepare (m_focus_ic->icid);

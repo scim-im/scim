@@ -27,7 +27,7 @@
 #include "scim_private.h"
 #include <scim.h>
 
-#include "scim_panel_ui_wayland.h"
+#include "scim_candidates_wayland.h"
 
 #include <wayland-client.h>
 #include "input-method-unstable-v2-client-protocol.h"
@@ -64,10 +64,10 @@ const struct wl_buffer_listener buffer_listener = {
 
 } // anonymous namespace
 
-class PanelUIWaylandImpl
+class CandidatesWaylandImpl
 {
 public:
-    PanelUI          m_ui;
+    CandidatesUI          m_ui;
 
     struct wl_display    *m_display;
     struct wl_compositor *m_compositor;
@@ -84,11 +84,11 @@ public:
     double   m_ptr_x, m_ptr_y;
     uint32_t m_enter_serial;
 
-    PanelUIWayland::CandidateSlot m_candidate_slot;
-    PanelUIWayland::PageSlot      m_page_up_slot;
-    PanelUIWayland::PageSlot      m_page_down_slot;
+    CandidatesWayland::CandidateSlot m_candidate_slot;
+    CandidatesWayland::PageSlot      m_page_up_slot;
+    CandidatesWayland::PageSlot      m_page_down_slot;
 
-    PanelUIWaylandImpl ()
+    CandidatesWaylandImpl ()
         : m_display (0), m_compositor (0), m_shm (0), m_input_method (0),
           m_seat (0), m_surface (0), m_popup (0), m_pointer (0),
           m_pointer_on_surface (false), m_ptr_x (0), m_ptr_y (0),
@@ -96,7 +96,7 @@ public:
     {
     }
 
-    ~PanelUIWaylandImpl ()
+    ~CandidatesWaylandImpl ()
     {
         finish ();
     }
@@ -199,14 +199,14 @@ public:
         if (button != BTN_LEFT)
             return;
         int idx = -1;
-        PanelUI::HitType hit =
+        CandidatesUI::HitType hit =
             m_ui.hit_test (static_cast<int> (m_ptr_x),
                            static_cast<int> (m_ptr_y), idx);
-        if (hit == PanelUI::HIT_CANDIDATE && idx >= 0) {
+        if (hit == CandidatesUI::HIT_CANDIDATE && idx >= 0) {
             if (m_candidate_slot) m_candidate_slot (idx);
-        } else if (hit == PanelUI::HIT_PREV_PAGE) {
+        } else if (hit == CandidatesUI::HIT_PREV_PAGE) {
             if (m_page_up_slot) m_page_up_slot ();
-        } else if (hit == PanelUI::HIT_NEXT_PAGE) {
+        } else if (hit == CandidatesUI::HIT_NEXT_PAGE) {
             if (m_page_down_slot) m_page_down_slot ();
         }
     }
@@ -233,8 +233,8 @@ namespace {
 void ptr_enter (void *data, struct wl_pointer *, uint32_t serial,
                 struct wl_surface *surface, wl_fixed_t sx, wl_fixed_t sy)
 {
-    PanelUIWaylandImpl *d =
-        static_cast<PanelUIWaylandImpl *> (data);
+    CandidatesWaylandImpl *d =
+        static_cast<CandidatesWaylandImpl *> (data);
     if (surface == d->m_surface) {
         d->m_pointer_on_surface = true;
         d->m_enter_serial = serial;
@@ -246,8 +246,8 @@ void ptr_enter (void *data, struct wl_pointer *, uint32_t serial,
 void ptr_leave (void *data, struct wl_pointer *, uint32_t,
                 struct wl_surface *surface)
 {
-    PanelUIWaylandImpl *d =
-        static_cast<PanelUIWaylandImpl *> (data);
+    CandidatesWaylandImpl *d =
+        static_cast<CandidatesWaylandImpl *> (data);
     if (surface == d->m_surface)
         d->m_pointer_on_surface = false;
 }
@@ -255,8 +255,8 @@ void ptr_leave (void *data, struct wl_pointer *, uint32_t,
 void ptr_motion (void *data, struct wl_pointer *, uint32_t,
                  wl_fixed_t sx, wl_fixed_t sy)
 {
-    PanelUIWaylandImpl *d =
-        static_cast<PanelUIWaylandImpl *> (data);
+    CandidatesWaylandImpl *d =
+        static_cast<CandidatesWaylandImpl *> (data);
     if (d->m_pointer_on_surface) {
         d->m_ptr_x = wl_fixed_to_double (sx);
         d->m_ptr_y = wl_fixed_to_double (sy);
@@ -266,8 +266,8 @@ void ptr_motion (void *data, struct wl_pointer *, uint32_t,
 void ptr_button (void *data, struct wl_pointer *, uint32_t, uint32_t,
                  uint32_t button, uint32_t state)
 {
-    PanelUIWaylandImpl *d =
-        static_cast<PanelUIWaylandImpl *> (data);
+    CandidatesWaylandImpl *d =
+        static_cast<CandidatesWaylandImpl *> (data);
     if (d->m_pointer_on_surface)
         d->handle_button (button, state);
 }
@@ -275,8 +275,8 @@ void ptr_button (void *data, struct wl_pointer *, uint32_t, uint32_t,
 void ptr_axis (void *data, struct wl_pointer *, uint32_t, uint32_t axis,
                wl_fixed_t value)
 {
-    PanelUIWaylandImpl *d =
-        static_cast<PanelUIWaylandImpl *> (data);
+    CandidatesWaylandImpl *d =
+        static_cast<CandidatesWaylandImpl *> (data);
     if (d->m_pointer_on_surface)
         d->handle_axis (axis, value);
 }
@@ -318,24 +318,24 @@ const struct zwp_input_popup_surface_v2_listener popup_listener = {
 /* Public API                                                          */
 /* ------------------------------------------------------------------ */
 
-PanelUIWayland::PanelUIWayland ()
-    : m_impl (new PanelUIWaylandImpl ())
+CandidatesWayland::CandidatesWayland ()
+    : m_impl (new CandidatesWaylandImpl ())
 {
 }
 
-PanelUIWayland::~PanelUIWayland ()
+CandidatesWayland::~CandidatesWayland ()
 {
     delete m_impl;
 }
 
 bool
-PanelUIWayland::init (struct wl_display *display,
+CandidatesWayland::init (struct wl_display *display,
                       struct wl_compositor *compositor,
                       struct wl_shm *shm,
                       struct zwp_input_method_v2 *input_method,
                       struct wl_seat *seat)
 {
-    PanelUIWaylandImpl *d = m_impl;
+    CandidatesWaylandImpl *d = m_impl;
     if (!display || !compositor || !shm || !input_method)
         return false;
 
@@ -368,55 +368,55 @@ PanelUIWayland::init (struct wl_display *display,
 }
 
 void
-PanelUIWayland::finish ()
+CandidatesWayland::finish ()
 {
     m_impl->finish ();
 }
 
 bool
-PanelUIWayland::is_ready () const
+CandidatesWayland::is_ready () const
 {
     return m_impl->m_popup != 0;
 }
 
-PanelUI &
-PanelUIWayland::ui ()
+CandidatesUI &
+CandidatesWayland::ui ()
 {
     return m_impl->m_ui;
 }
 
 void
-PanelUIWayland::update ()
+CandidatesWayland::update ()
 {
     m_impl->update ();
 }
 
 void
-PanelUIWayland::show ()
+CandidatesWayland::show ()
 {
     m_impl->update ();
 }
 
 void
-PanelUIWayland::hide ()
+CandidatesWayland::hide ()
 {
     m_impl->blank ();
 }
 
 void
-PanelUIWayland::signal_connect_candidate_selected (CandidateSlot slot)
+CandidatesWayland::signal_connect_candidate_selected (CandidateSlot slot)
 {
     m_impl->m_candidate_slot = slot;
 }
 
 void
-PanelUIWayland::signal_connect_page_up (PageSlot slot)
+CandidatesWayland::signal_connect_page_up (PageSlot slot)
 {
     m_impl->m_page_up_slot = slot;
 }
 
 void
-PanelUIWayland::signal_connect_page_down (PageSlot slot)
+CandidatesWayland::signal_connect_page_down (PageSlot slot)
 {
     m_impl->m_page_down_slot = slot;
 }

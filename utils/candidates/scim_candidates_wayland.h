@@ -1,12 +1,12 @@
 /**
- * @file scim_panel_ui_wayland.h
+ * @file scim_candidates_wayland.h
  * @brief Wayland surface shim for the Cairo input-panel renderer.
  *
  * Owns a wl_surface used as a zwp_input_popup_surface_v2 (created from the
- * frontend's zwp_input_method_v2 object) plus an shm buffer that PanelUI draws
+ * frontend's zwp_input_method_v2 object) plus an shm buffer that CandidatesUI draws
  * into. The compositor positions the popup at the text cursor; we only supply
- * content and route wl_pointer input back through PanelUI::hit_test(). This is
- * the Wayland counterpart of PanelUIX11.
+ * content and route wl_pointer input back through CandidatesUI::hit_test(). This is
+ * the Wayland counterpart of CandidatesUIX11.
  */
 
 /*
@@ -33,7 +33,7 @@
 #pragma once
 
 #include <functional>
-#include "scim_panel_ui.h"
+#include "scim_candidates.h"
 
 struct wl_display;
 struct wl_compositor;
@@ -43,17 +43,17 @@ struct zwp_input_method_v2;
 
 namespace scim {
 
-class PanelUIWaylandImpl;   // defined in scim_panel_ui_wayland.cpp
+class CandidatesWaylandImpl;   // defined in scim_candidates_wayland.cpp
 
 /**
- * @brief input-popup-surface-v2 backend driving a PanelUI renderer.
+ * @brief input-popup-surface-v2 backend driving a CandidatesUI renderer.
  */
-class PanelUIWayland
+class CandidatesWayland
 {
-    PanelUIWaylandImpl *m_impl;
+    CandidatesWaylandImpl *m_impl;
 
-    PanelUIWayland (const PanelUIWayland &);
-    const PanelUIWayland & operator = (const PanelUIWayland &);
+    CandidatesWayland (const CandidatesWayland &);
+    const CandidatesWayland & operator = (const CandidatesWayland &);
 
 public:
     /** @brief Callback when a candidate is clicked (page-relative index). */
@@ -61,8 +61,8 @@ public:
     /** @brief Callback for a page-flip request (scroll wheel). */
     typedef std::function<void ()>    PageSlot;
 
-    PanelUIWayland ();
-    ~PanelUIWayland ();
+    CandidatesWayland ();
+    ~CandidatesWayland ();
 
     /**
      * @brief Create the popup surface from the frontend's Wayland objects.
@@ -85,7 +85,7 @@ public:
     bool is_ready () const;
 
     /** @brief Access the renderer to push aux/lookup state. */
-    PanelUI & ui ();
+    CandidatesUI & ui ();
 
     /**
      * @brief Re-measure, redraw and commit; or blank the surface when the

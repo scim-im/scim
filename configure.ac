@@ -707,11 +707,11 @@ fi
 # cairo/pango; the X11 surface shim additionally needs cairo-xlib and X11.
 # Built whenever those are present (shared by the x11/wayland frontends).
 if test "$SCIM_HAS_CAIRO" = "yes" -a "$SCIM_HAS_CAIRO_XLIB" = "yes" -a "$have_x" = "yes"; then
-  SCIM_BUILD_PANEL_UI=1
-  enable_panel_ui=yes
+  SCIM_BUILD_CANDIDATES=1
+  enable_candidates=yes
 else
-  SCIM_BUILD_PANEL_UI=0
-  enable_panel_ui=no
+  SCIM_BUILD_CANDIDATES=0
+  enable_candidates=no
 fi
 
 # kimpanel D-Bus candidate UI backend: needs dbus-1.
@@ -969,8 +969,8 @@ AM_CONDITIONAL(SCIM_BUILD_GSETTINGS,
 AM_CONDITIONAL(SCIM_BUILD_IBUS_SYNC,
 		[test "$SCIM_HAS_GSETTINGS" = "yes" -a "$SCIM_HAS_IBUS" = "yes"])
 
-AM_CONDITIONAL(SCIM_BUILD_PANEL_UI,
-		[test "$enable_panel_ui" = "yes"])
+AM_CONDITIONAL(SCIM_BUILD_CANDIDATES,
+		[test "$enable_candidates" = "yes"])
 
 AM_CONDITIONAL(SCIM_BUILD_KIMPANEL,
 		[test "$enable_kimpanel" = "yes"])
@@ -1025,7 +1025,7 @@ AC_SUBST(SCIM_BUILD_FRONTEND_X11)
 AC_SUBST(SCIM_BUILD_FRONTEND_SOCKET)
 AC_SUBST(SCIM_BUILD_FRONTEND_WAYLAND)
 AC_SUBST(SCIM_BUILD_FRONTEND_IBUS)
-AC_SUBST(SCIM_BUILD_PANEL_UI)
+AC_SUBST(SCIM_BUILD_CANDIDATES)
 AC_SUBST(SCIM_BUILD_KIMPANEL)
 AC_SUBST(SCIM_BUILD_IMENGINE_RAWCODE)
 AC_SUBST(SCIM_BUILD_IMENGINE_TABLE)
@@ -1074,6 +1074,7 @@ AC_CONFIG_FILES([Makefile
 		 src/Makefile
 		 src/scim_types.h
 		 utils/Makefile
+		 utils/candidates/Makefile
 		 data/Makefile
 		 data/icons/Makefile
 		 data/pixmaps/Makefile
@@ -1125,7 +1126,7 @@ Module options:
   Socket FrontEnd module   $enable_frontend_socket
   IBus FrontEnd module     $enable_frontend_ibus
 
-  Cairo panel renderer     $enable_panel_ui
+  Cairo candidate renderer $enable_candidates
   kimpanel D-Bus UI        $enable_kimpanel
 
   RawCode IMEngine module  $enable_im_rawcode

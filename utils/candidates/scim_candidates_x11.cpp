@@ -23,7 +23,7 @@
 #include "scim_private.h"
 #include <scim.h>
 
-#include "scim_panel_ui_x11.h"
+#include "scim_candidates_x11.h"
 
 #include <X11/Xlib.h>
 #include <cairo.h>
@@ -31,10 +31,10 @@
 
 namespace scim {
 
-class PanelUIX11::PanelUIX11Impl
+class CandidatesUIX11::CandidatesUIX11Impl
 {
 public:
-    PanelUI          m_ui;
+    CandidatesUI          m_ui;
 
     Display         *m_display;
     int              m_screen;
@@ -50,13 +50,13 @@ public:
     PageSlot         m_page_up_slot;
     PageSlot         m_page_down_slot;
 
-    PanelUIX11Impl ()
+    CandidatesUIX11Impl ()
         : m_display (0), m_screen (0), m_root (0), m_window (0), m_surface (0),
           m_win_w (1), m_win_h (1), m_spot_x (0), m_spot_y (0), m_mapped (false)
     {
     }
 
-    ~PanelUIX11Impl ()
+    ~CandidatesUIX11Impl ()
     {
         destroy ();
     }
@@ -188,12 +188,12 @@ public:
         }
         if (ev.button == Button1) {
             int idx = -1;
-            PanelUI::HitType hit = m_ui.hit_test (ev.x, ev.y, idx);
-            if (hit == PanelUI::HIT_CANDIDATE && idx >= 0) {
+            CandidatesUI::HitType hit = m_ui.hit_test (ev.x, ev.y, idx);
+            if (hit == CandidatesUI::HIT_CANDIDATE && idx >= 0) {
                 if (m_candidate_slot) m_candidate_slot (idx);
-            } else if (hit == PanelUI::HIT_PREV_PAGE) {
+            } else if (hit == CandidatesUI::HIT_PREV_PAGE) {
                 if (m_page_up_slot) m_page_up_slot ();
-            } else if (hit == PanelUI::HIT_NEXT_PAGE) {
+            } else if (hit == CandidatesUI::HIT_NEXT_PAGE) {
                 if (m_page_down_slot) m_page_down_slot ();
             }
         }
@@ -235,18 +235,18 @@ public:
 /* Public API                                                          */
 /* ------------------------------------------------------------------ */
 
-PanelUIX11::PanelUIX11 ()
-    : m_impl (new PanelUIX11Impl ())
+CandidatesUIX11::CandidatesUIX11 ()
+    : m_impl (new CandidatesUIX11Impl ())
 {
 }
 
-PanelUIX11::~PanelUIX11 ()
+CandidatesUIX11::~CandidatesUIX11 ()
 {
     delete m_impl;
 }
 
 bool
-PanelUIX11::open (const String &display_name)
+CandidatesUIX11::open (const String &display_name)
 {
     if (m_impl->m_display)
         return true;
@@ -254,25 +254,25 @@ PanelUIX11::open (const String &display_name)
 }
 
 void
-PanelUIX11::close ()
+CandidatesUIX11::close ()
 {
     m_impl->destroy ();
 }
 
 bool
-PanelUIX11::is_open () const
+CandidatesUIX11::is_open () const
 {
     return m_impl->m_display != 0;
 }
 
-PanelUI &
-PanelUIX11::ui ()
+CandidatesUI &
+CandidatesUIX11::ui ()
 {
     return m_impl->m_ui;
 }
 
 int
-PanelUIX11::connection_number () const
+CandidatesUIX11::connection_number () const
 {
     if (!m_impl->m_display)
         return -1;
@@ -280,13 +280,13 @@ PanelUIX11::connection_number () const
 }
 
 void
-PanelUIX11::process_events ()
+CandidatesUIX11::process_events ()
 {
     m_impl->process_events ();
 }
 
 void
-PanelUIX11::move (int x, int y)
+CandidatesUIX11::move (int x, int y)
 {
     m_impl->m_spot_x = x;
     m_impl->m_spot_y = y;
@@ -295,15 +295,15 @@ PanelUIX11::move (int x, int y)
 }
 
 void
-PanelUIX11::update ()
+CandidatesUIX11::update ()
 {
     m_impl->update ();
 }
 
 void
-PanelUIX11::show ()
+CandidatesUIX11::show ()
 {
-    PanelUIX11Impl *d = m_impl;
+    CandidatesUIX11Impl *d = m_impl;
     if (!d->m_display) return;
     d->update ();
     if (!d->m_mapped) {
@@ -315,9 +315,9 @@ PanelUIX11::show ()
 }
 
 void
-PanelUIX11::hide ()
+CandidatesUIX11::hide ()
 {
-    PanelUIX11Impl *d = m_impl;
+    CandidatesUIX11Impl *d = m_impl;
     if (!d->m_display) return;
     if (d->m_mapped) {
         XUnmapWindow (d->m_display, d->m_window);
@@ -327,25 +327,25 @@ PanelUIX11::hide ()
 }
 
 bool
-PanelUIX11::is_shown () const
+CandidatesUIX11::is_shown () const
 {
     return m_impl->m_mapped;
 }
 
 void
-PanelUIX11::signal_connect_candidate_selected (CandidateSlot slot)
+CandidatesUIX11::signal_connect_candidate_selected (CandidateSlot slot)
 {
     m_impl->m_candidate_slot = slot;
 }
 
 void
-PanelUIX11::signal_connect_page_up (PageSlot slot)
+CandidatesUIX11::signal_connect_page_up (PageSlot slot)
 {
     m_impl->m_page_up_slot = slot;
 }
 
 void
-PanelUIX11::signal_connect_page_down (PageSlot slot)
+CandidatesUIX11::signal_connect_page_down (PageSlot slot)
 {
     m_impl->m_page_down_slot = slot;
 }

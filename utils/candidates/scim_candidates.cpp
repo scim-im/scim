@@ -27,7 +27,7 @@
 #include "scim_private.h"
 #include <scim.h>
 
-#include "scim_panel_ui.h"
+#include "scim_candidates.h"
 
 #include <vector>
 #include <pango/pangocairo.h>
@@ -38,10 +38,10 @@ namespace scim {
 /* Theme presets                                                       */
 /* ------------------------------------------------------------------ */
 
-PanelUITheme
-PanelUITheme::light ()
+CandidatesTheme
+CandidatesTheme::light ()
 {
-    PanelUITheme t;
+    CandidatesTheme t;
     t.font         = "Sans 12";
     t.bg           = { 0.98, 0.98, 0.98, 1.0 };
     t.fg           = { 0.10, 0.10, 0.10, 1.0 };
@@ -55,10 +55,10 @@ PanelUITheme::light ()
     return t;
 }
 
-PanelUITheme
-PanelUITheme::dark ()
+CandidatesTheme
+CandidatesTheme::dark ()
 {
-    PanelUITheme t;
+    CandidatesTheme t;
     t.font         = "Sans 12";
     t.bg           = { 0.16, 0.16, 0.16, 1.0 };
     t.fg           = { 0.92, 0.92, 0.92, 1.0 };
@@ -74,21 +74,21 @@ PanelUITheme::dark ()
 
 // Parse a CSS/X11 color string ("gray92", "light blue", "#rrggbb") into an
 // RGBA color, using Pango (no GDK dependency). Alpha defaults to 1.
-static PanelUIColor
-parse_color (const String &s, const PanelUIColor &fallback)
+static CandidatesColor
+parse_color (const String &s, const CandidatesColor &fallback)
 {
     PangoColor pc;
     if (s.length () && pango_color_parse (&pc, s.c_str ())) {
-        PanelUIColor c = { pc.red / 65535.0, pc.green / 65535.0, pc.blue / 65535.0, 1.0 };
+        CandidatesColor c = { pc.red / 65535.0, pc.green / 65535.0, pc.blue / 65535.0, 1.0 };
         return c;
     }
     return fallback;
 }
 
-PanelUITheme
-scim_panel_ui_theme_from_config (const ConfigPointer &config)
+CandidatesTheme
+scim_candidates_theme_from_config (const ConfigPointer &config)
 {
-    PanelUITheme t = PanelUITheme::light ();
+    CandidatesTheme t = CandidatesTheme::light ();
     if (config.null ())
         return t;
 
@@ -152,7 +152,7 @@ build_byte_offsets (const WideString &wstr, std::vector<int> &offsets)
 // its utf8 rendering. Returns null when there is nothing to apply.
 PangoAttrList *
 make_pango_attrs (const WideString &wstr, const AttributeList &attrs,
-                  const PanelUIColor &fg)
+                  const CandidatesColor &fg)
 {
     if (attrs.empty ())
         return 0;
@@ -229,10 +229,10 @@ make_pango_attrs (const WideString &wstr, const AttributeList &attrs,
 
 } // anonymous namespace
 
-class PanelUI::PanelUIImpl
+class CandidatesUI::CandidatesUIImpl
 {
 public:
-    PanelUITheme  m_theme;
+    CandidatesTheme  m_theme;
 
     // Raw state.
     bool          m_preedit_visible;
@@ -268,8 +268,8 @@ public:
     cairo_surface_t *m_scratch_surface;
     cairo_t         *m_scratch_cr;
 
-    PanelUIImpl ()
-        : m_theme (PanelUITheme::light ()),
+    CandidatesUIImpl ()
+        : m_theme (CandidatesTheme::light ()),
           m_preedit_visible (false), m_preedit_caret (0),
           m_aux_visible (false),
           m_lookup_visible (false), m_lookup_vertical (false),
@@ -282,7 +282,7 @@ public:
     {
     }
 
-    ~PanelUIImpl ()
+    ~CandidatesUIImpl ()
     {
         clear_layout ();
         if (m_scratch_cr) cairo_destroy (m_scratch_cr);
@@ -479,8 +479,8 @@ public:
         guint plen = static_cast<guint> (prefix_utf8.length ());
 
         const bool hi = (i == m_cursor_in_page);
-        const PanelUIColor &lab = hi ? m_theme.highlight_fg : m_theme.label;
-        const PanelUIColor &txt = hi ? m_theme.highlight_fg : m_theme.fg;
+        const CandidatesColor &lab = hi ? m_theme.highlight_fg : m_theme.label;
+        const CandidatesColor &txt = hi ? m_theme.highlight_fg : m_theme.fg;
 
         PangoAttribute *pa;
         pa = pango_attr_foreground_new ((guint16)(lab.r * 65535),
@@ -500,7 +500,7 @@ public:
         return plist;
     }
 
-    void paint_item (cairo_t *cr, const TextItem &it, const PanelUIColor &fg)
+    void paint_item (cairo_t *cr, const TextItem &it, const CandidatesColor &fg)
     {
         PangoLayout *layout = make_layout (cr, it.utf8, it.attrs);
         cairo_move_to (cr, it.x, it.y);
@@ -514,38 +514,38 @@ public:
 /* Public API                                                          */
 /* ------------------------------------------------------------------ */
 
-PanelUI::PanelUI ()
-    : m_impl (new PanelUIImpl ())
+CandidatesUI::CandidatesUI ()
+    : m_impl (new CandidatesUIImpl ())
 {
 }
 
-PanelUI::~PanelUI ()
+CandidatesUI::~CandidatesUI ()
 {
     delete m_impl;
 }
 
 void
-PanelUI::set_theme (const PanelUITheme &theme)
+CandidatesUI::set_theme (const CandidatesTheme &theme)
 {
     m_impl->m_theme = theme;
     m_impl->m_dirty = true;
 }
 
-const PanelUITheme &
-PanelUI::get_theme () const
+const CandidatesTheme &
+CandidatesUI::get_theme () const
 {
     return m_impl->m_theme;
 }
 
 void
-PanelUI::set_font (const String &font_desc)
+CandidatesUI::set_font (const String &font_desc)
 {
     m_impl->m_theme.font = font_desc;
     m_impl->m_dirty = true;
 }
 
 void
-PanelUI::update_preedit_string (const WideString &str, const AttributeList &attrs)
+CandidatesUI::update_preedit_string (const WideString &str, const AttributeList &attrs)
 {
     m_impl->m_preedit_str   = str;
     m_impl->m_preedit_attrs = attrs;
@@ -553,28 +553,28 @@ PanelUI::update_preedit_string (const WideString &str, const AttributeList &attr
 }
 
 void
-PanelUI::update_preedit_caret (int caret)
+CandidatesUI::update_preedit_caret (int caret)
 {
     m_impl->m_preedit_caret = caret;
     m_impl->m_dirty = true;
 }
 
 void
-PanelUI::show_preedit_string ()
+CandidatesUI::show_preedit_string ()
 {
     m_impl->m_preedit_visible = true;
     m_impl->m_dirty = true;
 }
 
 void
-PanelUI::hide_preedit_string ()
+CandidatesUI::hide_preedit_string ()
 {
     m_impl->m_preedit_visible = false;
     m_impl->m_dirty = true;
 }
 
 void
-PanelUI::update_aux_string (const WideString &str, const AttributeList &attrs)
+CandidatesUI::update_aux_string (const WideString &str, const AttributeList &attrs)
 {
     m_impl->m_aux_str   = str;
     m_impl->m_aux_attrs = attrs;
@@ -582,23 +582,23 @@ PanelUI::update_aux_string (const WideString &str, const AttributeList &attrs)
 }
 
 void
-PanelUI::show_aux_string ()
+CandidatesUI::show_aux_string ()
 {
     m_impl->m_aux_visible = true;
     m_impl->m_dirty = true;
 }
 
 void
-PanelUI::hide_aux_string ()
+CandidatesUI::hide_aux_string ()
 {
     m_impl->m_aux_visible = false;
     m_impl->m_dirty = true;
 }
 
 void
-PanelUI::update_lookup_table (const LookupTable &table)
+CandidatesUI::update_lookup_table (const LookupTable &table)
 {
-    PanelUIImpl *d = m_impl;
+    CandidatesUIImpl *d = m_impl;
     d->m_cand_text.clear ();
     d->m_cand_label.clear ();
 
@@ -623,23 +623,23 @@ PanelUI::update_lookup_table (const LookupTable &table)
 }
 
 void
-PanelUI::show_lookup_table ()
+CandidatesUI::show_lookup_table ()
 {
     m_impl->m_lookup_visible = true;
     m_impl->m_dirty = true;
 }
 
 void
-PanelUI::hide_lookup_table ()
+CandidatesUI::hide_lookup_table ()
 {
     m_impl->m_lookup_visible = false;
     m_impl->m_dirty = true;
 }
 
 bool
-PanelUI::is_visible () const
+CandidatesUI::is_visible () const
 {
-    PanelUIImpl *d = m_impl;
+    CandidatesUIImpl *d = m_impl;
     if (d->m_preedit_visible && d->m_preedit_str.length ()) return true;
     if (d->m_aux_visible && d->m_aux_str.length ()) return true;
     if (d->m_lookup_visible && !d->m_cand_text.empty ()) return true;
@@ -647,7 +647,7 @@ PanelUI::is_visible () const
 }
 
 void
-PanelUI::measure (int &width, int &height)
+CandidatesUI::measure (int &width, int &height)
 {
     m_impl->layout ();
     width  = m_impl->m_width;
@@ -655,12 +655,12 @@ PanelUI::measure (int &width, int &height)
 }
 
 void
-PanelUI::draw (cairo_t *cr)
+CandidatesUI::draw (cairo_t *cr)
 {
-    PanelUIImpl *d = m_impl;
+    CandidatesUIImpl *d = m_impl;
     d->layout ();
 
-    const PanelUITheme &t = d->m_theme;
+    const CandidatesTheme &t = d->m_theme;
 
     // Background.
     cairo_save (cr);
@@ -715,10 +715,10 @@ PanelUI::draw (cairo_t *cr)
     }
 }
 
-PanelUI::HitType
-PanelUI::hit_test (int x, int y, int &candidate_index) const
+CandidatesUI::HitType
+CandidatesUI::hit_test (int x, int y, int &candidate_index) const
 {
-    PanelUIImpl *d = m_impl;
+    CandidatesUIImpl *d = m_impl;
     candidate_index = -1;
     for (size_t i = 0; i < d->m_cells.size (); ++i) {
         const CandidateCell &c = d->m_cells[i];

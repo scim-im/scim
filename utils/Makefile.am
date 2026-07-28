@@ -17,6 +17,8 @@
 
 MAINTAINERCLEANFILES	= Makefile.in
 
+SUBDIRS			= candidates
+
 AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_builddir)/src \
 	    	  -I$(top_srcdir) \

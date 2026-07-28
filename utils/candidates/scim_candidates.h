@@ -1,11 +1,11 @@
 /**
- * @file scim_panel_ui.h
+ * @file scim_candidates.h
  * @brief Backend-agnostic Cairo+Pango renderer for the cursor-relative
  *        input panel (preedit + aux + candidate lookup table).
  *
  * This is the "own-Cairo" candidate UI core. It lays out and draws the input
  * panel onto a caller-supplied cairo_t and answers hit-tests, but knows nothing
- * about windows, X11 or Wayland. A surface shim (e.g. PanelUIX11) owns the
+ * about windows, X11 or Wayland. A surface shim (e.g. CandidatesUIX11) owns the
  * actual toplevel/surface, drives measure()/draw() and routes pointer events
  * back through hit_test().
  */
@@ -50,7 +50,7 @@ namespace scim {
 /**
  * @brief An RGBA color, components in [0,1].
  */
-struct PanelUIColor {
+struct CandidatesColor {
     double r;
     double g;
     double b;
@@ -63,34 +63,34 @@ struct PanelUIColor {
  * SCIM historically config-drives the panel font and colors, so a Cairo theme
  * reading those same values is consistent with the GTK panel, not a regression.
  */
-struct PanelUITheme {
+struct CandidatesTheme {
     String       font;          ///< Pango font description, e.g. "Sans 12".
-    PanelUIColor bg;            ///< Window background.
-    PanelUIColor fg;            ///< Normal text.
-    PanelUIColor label;         ///< Candidate label ("1." "2." ...).
-    PanelUIColor highlight_bg;  ///< Selected-candidate background.
-    PanelUIColor highlight_fg;  ///< Selected-candidate text.
-    PanelUIColor border;        ///< Window border.
+    CandidatesColor bg;            ///< Window background.
+    CandidatesColor fg;            ///< Normal text.
+    CandidatesColor label;         ///< Candidate label ("1." "2." ...).
+    CandidatesColor highlight_bg;  ///< Selected-candidate background.
+    CandidatesColor highlight_fg;  ///< Selected-candidate text.
+    CandidatesColor border;        ///< Window border.
     int          border_width;  ///< Border thickness in px.
     int          padding;       ///< Inner padding in px.
     int          spacing;       ///< Gap between rows / candidates in px.
 
     /** @brief A sane light-theme default. */
-    static PanelUITheme light ();
+    static CandidatesTheme light ();
     /** @brief A sane dark-theme default. */
-    static PanelUITheme dark ();
+    static CandidatesTheme dark ();
 };
 
 /**
  * @brief Build a theme from the SCIM config, matching the legacy GTK panel.
  *
  * Reads /Panel/Gtk/Font and /Panel/Gtk/Color/{NormalText,NormalBackground,
- * ActiveText,ActiveBackground} (CSS/X11 color strings) into a PanelUITheme, so
+ * ActiveText,ActiveBackground} (CSS/X11 color strings) into a CandidatesTheme, so
  * every in-process renderer honours the user's configured font and colors the
- * same way. Falls back to PanelUITheme::light() for missing/unparsable values.
- * The PanelUI class itself stays config-agnostic; this is the shared bridge.
+ * same way. Falls back to CandidatesTheme::light() for missing/unparsable values.
+ * The CandidatesUI class itself stays config-agnostic; this is the shared bridge.
  */
-PanelUITheme scim_panel_ui_theme_from_config (const ConfigPointer &config);
+CandidatesTheme scim_candidates_theme_from_config (const ConfigPointer &config);
 
 /**
  * @brief Backend-agnostic layout/draw of the input panel.
@@ -99,13 +99,13 @@ PanelUITheme scim_panel_ui_theme_from_config (const ConfigPointer &config);
  * scim::PanelClient, so a frontend can drive this in-process with the same
  * calls it used to forward to scim-panel-gtk.
  */
-class PanelUI
+class CandidatesUI
 {
-    class PanelUIImpl;
-    PanelUIImpl *m_impl;
+    class CandidatesUIImpl;
+    CandidatesUIImpl *m_impl;
 
-    PanelUI (const PanelUI &);
-    const PanelUI & operator = (const PanelUI &);
+    CandidatesUI (const CandidatesUI &);
+    const CandidatesUI & operator = (const CandidatesUI &);
 
 public:
     /** @brief Kind of region a point falls in (see hit_test()). */
@@ -116,12 +116,12 @@ public:
         HIT_NEXT_PAGE   ///< The "next page" affordance.
     };
 
-    PanelUI ();
-    ~PanelUI ();
+    CandidatesUI ();
+    ~CandidatesUI ();
 
     /** @name Theming @{ */
-    void set_theme (const PanelUITheme &theme);
-    const PanelUITheme & get_theme () const;
+    void set_theme (const CandidatesTheme &theme);
+    const CandidatesTheme & get_theme () const;
     /** @brief Convenience: override just the font description. */
     void set_font (const String &font_desc);
     /** @} */

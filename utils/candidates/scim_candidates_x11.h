@@ -1,10 +1,10 @@
 /**
- * @file scim_panel_ui_x11.h
+ * @file scim_candidates_x11.h
  * @brief X11 surface shim for the Cairo input-panel renderer.
  *
  * Owns an override-redirect toplevel + a cairo-xlib surface, positions it at
  * an absolute spot location with XMoveWindow, pumps its own X events and routes
- * pointer input back through PanelUI::hit_test(). This is the X11 half of the
+ * pointer input back through CandidatesUI::hit_test(). This is the X11 half of the
  * "own-Cairo" candidate UI; the Wayland shim (5c) will mirror it against an
  * input-popup-surface-v2.
  *
@@ -37,20 +37,20 @@
 
 #include <scim.h>
 #include <functional>
-#include "scim_panel_ui.h"
+#include "scim_candidates.h"
 
 namespace scim {
 
 /**
- * @brief X11 override-redirect surface driving a PanelUI renderer.
+ * @brief X11 override-redirect surface driving a CandidatesUI renderer.
  */
-class PanelUIX11
+class CandidatesUIX11
 {
-    class PanelUIX11Impl;
-    PanelUIX11Impl *m_impl;
+    class CandidatesUIX11Impl;
+    CandidatesUIX11Impl *m_impl;
 
-    PanelUIX11 (const PanelUIX11 &);
-    const PanelUIX11 & operator = (const PanelUIX11 &);
+    CandidatesUIX11 (const CandidatesUIX11 &);
+    const CandidatesUIX11 & operator = (const CandidatesUIX11 &);
 
 public:
     /** @brief Callback when a candidate is clicked (page-relative index). */
@@ -58,8 +58,8 @@ public:
     /** @brief Callback for a page-flip request (scroll wheel). */
     typedef std::function<void ()>    PageSlot;
 
-    PanelUIX11 ();
-    ~PanelUIX11 ();
+    CandidatesUIX11 ();
+    ~CandidatesUIX11 ();
 
     /**
      * @brief Open a connection and create the panel window.
@@ -71,7 +71,7 @@ public:
     bool is_open () const;
 
     /** @brief Access the renderer to push preedit/aux/lookup state. */
-    PanelUI & ui ();
+    CandidatesUI & ui ();
 
     /** @brief Xlib connection fd, for the caller's poll/select loop (-1 if closed). */
     int  connection_number () const;
