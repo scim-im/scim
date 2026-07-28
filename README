@@ -1,129 +1,183 @@
-Source-derived documentation for developers is provided separately, courtesy
-of doxygen.  Look for scim-doc-$(VERSION).tar.gz on our website for download
-or browse online at http://oss.leggewie.org/scim/
+SCIM -- Smart Common Input Method
+=================================
 
-To compile scim from VCS, be sure to run the bootstrap script in the toplevel
-directory first.  To prepare a new tarball for release, adjust the values of
-the AC_INIT, SCIM_*_VERSION, SCIM_CURRENT and SCIM_REVISION variables in
-configure.ac as necessary.  Then run
-"./bootstrap && ./configure && make dist && make docs".
+SCIM is a modular input-method platform.  A single backend hosts the IMEngine
+modules (pinyin, table, rawcode, ...); the various frontends expose it to
+applications, and the panel draws the candidate/toolbar UI.
 
-The main program of SCIM is named scim. The usage of scim is:
+Source-derived developer documentation is generated with doxygen.  Look for
+scim-doc-$(VERSION).tar.gz on our website or browse it online.
+
+Building
+========
+
+To build from VCS, run the bootstrap script in the top-level directory first:
+
+  ./bootstrap && ./configure && make
+
+To prepare a release tarball, adjust AC_INIT, SCIM_*_VERSION, SCIM_CURRENT and
+SCIM_REVISION in configure.ac as needed, then run
+
+  ./bootstrap && ./configure && make dist && make docs
+
+The GUI (panel and setup) targets GTK4.  Native IM modules are built for GTK2,
+GTK3, GTK4, Qt5 and Qt6 when the respective toolkits are present.
+
+
+Running scim
+============
 
   scim [option]...
 
-  The options are: 
-    -l, --list            List all of available modules.
-    -f, --frontend name   Uses specified FrontEnd module.
-    -c, --config name     Uses specified Config module.
-    -e, --engines name    Load specified set of input method engines.
-    -ne,--no-engines name Do not load those set of engines.
-    -d, --daemon          Run scim as a daemon.
+  The options are:
+    -l, --list            List all of the available modules.
+    -f, --frontend name   Use the specified FrontEnd module (e.g. x11, socket,
+                          wayland, ibus); auto-detected from the session when
+                          not given.
+    -c, --config name     Use the specified Config module.
+    -e, --engines name    Load the specified set of IMEngines.
+    -ne,--no-engines name Do not load that set of IMEngines.
+    -d, --daemon          Run in the background as a supervisor (restarts its
+                          children; on a GNOME/IBus session it runs the
+                          input-source coordinator instead of a frontend).
     --no-socket           Do not try to start a SCIM SocketFrontEnd daemon.
+    --xml                 With '-f ibus', print the IBus component manifest for
+                          the enabled engines and exit.
     -h, --help            Show this help message.
 
-By default, scim will use x11 frontend module and simple 
-config module if they are available, unless you specify the module names.
+When no frontend is given, scim picks one from the session: a GNOME/IBus
+session is served by the IBus frontend (see below), a plain X11 session by the
+x11 frontend, and a Wayland session by the wayland frontend when it is built.
 
-And if --no-socket option is not used, scim will try to start a separated
-daemon with SocketFrontEnd to provide the service, and X11 FrontEnd will
-try to connect to this service daemon.
+`scim -d` daemonizes itself and stays as a persistent supervisor: it launches
+the appropriate worker(s) and restarts them if they crash.  Install
+data/scim.desktop as an XDG autostart entry (the build does this) so the
+session starts `scim -d` automatically; scim then self-selects its role.
 
-TIPS of X11 FrontEnd:
-=====================
 
-* You can drag input window, lookup window by pressing down right mouse button.
-* export GDK_USE_XFT=1 before running scim to let scim use Anti-Aliased font.
-* Font and color of preedit, status and lookup area can be changed in config file.
+Client/server architecture (Socket FrontEnd)
+============================================
 
-TIPS of Socket FrontEnd, IMEngine and Config module:
-==================================================
+By default scim runs a single per-user client/server environment.  One process
+-- the SocketFrontEnd daemon -- owns the real backend and the config files;
+everything else is a thin client that relays to it over a local socket:
 
-*********** Notice ************
-From 1.0.0, scim will make use of SocketFrontEnd to construct a single user
-client/server input method environment automatically. Unless you use --no-socket
-option when starting scim.
-*******************************
+  * the GTK2/3/4 and Qt5/6 IM modules load the Socket IMEngine + Socket Config
+    proxies and relay key processing AND configuration to the daemon (they
+    embed the backend directly only as a fallback -- e.g. no socket module
+    built, manual mode, or a mismatched socket address);
+  * the x11, wayland and ibus frontends do the same when a daemon is present.
 
-Socket FrontEnd/IMEngine/Config module is useless under X11 environment. It's only
-useful to work with GTK2 SCIM IM Module.
-
-The purpose of Socket FrontEnd is to listen and accept request
-on a local/inet socket. Socket IMEngine and Config module serve as clients of 
-Socket FrontEnd.
+So there is exactly one process reading the config files and running the
+engines; activation is instant and learned state is shared.  Pass --no-socket
+(or -c/-e explicitly) to opt out and embed the backend in-process instead.
 
 The default socket address is local:$XDG_RUNTIME_DIR/scim-socket-frontend (and
-local:/tmp/scim-socket-frontend when XDG_RUNTIME_DIR is not set); the prefix
-local: indicates that it's a unix/local socket. If you want to create a inet
-socket, use inet: prefix, e.g. inet:localhost:12345, 12345 is the port number.
+local:/tmp/scim-socket-frontend when XDG_RUNTIME_DIR is not set); the local:
+prefix means a unix socket.  Use an inet: prefix for a TCP socket, e.g.
+SCIM_SOCKET_ADDRESS=inet:localhost:12345.
 
-Use following command to start scim daemon to listen a socket:
+The IM modules use the Socket IMEngine/Config modules by default.  To load
+other modules directly instead, set for example:
 
-$ scim -f socket -c simple -ne socket -d
+  $ export GTK_IM_SCIM_CONFIG_MODULE=simple
+  $ export GTK_IM_SCIM_IMENGINE_MODULES=table
 
-To specify a different address, you can do:
 
-$ SCIM_SOCKET_ADDRESS=inet:localhost:12345 scim -f socket -c simple -ne socket -d
+GNOME / IBus sessions
+=====================
 
-the option "-ne socket" tells scim does not load Socket IMEngine IM module, because
-there is no Socket FrontEnd running yet.
+On a GNOME (or any IBus) session the IME is served by ibus-daemon through the
+scim IBus engine, not by our own input frontend.  Here `scim -d` runs a single
+supervised daemon that hosts one shared backend for two co-loaded frontends:
 
-Then to use this scim to serve another scim, you can do like this:
+  scim -f socket,ibussync
 
-$ SCIM_SOCKET_ADDRESS=inet:localhost:12345 scim -f x11 -c socket -e socket -d
+  * socket   -- a warm SocketFrontEnd: the shared backend the relay-mode IBus
+                engine attaches to, so activating an engine is instant and
+                learned state survives ibus-daemon killing and relaunching the
+                engine process;
+  * ibussync -- a coordinator that keeps the set of enabled SCIM engines and
+                GNOME's input-source list (org.gnome.desktop.input-sources) in
+                sync, both directions, off that same backend.
 
-(This command starts a SCIM X11 XIM server which only forward request between
-X11 and the previous started SCIM Socket FrontEnd.)
+IBus discovers SCIM engines from a component manifest (scim.xml); see below.
 
-The option "-e socket" tells scim only uses Socket IMEngine IM module. Other module
-should not be loaded directly, because they will be accessed via Socket FrontEnd by
-Socket IMEngine IM module. -c socket tells scim to load configuration from remote
-Socket FrontEnd instead of local config file.
 
-Or if you want to use GTK2 IM Module within a GTK2/GNOME2 application, you can:
+IBus component manifest (scim.xml)
+==================================
 
-$ export SCIM_SOCKET_ADDRESS=inet:localhost:12345
-$ testgtk
+NOTE: This whole section applies to GNOME/IBus sessions ONLY.  On a plain X11
+or Wayland session the x11/wayland frontend hosts the backend directly and
+discovers engines from it, so no IBus component manifest is involved -- neither
+packagers nor users need to generate or install scim.xml there.
 
-Then you can use SCIM directly within testgtk, by right clicking on an entry widget
-and selecting SCIM input method.
+ibus-daemon reads a component manifest to learn which engines exist and how to
+launch them.  SCIM installs a bootstrap manifest to the IBus component
+directory (`pkg-config --variable=pkgdatadir ibus-1.0`/component, typically
+/usr/share/ibus/component/scim.xml) that lists only the generic "scim" engine.
 
-By default, GTK2 SCIM IM Module will only use Socket IMEngine/Config modules, if
-you want to load other modules directly, you may set the environment variables,
-e.g.:
+To expose every *enabled* SCIM engine as its own IBus entry, regenerate the
+manifest from the actually-enabled engines:
 
-$ export GTK_IM_SCIM_CONFIG_MODULE=simple
-$ export GTK_IM_SCIM_IMENGINE_MODULES=table
+  scim -f ibus --xml > /usr/share/ibus/component/scim.xml
 
-In case you do not understand how Socket FrontEnd/IMEngine module work, here is a
-simple diagram to explain it:
+The generator enumerates the engines visible in the environment it runs in, so
+run it as the identity whose engines you want to appear.  ibus-daemon scans the
+component directories once at startup, so restart ibus-daemon afterwards
+(e.g. `ibus restart`).
 
-+--------+
-|IMEngine|
-|Mod 1   |--+
-+--------+  |
-            |
-+--------+  |  +--------+    inet          +--------+  +--------+
-|IMEngine|  |  |Socket  | +--------+       |Socket  |  |X11     | /-----\
-|Mod 2   |--+--+        |-|a socket| <- -> |IMEngine|--|        |-| X11 |<->app
-+--------+  |  |FrontEnd| +--------+       |Module  |  |FrontEnd| \-----/
-   .        |  +--------+    local         +--------+  +--------+
-   .        |
-   .        |
-+--------+  |
-|IMEngine|  |
-|Mod n   |--+
-+--------+
+For packagers
+-------------
 
-Then you see, IMEngine Modules 1 to n (like pinyin, table, rawcode etc.) with
-Socket FrontEnd together act as a socket daemon (like apache), Socket IMEngine
-Module with X11 FrontEnd act as a client. All requests from application
-will first be sent to X11 FrontEnd, then transfered to Socket FrontEnd via
-Socket IMEngine IM Module, then those requests will be proceeded by the real
-IMEngine Modules (1 to n), all reply will be sent back to application via
-the same route.
+Regenerate the system manifest whenever the set of installed SCIM IMEngine
+packages changes -- i.e. watch the IMEngine module directory
+(`$(libdir)/scim-1.0/*/IMEngine/`) and, on any install or removal, run
 
-Have fun!
+  scim -f ibus --xml > /usr/share/ibus/component/scim.xml
+
+Wire this to your package manager's hooks: a dpkg trigger, an rpm file trigger,
+or a pacman hook on that directory.  Run it as root, so it enumerates only the
+system-wide engines -- exactly what belongs in the system manifest.  (Tables
+and other engines that live only in a user's home are handled per-user below.)
+
+For users -- exposing a user-level engine
+-----------------------------------------
+
+An engine that lives only in your home directory -- e.g. a scim-tables table
+you installed for your user, or a licensed engine that cannot be installed
+system-wide -- is invisible to the system generator.  To use it under IBus,
+generate your own manifest and point ibus-daemon at it:
+
+  1. Generate a personal manifest as yourself (this enumerates your FULL
+     enabled set -- the system engines PLUS your own):
+
+       mkdir -p ~/.local/share/ibus/component
+       scim -f ibus --xml > ~/.local/share/ibus/component/scim.xml
+
+  2. Tell ibus-daemon to scan that directory by exporting IBUS_COMPONENT_PATH
+     BEFORE ibus-daemon starts (in your login shell profile or systemd user
+     environment):
+
+       export IBUS_COMPONENT_PATH=$HOME/.local/share/ibus/component
+
+  3. Restart the session (or ibus-daemon) so it re-scans.
+
+The personal manifest is a superset that SUBSTITUTES for the system one for
+your session; it is not meant to be merged with it.  Regenerate it whenever you
+enable/disable engines or install a new user-level engine.
+
+
+Tips
+====
+
+* Panel appearance (preedit/status/lookup font and colors) is configured in
+  scim-setup; changes are pushed to running clients and applied on the fly.
+* You can drag the input, lookup and toolbar windows with the mouse.
+
+
+Authors
+=======
 
 James Su <suzhe@tsinghua.org.cn>
 Rolf Leggewie <foss@rolf.leggewie.biz>

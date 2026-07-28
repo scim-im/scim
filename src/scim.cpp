@@ -253,13 +253,19 @@ int main (int argc, char *argv [])
             String ("--help") == argv [i]) {
             cout << "Usage: " << argv [0] << " [option]...\n\n"
                  << "The options are: \n"
-                 << "  -l, --list              List all of available modules.\n"
-                 << "  -f, --frontend name     Use specified FrontEnd module.\n"
-                 << "  -c, --config name       Use specified Config module.\n"
-                 << "  -e, --engines name      Load specified set of IMEngines.\n"
-                 << "  -ne,--no-engines name   Do not load those set of IMEngines.\n"
-                 << "  -d, --daemon            Run " << argv [0] << " as a daemon.\n"
+                 << "  -l, --list              List all of the available modules.\n"
+                 << "  -f, --frontend name     Use the specified FrontEnd module (e.g. x11,\n"
+                 << "                          socket, wayland, ibus); auto-detected from the\n"
+                 << "                          session when not given.\n"
+                 << "  -c, --config name       Use the specified Config module.\n"
+                 << "  -e, --engines name      Load the specified set of IMEngines.\n"
+                 << "  -ne,--no-engines name   Do not load that set of IMEngines.\n"
+                 << "  -d, --daemon            Run in the background as a supervisor (restarts\n"
+                 << "                          its children; on a GNOME/IBus session it runs the\n"
+                 << "                          input-source coordinator instead of a frontend).\n"
                  << "  --no-socket             Do not try to start a SCIM SocketFrontEnd daemon.\n"
+                 << "  --xml                   With '-f ibus', print the IBus component manifest\n"
+                 << "                          for the enabled engines and exit.\n"
                  << "  -h, --help              Show this help message.\n";
             return 0;
         }

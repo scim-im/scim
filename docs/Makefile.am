@@ -21,6 +21,9 @@ CLEANFILES		= *.bak
 
 EXTRA_DIST		= scim.cfg developers design.zh_CN
 
+# Hand-written manual pages: install to $(mandir)/man1 and ship in the tarball.
+dist_man_MANS		= scim.1 scim-setup.1 scim-config-agent.1
+
 SUBDIRS			= manual
 
 .PHONY: html-local

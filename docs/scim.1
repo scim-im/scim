@@ -2,7 +2,7 @@
 .\"           2004,2006 Ming Hua <minghua@rice.edu>.
 .\" This man page is distributed under the same license as scim package.
 .\"
-.TH scim 1 "January 2006" "scim: 1.4.4" "scim manuals"
+.TH scim 1 "July 2026" "scim: 1.4.18" "scim manuals"
 .
 .SH NAME
 scim \(em smart common input method
@@ -15,6 +15,8 @@ scim \(em smart common input method
 .RB [ \-f " \fIfrontend\fR]"
 .RB [ \-\-no\-socket ]
 .RB [ \-d ]
+.br
+.B scim \-f ibus \-\-xml
 .br
 .B scim \-h
 .
@@ -37,9 +39,10 @@ same arguments.
 Use specified Config module.
 .TP
 .BR \-d " | " \-\-daemon
-Run as a daemon.
-The program will exit and leave a daemon in the background if invoked with
-this option.
+Run in the background as a supervisor process.
+It restarts its child processes if they exit abnormally; on a GNOME/IBus
+session it runs the input-source coordinator (which keeps the enabled SCIM
+engines and GNOME's input-source list in sync) instead of a frontend.
 .TP
 .BR \-e " | " \-\-engines " \fImodule\fR[,\fImodule\fR]..."
 Use specified IMEngine modules.
@@ -51,7 +54,10 @@ All modules except the named one(s) will be loaded, separate module names with
 comma.
 .TP
 .BR \-f " | " \-\-frontend " \fImodule\fR"
-Use specified FrontEnd module.
+Use the specified FrontEnd module, e.g. \fBx11\fR, \fBsocket\fR, \fBwayland\fR
+or \fBibus\fR.
+When omitted, a suitable frontend is auto-detected from the session (for
+example \fBwayland\fR on a Wayland session).
 .TP
 .BR \-h " | " \-\-help
 Show summary of options.
@@ -62,6 +68,24 @@ three groups \(em FrontEnd, Config and IMEngine.
 .TP
 .B \-\-no\-socket
 Do not start a socket FrondEnd module.
+.TP
+.B \-\-xml
+Only meaningful together with \fB\-f ibus\fR: print the IBus component manifest
+(one \fB<engine>\fR entry per enabled SCIM engine) to standard output and exit,
+without connecting to IBus.
+Use it to (re)generate the installed component, e.g.
+.RS
+.IP
+.B scim \-f ibus \-\-xml > /usr/share/ibus/component/scim.xml
+.RE
+.IP
+after the set of installed or enabled engines changes.
+.TP
+.B \-\-ibus
+Only meaningful together with \fB\-f ibus\fR: run as an embedded IBus engine
+launched by \fBibus\-daemon\fR.
+This is used by the exec line of the installed IBus component and is not
+normally invoked by hand.
 .
 .SH ENVIRONMENT
 .TP
