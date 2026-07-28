@@ -1,5 +1,8 @@
-extras/gtk_immodule/gtkimcontextscim.cpp
-extras/gtk_immodule/imscim.cpp
+extras/immodule/gtk2/gtkimcontextscim.cpp
+extras/immodule/gtk3/gtkimcontextscim.cpp
+extras/immodule/gtk4/scimgtkimcontext.cpp
+extras/immodule/qt5/scimqtinputcontext.cpp
+extras/immodule/qt6/scimqtinputcontext.cpp
 extras/panel/scim_panel_gtk.cpp
 extras/setup/scim-setup.desktop.in
 extras/setup/scim_setup_helper.cpp
@@ -57,7 +60,6 @@ src/scim_transaction.cpp
 src/scim_utility.cpp
 tests/scim_test_helper.cpp
 tests/scim_test_imengine.cpp
-utils/scimkeyselection.cpp
-utils/scimstringview.c
-utils/scimtrayicon.c
-utils/scim_x11_utils.cpp
+utils/gtkutils/scimkeyselection.cpp
+utils/gtkutils/scimstringview.c
+utils/x11utils/scim_x11_utils.cpp

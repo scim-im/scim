@@ -7,7 +7,7 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/intl \
 			  -I$(top_srcdir)/data \
-			  -I$(top_srcdir)/utils \
+			  -I$(top_srcdir)/utils/x11utils \
 			  -I$(top_srcdir)/extras/panel \
 			  -DSCIM_DATADIR=\"@SCIM_DATADIR@\" \
 			  -DSCIM_LOCALEDIR=\"@SCIM_LOCALEDIR@\" \
@@ -23,7 +23,7 @@ CONFIG_GTK2_IMMODULE = im-scim-orig.la
 endif
 
 if SCIM_BUILD_X11_UTILS
-X11_UTILS=$(top_builddir)/utils/libscim-x11utils@SCIM_EPOCH@.la
+X11_UTILS=$(top_builddir)/utils/x11utils/libscim-x11utils@SCIM_EPOCH@.la
 endif
 
 # Draw the lookup table in-process with the Cairo candidate renderer.

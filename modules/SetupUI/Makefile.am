@@ -24,7 +24,7 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/intl \
 			  -I$(top_srcdir)/data \
-			  -I$(top_srcdir)/utils \
+			  -I$(top_srcdir)/utils/gtkutils \
 			  -I$(top_srcdir)/modules/IMEngine \
 			  -DSCIM_DATADIR=\"@SCIM_DATADIR@\" \
 			  -DSCIM_LOCALEDIR=\"@SCIM_LOCALEDIR@\" \
@@ -62,7 +62,7 @@ aaa_frontend_setup_la_LDFLAGS = -avoid-version \
 		    		  @GTK_LIBS@ \
     				  @LTLIBINTL@
 aaa_frontend_setup_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
-				$(top_builddir)/utils/libscim-gtkutils@SCIM_EPOCH@.la
+				$(top_builddir)/utils/gtkutils/libscim-gtkutils@SCIM_EPOCH@.la
 
 
 aaa_imengine_setup_la_SOURCES = scim_imengine_setup.cpp
@@ -75,7 +75,7 @@ aaa_imengine_setup_la_LDFLAGS = -avoid-version \
 				@GTK_LIBS@ \
 				@LTLIBINTL@
 aaa_imengine_setup_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
-				$(top_builddir)/utils/libscim-gtkutils@SCIM_EPOCH@.la
+				$(top_builddir)/utils/gtkutils/libscim-gtkutils@SCIM_EPOCH@.la
 
 
 panel_gtk_setup_la_SOURCES     = scim_panel_gtk_setup.cpp

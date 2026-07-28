@@ -38,7 +38,7 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/intl \
 			  -I$(top_srcdir)/data \
-			  -I$(top_srcdir)/utils \
+			  -I$(top_srcdir)/utils/x11utils \
 			  -I$(top_srcdir)/extras/panel \
 			  -DSCIM_DATADIR=\"@SCIM_DATADIR@\" \
 			  -DSCIM_LOCALEDIR=\"@SCIM_LOCALEDIR@\" \
@@ -109,7 +109,7 @@ x11_la_LDFLAGS		= -avoid-version \
 
 x11_la_LIBADD		= IMdkit/libXimd.la \
 			  $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
-			  $(top_builddir)/utils/libscim-x11utils@SCIM_EPOCH@.la \
+			  $(top_builddir)/utils/x11utils/libscim-x11utils@SCIM_EPOCH@.la \
 			  $(PANEL_UI_LIBS) \
 			  $(KIMPANEL_LIBS)
 

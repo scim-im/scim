@@ -1074,6 +1074,8 @@ AC_CONFIG_FILES([Makefile
 		 src/Makefile
 		 src/scim_types.h
 		 utils/Makefile
+		 utils/x11utils/Makefile
+		 utils/gtkutils/Makefile
 		 utils/candidates/Makefile
 		 data/Makefile
 		 data/icons/Makefile
@@ -1090,11 +1092,11 @@ AC_CONFIG_FILES([Makefile
 	 	 docs/manual/Makefile
 	 	 configs/Makefile
 		 extras/Makefile
-		 extras/gtk_immodule/gtk2/Makefile
-		 extras/gtk_immodule/gtk3/Makefile
-		 extras/gtk_immodule/gtk4/Makefile
-		 extras/gtk_immodule/qt5/Makefile
-		 extras/gtk_immodule/qt6/Makefile
+		 extras/immodule/gtk2/Makefile
+		 extras/immodule/gtk3/Makefile
+		 extras/immodule/gtk4/Makefile
+		 extras/immodule/qt5/Makefile
+		 extras/immodule/qt6/Makefile
 		 extras/setup/Makefile
 		 extras/setup/gtk3/Makefile
 		 extras/setup/scim-setup

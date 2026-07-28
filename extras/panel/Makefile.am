@@ -6,7 +6,7 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/intl \
 			  -I$(top_srcdir)/data \
-			  -I$(top_srcdir)/utils \
+			  -I$(top_srcdir)/utils/gtkutils \
 			  -DSCIM_DATADIR=\"@SCIM_DATADIR@\" \
 			  -DSCIM_LOCALEDIR=\"@SCIM_LOCALEDIR@\" \
 			  -DSCIM_SYSCONFDIR=\"@SCIM_SYSCONFDIR@\" \
@@ -36,4 +36,4 @@ scim_panel_gtk_CXXFLAGS = @GTK_CFLAGS@ @X_CFLAGS@ $(CANDIDATES_CFLAGS)
 scim_panel_gtk_LDFLAGS  = @GTK_LIBS@ @X_LIBS@ @LTLIBINTL@
 
 scim_panel_gtk_LDADD    = $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
-			  $(top_builddir)/utils/libscim-gtkutils@SCIM_EPOCH@.la
+			  $(top_builddir)/utils/gtkutils/libscim-gtkutils@SCIM_EPOCH@.la
