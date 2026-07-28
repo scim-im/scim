@@ -69,10 +69,12 @@
 
 using namespace scim;
 
+#ifndef SCIM_HAS_CANDIDATES  // lookup-window nav icons (panel-drawn candidates only)
 #include "icons/up.xpm"
 #include "icons/down.xpm"
 #include "icons/left.xpm"
 #include "icons/right.xpm"
+#endif
 #include "icons/setup.xpm"
 #include "icons/help.xpm"
 #include "icons/trademark.xpm"
@@ -166,7 +168,12 @@ struct LookupTablePayload {
 /////////////////////////////////////////////////////////////////////////////
 static void       ui_config_reload_callback            (const ConfigPointer &config);
 static void       ui_load_config                       (void);
+static void       ui_apply_panel_style                 (void);
 static void       ui_initialize                        (void);
+
+// CSS class tagging the panel text widgets (preedit/aux/lookup items/property
+// labels) that ui_apply_panel_style () styles with the configured font/colors.
+#define SCIM_PANEL_TEXT_CSS_CLASS "scim-panel-text"
 
 static void       ui_settle_input_window               (bool            relative = false,
                                                         bool            force    = false);
@@ -209,10 +216,12 @@ static GtkWidget* ui_create_trademark_icon             (void);
 static GtkWidget* ui_create_stick_icon                 (bool            sticked);
 static GtkWidget* ui_create_help_icon                  (void);
 static GtkWidget* ui_create_menu_icon                  (void);
+#ifndef SCIM_HAS_CANDIDATES  // lookup-window nav icons (panel-drawn candidates only)
 static GtkWidget* ui_create_up_icon                    (void);
 static GtkWidget* ui_create_down_icon                  (void);
 static GtkWidget* ui_create_left_icon                  (void);
 static GtkWidget* ui_create_right_icon                 (void);
+#endif
 
 // Popover-menu helpers (GTK4 has no GtkMenu).
 static GtkWidget* ui_menu_new                          (void);
@@ -253,6 +262,7 @@ static void       ui_factory_menu_deactivate_cb        (GtkWidget      *item,
 static void       ui_submenu_button_cb                 (GtkButton      *button,
                                                         gpointer        user_data);
 
+#ifndef SCIM_HAS_CANDIDATES  // lookup-window callbacks (panel-drawn candidates only)
 static void       ui_lookup_table_vertical_pressed_cb  (GtkGestureClick *gesture,
                                                         int             n_press,
                                                         double          x,
@@ -266,6 +276,7 @@ static void       ui_lookup_table_up_button_click_cb   (GtkButton      *button,
                                                         gpointer        user_data);
 static void       ui_lookup_table_down_button_click_cb (GtkButton      *button,
                                                         gpointer        user_data);
+#endif
 
 static void       ui_window_stick_button_click_cb      (GtkButton      *button,
                                                         gpointer        user_data);
@@ -459,6 +470,7 @@ static GtkWidget         *_help_area                   = 0;
 static GtkWidget         *_command_menu                = 0;
 
 static PangoFontDescription *_default_font_desc        = 0;
+static GtkCssProvider       *_css_provider             = 0;
 
 static gboolean           _input_window_draging        = FALSE;
 
@@ -690,6 +702,70 @@ ui_load_config (void)
             _config->read (String (SCIM_CONFIG_PANEL_GTK_TOOLBAR_HIDE_TIMEOUT),
                            _toolbar_hide_timeout_max);
     }
+
+    ui_apply_panel_style ();
+}
+
+// GTK4 removed gtk_widget_modify_font/fg/bg; push the configured panel font and
+// normal fg/bg to the text widgets (tagged SCIM_PANEL_TEXT_CSS_CLASS) through a
+// display-wide CSS provider instead. Called from ui_load_config (), so it also
+// re-applies on the fly when the config is reloaded. The per-run reverse and
+// highlight candidate colors are still applied via Pango attributes at draw
+// time (see create_pango_attrlist); this only sets the base font and the colors
+// those widgets would otherwise inherit from the GTK theme.
+static void
+ui_apply_panel_style (void)
+{
+    GString *css = g_string_new ("." SCIM_PANEL_TEXT_CSS_CLASS " {\n");
+
+    gchar *bg = gdk_rgba_to_string (&_normal_bg);
+    gchar *fg = gdk_rgba_to_string (&_normal_text);
+    g_string_append_printf (css, "  background-color: %s;\n  color: %s;\n", bg, fg);
+    g_free (bg);
+    g_free (fg);
+
+    if (_default_font_desc) {
+        PangoFontMask mask = pango_font_description_get_set_fields (_default_font_desc);
+
+        if (mask & PANGO_FONT_MASK_FAMILY) {
+            const char *family = pango_font_description_get_family (_default_font_desc);
+            if (family && *family)
+                g_string_append_printf (css, "  font-family: \"%s\";\n", family);
+        }
+        if (mask & PANGO_FONT_MASK_SIZE) {
+            int size = pango_font_description_get_size (_default_font_desc);
+            if (size > 0) {
+                if (pango_font_description_get_size_is_absolute (_default_font_desc))
+                    g_string_append_printf (css, "  font-size: %dpx;\n", size / PANGO_SCALE);
+                else
+                    g_string_append_printf (css, "  font-size: %dpt;\n", size / PANGO_SCALE);
+            }
+        }
+        if (mask & PANGO_FONT_MASK_WEIGHT)
+            g_string_append_printf (css, "  font-weight: %d;\n",
+                                    (int) pango_font_description_get_weight (_default_font_desc));
+        if (mask & PANGO_FONT_MASK_STYLE) {
+            PangoStyle style = pango_font_description_get_style (_default_font_desc);
+            g_string_append_printf (css, "  font-style: %s;\n",
+                                    style == PANGO_STYLE_ITALIC  ? "italic"  :
+                                    style == PANGO_STYLE_OBLIQUE ? "oblique" : "normal");
+        }
+    }
+
+    g_string_append (css, "}\n");
+
+    if (!_css_provider) {
+        _css_provider = gtk_css_provider_new ();
+        GdkDisplay *display = gdk_display_get_default ();
+        if (display)
+            gtk_style_context_add_provider_for_display (
+                display, GTK_STYLE_PROVIDER (_css_provider),
+                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    }
+
+    gtk_css_provider_load_from_string (_css_provider, css->str);
+
+    g_string_free (css, TRUE);
 }
 
 // Absolute window positioning.  GTK4 removed gtk_window_move; on X11 we move
@@ -723,7 +799,9 @@ ui_initialize (void)
 {
     SCIM_DEBUG_MAIN (1) << "Initialize UI...\n";
 
-    GtkWidget *input_window_vbox;
+#ifndef SCIM_HAS_CANDIDATES
+    GtkWidget *input_window_vbox;  // parent for the embedded lookup window
+#endif
 
     ui_load_config ();
     _toolbar_hidden = false;
@@ -753,7 +831,8 @@ ui_initialize (void)
         gtk_window_set_decorated (GTK_WINDOW (_input_window), FALSE);
         gtk_window_set_resizable (GTK_WINDOW (_input_window), FALSE);
 
-        // TODO(gtk4): per-widget bg/fg/font via CSS provider (was gtk_widget_modify_*).
+        // Font/fg/bg come from the display CSS provider (ui_apply_panel_style);
+        // the text widgets below are tagged SCIM_PANEL_TEXT_CSS_CLASS.
 
         frame = gtk_frame_new (0);
         gtk_window_set_child (GTK_WINDOW (_input_window), frame);
@@ -764,10 +843,13 @@ ui_initialize (void)
         vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
         gtk_widget_set_hexpand (vbox, TRUE);
         gtk_box_append (GTK_BOX (hbox), vbox);
+#ifndef SCIM_HAS_CANDIDATES
         input_window_vbox = vbox;
+#endif
 
         //Create preedit area
         _preedit_area = scim_string_view_new ();
+        gtk_widget_add_css_class (_preedit_area, SCIM_PANEL_TEXT_CSS_CLASS);
         scim_string_view_set_width_chars (SCIM_STRING_VIEW (_preedit_area), 24);
         scim_string_view_set_forward_event (SCIM_STRING_VIEW (_preedit_area), TRUE);
         scim_string_view_set_auto_resize (SCIM_STRING_VIEW (_preedit_area), TRUE);
@@ -780,6 +862,7 @@ ui_initialize (void)
 
         //Create aux area
         _aux_area = scim_string_view_new ();
+        gtk_widget_add_css_class (_aux_area, SCIM_PANEL_TEXT_CSS_CLASS);
         scim_string_view_set_width_chars (SCIM_STRING_VIEW (_aux_area), 24);
         scim_string_view_set_draw_cursor (SCIM_STRING_VIEW (_aux_area), FALSE);
         scim_string_view_set_forward_event (SCIM_STRING_VIEW (_aux_area), TRUE);
@@ -795,6 +878,12 @@ ui_initialize (void)
     }
 
     //Create lookup table window
+    //
+    // Only when candidates are NOT drawn in-process by the transports. With the
+    // in-process Cairo renderer built (SCIM_HAS_CANDIDATES) no client forwards
+    // lookup-table updates to the panel, so the panel needs no lookup window and
+    // stays a status/property toolbar only.
+#ifndef SCIM_HAS_CANDIDATES
     {
         GtkWidget *vbox;
         GtkWidget *hbox;
@@ -833,6 +922,7 @@ ui_initialize (void)
             //New table items
             for (int i=0; i<SCIM_LOOKUP_TABLE_MAX_PAGESIZE; ++i) {
                 _lookup_table_items [i] = scim_string_view_new ();
+                gtk_widget_add_css_class (_lookup_table_items [i], SCIM_PANEL_TEXT_CSS_CLASS);
                 scim_string_view_set_width_chars (SCIM_STRING_VIEW (_lookup_table_items [i]), 80);
                 scim_string_view_set_has_frame (SCIM_STRING_VIEW (_lookup_table_items [i]), FALSE);
                 scim_string_view_set_forward_event (SCIM_STRING_VIEW (_lookup_table_items [i]), TRUE);
@@ -886,6 +976,7 @@ ui_initialize (void)
                 gtk_box_append (GTK_BOX (lookup_table_parent), hbox);
 
             _lookup_table_items [0] = scim_string_view_new ();
+            gtk_widget_add_css_class (_lookup_table_items [0], SCIM_PANEL_TEXT_CSS_CLASS);
             scim_string_view_set_forward_event (SCIM_STRING_VIEW (_lookup_table_items [0]), TRUE);
             scim_string_view_set_auto_resize (SCIM_STRING_VIEW (_lookup_table_items [0]), TRUE);
             scim_string_view_set_has_frame (SCIM_STRING_VIEW (_lookup_table_items [0]), FALSE);
@@ -925,6 +1016,7 @@ ui_initialize (void)
         if (!_lookup_table_embedded)
             panel_window_move (_lookup_table_window, ui_screen_width (), ui_screen_height ());
     }
+#endif // !SCIM_HAS_CANDIDATES
 
     //Create toolbar window
     {
@@ -1054,7 +1146,7 @@ ui_initialize (void)
         _input_window_x = spot_x;
         _input_window_y = spot_y;
 
-        if (!_lookup_table_embedded) {
+        if (_lookup_table_window && !_lookup_table_embedded) {
             panel_window_move (_lookup_table_window, spot_x, spot_y + 32);
             _lookup_table_window_x = spot_x;
             _lookup_table_window_y = spot_y + 32;
@@ -1142,6 +1234,9 @@ static void
 ui_settle_lookup_table_window(bool force)
 {
     SCIM_DEBUG_MAIN (2) << " Settle lookup table window...\n";
+
+    if (!_lookup_table_window)  // demoted: candidates drawn in-process
+        return;
 
     if (_lookup_table_embedded)
         return;
@@ -1355,7 +1450,8 @@ ui_create_label (const String   &name,
     GtkWidget * hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     GtkWidget * label = gtk_label_new (name.c_str ());
 
-    // TODO(gtk4): apply _default_font_desc to the label via CSS provider.
+    // Font/colors come from the display CSS provider (ui_apply_panel_style).
+    gtk_widget_add_css_class (label, SCIM_PANEL_TEXT_CSS_CLASS);
 
     GtkWidget *icon = ui_create_icon (iconfile,
                                       xpm,
@@ -1465,6 +1561,9 @@ ui_create_menu_icon (void)
                            TOOLBAR_ICON_SIZE);
 }
 
+// Lookup-table navigation icons -- only needed by the panel's own lookup
+// window, which is not built when candidates are drawn in-process.
+#ifndef SCIM_HAS_CANDIDATES
 static GtkWidget *
 ui_create_up_icon (void)
 {
@@ -1500,6 +1599,7 @@ ui_create_down_icon (void)
                            LOOKUP_ICON_SIZE,
                            LOOKUP_ICON_SIZE);
 }
+#endif // !SCIM_HAS_CANDIDATES
 
 /////////////////////////////////////////////////////////////////////////////
 // Popover-based menu helpers (replacing GtkMenu, removed in GTK4).
@@ -1731,6 +1831,9 @@ ui_submenu_button_cb (GtkButton *button,
         gtk_popover_popup (GTK_POPOVER (submenu));
 }
 
+// Lookup-table click/paging callbacks -- wired only to the panel's own lookup
+// window, which is not built when candidates are drawn in-process.
+#ifndef SCIM_HAS_CANDIDATES
 static void
 ui_lookup_table_vertical_pressed_cb (GtkGestureClick *gesture,
                                      int              n_press,
@@ -1777,6 +1880,7 @@ ui_lookup_table_down_button_click_cb (GtkButton *button,
 
     _panel_agent->lookup_table_page_down ();
 }
+#endif // !SCIM_HAS_CANDIDATES
 
 static void
 ui_window_stick_button_click_cb (GtkButton *button,
@@ -1987,7 +2091,8 @@ ui_can_hide_input_window (void)
 
     if (gtk_widget_get_visible (_preedit_area) ||
         gtk_widget_get_visible (_aux_area) ||
-        (_lookup_table_embedded && gtk_widget_get_visible (_lookup_table_window)))
+        (_lookup_table_window && _lookup_table_embedded &&
+         gtk_widget_get_visible (_lookup_table_window)))
         return false;
     return true;
 }
@@ -2619,7 +2724,8 @@ do_slot_turn_on (void)
     _toolbar_hidden = false;
     _panel_is_on = true;
 
-    gtk_widget_hide (_lookup_table_window);
+    if (_lookup_table_window)
+        gtk_widget_hide (_lookup_table_window);
     gtk_widget_hide (_input_window);
     gtk_widget_hide (_preedit_area);
     gtk_widget_hide (_aux_area);
@@ -2659,7 +2765,8 @@ do_slot_turn_off (void)
     _panel_is_on = false;
 
     gtk_widget_hide (_input_window);
-    gtk_widget_hide (_lookup_table_window);
+    if (_lookup_table_window)
+        gtk_widget_hide (_lookup_table_window);
 
     gtk_widget_hide (_preedit_area);
     gtk_widget_hide (_aux_area);
@@ -2885,6 +2992,9 @@ do_slot_show_aux_string (void)
 static void
 do_slot_show_lookup_table (void)
 {
+    if (!_lookup_table_window)  // demoted: candidates drawn in-process
+        return;
+
     gtk_widget_show (_lookup_table_window);
 
     if (_panel_is_on && _lookup_table_embedded && !gtk_widget_get_visible (_input_window)) {
@@ -2922,6 +3032,9 @@ do_slot_hide_aux_string (void)
 static void
 do_slot_hide_lookup_table (void)
 {
+    if (!_lookup_table_window)  // demoted: candidates drawn in-process
+        return;
+
     gtk_widget_hide (_lookup_table_window);
 
     if (_lookup_table_embedded && ui_can_hide_input_window ())
@@ -2967,6 +3080,9 @@ do_slot_update_aux_string (const String &str, const AttributeList &attrs)
 static void
 do_slot_update_lookup_table (const LookupTablePayload &table)
 {
+    if (!_lookup_table_window)  // demoted: candidates drawn in-process
+        return;
+
     size_t i;
     size_t item_num = table.page_size;
 
