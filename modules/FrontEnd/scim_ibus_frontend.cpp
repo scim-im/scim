@@ -22,10 +22,11 @@
 #define Uses_SCIM_FRONTEND
 #define Uses_SCIM_BACKEND
 #define Uses_SCIM_IMENGINE
+#define Uses_SCIM_IMENGINE_MODULE
+#define Uses_SCIM_COMPOSE_KEY
 #define Uses_SCIM_CONFIG_BASE
 #define Uses_SCIM_CONFIG_PATH
 #define Uses_SCIM_LOOKUP_TABLE
-#define Uses_SCIM_PANEL_CLIENT
 #define Uses_SCIM_UTILITY
 #define Uses_SCIM_DEBUG
 
@@ -135,12 +136,7 @@ IBusFrontEnd::IBusFrontEnd (const BackEndPointer &backend,
       m_factory (0),
       m_embedded (embedded),
       m_xml_mode (xml_mode),
-      m_current (0),
-      m_panel_iochannel (0),
-      m_panel_watch_in (0),
-      m_panel_watch_err (0),
-      m_panel_watch_hup (0),
-      m_panel_focus_siid (-1)
+      m_current (0)
 {
     if (!_scim_frontend.null () && _scim_frontend != this)
         throw FrontEndError (String ("IBus -- only one frontend can be created!"));
@@ -148,7 +144,6 @@ IBusFrontEnd::IBusFrontEnd (const BackEndPointer &backend,
 
 IBusFrontEnd::~IBusFrontEnd ()
 {
-    panel_close ();
     // Engines own the scim instances via their bridge data; drop any left.
     for (scim_map<int, IBusEngineData *>::iterator it = m_engines.begin ();
          it != m_engines.end (); ++it) {
@@ -174,9 +169,9 @@ IBusFrontEnd::init (int /*argc*/, char ** /*argv*/)
     reload_config_callback (m_config);
     m_config->signal_connect_reload (slot (this, &IBusFrontEnd::reload_config_callback));
 
-    // --xml: emit the component manifest (one engine per enabled SCIM factory)
-    // and stop, without touching ibus-daemon. Used to (re)generate the
-    // installed component XML when the enabled engines change.
+    // --xml: emit the component manifest (one engine per installed SCIM
+    // factory) and stop, without touching ibus-daemon. Used to (re)generate the
+    // installed component XML when the set of installed engines changes.
     if (m_xml_mode) {
         print_component_xml ();
         return;
@@ -203,21 +198,14 @@ IBusFrontEnd::init (int /*argc*/, char ** /*argv*/)
         // installed component XML: just own the well-known name.
         ibus_bus_request_name (m_bus, SCIM_IBUS_BUS_NAME, 0);
     } else {
-        // Standalone: register a component carrying every enabled SCIM factory
-        // as an engine, so a running ibus-daemon learns them for this session.
+        // Standalone: register a component carrying every installed SCIM
+        // factory as an engine, so a running ibus-daemon learns them for this
+        // session.
         IBusComponent *component = build_component ();
         ibus_bus_register_component (m_bus, component);
         g_object_unref (component);
     }
 
-    // Connect to (launching if needed) the SCIM panel for the status/property
-    // toolbar. Non-fatal: if it can't be reached, input still works and
-    // gnome-shell shows candidates. Prefer the X/XWayland display for the panel
-    // window; fall back to the Wayland display.
-    const char *disp = getenv ("DISPLAY");
-    if (!disp || !*disp) disp = getenv ("WAYLAND_DISPLAY");
-    m_display_name = disp ? String (disp) : String ();
-    panel_open ();
 }
 
 void
@@ -233,21 +221,85 @@ IBusFrontEnd::run ()
 /* Engine enumeration / component manifest                             */
 /* ------------------------------------------------------------------ */
 
+// First character of an engine's name, for the ibus panel's indicator.
+//
+// gnome-shell shows <symbol> verbatim and otherwise falls back to the language
+// code, so two engines for one language both read as "zh" and get numbered.
+// One character disambiguates them.
+//
+// The name is already localized -- TableFactory::get_name () asks the table for
+// scim_get_current_locale () -- so generating the component XML under, say,
+// zh_TW yields the CJK name and a CJK symbol, while a C or English locale
+// yields the latin name and a latin initial. Note the table's STATUS_PROMPT is
+// not usable here: it reports input mode ("full/half", "Chinese/English") and is
+// commonly identical across engines.
+static String
+engine_symbol (const WideString &name)
+{
+    if (name.empty ()) return String ();
+    return utf8_wcstombs (WideString (1, name[0]));
+}
+
 void
 IBusFrontEnd::enumerate_engines (std::vector<IBusEngineInfo> &out)
 {
+    // List ALL installed engines, not just the enabled ones the backend loaded:
+    // the manifest is the set of engines GNOME/IBus can OFFER, and disabling an
+    // engine in scim-setup should not make it un-offerable (you could never
+    // re-enable it from GNOME then).  Enumerate the modules directly, ignoring
+    // the disabled-factory list, exactly as scim-setup's engine list does.  The
+    // active/enabled subset is reconciled separately by the ibussync frontend.
     out.clear ();
-    std::vector<String> uuids;
-    get_factory_list_for_encoding (uuids, String ());   // all encodings
-    for (size_t i = 0; i < uuids.size (); ++i) {
+
+    std::vector<String>    module_list;
+    IMEngineFactoryPointer factory;
+    IMEngineModule         module;
+    std::vector<String>    seen;
+
+    scim_get_imengine_module_list (module_list);
+
+    // The built-in "English/European" (compose-key) engine, like the backend.
+    factory = new ComposeKeyFactory ();
+    {
         IBusEngineInfo info;
-        info.uuid     = uuids[i];
-        info.name     = utf8_wcstombs (get_factory_name (uuids[i]));
-        info.language = get_factory_language (uuids[i]);
-        info.icon     = get_factory_icon_file (uuids[i]);
-        if (!info.name.length ())
-            info.name = uuids[i];
+        info.uuid     = factory->get_uuid ();
+        info.name     = utf8_wcstombs (factory->get_name ());
+        info.symbol   = engine_symbol (factory->get_name ());
+        info.language = scim_get_normalized_language (factory->get_language ());
+        info.icon     = factory->get_icon_file ();
+        if (!info.name.length ()) info.name = info.uuid;
+        seen.push_back (info.uuid);
         out.push_back (info);
+    }
+    factory.reset ();
+
+    for (size_t i = 0; i < module_list.size (); ++i) {
+        module.load (module_list[i], m_config);
+        if (!module.valid ()) continue;
+
+        for (size_t j = 0; j < module.number_of_factories (); ++j) {
+            try {
+                factory = module.create_factory (j);
+            } catch (...) {
+                factory.reset ();
+            }
+            if (factory.null ()) continue;
+
+            String uuid = factory->get_uuid ();
+            if (std::find (seen.begin (), seen.end (), uuid) == seen.end ()) {
+                IBusEngineInfo info;
+                info.uuid     = uuid;
+                info.name     = utf8_wcstombs (factory->get_name ());
+                info.symbol   = engine_symbol (factory->get_name ());
+                info.language = scim_get_normalized_language (factory->get_language ());
+                info.icon     = factory->get_icon_file ();
+                if (!info.name.length ()) info.name = uuid;
+                seen.push_back (uuid);
+                out.push_back (info);
+            }
+            factory.reset ();
+        }
+        module.unload ();
     }
 }
 
@@ -268,15 +320,17 @@ IBusFrontEnd::build_component ()
     enumerate_engines (engines);
 
     for (size_t i = 0; i < engines.size (); ++i) {
-        IBusEngineDesc *desc = ibus_engine_desc_new (
-            engines[i].uuid.c_str (),
-            engines[i].name.c_str (),
-            engines[i].name.c_str (),
-            engines[i].language.length () ? engines[i].language.c_str () : "other",
-            "GPL",
-            "SCIM developers",
-            engines[i].icon.c_str (),
-            "us");
+        IBusEngineDesc *desc = ibus_engine_desc_new_varargs (
+            "name",        engines[i].uuid.c_str (),
+            "longname",    engines[i].name.c_str (),
+            "description", engines[i].name.c_str (),
+            "language",    engines[i].language.length () ? engines[i].language.c_str () : "other",
+            "license",     "GPL",
+            "author",      "SCIM developers",
+            "icon",        engines[i].icon.c_str (),
+            "layout",      "us",
+            "symbol",      engines[i].symbol.c_str (),
+            NULL);
         ibus_component_add_engine (component, desc);
     }
 
@@ -310,8 +364,8 @@ IBusFrontEnd::print_component_xml ()
 
     std::cout <<
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-        "<!-- Generated by 'scim -f ibus -- --xml'. Regenerate when the enabled\n"
-        "     SCIM engines change. -->\n"
+        "<!-- Generated by 'scim -f ibus -- --xml'. Regenerate when the set of\n"
+        "     installed SCIM engines changes. -->\n"
         "<component>\n"
         "    <name>" SCIM_IBUS_BUS_NAME "</name>\n"
         "    <description>Smart Common Input Method</description>\n"
@@ -329,7 +383,11 @@ IBusFrontEnd::print_component_xml ()
             "            <name>"        << xml_escape (engines[i].uuid) << "</name>\n"
             "            <longname>"    << xml_escape (engines[i].name) << "</longname>\n"
             "            <description>" << xml_escape (engines[i].name) << "</description>\n"
-            "            <language>"    << xml_escape (engines[i].language.length () ? engines[i].language : String ("other")) << "</language>\n"
+            "            <language>"    << xml_escape (engines[i].language.length () ? engines[i].language : String ("other")) << "</language>\n";
+        if (engines[i].symbol.length ())
+            std::cout <<
+            "            <symbol>"      << xml_escape (engines[i].symbol) << "</symbol>\n";
+        std::cout <<
             "            <license>GPL</license>\n"
             "            <author>SCIM developers</author>\n"
             "            <icon>"        << xml_escape (engines[i].icon) << "</icon>\n"
@@ -413,6 +471,7 @@ IBusFrontEnd::create_engine (const gchar *engine_name)
     g_signal_connect (engine, "cursor-up",   G_CALLBACK (cb_cursor_up),   d);
     g_signal_connect (engine, "cursor-down", G_CALLBACK (cb_cursor_down), d);
     g_signal_connect (engine, "candidate-clicked", G_CALLBACK (cb_candidate_clicked), d);
+    g_signal_connect (engine, "property-activate", G_CALLBACK (cb_property_activate), d);
     g_object_weak_ref (G_OBJECT (engine), cb_engine_destroy, d);
 
     return engine;
@@ -424,13 +483,6 @@ IBusFrontEnd::destroy_engine (IBusEngineData *d)
     if (!d) return;
     if (m_current == d)
         m_current = 0;
-    if (m_panel_client.get_connection_number () >= 0) {
-        m_panel_client.prepare (d->siid);
-        m_panel_client.remove_input_context (d->siid);
-        m_panel_client.send ();
-    }
-    if (m_panel_focus_siid == d->siid)
-        m_panel_focus_siid = -1;
     m_engines.erase (d->siid);
     delete_instance (d->siid);
     delete d;
@@ -444,100 +496,98 @@ IBusFrontEnd::find_engine (int siid)
 }
 
 /* ------------------------------------------------------------------ */
-/* Panel (status/property toolbar)                                     */
+/* Properties -> ibus                                                  */
 /* ------------------------------------------------------------------ */
+
+// Translate one scim Property into an IBusProperty.
+//
+// scim expresses no checked/unchecked state: a toggle reports its position by
+// changing its own label (the table engine's Full/Half Letter property flips
+// between the full- and half-width glyphs). So these map to plain menu entries
+// whose label is refreshed via update_property (), not to PROP_TYPE_TOGGLE,
+// which would need a checked-ness scim does not give us.
+static IBusProperty *
+scim_property_to_ibus (const Property &p, IBusPropList *sub_props)
+{
+    IBusText *label = ibus_text_new_from_string (p.get_label ().c_str ());
+    IBusText *tip   = p.get_tip ().length ()
+                      ? ibus_text_new_from_string (p.get_tip ().c_str ()) : 0;
+
+    return ibus_property_new (p.get_key ().c_str (),
+                              sub_props ? PROP_TYPE_MENU : PROP_TYPE_NORMAL,
+                              label,
+                              p.get_icon ().length () ? p.get_icon ().c_str () : 0,
+                              tip,
+                              p.active (),      // sensitive: a live property is clickable
+                              p.visible (),
+                              PROP_STATE_INCONSISTENT,
+                              sub_props);
+}
+
+// Build an IBusPropList for [begin, end).
+//
+// scim ships a flat, key-sorted list whose hierarchy is implied by the keys:
+// "/IMEngine/Table/Letter" is a child of "/IMEngine/Table" (Property::
+// is_a_leaf_of ()). Children immediately follow their parent, so each node owns
+// the run of entries that are leaves of it -- the same walk scim-panel-gtk uses
+// to build its own menus.
+static IBusPropList *
+scim_properties_to_ibus (PropertyList::const_iterator begin,
+                         PropertyList::const_iterator end)
+{
+    if (begin >= end) return 0;
+
+    IBusPropList *list = ibus_prop_list_new ();
+
+    PropertyList::const_iterator it = begin;
+    while (it < end) {
+        PropertyList::const_iterator child = it + 1;
+        while (child < end && child->is_a_leaf_of (*it))
+            ++ child;
+
+        IBusPropList *sub = scim_properties_to_ibus (it + 1, child);
+        ibus_prop_list_append (list, scim_property_to_ibus (*it, sub));
+
+        it = child;
+    }
+
+    return list;
+}
 
 void
 IBusFrontEnd::register_properties (int id, const PropertyList &properties)
 {
-    if (id == m_panel_focus_siid && m_panel_client.get_connection_number () >= 0) {
-        m_panel_client.prepare (id);
-        m_panel_client.register_properties (id, properties);
-        m_panel_client.send ();
-    }
+    IBusEngineData *d = find_engine (id);
+    if (!d || !d->engine) return;
+
+    IBusPropList *list = scim_properties_to_ibus (properties.begin (),
+                                                  properties.end ());
+    if (!list) list = ibus_prop_list_new ();
+
+    // Sinks the floating list.
+    ibus_engine_register_properties (d->engine, list);
 }
 
 void
 IBusFrontEnd::update_property (int id, const Property &property)
 {
-    if (id == m_panel_focus_siid && m_panel_client.get_connection_number () >= 0) {
-        m_panel_client.prepare (id);
-        m_panel_client.update_property (id, property);
-        m_panel_client.send ();
-    }
+    IBusEngineData *d = find_engine (id);
+    if (!d || !d->engine) return;
+
+    // Sinks the floating property.
+    ibus_engine_update_property (d->engine, scim_property_to_ibus (property, 0));
 }
 
 void
-IBusFrontEnd::panel_slot_trigger_property (int context, const String &property)
+IBusFrontEnd::engine_property_activate (IBusEngineData *d, const gchar *prop_name,
+                                        guint /*prop_state*/)
 {
-    // A toolbar property was clicked (half/full width, punctuation, ...).
-    if (find_engine (context)) {
-        m_panel_client.prepare (context);
-        trigger_property (context, property);
-        m_panel_client.send ();
-    }
-}
+    // The ibus panel was clicked. scim has no per-state activation: triggering
+    // the property lets the engine advance it and report the new label back
+    // through update_property ().
+    if (!d || !prop_name) return;
 
-void
-IBusFrontEnd::panel_slot_reload_config (int /*context*/)
-{
-    if (!m_config.null ())
-        m_config->reload ();
-}
-
-gboolean
-IBusFrontEnd::cb_panel_io (GIOChannel * /*source*/, GIOCondition cond, gpointer /*data*/)
-{
-    if (_scim_frontend.null ())
-        return FALSE;
-    IBusFrontEnd *fe = _scim_frontend;
-
-    if (cond == G_IO_IN) {
-        if (!fe->m_panel_client.filter_event ()) {
-            fe->panel_close ();
-            fe->panel_open ();
-            return FALSE;
-        }
-    } else if (cond == G_IO_ERR || cond == G_IO_HUP) {
-        fe->panel_close ();
-        fe->panel_open ();
-        return FALSE;
-    }
-    return TRUE;
-}
-
-bool
-IBusFrontEnd::panel_open ()
-{
-    // Connects to the SCIM panel (launching scim-panel-gtk on demand). Only the
-    // toolbar (properties/status) is used here; candidates come from gnome-shell.
-    if (m_panel_client.open_connection (m_config->get_name (), m_display_name) < 0) {
-        SCIM_DEBUG_FRONTEND(1) << "IBus -- cannot connect to the SCIM panel.\n";
-        return false;
-    }
-
-    int fd = m_panel_client.get_connection_number ();
-    if (fd < 0)
-        return false;
-
-    m_panel_client.signal_connect_trigger_property (slot (this, &IBusFrontEnd::panel_slot_trigger_property));
-    m_panel_client.signal_connect_reload_config    (slot (this, &IBusFrontEnd::panel_slot_reload_config));
-
-    m_panel_iochannel = g_io_channel_unix_new (fd);
-    m_panel_watch_in  = g_io_add_watch (m_panel_iochannel, G_IO_IN,  cb_panel_io, 0);
-    m_panel_watch_err = g_io_add_watch (m_panel_iochannel, G_IO_ERR, cb_panel_io, 0);
-    m_panel_watch_hup = g_io_add_watch (m_panel_iochannel, G_IO_HUP, cb_panel_io, 0);
-    return true;
-}
-
-void
-IBusFrontEnd::panel_close ()
-{
-    if (m_panel_watch_in)  { g_source_remove (m_panel_watch_in);  m_panel_watch_in  = 0; }
-    if (m_panel_watch_err) { g_source_remove (m_panel_watch_err); m_panel_watch_err = 0; }
-    if (m_panel_watch_hup) { g_source_remove (m_panel_watch_hup); m_panel_watch_hup = 0; }
-    if (m_panel_iochannel) { g_io_channel_unref (m_panel_iochannel); m_panel_iochannel = 0; }
-    m_panel_client.close_connection ();
+    trigger_property (d->siid, String (prop_name));
 }
 
 /* ------------------------------------------------------------------ */
@@ -568,6 +618,24 @@ IBusFrontEnd::engine_process_key (IBusEngineData *d, guint keyval, guint keycode
 
     bool ate = process_key_event (d->siid, scimkey);
 
+    // A key release must always reach the client, whatever the engine says.
+    //
+    // Under ibus the compositor decides key repeat from whether the client saw
+    // the release: it starts repeating on press and stops on release. SCIM
+    // engines report releases as handled when they simply discard them (see
+    // "discard the key release event" in scim-tables' table engine), which
+    // would swallow the release and leave the compositor repeating the key
+    // forever -- hold Backspace once and it deletes until focus changes.
+    //
+    // The other frontends never saw this: under XIM and the GTK/Qt immodules
+    // autorepeat comes from the X server or the toolkit and follows physical
+    // key state, so the engine's answer does not affect it. Returning FALSE
+    // here is also what ibus engines conventionally do for releases; the engine
+    // has already run its side effects (commit, preedit) by this point, so only
+    // the delivery decision changes.
+    if (state & IBUS_RELEASE_MASK)
+        ate = false;
+
     m_current = 0;
     *consumed = ate ? TRUE : FALSE;
 }
@@ -577,31 +645,12 @@ IBusFrontEnd::engine_focus_in (IBusEngineData *d)
 {
     m_current = d;
     focus_in (d->siid);
-
-    // Bring up the toolbar for this engine's properties.
-    if (m_panel_client.get_connection_number () >= 0) {
-        m_panel_focus_siid = d->siid;
-        m_panel_client.prepare (d->siid);
-        m_panel_client.register_input_context (d->siid, get_instance_uuid (d->siid));
-        m_panel_client.focus_in (d->siid, get_instance_uuid (d->siid));
-        m_panel_client.turn_on (d->siid);
-        m_panel_client.send ();
-    }
 }
 
 void
 IBusFrontEnd::engine_focus_out (IBusEngineData *d)
 {
     focus_out (d->siid);
-
-    if (m_panel_client.get_connection_number () >= 0) {
-        m_panel_client.prepare (d->siid);
-        m_panel_client.turn_off (d->siid);
-        m_panel_client.focus_out (d->siid);
-        m_panel_client.send ();
-    }
-    if (m_panel_focus_siid == d->siid)
-        m_panel_focus_siid = -1;
 
     if (m_current == d)
         m_current = 0;
@@ -801,6 +850,13 @@ IBusFrontEnd::cb_process_key_event (IBusEngine * /*engine*/, guint keyval,
     gboolean consumed = FALSE;
     d->frontend->engine_process_key (d, keyval, keycode, state, &consumed);
     return consumed;
+}
+
+void IBusFrontEnd::cb_property_activate (IBusEngine *, const gchar *prop_name,
+                                        guint prop_state, gpointer u)
+{
+    IBusEngineData *d = static_cast<IBusEngineData *> (u);
+    d->frontend->engine_property_activate (d, prop_name, prop_state);
 }
 
 void IBusFrontEnd::cb_focus_in  (IBusEngine *, gpointer u)

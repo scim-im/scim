@@ -245,7 +245,7 @@ int main (int argc, char *argv [])
                  << "                          input-source coordinator instead of a frontend).\n"
                  << "  --no-socket             Do not try to start a SCIM SocketFrontEnd daemon.\n"
                  << "  --xml                   With '-f ibus' and passed after '--', print the\n"
-                 << "                          IBus component manifest for the enabled engines\n"
+                 << "                          IBus component manifest for the installed engines\n"
                  << "                          and exit.\n"
                  << "  -h, --help              Show this help message.\n";
             return 0;

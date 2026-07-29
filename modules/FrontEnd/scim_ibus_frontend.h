@@ -47,6 +47,7 @@ struct IBusEngineData;
 struct IBusEngineInfo {
     String  uuid;       // SCIM factory UUID == IBus engine name
     String  name;       // display name (utf8)
+    String  symbol;     // one character for the ibus panel's indicator
     String  language;
     String  icon;
 };
@@ -65,18 +66,6 @@ class IBusFrontEnd : public FrontEndBase
 
     // The engine whose key is currently being processed (for forwarding).
     IBusEngineData *m_current;
-
-    // Panel client for the SCIM status/property toolbar (half/full width,
-    // punctuation, ...). Only properties/status go here; preedit/aux/lookup are
-    // rendered by gnome-shell via ibus. The panel socket fd is serviced through
-    // a GIOChannel in the ibus (GLib) main loop.
-    PanelClient     m_panel_client;
-    GIOChannel     *m_panel_iochannel;
-    guint           m_panel_watch_in;
-    guint           m_panel_watch_err;
-    guint           m_panel_watch_hup;
-    String          m_display_name;
-    int             m_panel_focus_siid;   // siid currently focused in the panel
 
 public:
     IBusFrontEnd (const BackEndPointer &backend,
@@ -100,7 +89,10 @@ protected:
     virtual void commit_string         (int id, const WideString & str);
     virtual void forward_key_event     (int id, const KeyEvent & key);
 
-    // Backend -> panel toolbar (properties/status only).
+    // Backend -> ibus properties. The active ibus panel renders these: on GNOME
+    // that is gnome-shell's input-source menu, elsewhere ibus-ui-gtk3's tray
+    // menu. scim-panel-gtk is not involved on this path -- an ibus desktop
+    // already shows an input-method UI, and a second one would duplicate it.
     virtual void register_properties   (int id, const PropertyList & properties);
     virtual void update_property       (int id, const Property     & property);
 
@@ -110,6 +102,8 @@ public:
 
 private:
     IBusEngineData * find_engine (int siid);
+    void engine_property_activate (IBusEngineData *d, const gchar *prop_name,
+                                   guint prop_state);
     void send_preedit (IBusEngineData *d);
     void reload_config_callback (const ConfigPointer &config);
 
@@ -117,13 +111,6 @@ private:
     void enumerate_engines (std::vector<IBusEngineInfo> &out);
     IBusComponent * build_component ();
     void print_component_xml ();
-
-    // Panel (status/property toolbar) connection + slots.
-    bool panel_open ();
-    void panel_close ();
-    void panel_slot_trigger_property (int context, const String &property);
-    void panel_slot_reload_config    (int context);
-    static gboolean cb_panel_io (GIOChannel *source, GIOCondition cond, gpointer data);
 
     // Factory / engine bridge.
     IBusEngine * create_engine (const gchar *engine_name);
@@ -154,6 +141,7 @@ public:
     static void cb_cursor_up   (IBusEngine *engine, gpointer user_data);
     static void cb_cursor_down (IBusEngine *engine, gpointer user_data);
     static void cb_candidate_clicked (IBusEngine *engine, guint index, guint button, guint state, gpointer user_data);
+    static void cb_property_activate (IBusEngine *engine, const gchar *prop_name, guint prop_state, gpointer user_data);
     static void cb_engine_destroy (gpointer user_data, GObject *where);
     static void cb_disconnected (IBusBus *bus, gpointer user_data);
 };

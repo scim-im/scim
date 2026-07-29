@@ -39,6 +39,8 @@
 #define Uses_SCIM_FRONTEND
 #define Uses_SCIM_BACKEND
 #define Uses_SCIM_CONFIG_BASE
+#define Uses_SCIM_GLOBAL_CONFIG
+#define Uses_SCIM_CONFIG_PATH
 #include <scim.h>
 
 #include <glib.h>
@@ -165,10 +167,16 @@ public:
     bool has_exited () const { return m_should_exit; }
 
 private:
-    // The installed SCIM engines that ibus actually knows: our backend's
-    // factories intersected with ibus_bus_list_engines() (matched by UUID; a
-    // SCIM factory UUID never collides with another engine's name). Empty
-    // (safely) when ibus is unreachable -- ScimIBusSync then bails.
+    // All installed SCIM engines that ibus actually knows: our full installed
+    // set intersected with ibus_bus_list_engines() (matched by UUID; a SCIM
+    // factory UUID never collides with another engine's name). Empty (safely)
+    // when ibus is unreachable -- ScimIBusSync then bails.
+    //
+    // "All installed" = enabled (the loaded factories) UNION the disabled list
+    // from global config. ScimIBusSync derives enabled = all - disabled, so it
+    // needs the FULL set here, not just the enabled one: otherwise an engine
+    // the user has disabled (or a user-installed engine turned off by default)
+    // could never be enabled from GNOME.
     std::vector<String> compute_all_installed ()
     {
         std::vector<String> result;
@@ -176,11 +184,19 @@ private:
         if (!m_bus || !ibus_bus_is_connected (m_bus))
             return result;
 
-        std::vector<String> our;
-        get_factory_list_for_encoding (our, String (""));
-        if (our.empty ())
+        std::set<String> ours;
+
+        std::vector<String> enabled;
+        get_factory_list_for_encoding (enabled, String (""));
+        ours.insert (enabled.begin (), enabled.end ());
+
+        std::vector<String> disabled;
+        disabled = scim_global_config_read (
+            String (SCIM_GLOBAL_CONFIG_DISABLED_IMENGINE_FACTORIES), disabled);
+        ours.insert (disabled.begin (), disabled.end ());
+
+        if (ours.empty ())
             return result;
-        std::set<String> ours (our.begin (), our.end ());
 
         GList *engines = ibus_bus_list_engines (m_bus);
         for (GList *p = engines; p; p = p->next) {

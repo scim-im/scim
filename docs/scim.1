@@ -71,7 +71,7 @@ Do not start a socket FrondEnd module.
 .TP
 .B \-\-xml
 A frontend argument, so pass it after \fB\-\-\fR and only with \fB\-f ibus\fR:
-print the IBus component manifest (one \fB<engine>\fR entry per enabled SCIM
+print the IBus component manifest (one \fB<engine>\fR entry per installed SCIM
 engine) to standard output and exit, without connecting to IBus.
 Use it to (re)generate the installed component, e.g.
 .RS
@@ -79,7 +79,7 @@ Use it to (re)generate the installed component, e.g.
 .B scim \-f ibus \-\- \-\-xml > /usr/share/ibus/component/scim.xml
 .RE
 .IP
-after the set of enabled engines changes.
+after the set of installed engines changes.
 .TP
 .B \-\-ibus
 Only meaningful together with \fB\-f ibus\fR: run as an embedded IBus engine

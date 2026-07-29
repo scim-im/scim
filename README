@@ -41,8 +41,8 @@ Running scim
                           children; on a GNOME/IBus session it runs the
                           input-source coordinator instead of a frontend).
     --no-socket           Do not try to start a SCIM SocketFrontEnd daemon.
-    --xml                 With '-f ibus', print the IBus component manifest for
-                          the enabled engines and exit.
+    --xml                 With '-f ibus' (after '--'), print the IBus component
+                          manifest for the installed engines and exit.
     -h, --help            Show this help message.
 
 When no frontend is given, scim picks one from the session: a GNOME/IBus
@@ -117,15 +117,19 @@ launch them.  SCIM installs a bootstrap manifest to the IBus component
 directory (`pkg-config --variable=pkgdatadir ibus-1.0`/component, typically
 /usr/share/ibus/component/scim.xml) that lists only the generic "scim" engine.
 
-To expose every *enabled* SCIM engine as its own IBus entry, regenerate the
-manifest from the actually-enabled engines:
+To expose every *installed* SCIM engine as its own IBus entry, regenerate the
+manifest:
 
   scim -f ibus -- --xml > /usr/share/ibus/component/scim.xml
 
-The generator enumerates the engines visible in the environment it runs in, so
-run it as the identity whose engines you want to appear.  ibus-daemon scans the
-component directories once at startup, so restart ibus-daemon afterwards
-(e.g. `ibus restart`).
+This lists all installed engines, enabled or not: the manifest is the set of
+engines GNOME/IBus can OFFER, and which of them are actually active is a
+separate dimension the ibussync coordinator keeps in sync with GNOME.  So you
+regenerate only when engines are INSTALLED or removed, not when you enable or
+disable one.  The generator enumerates the engines visible in the environment
+it runs in, so run it as the identity whose engines you want to appear.
+ibus-daemon scans the component directories once at startup, so restart
+ibus-daemon afterwards (e.g. `ibus restart`).
 
 For packagers
 -------------
@@ -150,9 +154,8 @@ system-wide -- is invisible to the system generator.  To use it under IBus,
 generate your own manifest and add its directory to ibus-daemon's search path:
 
   1. Generate a personal manifest as yourself.  Run as you, the generator sees
-     both the system-wide engines AND the ones in your home, so it lists your
-     full enabled set (it lists only enabled engines, not disabled ones; see
-     the note below):
+     both the system-wide engines AND the ones in your home, so it lists every
+     installed engine from both (enabled or not):
 
        mkdir -p ~/.local/share/ibus/component
        scim -f ibus -- --xml > ~/.local/share/ibus/component/scim.xml
@@ -173,13 +176,15 @@ any other input methods).  ibus-daemon merges the manifests it finds: engines
 from all scanned files are UNIONed by engine name (on a duplicate name the
 first one loaded wins), so your personal manifest and the system one coexist --
 your home-only engines simply add to the system set.  Regenerate your manifest
-whenever you enable/disable engines or install a new user-level engine.
+whenever you install or remove a user-level engine.
 
-Why enabled-only?  The manifest lists the engines SCIM currently offers, which
-is what the input-source coordinator keeps in sync with GNOME.  To expose an
-engine you have turned off, enable it in scim-setup first, then regenerate.
-Disabled engines are deliberately left out so GNOME does not offer engines the
-coordinator would not treat as available.
+Enable vs. install: the manifest lists every installed engine, so you do NOT
+regenerate it when you enable or disable an engine.  Enabling/disabling is the
+"active" dimension -- the ibussync coordinator keeps SCIM's enabled set and
+GNOME's input-source list in sync, both directions -- while the manifest is the
+"available" dimension that only changes when engines are installed or removed.
+Because a user-installed engine now appears in the manifest even while disabled,
+you can add it straight from GNOME's input-source chooser.
 
 
 Tips

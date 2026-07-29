@@ -3,17 +3,19 @@
      component directory and launches <exec> when a SCIM engine is selected.
 
      This bootstrap lists only the generic "scim" engine (the default SCIM
-     engine). To expose every enabled SCIM engine as its own IBus entry,
-     regenerate this file from the actually-enabled engines:
+     engine). To expose every installed SCIM engine as its own IBus entry,
+     regenerate this file from the installed engines:
 
          scim -f ibus -- --xml > THIS_FILE
 
-     (run it again whenever the set of enabled SCIM engines changes).
+     (run it again whenever the set of INSTALLED SCIM engines changes; enabling
+     or disabling an engine does not need a regenerate -- the manifest lists all
+     installed engines and the active subset is synced with GNOME separately).
 
      System install: the packager regenerates this file whenever any SCIM
      IMEngine package is installed or removed (e.g. via a dpkg trigger / rpm
      file trigger on the IMEngine module directory), so the system component
-     always mirrors the system-wide enabled engines. Enumeration runs as root,
+     always mirrors the system-wide installed engines. Enumeration runs as root,
      so only system engines appear here.
 
      User-level engines: engines that live only in a user's home (e.g. a
