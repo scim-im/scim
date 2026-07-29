@@ -144,6 +144,7 @@ IBusFrontEnd::IBusFrontEnd (const BackEndPointer &backend,
 
 IBusFrontEnd::~IBusFrontEnd ()
 {
+    m_config_reload_connection.disconnect ();
     // Engines own the scim instances via their bridge data; drop any left.
     for (scim_map<int, IBusEngineData *>::iterator it = m_engines.begin ();
          it != m_engines.end (); ++it) {
@@ -167,7 +168,8 @@ void
 IBusFrontEnd::init (int /*argc*/, char ** /*argv*/)
 {
     reload_config_callback (m_config);
-    m_config->signal_connect_reload (slot (this, &IBusFrontEnd::reload_config_callback));
+    m_config_reload_connection =
+        m_config->signal_connect_reload (slot (this, &IBusFrontEnd::reload_config_callback));
 
     // --xml: emit the component manifest (one engine per installed SCIM
     // factory) and stop, without touching ibus-daemon. Used to (re)generate the

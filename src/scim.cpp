@@ -116,8 +116,8 @@ int main (int argc, char *argv [])
     int   new_argc = 0;
     char *new_argv [80];
 
-    //Display version info
-    cout << "Smart Common Input Method " << SCIM_VERSION << "\n\n";
+    //Display version info (to stderr, so stdout stays clean for --xml / --list)
+    cerr << "Smart Common Input Method " << SCIM_VERSION << "\n\n";
 
     //get modules list
     scim_get_frontend_module_list (frontend_list);

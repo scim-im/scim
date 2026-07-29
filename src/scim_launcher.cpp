@@ -266,7 +266,13 @@ int main (int argc, char *argv [])
             if (!fem || !fem->valid ()) {
                 std::cerr << "Failed to load " << frontend_names[n]
                           << " FrontEnd module" << (multi ? " (skipping).\n" : ".\n");
-                delete fem;
+                // Deliberately leaked, not deleted: FrontEndModule::load ()
+                // keeps a module whose init () threw mapped on purpose, and
+                // deleting it here would dlclose it anyway. A frontend that got
+                // as far as connecting a config-reload slot would then leave that
+                // slot pointing into unmapped code, and destroying the signal at
+                // exit () would fault. The process is either exiting or carrying
+                // on with the other frontends, so the handle costs nothing.
                 if (!multi) return 1;
                 continue;
             }

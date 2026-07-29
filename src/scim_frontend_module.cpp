@@ -26,6 +26,7 @@
 #define Uses_SCIM_FRONTEND_MODULE
 #include "scim_private.h"
 #include "scim.h"
+#include <iostream>
 
 namespace scim {
 
@@ -82,7 +83,19 @@ FrontEndModule::load (const String &name,
             (FrontEndModuleHasExitedFunc) m_module.symbol ("scim_frontend_module_has_exited");
 
         m_frontend_init (backend, config, argc, argv);
+    } catch (const std::exception &e) {
+        // Report why. A frontend that declines to start (no compositor
+        // protocol, no display, no seat) is the normal way this fails, and
+        // without the message every cause looks like "failed to load".
+        std::cerr << "FrontEnd module " << name << ": " << e.what () << "\n";
+        m_frontend_init = 0;
+        m_frontend_run = 0;
+        m_frontend_poll_fds = 0;
+        m_frontend_process_events = 0;
+        m_frontend_has_exited = 0;
+        return false;
     } catch (...) {
+        std::cerr << "FrontEnd module " << name << " failed to initialize.\n";
         /* Don't unload FrontEnd module to avoid possible crash, when the
          * exception is thrown by the module itself.
          * m_module.unload ();

@@ -61,6 +61,9 @@ class IBusFrontEnd : public FrontEndBase
     bool            m_embedded;      // launched by ibus-daemon (--ibus)
     bool            m_xml_mode;      // print the component XML and exit (--xml)
 
+    // Dropped in the destructor; see the wayland frontend for why.
+    Connection      m_config_reload_connection;
+
     // siid -> engine bridge state.
     scim_map<int, IBusEngineData *> m_engines;
 
