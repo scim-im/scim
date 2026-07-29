@@ -89,3 +89,7 @@ panel_gtk_setup_la_LDFLAGS     = -avoid-version \
 				 @LTLIBINTL@
 panel_gtk_setup_la_LIBADD      = $(top_builddir)/src/libscim@SCIM_EPOCH@.la
 
+
+# dlopen-ed setup modules, never linked: drop the installed libtool archives.
+install-data-hook:
+	rm -f $(DESTDIR)$(setupmoduledir)/*.la

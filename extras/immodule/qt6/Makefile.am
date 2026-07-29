@@ -52,3 +52,7 @@ MOC = @QT6_MOC@
 
 moc_scimqtinputcontext.cpp: scimqtinputcontext.h scim.json
 	$(AM_V_GEN) $(MOC) -DQT_VERSION=0x060000 $(srcdir)/scimqtinputcontext.h -o $@
+
+# dlopen-ed plugin, never linked: drop the installed libtool archive (shared dir).
+install-data-hook:
+	rm -f "$(DESTDIR)$(moduledir)/libscimqtinputcontextplugin.la"

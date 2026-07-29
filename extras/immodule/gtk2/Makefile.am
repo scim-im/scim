@@ -57,3 +57,8 @@ im_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     @GTK2_LIBS@
 
 im_scim_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(X11_UTILS) $(CANDIDATES_LIBS)
+
+# Immodules are dlopen-ed, never linked: drop the installed libtool archive.
+# The dir is shared with other IMEs, so remove only our own file.
+install-data-hook:
+	rm -f "$(DESTDIR)$(moduledir)/im-scim.la"

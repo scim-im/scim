@@ -76,7 +76,9 @@ Makefile.in
 # Generated IBus component manifest (from scim.xml.in)
 /modules/FrontEnd/scim.xml
 
-# Generated KWin virtual-keyboard entry (from scim-virtual-keyboard.desktop.in)
+# Generated desktop entries (from data/*.desktop.in): the autostart entry and
+# the KWin virtual-keyboard one.
+/data/scim.desktop
 /data/scim-virtual-keyboard.desktop
 
 # Built executables

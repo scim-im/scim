@@ -74,3 +74,7 @@ socket_la_LDFLAGS	= -avoid-version \
 			  
 socket_la_LIBADD	= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
 
+
+# dlopen-ed modules, never linked: drop the installed libtool archives.
+install-data-hook:
+	rm -f $(DESTDIR)$(moduledir)/*.la

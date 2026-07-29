@@ -87,7 +87,8 @@ AC_CONFIG_HEADERS([config.h])
 AM_PROG_AR
 
 # Init libtool
-LT_INIT([dlopen])
+dnl dlopen-ed modules and shared libraries only; no static archives (.a).
+LT_INIT([disable-static dlopen])
 AC_SUBST(LIBTOOL_DEPS)
 
 # Modules are loaded with dlopen(3) directly (libltdl dropped).
