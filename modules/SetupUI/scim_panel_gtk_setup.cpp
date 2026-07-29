@@ -150,11 +150,11 @@ static String __config_cand_normal_bg            = "";
 static String __config_cand_normal_text          = "";
 static String __config_cand_active_bg            = "";
 static String __config_cand_active_text          = "";
-// The panel color a candidate color falls back to, for display in the picker.
-static String __fallback_normal_bg               = "gray92";
-static String __fallback_normal_text             = "black";
-static String __fallback_active_bg               = "light blue";
-static String __fallback_active_text             = "black";
+// Panel colors (also the fallback shown for an unset candidate color).
+static String __config_panel_normal_bg               = "gray92";
+static String __config_panel_normal_text             = "black";
+static String __config_panel_active_bg               = "light blue";
+static String __config_panel_active_text             = "black";
 
 static bool   __have_changed                     = false;
 
@@ -177,6 +177,10 @@ static GtkWidget * __widget_cand_normal_bg            = 0;
 static GtkWidget * __widget_cand_normal_text          = 0;
 static GtkWidget * __widget_cand_active_bg            = 0;
 static GtkWidget * __widget_cand_active_text          = 0;
+static GtkWidget * __widget_panel_normal_bg           = 0;
+static GtkWidget * __widget_panel_normal_text         = 0;
+static GtkWidget * __widget_panel_active_bg           = 0;
+static GtkWidget * __widget_panel_active_text         = 0;
 
 enum ToolbarShowFlavourType {
     SCIM_TOOLBAR_SHOW_ALWAYS,
@@ -213,6 +217,10 @@ on_candidate_font_selection_clicked  (GtkButton       *button,
 
 static void
 on_candidate_color_set               (GtkColorButton  *button,
+                                      gpointer         user_data);
+
+static void
+on_panel_color_set                   (GtkColorButton  *button,
                                       gpointer         user_data);
 
 static void
@@ -380,6 +388,46 @@ create_setup_window ()
         __widget_candidate_font = gtk_button_new_with_label ("default");
         gtk_box_append (GTK_BOX (hbox), __widget_candidate_font);
         gtk_label_set_mnemonic_widget (GTK_LABEL (label), __widget_candidate_font);
+
+        // Panel colors (written under /Panel/Gtk/Color/*).
+        frame = gtk_frame_new (_("Panel colors"));
+        gtk_widget_set_margin_start (frame, 4);
+        gtk_widget_set_margin_end (frame, 4);
+        gtk_widget_set_margin_top (frame, 4);
+        gtk_widget_set_margin_bottom (frame, 4);
+        gtk_widget_set_hexpand (frame, TRUE);
+        gtk_box_append (GTK_BOX (page), frame);
+
+        table = gtk_grid_new ();
+        gtk_grid_set_row_spacing (GTK_GRID (table), 4);
+        gtk_grid_set_column_spacing (GTK_GRID (table), 8);
+        gtk_widget_set_margin_start (table, 4);
+        gtk_widget_set_margin_end (table, 4);
+        gtk_widget_set_margin_top (table, 4);
+        gtk_widget_set_margin_bottom (table, 4);
+        gtk_frame_set_child (GTK_FRAME (frame), table);
+
+        {
+            struct { const char *label; GtkWidget **widget; String *cfg; } rows[] = {
+                { _("N_ormal background:"),   &__widget_panel_normal_bg,   &__config_panel_normal_bg   },
+                { _("No_rmal text:"),         &__widget_panel_normal_text, &__config_panel_normal_text },
+                { _("Se_lected background:"), &__widget_panel_active_bg,   &__config_panel_active_bg   },
+                { _("Selec_ted text:"),       &__widget_panel_active_text, &__config_panel_active_text },
+            };
+            for (int i = 0; i < 4; ++i) {
+                label = gtk_label_new_with_mnemonic (rows[i].label);
+                gtk_widget_set_halign (label, GTK_ALIGN_START);
+                gtk_grid_attach (GTK_GRID (table), label, 0, i, 1, 1);
+
+                *rows[i].widget = gtk_color_button_new ();
+                gtk_grid_attach (GTK_GRID (table), *rows[i].widget, 1, i, 1, 1);
+                gtk_label_set_mnemonic_widget (GTK_LABEL (label), *rows[i].widget);
+
+                g_signal_connect ((gpointer) *rows[i].widget, "color-set",
+                                  G_CALLBACK (on_panel_color_set),
+                                  rows[i].cfg);
+            }
+        }
 
         // Candidate colors.  Each defaults to the matching panel color until set
         // here (then written under /Candidates/Default/Color/*).
@@ -676,16 +724,21 @@ setup_widget_value ()
     // color it falls back to.
     if (__widget_cand_normal_bg)
         set_color_button (__widget_cand_normal_bg,
-            __config_cand_normal_bg.length () ? __config_cand_normal_bg : __fallback_normal_bg);
+            __config_cand_normal_bg.length () ? __config_cand_normal_bg : __config_panel_normal_bg);
     if (__widget_cand_normal_text)
         set_color_button (__widget_cand_normal_text,
-            __config_cand_normal_text.length () ? __config_cand_normal_text : __fallback_normal_text);
+            __config_cand_normal_text.length () ? __config_cand_normal_text : __config_panel_normal_text);
     if (__widget_cand_active_bg)
         set_color_button (__widget_cand_active_bg,
-            __config_cand_active_bg.length () ? __config_cand_active_bg : __fallback_active_bg);
+            __config_cand_active_bg.length () ? __config_cand_active_bg : __config_panel_active_bg);
     if (__widget_cand_active_text)
         set_color_button (__widget_cand_active_text,
-            __config_cand_active_text.length () ? __config_cand_active_text : __fallback_active_text);
+            __config_cand_active_text.length () ? __config_cand_active_text : __config_panel_active_text);
+
+    if (__widget_panel_normal_bg)   set_color_button (__widget_panel_normal_bg,   __config_panel_normal_bg);
+    if (__widget_panel_normal_text) set_color_button (__widget_panel_normal_text, __config_panel_normal_text);
+    if (__widget_panel_active_bg)   set_color_button (__widget_panel_active_bg,   __config_panel_active_bg);
+    if (__widget_panel_active_text) set_color_button (__widget_panel_active_text, __config_panel_active_text);
 }
 
 void
@@ -750,14 +803,14 @@ load_config (const ConfigPointer &config)
         __config_cand_active_text =
             config->read (String (SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_ACTIVE_TEXT), String ());
 
-        __fallback_normal_bg =
-            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_BG),   __fallback_normal_bg);
-        __fallback_normal_text =
-            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_TEXT), __fallback_normal_text);
-        __fallback_active_bg =
-            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_BG),   __fallback_active_bg);
-        __fallback_active_text =
-            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_TEXT), __fallback_active_text);
+        __config_panel_normal_bg =
+            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_BG),   __config_panel_normal_bg);
+        __config_panel_normal_text =
+            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_TEXT), __config_panel_normal_text);
+        __config_panel_active_bg =
+            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_BG),   __config_panel_active_bg);
+        __config_panel_active_text =
+            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_TEXT), __config_panel_active_text);
 
         setup_widget_value ();
 
@@ -812,6 +865,11 @@ save_config (const ConfigPointer &config)
                        __config_cand_active_bg);
         config->write (String (SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_ACTIVE_TEXT),
                        __config_cand_active_text);
+
+        config->write (String (SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_BG),   __config_panel_normal_bg);
+        config->write (String (SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_TEXT), __config_panel_normal_text);
+        config->write (String (SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_BG),   __config_panel_active_bg);
+        config->write (String (SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_TEXT), __config_panel_active_text);
 
         __have_changed = false;
     }
@@ -1033,6 +1091,23 @@ set_color_button (GtkWidget *button, const String &color)
     gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (button), &rgba);
 }
 
+// Read a color button as #rrggbb, which the panel and the candidate renderer's
+// pango_color_parse both read back.
+static String
+color_button_hex (GtkColorButton *button)
+{
+    GdkRGBA rgba;
+    gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (button), &rgba);
+
+    gchar *hex = g_strdup_printf ("#%02x%02x%02x",
+        (int) (CLAMP (rgba.red,   0.0, 1.0) * 255.0 + 0.5),
+        (int) (CLAMP (rgba.green, 0.0, 1.0) * 255.0 + 0.5),
+        (int) (CLAMP (rgba.blue,  0.0, 1.0) * 255.0 + 0.5));
+    String s (hex);
+    g_free (hex);
+    return s;
+}
+
 static void
 on_candidate_color_set (GtkColorButton *button,
                         gpointer        user_data)
@@ -1041,18 +1116,24 @@ on_candidate_color_set (GtkColorButton *button,
     if (!cfg)
         return;
 
-    GdkRGBA rgba;
-    gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (button), &rgba);
-
-    // Store as #rrggbb, which the candidate renderer's pango_color_parse reads.
-    gchar *hex = g_strdup_printf ("#%02x%02x%02x",
-        (int) (CLAMP (rgba.red,   0.0, 1.0) * 255.0 + 0.5),
-        (int) (CLAMP (rgba.green, 0.0, 1.0) * 255.0 + 0.5),
-        (int) (CLAMP (rgba.blue,  0.0, 1.0) * 255.0 + 0.5));
-    *cfg = String (hex);
-    g_free (hex);
-
+    *cfg = color_button_hex (button);
     __have_changed = true;
+}
+
+static void
+on_panel_color_set (GtkColorButton *button,
+                    gpointer        user_data)
+{
+    String *cfg = static_cast<String *> (user_data);
+    if (!cfg)
+        return;
+
+    *cfg = color_button_hex (button);
+    __have_changed = true;
+
+    // A candidate color still following the panel should track the new panel
+    // color in its picker (set_rgba does not re-emit "color-set").
+    setup_widget_value ();
 }
 
 /*
