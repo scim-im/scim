@@ -15,8 +15,10 @@
 
 /*
  * GTK4 loads input-method modules as GIO modules that implement the
- * "gtk-im-module" extension point.  For a module file named libim-scim.so,
- * GLib resolves the entry points g_io_im_scim_load()/g_io_im_scim_unload().
+ * "gtk-im-module" extension point.  GLib derives the entry-point names from the
+ * module filename: it drops an optional "lib" prefix and the extension and maps
+ * '-' to '_', so both "im-scim.so" and "libim-scim.so" resolve to
+ * g_io_im_scim_load()/g_io_im_scim_unload()/g_io_im_scim_query().
  */
 
 #include <gtk/gtk.h>

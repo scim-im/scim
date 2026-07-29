@@ -19,7 +19,7 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 				  -DSCIM_KEYBOARD_ICON_FILE=\"@SCIM_ICONDIR@/keyboard.png\"
 
 if SCIM_BUILD_GTK4_IMMODULE
-CONFIG_GTK4_IMMODULE = libim-scim.la
+CONFIG_GTK4_IMMODULE = im-scim.la
 endif
 
 if SCIM_LD_VERSION_SCRIPT
@@ -43,15 +43,15 @@ moduledir = @GTK4_IM_MODULEDIR@
 
 module_LTLIBRARIES = $(CONFIG_GTK4_IMMODULE)
 
-libim_scim_la_SOURCES = scimgtkimcontext.cpp imscim.cpp
+im_scim_la_SOURCES = scimgtkimcontext.cpp imscim.cpp
 
-libim_scim_la_CXXFLAGS = @GTK4_CFLAGS@ $(CANDIDATES_CFLAGS)
-libim_scim_la_CFLAGS   = @GTK4_CFLAGS@ $(CANDIDATES_CFLAGS)
+im_scim_la_CXXFLAGS = @GTK4_CFLAGS@ $(CANDIDATES_CFLAGS)
+im_scim_la_CFLAGS   = @GTK4_CFLAGS@ $(CANDIDATES_CFLAGS)
 
-libim_scim_la_LDFLAGS = -rpath $(moduledir) \
+im_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     -avoid-version \
 		     -module \
 		     $(LD_VERSION_SCRIPT_OPTION) \
 		     @GTK4_LIBS@
 
-libim_scim_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(CANDIDATES_LIBS)
+im_scim_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(CANDIDATES_LIBS)

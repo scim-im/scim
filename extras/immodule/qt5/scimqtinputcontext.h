@@ -59,7 +59,12 @@ public:
 class ScimQtInputContextPlugin : public QPlatformInputContextPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA (IID "org.qt-project.Qt.QPlatformInputContextFactoryInterface" FILE "scim.json")
+    // Must match QPlatformInputContextFactoryInterface_iid exactly, version suffix
+    // included -- it is still ".5.1" in Qt6. Spelled without one, this declares an
+    // interface Qt does not recognise and the plugin is passed over in silence: the
+    // compose plugin loads instead and no key ever reaches SCIM. Written out rather
+    // than using the macro because moc needs a literal here.
+    Q_PLUGIN_METADATA (IID "org.qt-project.Qt.QPlatformInputContextFactoryInterface.5.1" FILE "scim.json")
 
 public:
     QPlatformInputContext *create (const QString &key,
