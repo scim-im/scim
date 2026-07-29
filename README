@@ -2,8 +2,9 @@ SCIM -- Smart Common Input Method
 =================================
 
 SCIM is a modular input-method platform.  A single backend hosts the IMEngine
-modules (pinyin, table, rawcode, ...); the various frontends expose it to
-applications, and the panel draws the candidate/toolbar UI.
+modules (pinyin, table, rawcode, ...); frontends expose it to applications, a
+candidate renderer shows the preedit and candidate list at the cursor, and a
+panel provides the toolbar and status area.
 
 Source-derived developer documentation is generated with doxygen.  Look for
 scim-doc-$(VERSION).tar.gz on our website or browse it online.
@@ -161,12 +162,28 @@ generate your own manifest and add its directory to ibus-daemon's search path:
        scim -f ibus -- --xml > ~/.local/share/ibus/component/scim.xml
 
   2. Point IBUS_COMPONENT_PATH at BOTH your directory AND the system component
-     directory, BEFORE ibus-daemon starts (in your login shell profile or
-     systemd user environment):
+     directory, in a way that reaches ibus-daemon.  On modern desktops
+     ibus-daemon runs as a systemd USER service (org.freedesktop.IBus.session.
+     *.service), so it inherits the systemd user manager's environment, NOT your
+     login shell profile -- setting the variable in ~/.bashrc or ~/.profile does
+     NOT reach it.  Set it in the systemd user environment instead, via
+     ~/.config/environment.d/ (read by systemd --user at login, before it starts
+     ibus-daemon).  Find your system component dir once:
 
-       export IBUS_COMPONENT_PATH="$HOME/.local/share/ibus/component:$(pkg-config --variable=pkgdatadir ibus-1.0)/component"
+       pkg-config --variable=pkgdatadir ibus-1.0     # e.g. /usr/share/ibus
 
-  3. Restart the session (or ibus-daemon) so it re-scans.
+     then create ~/.config/environment.d/scim-ibus.conf with the resolved paths
+     (environment.d does no command substitution; ${HOME} is fine):
+
+       IBUS_COMPONENT_PATH=${HOME}/.local/share/ibus/component:/usr/share/ibus/component
+
+  3. Log out and back in so systemd --user re-reads environment.d and restarts
+     ibus-daemon with the new value (a plain `ibus restart` may not pick it up,
+     since it keeps the old environment).
+
+     (Sessions that still start ibus-daemon from an X startup script rather than
+     systemd read ~/.xprofile; a system-wide alternative that reaches any
+     session is /etc/environment, but it needs root and affects all users.)
 
 IMPORTANT: IBUS_COMPONENT_PATH REPLACES ibus-daemon's default search path
 rather than adding to it, and ibus-daemon does not scan any per-user directory
@@ -190,13 +207,10 @@ you can add it straight from GNOME's input-source chooser.
 Tips
 ====
 
-* Panel appearance (preedit/status/lookup font and colors) is configured in
-  scim-setup; changes are pushed to running clients and applied on the fly.
-* You can drag the input, lookup and toolbar windows with the mouse.
-
-
-Authors
-=======
-
-James Su <suzhe@tsinghua.org.cn>
-Rolf Leggewie <foss@rolf.leggewie.biz>
+* Candidate and preedit appearance (font and colors) lives under the
+  /Panel/Gtk/* config keys, editable in scim-setup and shared by both the panel
+  and the candidate renderer.  Panel changes are pushed to running clients and
+  applied on the fly.
+* The panel's toolbar window -- and, when the panel draws candidates itself
+  (built without the candidate renderer), its input and lookup windows -- can be
+  dragged with the mouse.

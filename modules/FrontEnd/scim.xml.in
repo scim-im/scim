@@ -25,14 +25,16 @@
 
          scim -f ibus -- --xml > ~/.local/share/ibus/component/scim.xml
 
-     and adds that directory to IBUS_COMPONENT_PATH BEFORE ibus-daemon starts
-     (login shell or systemd user environment; ibus scans component dirs once
-     at startup). IBUS_COMPONENT_PATH REPLACES ibus-daemon's default search
-     path, and no per-user dir is scanned by default, so the system component
-     directory must be listed too, e.g.
+     and adds that directory to IBUS_COMPONENT_PATH. ibus-daemon runs as a
+     systemd user service on modern desktops, so set this in the systemd user
+     environment (~/.config/environment.d/*.conf), NOT the login shell profile
+     (~/.bashrc/~/.profile), which ibus-daemon does not read. IBUS_COMPONENT_PATH
+     REPLACES ibus-daemon's default search path, and no per-user dir is scanned
+     by default, so the system component dir must be listed too. environment.d
+     does no command substitution, so use resolved paths, e.g.
 
-         export IBUS_COMPONENT_PATH="$HOME/.local/share/ibus/component:\
-             $(pkg-config --variable=pkgdatadir ibus-1.0)/component"
+         # ~/.config/environment.d/scim-ibus.conf
+         IBUS_COMPONENT_PATH=${HOME}/.local/share/ibus/component:/usr/share/ibus/component
 
      ibus-daemon UNIONs the engines from every manifest it scans (duplicate
      engine names: first loaded wins), so the personal file coexists with this
