@@ -48,6 +48,15 @@ using namespace scim;
 #define scim_setup_module_query_changed   panel_gtk_setup_LTX_scim_setup_module_query_changed
 
 #define SCIM_CONFIG_PANEL_GTK_FONT                      "/Panel/Gtk/Font"
+#define SCIM_CONFIG_CANDIDATES_DEFAULT_FONT             "/Candidates/Default/Font"
+#define SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_BG           "/Panel/Gtk/Color/NormalBackground"
+#define SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_TEXT         "/Panel/Gtk/Color/NormalText"
+#define SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_BG           "/Panel/Gtk/Color/ActiveBackground"
+#define SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_TEXT         "/Panel/Gtk/Color/ActiveText"
+#define SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_NORMAL_BG   "/Candidates/Default/Color/NormalBackground"
+#define SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_NORMAL_TEXT "/Candidates/Default/Color/NormalText"
+#define SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_ACTIVE_BG   "/Candidates/Default/Color/ActiveBackground"
+#define SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_ACTIVE_TEXT "/Candidates/Default/Color/ActiveText"
 #define SCIM_CONFIG_PANEL_GTK_TOOLBAR_ALWAYS_SHOW       "/Panel/Gtk/ToolBar/AlwaysShow"
 #define SCIM_CONFIG_PANEL_GTK_TOOLBAR_ALWAYS_HIDDEN     "/Panel/Gtk/ToolBar/AlwaysHidden"
 #define SCIM_CONFIG_PANEL_GTK_TOOLBAR_AUTO_SNAP         "/Panel/Gtk/ToolBar/AutoSnap"
@@ -133,6 +142,19 @@ static bool   __config_default_sticked           = false;
 static bool   __config_show_tray_icon            = true;
 
 static String __config_font                      = "default";
+static String __config_candidate_font            = "default";
+
+// Candidate colors: empty means "follow the panel color" (the key stays unset,
+// so scim_candidates_theme_from_config () falls back to /Panel/Gtk/Color/*).
+static String __config_cand_normal_bg            = "";
+static String __config_cand_normal_text          = "";
+static String __config_cand_active_bg            = "";
+static String __config_cand_active_text          = "";
+// The panel color a candidate color falls back to, for display in the picker.
+static String __fallback_normal_bg               = "gray92";
+static String __fallback_normal_text             = "black";
+static String __fallback_active_bg               = "light blue";
+static String __fallback_active_text             = "black";
 
 static bool   __have_changed                     = false;
 
@@ -150,6 +172,11 @@ static GtkWidget * __widget_lookup_table_vertical     = 0;
 static GtkWidget * __widget_default_sticked           = 0;
 static GtkWidget * __widget_show_tray_icon            = 0;
 static GtkWidget * __widget_font                      = 0;
+static GtkWidget * __widget_candidate_font            = 0;
+static GtkWidget * __widget_cand_normal_bg            = 0;
+static GtkWidget * __widget_cand_normal_text          = 0;
+static GtkWidget * __widget_cand_active_bg            = 0;
+static GtkWidget * __widget_cand_active_text          = 0;
 
 enum ToolbarShowFlavourType {
     SCIM_TOOLBAR_SHOW_ALWAYS,
@@ -179,6 +206,18 @@ on_toolbar_show_behaviour_changed      (GtkComboBox     *combobox,
 static void
 on_font_selection_clicked            (GtkButton       *button,
                                       gpointer         user_data);
+
+static void
+on_candidate_font_selection_clicked  (GtkButton       *button,
+                                      gpointer         user_data);
+
+static void
+on_candidate_color_set               (GtkColorButton  *button,
+                                      gpointer         user_data);
+
+static void
+set_color_button                     (GtkWidget       *button,
+                                      const String    &color);
 
 static void
 setup_widget_value ();
@@ -330,6 +369,59 @@ create_setup_window ()
         gtk_box_append (GTK_BOX (hbox), __widget_font);
         gtk_label_set_mnemonic_widget (GTK_LABEL (label), __widget_font);
 
+        hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+        gtk_box_append (GTK_BOX (vbox), hbox);
+
+        label = gtk_label_new_with_mnemonic (_("C_andidate font:"));
+        gtk_widget_set_margin_start (label, 4);
+        gtk_widget_set_margin_end (label, 4);
+        gtk_box_append (GTK_BOX (hbox), label);
+
+        __widget_candidate_font = gtk_button_new_with_label ("default");
+        gtk_box_append (GTK_BOX (hbox), __widget_candidate_font);
+        gtk_label_set_mnemonic_widget (GTK_LABEL (label), __widget_candidate_font);
+
+        // Candidate colors.  Each defaults to the matching panel color until set
+        // here (then written under /Candidates/Default/Color/*).
+        frame = gtk_frame_new (_("Candidate colors"));
+        gtk_widget_set_margin_start (frame, 4);
+        gtk_widget_set_margin_end (frame, 4);
+        gtk_widget_set_margin_top (frame, 4);
+        gtk_widget_set_margin_bottom (frame, 4);
+        gtk_widget_set_hexpand (frame, TRUE);
+        gtk_box_append (GTK_BOX (page), frame);
+
+        table = gtk_grid_new ();
+        gtk_grid_set_row_spacing (GTK_GRID (table), 4);
+        gtk_grid_set_column_spacing (GTK_GRID (table), 8);
+        gtk_widget_set_margin_start (table, 4);
+        gtk_widget_set_margin_end (table, 4);
+        gtk_widget_set_margin_top (table, 4);
+        gtk_widget_set_margin_bottom (table, 4);
+        gtk_frame_set_child (GTK_FRAME (frame), table);
+
+        {
+            struct { const char *label; GtkWidget **widget; String *cfg; } rows[] = {
+                { _("Normal _background:"),   &__widget_cand_normal_bg,   &__config_cand_normal_bg   },
+                { _("Normal _text:"),         &__widget_cand_normal_text, &__config_cand_normal_text },
+                { _("Selected ba_ckground:"), &__widget_cand_active_bg,   &__config_cand_active_bg   },
+                { _("Selected te_xt:"),       &__widget_cand_active_text, &__config_cand_active_text },
+            };
+            for (int i = 0; i < 4; ++i) {
+                label = gtk_label_new_with_mnemonic (rows[i].label);
+                gtk_widget_set_halign (label, GTK_ALIGN_START);
+                gtk_grid_attach (GTK_GRID (table), label, 0, i, 1, 1);
+
+                *rows[i].widget = gtk_color_button_new ();
+                gtk_grid_attach (GTK_GRID (table), *rows[i].widget, 1, i, 1, 1);
+                gtk_label_set_mnemonic_widget (GTK_LABEL (label), *rows[i].widget);
+
+                g_signal_connect ((gpointer) *rows[i].widget, "color-set",
+                                  G_CALLBACK (on_candidate_color_set),
+                                  rows[i].cfg);
+            }
+        }
+
         // Connect all signals.
         g_signal_connect ((gpointer) __widget_toolbar_show_behaviour, "changed",
                           G_CALLBACK (on_toolbar_show_behaviour_changed),
@@ -385,6 +477,10 @@ create_setup_window ()
 
         g_signal_connect ((gpointer) __widget_font, "clicked",
                           G_CALLBACK (on_font_selection_clicked),
+                          NULL);
+
+        g_signal_connect ((gpointer) __widget_candidate_font, "clicked",
+                          G_CALLBACK (on_candidate_font_selection_clicked),
                           NULL);
 
         // Set all tooltips.
@@ -453,8 +549,14 @@ create_setup_window ()
                                 "its original position."));
 
         gtk_widget_set_tooltip_text (__widget_font,
-                              _("The font setting will be used in "
-                                "the input and lookup table windows."));
+                              _("The font used by the panel windows (and the "
+                                "input and lookup table windows when the panel "
+                                "draws candidates itself)."));
+
+        gtk_widget_set_tooltip_text (__widget_candidate_font,
+                              _("The font used by the candidate window (preedit "
+                                "and candidate list) drawn at the cursor.  Leave "
+                                "as \"default\" to follow the panel font."));
 
         window = page;
 
@@ -563,6 +665,27 @@ setup_widget_value ()
             GTK_BUTTON (__widget_font),
             __config_font.c_str ());
     }
+
+    if (__widget_candidate_font) {
+        gtk_button_set_label (
+            GTK_BUTTON (__widget_candidate_font),
+            __config_candidate_font.c_str ());
+    }
+
+    // Show the effective color: the candidate override if set, else the panel
+    // color it falls back to.
+    if (__widget_cand_normal_bg)
+        set_color_button (__widget_cand_normal_bg,
+            __config_cand_normal_bg.length () ? __config_cand_normal_bg : __fallback_normal_bg);
+    if (__widget_cand_normal_text)
+        set_color_button (__widget_cand_normal_text,
+            __config_cand_normal_text.length () ? __config_cand_normal_text : __fallback_normal_text);
+    if (__widget_cand_active_bg)
+        set_color_button (__widget_cand_active_bg,
+            __config_cand_active_bg.length () ? __config_cand_active_bg : __fallback_active_bg);
+    if (__widget_cand_active_text)
+        set_color_button (__widget_cand_active_text,
+            __config_cand_active_text.length () ? __config_cand_active_text : __fallback_active_text);
 }
 
 void
@@ -614,6 +737,27 @@ load_config (const ConfigPointer &config)
         __config_font =
             config->read (String (SCIM_CONFIG_PANEL_GTK_FONT),
                           __config_font);
+        __config_candidate_font =
+            config->read (String (SCIM_CONFIG_CANDIDATES_DEFAULT_FONT),
+                          __config_candidate_font);
+
+        __config_cand_normal_bg =
+            config->read (String (SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_NORMAL_BG), String ());
+        __config_cand_normal_text =
+            config->read (String (SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_NORMAL_TEXT), String ());
+        __config_cand_active_bg =
+            config->read (String (SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_ACTIVE_BG), String ());
+        __config_cand_active_text =
+            config->read (String (SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_ACTIVE_TEXT), String ());
+
+        __fallback_normal_bg =
+            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_BG),   __fallback_normal_bg);
+        __fallback_normal_text =
+            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_TEXT), __fallback_normal_text);
+        __fallback_active_bg =
+            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_BG),   __fallback_active_bg);
+        __fallback_active_text =
+            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_TEXT), __fallback_active_text);
 
         setup_widget_value ();
 
@@ -655,6 +799,19 @@ save_config (const ConfigPointer &config)
                        __config_default_sticked);
         config->write (String (SCIM_CONFIG_PANEL_GTK_FONT),
                        __config_font);
+        config->write (String (SCIM_CONFIG_CANDIDATES_DEFAULT_FONT),
+                       __config_candidate_font);
+
+        // Empty strings stay unset in effect (read as ""), so an untouched color
+        // keeps following the panel color instead of being frozen here.
+        config->write (String (SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_NORMAL_BG),
+                       __config_cand_normal_bg);
+        config->write (String (SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_NORMAL_TEXT),
+                       __config_cand_normal_text);
+        config->write (String (SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_ACTIVE_BG),
+                       __config_cand_active_bg);
+        config->write (String (SCIM_CONFIG_CANDIDATES_DEFAULT_COLOR_ACTIVE_TEXT),
+                       __config_cand_active_text);
 
         __have_changed = false;
     }
@@ -811,6 +968,91 @@ on_font_selection_clicked (GtkButton *button,
     g_signal_connect (font_selection, "response", G_CALLBACK (font_dialog_response_cb), NULL);
 
     gtk_window_present (GTK_WINDOW (font_selection));
+}
+
+static void
+candidate_font_dialog_response_cb (GtkDialog *dialog,
+                                   gint       response,
+                                   gpointer   user_data)
+{
+    if (response == GTK_RESPONSE_OK) {
+        gchar *fontname = gtk_font_chooser_get_font (GTK_FONT_CHOOSER (dialog));
+
+        if (fontname) {
+            __config_candidate_font = String (fontname);
+            g_free (fontname);
+
+            gtk_button_set_label (
+                GTK_BUTTON (__widget_candidate_font),
+                __config_candidate_font.c_str ());
+
+            __have_changed = true;
+        }
+    }
+
+    gtk_window_destroy (GTK_WINDOW (dialog));
+}
+
+static void
+on_candidate_font_selection_clicked (GtkButton *button,
+                                     gpointer   user_data)
+{
+    GtkWidget *font_selection = gtk_font_chooser_dialog_new (_("Select Candidate Font"), NULL);
+    GtkRoot   *root = gtk_widget_get_root (GTK_WIDGET (button));
+
+    if (__config_candidate_font != "default") {
+        gtk_font_chooser_set_font (
+            GTK_FONT_CHOOSER (font_selection),
+            __config_candidate_font.c_str ());
+    }
+
+    if (root && GTK_IS_WINDOW (root))
+        gtk_window_set_transient_for (GTK_WINDOW (font_selection), GTK_WINDOW (root));
+    gtk_window_set_modal (GTK_WINDOW (font_selection), TRUE);
+
+    g_signal_connect (font_selection, "response", G_CALLBACK (candidate_font_dialog_response_cb), NULL);
+
+    gtk_window_present (GTK_WINDOW (font_selection));
+}
+
+// Parse a color string (X11/CSS name or #rrggbb) the same way the candidate
+// renderer does (Pango), and show it in the color button.
+static void
+set_color_button (GtkWidget *button, const String &color)
+{
+    GdkRGBA rgba = { 0.5, 0.5, 0.5, 1.0 };
+    PangoColor pc;
+
+    if (color.length () && pango_color_parse (&pc, color.c_str ())) {
+        rgba.red   = pc.red   / 65535.0;
+        rgba.green = pc.green / 65535.0;
+        rgba.blue  = pc.blue  / 65535.0;
+        rgba.alpha = 1.0;
+    }
+
+    gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (button), &rgba);
+}
+
+static void
+on_candidate_color_set (GtkColorButton *button,
+                        gpointer        user_data)
+{
+    String *cfg = static_cast<String *> (user_data);
+    if (!cfg)
+        return;
+
+    GdkRGBA rgba;
+    gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (button), &rgba);
+
+    // Store as #rrggbb, which the candidate renderer's pango_color_parse reads.
+    gchar *hex = g_strdup_printf ("#%02x%02x%02x",
+        (int) (CLAMP (rgba.red,   0.0, 1.0) * 255.0 + 0.5),
+        (int) (CLAMP (rgba.green, 0.0, 1.0) * 255.0 + 0.5),
+        (int) (CLAMP (rgba.blue,  0.0, 1.0) * 255.0 + 0.5));
+    *cfg = String (hex);
+    g_free (hex);
+
+    __have_changed = true;
 }
 
 /*

@@ -85,24 +85,54 @@ parse_color (const String &s, const CandidatesColor &fallback)
     return fallback;
 }
 
+// Read an appearance key with a layered fallback:
+//   /Candidates/<renderer>/<key>  ->  /Candidates/Default/<key>  ->
+//   /Panel/Gtk/<key> (legacy, shared with the panel)  ->  "" (unset)
+// so a per-renderer override wins, otherwise the shared Candidates/Default
+// value, otherwise the historical panel value (backward compatible). When
+// skip_default is set, the sentinel "default" is treated as unset at each
+// level, so writing "default" in setup does not shadow a lower level.
+static String
+read_layered_key (const ConfigPointer &config, const String &renderer,
+                  const String &key, bool skip_default = false)
+{
+    const String levels[] = {
+        String ("/Candidates/") + renderer + "/" + key,
+        renderer == String ("Default") ? String () : String ("/Candidates/Default/") + key,
+        String ("/Panel/Gtk/") + key,
+    };
+    for (const String &path : levels) {
+        if (path.empty ())
+            continue;
+        String v = config->read (path, String ());
+        if (v.length () && (!skip_default || v != String ("default")))
+            return v;
+    }
+    return String ();
+}
+
 CandidatesTheme
-scim_candidates_theme_from_config (const ConfigPointer &config)
+scim_candidates_theme_from_config (const ConfigPointer &config, const String &renderer)
 {
     CandidatesTheme t = CandidatesTheme::light ();
     if (config.null ())
         return t;
 
-    // Same keys the legacy GTK panel uses (defined privately there, so use the
-    // literal paths here) for a consistent, backward-compatible appearance.
-    String font = config->read (String ("/Panel/Gtk/Font"), String ());
-    if (font.length () && font != String ("default"))
+    String font = read_layered_key (config, renderer, String ("Font"), true);
+    if (font.length ())
         t.font = font;
 
-    t.bg           = parse_color (config->read (String ("/Panel/Gtk/Color/NormalBackground"), String ("gray92")),     t.bg);
-    t.fg           = parse_color (config->read (String ("/Panel/Gtk/Color/NormalText"),       String ("black")),      t.fg);
-    t.highlight_bg = parse_color (config->read (String ("/Panel/Gtk/Color/ActiveBackground"), String ("light blue")), t.highlight_bg);
-    t.highlight_fg = parse_color (config->read (String ("/Panel/Gtk/Color/ActiveText"),       String ("black")),      t.highlight_fg);
-    // label/border have no legacy keys; keep the light() defaults.
+    // parse_color () keeps the light() field when its string is empty/unparsable,
+    // so pass the historical default string when every level is unset.
+    auto color = [&] (const char *key, const char *deflt) -> String {
+        String v = read_layered_key (config, renderer, String (key));
+        return v.length () ? v : String (deflt);
+    };
+    t.bg           = parse_color (color ("Color/NormalBackground", "gray92"),     t.bg);
+    t.fg           = parse_color (color ("Color/NormalText",       "black"),      t.fg);
+    t.highlight_bg = parse_color (color ("Color/ActiveBackground", "light blue"), t.highlight_bg);
+    t.highlight_fg = parse_color (color ("Color/ActiveText",       "black"),      t.highlight_fg);
+    // label/border have no config keys yet; keep the light() defaults.
     return t;
 }
 

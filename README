@@ -207,10 +207,14 @@ you can add it straight from GNOME's input-source chooser.
 Tips
 ====
 
-* Candidate and preedit appearance (font and colors) lives under the
-  /Panel/Gtk/* config keys, editable in scim-setup and shared by both the panel
-  and the candidate renderer.  Panel changes are pushed to running clients and
-  applied on the fly.
+* The candidate window (preedit and candidate list) has its own appearance,
+  configured under /Candidates/Default/* -- scim-setup exposes the font
+  ("Candidate font") and the four colors ("Candidate colors").  Each setting
+  falls back to the panel's /Panel/Gtk/* value until you give it a
+  candidate-specific value (e.g. a larger candidate font), so existing setups
+  look unchanged.  Changes are applied on the fly, without restarting.
+* Panel appearance (font/colors of the toolbar and status area) is configured
+  in scim-setup; changes are pushed to running clients and applied on the fly.
 * The panel's toolbar window -- and, when the panel draws candidates itself
   (built without the candidate renderer), its input and lookup windows -- can be
   dragged with the mouse.

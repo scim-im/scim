@@ -82,15 +82,20 @@ struct CandidatesTheme {
 };
 
 /**
- * @brief Build a theme from the SCIM config, matching the legacy GTK panel.
+ * @brief Build a theme from the SCIM config for a candidate renderer.
  *
- * Reads /Panel/Gtk/Font and /Panel/Gtk/Color/{NormalText,NormalBackground,
- * ActiveText,ActiveBackground} (CSS/X11 color strings) into a CandidatesTheme, so
- * every in-process renderer honours the user's configured font and colors the
- * same way. Falls back to CandidatesTheme::light() for missing/unparsable values.
- * The CandidatesUI class itself stays config-agnostic; this is the shared bridge.
+ * Reads Font and Color/{NormalText,NormalBackground,ActiveText,ActiveBackground}
+ * (CSS/X11 color strings) with a layered fallback:
+ *   /Candidates/<renderer>/<key>  ->  /Candidates/Default/<key>  ->
+ *   /Panel/Gtk/<key> (legacy, shared with the panel)  ->  CandidatesTheme::light().
+ * So the candidate appearance is configured independently of the panel under
+ * the "/Candidates/Default/" keys (a future GTK/Qt renderer can override via
+ * "/Candidates/Gtk/" or "/Candidates/Qt/"), while existing setups that only set
+ * the old "/Panel/Gtk/" keys keep working unchanged. @p renderer selects the top
+ * level and defaults to "Default" (the toolkit-agnostic Cairo renderer).
  */
-CandidatesTheme scim_candidates_theme_from_config (const ConfigPointer &config);
+CandidatesTheme scim_candidates_theme_from_config (const ConfigPointer &config,
+                                                   const String &renderer = String ("Default"));
 
 /**
  * @brief Backend-agnostic layout/draw of the input panel.

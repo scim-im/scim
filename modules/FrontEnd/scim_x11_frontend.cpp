@@ -160,7 +160,6 @@ X11FrontEnd::X11FrontEnd (const BackEndPointer &backend,
     // Attach Panel Client signal.
     m_panel_client.signal_connect_reload_config                 (slot (this, &X11FrontEnd::panel_slot_reload_config));
     m_panel_client.signal_connect_exit                          (slot (this, &X11FrontEnd::panel_slot_exit));
-    m_panel_client.signal_connect_update_lookup_table_page_size (slot (this, &X11FrontEnd::panel_slot_update_lookup_table_page_size));
     m_panel_client.signal_connect_lookup_table_page_up          (slot (this, &X11FrontEnd::panel_slot_lookup_table_page_up));
     m_panel_client.signal_connect_lookup_table_page_down        (slot (this, &X11FrontEnd::panel_slot_lookup_table_page_down));
     m_panel_client.signal_connect_trigger_property              (slot (this, &X11FrontEnd::panel_slot_trigger_property));
@@ -220,8 +219,6 @@ X11FrontEnd::show_preedit_string (int siid)
             refresh_candidates_ui ();
         }
 #endif
-        else
-            m_panel_client.show_preedit_string (m_focus_ic->icid);
     }
 }
 
@@ -241,7 +238,6 @@ X11FrontEnd::show_aux_string (int siid)
             return;
         }
 #endif
-        m_panel_client.show_aux_string (m_focus_ic->icid);
     }
 }
 
@@ -261,7 +257,6 @@ X11FrontEnd::show_lookup_table (int siid)
             return;
         }
 #endif
-        m_panel_client.show_lookup_table (m_focus_ic->icid);
     }
 }
 
@@ -283,8 +278,6 @@ X11FrontEnd::hide_preedit_string (int siid)
             refresh_candidates_ui ();
         }
 #endif
-        else
-            m_panel_client.hide_preedit_string (m_focus_ic->icid);
     }
 }
 
@@ -304,7 +297,6 @@ X11FrontEnd::hide_aux_string (int siid)
             return;
         }
 #endif
-        m_panel_client.hide_aux_string (m_focus_ic->icid);
     }
 }
 
@@ -324,7 +316,6 @@ X11FrontEnd::hide_lookup_table (int siid)
             return;
         }
 #endif
-        m_panel_client.hide_lookup_table (m_focus_ic->icid);
     }
 }
 
@@ -346,8 +337,6 @@ X11FrontEnd::update_preedit_caret (int siid, int caret)
             refresh_candidates_ui ();
         }
 #endif
-        else
-            m_panel_client.update_preedit_caret (m_focus_ic->icid, caret);
     }
 }
 
@@ -369,8 +358,6 @@ X11FrontEnd::update_preedit_string (int siid, const WideString & str, const Attr
             refresh_candidates_ui ();
         }
 #endif
-        else
-            m_panel_client.update_preedit_string (m_focus_ic->icid, str, attrs);
     }
 }
 
@@ -390,7 +377,6 @@ X11FrontEnd::update_aux_string (int siid, const WideString & str, const Attribut
             return;
         }
 #endif
-        m_panel_client.update_aux_string (m_focus_ic->icid, str, attrs);
     }
 }
 
@@ -410,7 +396,6 @@ X11FrontEnd::update_lookup_table (int siid, const LookupTable & table)
             return;
         }
 #endif
-        m_panel_client.update_lookup_table (m_focus_ic->icid, table);
     }
 }
 
@@ -582,7 +567,7 @@ X11FrontEnd::init (int argc, char **argv)
 
     SCIM_DEBUG_FRONTEND (1) << "X11 -- Connecting to panel daemon.\n";
 
-    if (m_panel_client.open_connection (m_config->get_name (), m_display_name) < 0)
+    if (m_panel_client.open_connection (m_config->get_name ()) < 0)
         throw FrontEndError (String ("X11 -- failed to connect to the panel daemon!"));
 
     // Only use ComposeKeyFactory when it's enabled.
@@ -649,7 +634,7 @@ X11FrontEnd::process_events ()
         if (!m_panel_client.filter_event ()) {
             SCIM_DEBUG_FRONTEND(1) << "X11 -- Lost connection with panel daemon, re-establish it!\n";
             m_panel_client.close_connection ();
-            if (m_panel_client.open_connection (m_config->get_name (), m_display_name) < 0)
+            if (m_panel_client.open_connection (m_config->get_name ()) < 0)
                 SCIM_DEBUG_FRONTEND(1) << "X11 -- Can't re-establish connection with panel daemon!\n";
         }
     }
@@ -1748,7 +1733,7 @@ X11FrontEnd::start_ic (X11IC *ic)
             m_kimpanel.show_preedit_string (false);
             m_kimpanel.show_aux_string (false);
             m_kimpanel.show_lookup_table (false);
-        } else
+        }
 #endif
 #ifdef SCIM_HAS_CANDIDATES
         if (use_candidates_ui ()) {
@@ -1756,13 +1741,8 @@ X11FrontEnd::start_ic (X11IC *ic)
             m_candidates_ui.ui ().hide_aux_string ();
             m_candidates_ui.ui ().hide_lookup_table ();
             refresh_candidates_ui ();
-        } else
-#endif
-        {
-            m_panel_client.hide_preedit_string (ic->icid);
-            m_panel_client.hide_aux_string (ic->icid);
-            m_panel_client.hide_lookup_table (ic->icid);
         }
+#endif
 
         if (ic->shared_siid) reset (ic->siid);
 
@@ -1898,16 +1878,6 @@ X11FrontEnd::panel_slot_exit (int context)
     m_should_exit = true;
 }
 
-void
-X11FrontEnd::panel_slot_update_lookup_table_page_size (int context, int page_size)
-{
-    X11IC *ic = m_ic_manager.find_ic (context);
-    if (validate_ic (ic)) {
-        m_panel_client.prepare (ic->icid);
-        update_lookup_table_page_size (ic->siid, page_size);
-        m_panel_client.send ();
-    }
-}
 void
 X11FrontEnd::panel_slot_lookup_table_page_up (int context)
 {
@@ -2165,14 +2135,11 @@ X11FrontEnd::panel_req_update_spot_location (const X11IC *ic)
 #ifdef SCIM_HAS_KIMPANEL
         if (use_kimpanel_ui ())
             m_kimpanel.update_spot_location (spot_x, spot_y);
-        else
 #endif
 #ifdef SCIM_HAS_CANDIDATES
         if (use_candidates_ui ())
             m_candidates_ui.move (spot_x, spot_y);
-        else
 #endif
-        m_panel_client.update_spot_location (ic->icid, spot_x, spot_y);
     }
 }
 

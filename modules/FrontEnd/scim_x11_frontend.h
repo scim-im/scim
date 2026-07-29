@@ -208,7 +208,6 @@ private:
 
     void panel_slot_reload_config (int context);
     void panel_slot_exit          (int context);
-    void panel_slot_update_lookup_table_page_size (int context, int page_size);
     void panel_slot_lookup_table_page_up (int context);
     void panel_slot_lookup_table_page_down (int context);
     void panel_slot_trigger_property (int context, const String &property);

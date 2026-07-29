@@ -19,19 +19,12 @@ if SCIM_BUILD_PANEL_GTK
 CONFIG_SCIM_PANEL_GTK    = scim-panel-gtk
 endif
 
-# When the candidate renderer is built in-process (every transport draws its
-# own lookup table), the panel drops its lookup-table window and stays a
-# status/property toolbar only.
-if SCIM_BUILD_CANDIDATES
-CANDIDATES_CFLAGS       = -DSCIM_HAS_CANDIDATES
-endif
-
 libexecdir		= $(libdir)/scim@SCIM_EPOCH@
 libexec_PROGRAMS        = $(CONFIG_SCIM_PANEL_GTK)
 
 scim_panel_gtk_SOURCES  = scim_panel_gtk.cpp
 
-scim_panel_gtk_CXXFLAGS = @GTK_CFLAGS@ @X_CFLAGS@ $(CANDIDATES_CFLAGS)
+scim_panel_gtk_CXXFLAGS = @GTK_CFLAGS@ @X_CFLAGS@
 
 scim_panel_gtk_LDFLAGS  = @GTK_LIBS@ @X_LIBS@ @LTLIBINTL@
 

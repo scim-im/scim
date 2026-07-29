@@ -139,8 +139,6 @@ static void     gtk_im_slave_preedit_end_cb             (GtkIMContext           
 /* private functions */
 static void     panel_slot_reload_config                (int                     context);
 static void     panel_slot_exit                         (int                     context);
-static void     panel_slot_update_lookup_table_page_size(int                     context,
-                                                         int                     page_size);
 static void     panel_slot_lookup_table_page_up         (int                     context);
 static void     panel_slot_lookup_table_page_down       (int                     context);
 static void     panel_slot_trigger_property             (int                     context,
@@ -167,7 +165,6 @@ static void     panel_slot_change_factory               (int                    
 static void     panel_req_focus_in                      (GtkIMContextSCIM       *ic);
 static void     panel_req_update_screen                 (GtkIMContextSCIM       *ic);
 static void     panel_req_update_factory_info           (GtkIMContextSCIM       *ic);
-static void     panel_req_update_spot_location          (GtkIMContextSCIM       *ic);
 static void     panel_req_show_help                     (GtkIMContextSCIM       *ic);
 static void     panel_req_show_factory_menu             (GtkIMContextSCIM       *ic);
 
@@ -298,6 +295,9 @@ static PanelClient                                      _panel_client;
 // X11 and Wayland (the compositor/toolkit positions the popover).
 static CandidatesUI                                     _candidates_ui;
 static GtkWidget                                       *_candidates_popover         = 0;
+
+// Defined further down; needed by the focus/turn-on reset above it.
+static void candidates_hide ();
 static GtkWidget                                       *_candidates_area            = 0;
 #endif
 
@@ -782,14 +782,16 @@ gtk_im_context_scim_focus_in (GtkIMContext *context)
 
         panel_req_focus_in (context_scim);
         panel_req_update_screen (context_scim);
-        panel_req_update_spot_location (context_scim);
         panel_req_update_factory_info (context_scim);
 
         if (context_scim->impl->is_on) {
             _panel_client.turn_on (context_scim->id);
-            _panel_client.hide_preedit_string (context_scim->id);
-            _panel_client.hide_aux_string (context_scim->id);
-            _panel_client.hide_lookup_table (context_scim->id);
+#ifdef SCIM_HAS_CANDIDATES
+            // This context just became active. The in-process renderer is shared by
+            // every context in this process, so clear anything the previously focused
+            // one left on screen before we start drawing.
+            candidates_hide ();
+#endif
             context_scim->impl->si->focus_in ();
         } else {
             _panel_client.turn_off (context_scim->id);
@@ -842,7 +844,6 @@ gtk_im_context_scim_set_cursor_location (GtkIMContext *context,
             context_scim->impl->cursor_x = cx;
             context_scim->impl->cursor_y = cy;
             _panel_client.prepare (context_scim->id);
-            panel_req_update_spot_location (context_scim);
             _panel_client.send ();
             SCIM_DEBUG_FRONTEND(2) << "new cursor location = " << context_scim->impl->cursor_x << "," << context_scim->impl->cursor_y << "\n";
         }
@@ -1097,17 +1098,6 @@ panel_slot_exit (int /* context */)
     finalize ();
 }
 
-static void
-panel_slot_update_lookup_table_page_size (int context, int page_size)
-{
-    GtkIMContextSCIM *ic = find_ic (context);
-    SCIM_DEBUG_FRONTEND(1) << "panel_slot_update_lookup_table_page_size context=" << context << " page_size=" << page_size << " ic=" << ic << "\n";
-    if (ic && ic->impl) {
-        _panel_client.prepare (ic->id);
-        ic->impl->si->update_lookup_table_page_size (page_size);
-        _panel_client.send ();
-    }
-}
 
 static void
 panel_slot_lookup_table_page_up (int context)
@@ -1343,11 +1333,6 @@ panel_req_focus_in (GtkIMContextSCIM *ic)
     _panel_client.focus_in (ic->id, ic->impl->si->get_factory_uuid ());
 }
 
-static void
-panel_req_update_spot_location (GtkIMContextSCIM *ic)
-{
-    _panel_client.update_spot_location (ic->id, ic->impl->cursor_x, ic->impl->cursor_y);
-}
 
 
 static bool
@@ -1509,7 +1494,7 @@ panel_initialize ()
 
     SCIM_DEBUG_FRONTEND(1) << "panel_initialize..\n";
 
-    if (_panel_client.open_connection (_config->get_name (), display_name) >= 0) {
+    if (_panel_client.open_connection (_config->get_name ()) >= 0) {
         int fd = _panel_client.get_connection_number ();
         _panel_iochannel = g_io_channel_unix_new (fd);
 
@@ -1567,12 +1552,14 @@ turn_on_ic (GtkIMContextSCIM *ic)
         if (ic == _focused_ic) {
             panel_req_focus_in (ic);
             panel_req_update_screen (ic);
-            panel_req_update_spot_location (ic);
             panel_req_update_factory_info (ic);
             _panel_client.turn_on (ic->id);
-            _panel_client.hide_preedit_string (ic->id);
-            _panel_client.hide_aux_string (ic->id);
-            _panel_client.hide_lookup_table (ic->id);
+#ifdef SCIM_HAS_CANDIDATES
+            // This context just became active. The in-process renderer is shared by
+            // every context in this process, so clear anything the previously focused
+            // one left on screen before we start drawing.
+            candidates_hide ();
+#endif
             ic->impl->si->focus_in ();
         }
 
@@ -1843,7 +1830,6 @@ initialize (void)
     // Attach Panel Client signal.
     _panel_client.signal_connect_reload_config                 (slot (panel_slot_reload_config));
     _panel_client.signal_connect_exit                          (slot (panel_slot_exit));
-    _panel_client.signal_connect_update_lookup_table_page_size (slot (panel_slot_update_lookup_table_page_size));
     _panel_client.signal_connect_lookup_table_page_up          (slot (panel_slot_lookup_table_page_up));
     _panel_client.signal_connect_lookup_table_page_down        (slot (panel_slot_lookup_table_page_down));
     _panel_client.signal_connect_trigger_property              (slot (panel_slot_trigger_property));
@@ -2064,9 +2050,15 @@ slot_show_preedit_string (IMEngineInstanceBase *si)
             }
             if (ic->impl->preedit_string.length ())
                 g_signal_emit_by_name(_focused_ic, "preedit-changed");
-        } else {
-            _panel_client.show_preedit_string (ic->id);
         }
+#ifdef SCIM_HAS_CANDIDATES
+        else {
+            // The client cannot draw preedit inline, so the in-process
+            // renderer does it (matching the x11 frontend).
+            _candidates_ui.show_preedit_string ();
+            candidates_show (ic);
+        }
+#endif
     }
 }
 
@@ -2077,8 +2069,14 @@ slot_show_aux_string (IMEngineInstanceBase *si)
 
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
-    if (ic && ic->impl && _focused_ic == ic)
-        _panel_client.show_aux_string (ic->id);
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        // There is no client-side path for the aux string; the renderer is the
+        // only place it can appear.
+        _candidates_ui.show_aux_string ();
+        candidates_show (ic);
+#endif
+    }
 }
 
 static void 
@@ -2091,8 +2089,6 @@ slot_show_lookup_table (IMEngineInstanceBase *si)
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
         candidates_show (ic);
-#else
-        _panel_client.show_lookup_table (ic->id);
 #endif
     }
 }
@@ -2118,9 +2114,13 @@ slot_hide_preedit_string (IMEngineInstanceBase *si)
                 g_signal_emit_by_name(ic, "preedit-end");
                 ic->impl->preedit_started = false;
             }
-        } else {
-            _panel_client.hide_preedit_string (ic->id);
         }
+#ifdef SCIM_HAS_CANDIDATES
+        else {
+            _candidates_ui.hide_preedit_string ();
+            candidates_resize ();
+        }
+#endif
     }
 }
 
@@ -2131,8 +2131,12 @@ slot_hide_aux_string (IMEngineInstanceBase *si)
 
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
-    if (ic && ic->impl && _focused_ic == ic)
-        _panel_client.hide_aux_string (ic->id);
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        _candidates_ui.hide_aux_string ();
+        candidates_resize ();
+#endif
+    }
 }
 
 static void 
@@ -2145,8 +2149,6 @@ slot_hide_lookup_table (IMEngineInstanceBase *si)
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
         candidates_hide ();
-#else
-        _panel_client.hide_lookup_table (ic->id);
 #endif
     }
 }
@@ -2166,9 +2168,13 @@ slot_update_preedit_caret (IMEngineInstanceBase *si, int caret)
                 ic->impl->preedit_started = true;
             }
             g_signal_emit_by_name(ic, "preedit-changed");
-        } else {
-            _panel_client.update_preedit_caret (ic->id, caret);
         }
+#ifdef SCIM_HAS_CANDIDATES
+        else {
+            _candidates_ui.update_preedit_caret (caret);
+            candidates_resize ();
+        }
+#endif
     }
 }
 
@@ -2193,9 +2199,13 @@ slot_update_preedit_string (IMEngineInstanceBase *si,
             ic->impl->preedit_updating = true;
             g_signal_emit_by_name(ic, "preedit-changed");
             ic->impl->preedit_updating = false;
-        } else {
-            _panel_client.update_preedit_string (ic->id, str, attrs);
         }
+#ifdef SCIM_HAS_CANDIDATES
+        else {
+            _candidates_ui.update_preedit_string (str, attrs);
+            candidates_resize ();
+        }
+#endif
     }
 }
 
@@ -2208,8 +2218,12 @@ slot_update_aux_string (IMEngineInstanceBase *si,
 
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
-    if (ic && ic->impl && _focused_ic == ic)
-        _panel_client.update_aux_string (ic->id, str, attrs);
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        _candidates_ui.update_aux_string (str, attrs);
+        candidates_resize ();
+#endif
+    }
 }
 
 static void 
@@ -2253,8 +2267,6 @@ slot_update_lookup_table (IMEngineInstanceBase *si,
 #ifdef SCIM_HAS_CANDIDATES
         _candidates_ui.update_lookup_table (table);
         candidates_resize ();
-#else
-        _panel_client.update_lookup_table (ic->id, table);
 #endif
     }
 }
@@ -2414,6 +2426,10 @@ reload_config_callback (const ConfigPointer &config)
     scim_global_config_flush ();
 
     _keyboard_layout = scim_get_default_keyboard_layout ();
+
+    // Re-apply the candidate appearance so a font/color change takes effect
+    // without restarting.
+    _candidates_ui.set_theme (scim_candidates_theme_from_config (config));
 }
 
 static void

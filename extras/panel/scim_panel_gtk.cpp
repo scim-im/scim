@@ -69,12 +69,6 @@
 
 using namespace scim;
 
-#ifndef SCIM_HAS_CANDIDATES  // lookup-window nav icons (panel-drawn candidates only)
-#include "icons/up.xpm"
-#include "icons/down.xpm"
-#include "icons/left.xpm"
-#include "icons/right.xpm"
-#endif
 #include "icons/setup.xpm"
 #include "icons/help.xpm"
 #include "icons/trademark.xpm"
@@ -122,9 +116,7 @@ using namespace scim;
 
 // Drag targets for the window-move gestures.
 enum {
-    DRAG_TARGET_INPUT = 0,
-    DRAG_TARGET_TOOLBAR,
-    DRAG_TARGET_LOOKUP
+    DRAG_TARGET_TOOLBAR = 0
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -175,9 +167,6 @@ static void       ui_initialize                        (void);
 // labels) that ui_apply_panel_style () styles with the configured font/colors.
 #define SCIM_PANEL_TEXT_CSS_CLASS "scim-panel-text"
 
-static void       ui_settle_input_window               (bool            relative = false,
-                                                        bool            force    = false);
-static void       ui_settle_lookup_table_window        (bool            force    = false);
 static void       ui_settle_toolbar_window             (bool            force    = false);
 
 static bool       ui_get_screen_rect                   (GdkRectangle &rect);
@@ -216,12 +205,6 @@ static GtkWidget* ui_create_trademark_icon             (void);
 static GtkWidget* ui_create_stick_icon                 (bool            sticked);
 static GtkWidget* ui_create_help_icon                  (void);
 static GtkWidget* ui_create_menu_icon                  (void);
-#ifndef SCIM_HAS_CANDIDATES  // lookup-window nav icons (panel-drawn candidates only)
-static GtkWidget* ui_create_up_icon                    (void);
-static GtkWidget* ui_create_down_icon                  (void);
-static GtkWidget* ui_create_left_icon                  (void);
-static GtkWidget* ui_create_right_icon                 (void);
-#endif
 
 // Popover-menu helpers (GTK4 has no GtkMenu).
 static GtkWidget* ui_menu_new                          (void);
@@ -243,9 +226,6 @@ static GtkWidget* ui_create_factory_menu_entry         (const PanelFactoryInfo &
                                                         bool                   show_name);
 
 // callback functions
-static void       ui_preedit_area_move_cursor_cb       (ScimStringView *view,
-                                                        guint           position);
-
 static void       ui_help_button_click_cb              (GtkButton      *button,
                                                         gpointer        user_data);
 static void       ui_menu_button_click_cb              (GtkButton      *button,
@@ -262,21 +242,6 @@ static void       ui_factory_menu_deactivate_cb        (GtkWidget      *item,
 static void       ui_submenu_button_cb                 (GtkButton      *button,
                                                         gpointer        user_data);
 
-#ifndef SCIM_HAS_CANDIDATES  // lookup-window callbacks (panel-drawn candidates only)
-static void       ui_lookup_table_vertical_pressed_cb  (GtkGestureClick *gesture,
-                                                        int             n_press,
-                                                        double          x,
-                                                        double          y,
-                                                        gpointer        user_data);
-
-static void       ui_lookup_table_horizontal_click_cb  (GtkWidget      *item,
-                                                        guint           position);
-
-static void       ui_lookup_table_up_button_click_cb   (GtkButton      *button,
-                                                        gpointer        user_data);
-static void       ui_lookup_table_down_button_click_cb (GtkButton      *button,
-                                                        gpointer        user_data);
-#endif
 
 static void       ui_window_stick_button_click_cb      (GtkButton      *button,
                                                         gpointer        user_data);
@@ -335,7 +300,6 @@ static void       ui_property_menu_deactivate_cb       (GtkWidget      *item,
 static gboolean   ui_help_close_request_cb             (GtkWindow      *window,
                                                         gpointer        user_data);
 
-static bool       ui_can_hide_input_window             (void);
 
 static bool       ui_any_menu_activated                (void);
 
@@ -366,20 +330,9 @@ static void       slot_reload_config                   (void);
 static void       slot_turn_on                         (void);
 static void       slot_turn_off                        (void);
 static void       slot_update_screen                   (int screen);
-static void       slot_update_spot_location            (int x, int y);
 static void       slot_update_factory_info             (const PanelFactoryInfo &info);
 static void       slot_show_help                       (const String &help);
 static void       slot_show_factory_menu               (const std::vector <PanelFactoryInfo> &menu);
-static void       slot_show_preedit_string             (void);
-static void       slot_show_aux_string                 (void);
-static void       slot_show_lookup_table               (void);
-static void       slot_hide_preedit_string             (void);
-static void       slot_hide_aux_string                 (void);
-static void       slot_hide_lookup_table               (void);
-static void       slot_update_preedit_string           (const String &str, const AttributeList &attrs);
-static void       slot_update_preedit_caret            (int caret);
-static void       slot_update_aux_string               (const String &str, const AttributeList &attrs);
-static void       slot_update_lookup_table             (const LookupTable &table);
 static void       slot_register_properties             (const PropertyList &props);
 static void       slot_update_property                 (const Property &prop);
 static void       slot_register_helper_properties      (int id, const PropertyList &props);
@@ -394,20 +347,9 @@ static void       do_slot_reload_config                (void);
 static void       do_slot_turn_on                      (void);
 static void       do_slot_turn_off                     (void);
 static void       do_slot_update_screen                (int screen);
-static void       do_slot_update_spot_location         (int x, int y);
 static void       do_slot_update_factory_info          (const PanelFactoryInfo &info);
 static void       do_slot_show_help                    (const String &help);
 static void       do_slot_show_factory_menu            (const std::vector <PanelFactoryInfo> &menu);
-static void       do_slot_show_preedit_string          (void);
-static void       do_slot_show_aux_string              (void);
-static void       do_slot_show_lookup_table            (void);
-static void       do_slot_hide_preedit_string          (void);
-static void       do_slot_hide_aux_string              (void);
-static void       do_slot_hide_lookup_table            (void);
-static void       do_slot_update_preedit_string        (const String &str, const AttributeList &attrs);
-static void       do_slot_update_preedit_caret         (int caret);
-static void       do_slot_update_aux_string            (const String &str, const AttributeList &attrs);
-static void       do_slot_update_lookup_table          (const LookupTablePayload &table);
 static void       do_slot_register_properties          (const PropertyList &props);
 static void       do_slot_update_property              (const Property &prop);
 static void       do_slot_register_helper_properties   (int id, const PropertyList &props);
@@ -445,14 +387,7 @@ static gboolean   check_exit_timeout_cb                (gpointer data);
 /////////////////////////////////////////////////////////////////////////////
 // Declaration of internal variables.
 /////////////////////////////////////////////////////////////////////////////
-static GtkWidget         *_input_window                = 0;
-static GtkWidget         *_preedit_area                = 0;
-static GtkWidget         *_aux_area                    = 0;
 
-static GtkWidget         *_lookup_table_window         = 0;
-static GtkWidget         *_lookup_table_up_button      = 0;
-static GtkWidget         *_lookup_table_down_button    = 0;
-static GtkWidget         *_lookup_table_items [SCIM_LOOKUP_TABLE_MAX_PAGESIZE];
 
 static GtkWidget         *_toolbar_window              = 0;
 static GtkWidget         *_toolbar_hbox                = 0;
@@ -472,23 +407,15 @@ static GtkWidget         *_command_menu                = 0;
 static PangoFontDescription *_default_font_desc        = 0;
 static GtkCssProvider       *_css_provider             = 0;
 
-static gboolean           _input_window_draging        = FALSE;
 
-static gint               _input_window_x              = 0;
-static gint               _input_window_y              = 0;
 
 static gboolean           _toolbar_window_draging      = FALSE;
 
-static gboolean           _lookup_table_window_draging = FALSE;
-static gint               _lookup_table_window_x       = 0;
-static gint               _lookup_table_window_y       = 0;
 
 // The logical position captured at drag-begin (offsets are added to it).
 static gint               _drag_start_x                = 0;
 static gint               _drag_start_y                = 0;
 
-static bool               _lookup_table_embedded       = true;
-static bool               _lookup_table_vertical       = false;
 static bool               _window_sticked              = false;
 
 static bool               _toolbar_always_show         = false;
@@ -507,8 +434,6 @@ static bool               _factory_menu_activated      = false;
 static bool               _command_menu_activated      = false;
 static bool               _property_menu_activated     = false;
 
-static int                _spot_location_x             = -1;
-static int                _spot_location_y             = -1;
 
 static int                _toolbar_window_x            = -1;
 static int                _toolbar_window_y            = -1;
@@ -518,7 +443,6 @@ static guint              _toolbar_hide_timeout        = 0;
 
 static bool               _ui_initialized              = false;
 
-static int                _lookup_table_index [SCIM_LOOKUP_TABLE_MAX_PAGESIZE+1];
 
 static GdkRGBA            _normal_bg;
 static GdkRGBA            _normal_text;
@@ -649,14 +573,6 @@ ui_load_config (void)
         _window_sticked  =
             _config->read (String (SCIM_CONFIG_PANEL_GTK_DEFAULT_STICKED),
                            _window_sticked);
-
-        _lookup_table_vertical =
-            _config->read (String (SCIM_CONFIG_PANEL_GTK_LOOKUP_TABLE_VERTICAL),
-                           _lookup_table_vertical);
-
-        _lookup_table_embedded =
-            _config->read (String (SCIM_CONFIG_PANEL_GTK_LOOKUP_TABLE_EMBEDDED),
-                           _lookup_table_embedded);
 
         _toolbar_always_show =
             _config->read (String (SCIM_CONFIG_PANEL_GTK_TOOLBAR_ALWAYS_SHOW),
@@ -799,224 +715,19 @@ ui_initialize (void)
 {
     SCIM_DEBUG_MAIN (1) << "Initialize UI...\n";
 
-#ifndef SCIM_HAS_CANDIDATES
-    GtkWidget *input_window_vbox;  // parent for the embedded lookup window
-#endif
 
     ui_load_config ();
     _toolbar_hidden = false;
 
-    if (_lookup_table_window && GTK_IS_WINDOW (_lookup_table_window))
-        gtk_window_destroy (GTK_WINDOW (_lookup_table_window));
-    if (_input_window) gtk_window_destroy (GTK_WINDOW (_input_window));
     if (_toolbar_window) gtk_window_destroy (GTK_WINDOW (_toolbar_window));
     if (_help_dialog) gtk_window_destroy (GTK_WINDOW (_help_dialog));
 
-    _lookup_table_window = 0;
-    _input_window = 0;
     _toolbar_window = 0;
     _toolbar_hbox = 0;
     _help_dialog = 0;
     _command_menu = 0;
     _factory_menu = 0;
     _frontend_properties_area = 0;
-
-    // Create input window
-    {
-        GtkWidget *vbox;
-        GtkWidget *hbox;
-        GtkWidget *frame;
-
-        _input_window = gtk_window_new ();
-        gtk_window_set_decorated (GTK_WINDOW (_input_window), FALSE);
-        gtk_window_set_resizable (GTK_WINDOW (_input_window), FALSE);
-
-        // Font/fg/bg come from the display CSS provider (ui_apply_panel_style);
-        // the text widgets below are tagged SCIM_PANEL_TEXT_CSS_CLASS.
-
-        frame = gtk_frame_new (0);
-        gtk_window_set_child (GTK_WINDOW (_input_window), frame);
-
-        hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-        gtk_frame_set_child (GTK_FRAME (frame), hbox);
-
-        vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-        gtk_widget_set_hexpand (vbox, TRUE);
-        gtk_box_append (GTK_BOX (hbox), vbox);
-#ifndef SCIM_HAS_CANDIDATES
-        input_window_vbox = vbox;
-#endif
-
-        //Create preedit area
-        _preedit_area = scim_string_view_new ();
-        gtk_widget_add_css_class (_preedit_area, SCIM_PANEL_TEXT_CSS_CLASS);
-        scim_string_view_set_width_chars (SCIM_STRING_VIEW (_preedit_area), 24);
-        scim_string_view_set_forward_event (SCIM_STRING_VIEW (_preedit_area), TRUE);
-        scim_string_view_set_auto_resize (SCIM_STRING_VIEW (_preedit_area), TRUE);
-        scim_string_view_set_has_frame (SCIM_STRING_VIEW (_preedit_area), FALSE);
-        g_signal_connect (G_OBJECT (_preedit_area), "move_cursor",
-                          G_CALLBACK (ui_preedit_area_move_cursor_cb),
-                          0);
-        gtk_widget_set_hexpand (_preedit_area, TRUE);
-        gtk_box_append (GTK_BOX (vbox), _preedit_area);
-
-        //Create aux area
-        _aux_area = scim_string_view_new ();
-        gtk_widget_add_css_class (_aux_area, SCIM_PANEL_TEXT_CSS_CLASS);
-        scim_string_view_set_width_chars (SCIM_STRING_VIEW (_aux_area), 24);
-        scim_string_view_set_draw_cursor (SCIM_STRING_VIEW (_aux_area), FALSE);
-        scim_string_view_set_forward_event (SCIM_STRING_VIEW (_aux_area), TRUE);
-        scim_string_view_set_auto_resize (SCIM_STRING_VIEW (_aux_area), TRUE);
-        scim_string_view_set_has_frame (SCIM_STRING_VIEW (_aux_area), FALSE);
-        gtk_widget_set_hexpand (_aux_area, TRUE);
-        gtk_box_append (GTK_BOX (vbox), _aux_area);
-
-        // dragging support
-        ui_toolbar_add_drag_controllers (_input_window, DRAG_TARGET_INPUT);
-
-        panel_window_move (_input_window, ui_screen_width (), ui_screen_height ());
-    }
-
-    //Create lookup table window
-    //
-    // Only when candidates are NOT drawn in-process by the transports. With the
-    // in-process Cairo renderer built (SCIM_HAS_CANDIDATES) no client forwards
-    // lookup-table updates to the panel, so the panel needs no lookup window and
-    // stays a status/property toolbar only.
-#ifndef SCIM_HAS_CANDIDATES
-    {
-        GtkWidget *vbox;
-        GtkWidget *hbox;
-        GtkWidget *frame;
-        GtkWidget *lookup_table_parent;
-        GtkWidget *image;
-        GtkWidget *separator;
-
-        if (_lookup_table_embedded) {
-            _lookup_table_window = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-            gtk_widget_set_hexpand (_lookup_table_window, TRUE);
-            gtk_box_append (GTK_BOX (input_window_vbox), _lookup_table_window);
-            lookup_table_parent = _lookup_table_window;
-            separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
-            gtk_box_append (GTK_BOX (lookup_table_parent), separator);
-        } else {
-            _lookup_table_window = gtk_window_new ();
-            gtk_window_set_decorated (GTK_WINDOW (_lookup_table_window), FALSE);
-            gtk_window_set_resizable (GTK_WINDOW (_lookup_table_window), FALSE);
-
-            ui_toolbar_add_drag_controllers (_lookup_table_window, DRAG_TARGET_LOOKUP);
-
-            frame = gtk_frame_new (0);
-            gtk_window_set_child (GTK_WINDOW (_lookup_table_window), frame);
-            lookup_table_parent = frame;
-        }
-
-        //Vertical lookup table
-        if (_lookup_table_vertical) {
-            vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
-            if (GTK_IS_FRAME (lookup_table_parent))
-                gtk_frame_set_child (GTK_FRAME (lookup_table_parent), vbox);
-            else
-                gtk_box_append (GTK_BOX (lookup_table_parent), vbox);
-
-            //New table items
-            for (int i=0; i<SCIM_LOOKUP_TABLE_MAX_PAGESIZE; ++i) {
-                _lookup_table_items [i] = scim_string_view_new ();
-                gtk_widget_add_css_class (_lookup_table_items [i], SCIM_PANEL_TEXT_CSS_CLASS);
-                scim_string_view_set_width_chars (SCIM_STRING_VIEW (_lookup_table_items [i]), 80);
-                scim_string_view_set_has_frame (SCIM_STRING_VIEW (_lookup_table_items [i]), FALSE);
-                scim_string_view_set_forward_event (SCIM_STRING_VIEW (_lookup_table_items [i]), TRUE);
-                scim_string_view_set_auto_resize (SCIM_STRING_VIEW (_lookup_table_items [i]), TRUE);
-                scim_string_view_set_draw_cursor (SCIM_STRING_VIEW (_lookup_table_items [i]), FALSE);
-                scim_string_view_set_auto_move_cursor (SCIM_STRING_VIEW (_lookup_table_items [i]), FALSE);
-
-                GtkGesture *click = gtk_gesture_click_new ();
-                gtk_gesture_single_set_button (GTK_GESTURE_SINGLE (click), 0);
-                g_signal_connect (click, "pressed",
-                                  G_CALLBACK (ui_lookup_table_vertical_pressed_cb),
-                                  GINT_TO_POINTER (i));
-                gtk_widget_add_controller (_lookup_table_items [i], GTK_EVENT_CONTROLLER (click));
-
-                gtk_widget_set_hexpand (_lookup_table_items [i], TRUE);
-                gtk_box_append (GTK_BOX (vbox), _lookup_table_items [i]);
-            }
-
-            separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
-            gtk_box_append (GTK_BOX (vbox), separator);
-
-            hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-            gtk_widget_set_hexpand (hbox, TRUE);
-            gtk_box_append (GTK_BOX (vbox), hbox);
-
-            //New up button (leftmost)
-            image = ui_create_up_icon ();
-            _lookup_table_up_button = gtk_button_new ();
-            gtk_button_set_child (GTK_BUTTON (_lookup_table_up_button), image);
-            gtk_widget_set_halign (_lookup_table_up_button, GTK_ALIGN_END);
-            gtk_box_append (GTK_BOX (hbox), _lookup_table_up_button);
-            g_signal_connect (G_OBJECT (_lookup_table_up_button), "clicked",
-                                G_CALLBACK (ui_lookup_table_up_button_click_cb),
-                                image);
-
-            //New down button
-            image = ui_create_down_icon ();
-            _lookup_table_down_button = gtk_button_new ();
-            gtk_button_set_child (GTK_BUTTON (_lookup_table_down_button), image);
-            gtk_widget_set_halign (_lookup_table_down_button, GTK_ALIGN_END);
-            gtk_box_append (GTK_BOX (hbox), _lookup_table_down_button);
-            g_signal_connect (G_OBJECT (_lookup_table_down_button), "clicked",
-                                G_CALLBACK (ui_lookup_table_down_button_click_cb),
-                                image);
-
-        } else {
-            hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-            if (GTK_IS_FRAME (lookup_table_parent))
-                gtk_frame_set_child (GTK_FRAME (lookup_table_parent), hbox);
-            else
-                gtk_box_append (GTK_BOX (lookup_table_parent), hbox);
-
-            _lookup_table_items [0] = scim_string_view_new ();
-            gtk_widget_add_css_class (_lookup_table_items [0], SCIM_PANEL_TEXT_CSS_CLASS);
-            scim_string_view_set_forward_event (SCIM_STRING_VIEW (_lookup_table_items [0]), TRUE);
-            scim_string_view_set_auto_resize (SCIM_STRING_VIEW (_lookup_table_items [0]), TRUE);
-            scim_string_view_set_has_frame (SCIM_STRING_VIEW (_lookup_table_items [0]), FALSE);
-            scim_string_view_set_draw_cursor (SCIM_STRING_VIEW (_lookup_table_items [0]), FALSE);
-            scim_string_view_set_auto_move_cursor (SCIM_STRING_VIEW (_lookup_table_items [0]), FALSE);
-            g_signal_connect (G_OBJECT (_lookup_table_items [0]), "move_cursor",
-                            G_CALLBACK (ui_lookup_table_horizontal_click_cb),
-                            0);
-            gtk_widget_set_hexpand (_lookup_table_items [0], TRUE);
-            gtk_box_append (GTK_BOX (hbox), _lookup_table_items [0]);
-
-            separator = gtk_separator_new (GTK_ORIENTATION_VERTICAL);
-            gtk_box_append (GTK_BOX (hbox), separator);
-
-            //New left button
-            image = ui_create_left_icon ();
-            _lookup_table_up_button = gtk_button_new ();
-            gtk_button_set_child (GTK_BUTTON (_lookup_table_up_button), image);
-            gtk_box_append (GTK_BOX (hbox), _lookup_table_up_button);
-            g_signal_connect (G_OBJECT (_lookup_table_up_button), "clicked",
-                                G_CALLBACK (ui_lookup_table_up_button_click_cb),
-                                image);
-
-            //New right button
-            image = ui_create_right_icon ();
-            _lookup_table_down_button = gtk_button_new ();
-            gtk_button_set_child (GTK_BUTTON (_lookup_table_down_button), image);
-            gtk_box_append (GTK_BOX (hbox), _lookup_table_down_button);
-            g_signal_connect (G_OBJECT (_lookup_table_down_button), "clicked",
-                                G_CALLBACK (ui_lookup_table_down_button_click_cb),
-                                image);
-        }
-
-        gtk_widget_add_css_class (_lookup_table_up_button, "flat");
-        gtk_widget_add_css_class (_lookup_table_down_button, "flat");
-
-        if (!_lookup_table_embedded)
-            panel_window_move (_lookup_table_window, ui_screen_width (), ui_screen_height ());
-    }
-#endif // !SCIM_HAS_CANDIDATES
 
     //Create toolbar window
     {
@@ -1136,22 +847,6 @@ ui_initialize (void)
 
     // TODO: reimplement the tray via a hand-rolled GDBus StatusNotifierItem (GTK4-safe; libayatana is gtk3-only).
 
-    //Settle input/lookup windows to default position
-    {
-        int spot_x, spot_y;
-
-        spot_x = ui_screen_width () / 2 - 64;
-        spot_y = ui_screen_height () * 3 / 4;
-        panel_window_move (_input_window, spot_x, spot_y);
-        _input_window_x = spot_x;
-        _input_window_y = spot_y;
-
-        if (_lookup_table_window && !_lookup_table_embedded) {
-            panel_window_move (_lookup_table_window, spot_x, spot_y + 32);
-            _lookup_table_window_x = spot_x;
-            _lookup_table_window_y = spot_y + 32;
-        }
-    }
 
     //Init timeout callback
     if (_toolbar_hide_timeout != 0) {
@@ -1190,93 +885,7 @@ ui_initialize (void)
     _ui_initialized = true;
 }
 
-static void
-ui_settle_input_window (bool relative, bool force)
-{
-    SCIM_DEBUG_MAIN (2) << " Settle input window...\n";
 
-    if (_window_sticked) {
-        if (force) {
-            panel_window_move (_input_window, _input_window_x, _input_window_y);
-        }
-        return;
-    }
-
-    GtkRequisition ws;
-    gint spot_x, spot_y;
-
-    gtk_widget_get_preferred_size (_input_window, &ws, NULL);
-
-    if (!relative) {
-        spot_x = _spot_location_x;
-        spot_y = _spot_location_y;
-    } else {
-        spot_x = _input_window_x;
-        spot_y = _input_window_y;
-    }
-
-    if (spot_x < 0) spot_x = 0;
-    if (spot_y < 0) spot_y = 0;
-
-    if (spot_x + ws.width > ui_screen_width () - 4)
-        spot_x = ui_screen_width () - ws.width - 4;
-    if (spot_y + ws.height + 8 > ui_screen_height () - 4)
-        spot_y = ui_screen_height () - ws.height - 4;
-
-    if (spot_x != _input_window_x || spot_y != _input_window_y || force) {
-        panel_window_move (_input_window, spot_x, spot_y);
-        _input_window_x = spot_x;
-        _input_window_y = spot_y;
-    }
-}
-
-static void
-ui_settle_lookup_table_window(bool force)
-{
-    SCIM_DEBUG_MAIN (2) << " Settle lookup table window...\n";
-
-    if (!_lookup_table_window)  // demoted: candidates drawn in-process
-        return;
-
-    if (_lookup_table_embedded)
-        return;
-
-    if (_window_sticked) {
-        if (force)
-            panel_window_move (_lookup_table_window, _lookup_table_window_x, _lookup_table_window_y);
-        return;
-    }
-
-    gint pos_x, pos_y;
-
-    GtkRequisition iws;
-    GtkRequisition ws;
-
-    gtk_widget_get_preferred_size (_input_window, &iws, NULL);
-    gtk_widget_get_preferred_size (_lookup_table_window, &ws, NULL);
-
-    pos_x = _input_window_x;
-    pos_y = _input_window_y + iws.height + 8;
-
-    if (pos_x + ws.width > ui_screen_width () - 8) {
-        pos_x = ui_screen_width () - ws.width - 8;
-    }
-
-    if (pos_y + ws.height > ui_screen_height () - 8) {
-        pos_y = ui_screen_height () - ws.height - 40;
-    }
-
-    // input window and lookup table window are overlapped.
-    if (pos_y < _input_window_y + iws.height && pos_y + ws.height > _input_window_y) {
-        pos_y = _input_window_y - ws.height - 8;
-    }
-
-    if (_lookup_table_window_x != pos_x || _lookup_table_window_y != pos_y || force) {
-        panel_window_move (_lookup_table_window, pos_x, pos_y);
-        _lookup_table_window_x = pos_x;
-        _lookup_table_window_y = pos_y;
-    }
-}
 
 static void
 ui_settle_toolbar_window (bool force)
@@ -1408,8 +1017,6 @@ ui_get_workarea (int &x, int &y, int &width, int &height)
 static void
 ui_switch_screen (void)
 {
-    ui_settle_input_window ();
-    ui_settle_lookup_table_window ();
     ui_settle_toolbar_window ();
 }
 
@@ -1563,43 +1170,6 @@ ui_create_menu_icon (void)
 
 // Lookup-table navigation icons -- only needed by the panel's own lookup
 // window, which is not built when candidates are drawn in-process.
-#ifndef SCIM_HAS_CANDIDATES
-static GtkWidget *
-ui_create_up_icon (void)
-{
-    return ui_create_icon (SCIM_UP_ICON_FILE,
-                           (const char **) up_xpm,
-                           LOOKUP_ICON_SIZE,
-                           LOOKUP_ICON_SIZE);
-}
-
-static GtkWidget *
-ui_create_left_icon (void)
-{
-    return ui_create_icon (SCIM_LEFT_ICON_FILE,
-                           (const char **) left_xpm,
-                           LOOKUP_ICON_SIZE,
-                           LOOKUP_ICON_SIZE);
-}
-
-static GtkWidget *
-ui_create_right_icon (void)
-{
-    return ui_create_icon (SCIM_RIGHT_ICON_FILE,
-                           (const char **) right_xpm,
-                           LOOKUP_ICON_SIZE,
-                           LOOKUP_ICON_SIZE);
-}
-
-static GtkWidget *
-ui_create_down_icon (void)
-{
-    return ui_create_icon (SCIM_DOWN_ICON_FILE,
-                           (const char **) down_xpm,
-                           LOOKUP_ICON_SIZE,
-                           LOOKUP_ICON_SIZE);
-}
-#endif // !SCIM_HAS_CANDIDATES
 
 /////////////////////////////////////////////////////////////////////////////
 // Popover-based menu helpers (replacing GtkMenu, removed in GTK4).
@@ -1735,15 +1305,6 @@ ui_create_factory_menu_entry (const PanelFactoryInfo &info,
 
 /* Implementation of callback functions */
 static void
-ui_preedit_area_move_cursor_cb (ScimStringView *view,
-                                guint           position)
-{
-    SCIM_DEBUG_MAIN (3) << "  ui_preedit_area_move_cursor_cb...\n";
-
-    _panel_agent->move_preedit_caret (position);
-}
-
-static void
 ui_help_button_click_cb (GtkButton *button,
                          gpointer   user_data)
 {
@@ -1833,54 +1394,6 @@ ui_submenu_button_cb (GtkButton *button,
 
 // Lookup-table click/paging callbacks -- wired only to the panel's own lookup
 // window, which is not built when candidates are drawn in-process.
-#ifndef SCIM_HAS_CANDIDATES
-static void
-ui_lookup_table_vertical_pressed_cb (GtkGestureClick *gesture,
-                                     int              n_press,
-                                     double           x,
-                                     double           y,
-                                     gpointer         user_data)
-{
-    SCIM_DEBUG_MAIN (3) << "  ui_lookup_table_vertical_pressed_cb...\n";
-
-    _panel_agent->select_candidate ((uint32)GPOINTER_TO_INT (user_data));
-}
-
-static void
-ui_lookup_table_horizontal_click_cb (GtkWidget *item,
-                                     guint      position)
-{
-    SCIM_DEBUG_MAIN (3) << "  ui_lookup_table_horizontal_click_cb...\n";
-
-    int *index = _lookup_table_index;
-    int pos = (int) position;
-
-    for (int i=0; i<SCIM_LOOKUP_TABLE_MAX_PAGESIZE && index [i] >= 0; ++i) {
-        if (pos >= index [i] && pos < index [i+1]) {
-            _panel_agent->select_candidate ((uint32) i);
-            return;
-        }
-    }
-}
-
-static void
-ui_lookup_table_up_button_click_cb (GtkButton *button,
-                                    gpointer user_data)
-{
-    SCIM_DEBUG_MAIN (3) << "  ui_lookup_table_up_button_click_cb...\n";
-
-    _panel_agent->lookup_table_page_up ();
-}
-
-static void
-ui_lookup_table_down_button_click_cb (GtkButton *button,
-                                      gpointer user_data)
-{
-    SCIM_DEBUG_MAIN (3) << "  ui_lookup_table_down_button_click_cb...\n";
-
-    _panel_agent->lookup_table_page_down ();
-}
-#endif // !SCIM_HAS_CANDIDATES
 
 static void
 ui_window_stick_button_click_cb (GtkButton *button,
@@ -1895,14 +1408,10 @@ ui_window_stick_button_click_cb (GtkButton *button,
 static void
 ui_drag_get_context (int target, GtkWidget **win, gint **px, gint **py)
 {
-    switch (target) {
-    case DRAG_TARGET_INPUT:
-        *win = _input_window;   *px = &_input_window_x;        *py = &_input_window_y;        break;
-    case DRAG_TARGET_TOOLBAR:
-        *win = _toolbar_window; *px = &_toolbar_window_x;      *py = &_toolbar_window_y;      break;
-    default:
-        *win = _lookup_table_window; *px = &_lookup_table_window_x; *py = &_lookup_table_window_y; break;
-    }
+    // The toolbar is the only window the panel owns now: preedit, aux and
+    // candidates are drawn in-process by the transports via libscim-candidates.
+    (void) target;
+    *win = _toolbar_window; *px = &_toolbar_window_x; *py = &_toolbar_window_y;
 }
 
 static void
@@ -1918,9 +1427,7 @@ ui_window_drag_begin_cb (GtkGestureDrag *gesture,
     _drag_start_x = *px;
     _drag_start_y = *py;
 
-    if (target == DRAG_TARGET_INPUT)        _input_window_draging = TRUE;
-    else if (target == DRAG_TARGET_TOOLBAR) _toolbar_window_draging = TRUE;
-    else                                    _lookup_table_window_draging = TRUE;
+    _toolbar_window_draging = TRUE;
 }
 
 static void
@@ -1956,22 +1463,16 @@ ui_window_drag_end_cb (GtkGestureDrag *gesture,
     *px = nx;
     *py = ny;
 
-    if (target == DRAG_TARGET_INPUT) {
-        _input_window_draging = FALSE;
-    } else if (target == DRAG_TARGET_TOOLBAR) {
-        _toolbar_window_draging = FALSE;
+    _toolbar_window_draging = FALSE;
 
-        int pos_x = nx, pos_y = ny;
-        if (!_config.null ()) {
-            if (_multi_monitors) {
-                pos_x = -1;
-                pos_y = -1;
-            }
-            _config->write (SCIM_CONFIG_PANEL_GTK_TOOLBAR_POS_X, pos_x);
-            _config->write (SCIM_CONFIG_PANEL_GTK_TOOLBAR_POS_Y, pos_y);
+    int pos_x = nx, pos_y = ny;
+    if (!_config.null ()) {
+        if (_multi_monitors) {
+            pos_x = -1;
+            pos_y = -1;
         }
-    } else {
-        _lookup_table_window_draging = FALSE;
+        _config->write (SCIM_CONFIG_PANEL_GTK_TOOLBAR_POS_X, pos_x);
+        _config->write (SCIM_CONFIG_PANEL_GTK_TOOLBAR_POS_Y, pos_y);
     }
 }
 
@@ -2084,18 +1585,6 @@ ui_hide_window_timeout_cb (gpointer data)
     return TRUE;
 }
 
-static bool
-ui_can_hide_input_window (void)
-{
-    if (!_panel_is_on) return true;
-
-    if (gtk_widget_get_visible (_preedit_area) ||
-        gtk_widget_get_visible (_aux_area) ||
-        (_lookup_table_window && _lookup_table_embedded &&
-         gtk_widget_get_visible (_lookup_table_window)))
-        return false;
-    return true;
-}
 
 static bool
 ui_any_menu_activated (void)
@@ -2439,20 +1928,9 @@ initialize_panel_agent (const String &config, const String &display, bool reside
     _panel_agent->signal_connect_turn_on                    (slot (slot_turn_on));
     _panel_agent->signal_connect_turn_off                   (slot (slot_turn_off));
     _panel_agent->signal_connect_update_screen              (slot (slot_update_screen));
-    _panel_agent->signal_connect_update_spot_location       (slot (slot_update_spot_location));
     _panel_agent->signal_connect_update_factory_info        (slot (slot_update_factory_info));
     _panel_agent->signal_connect_show_help                  (slot (slot_show_help));
     _panel_agent->signal_connect_show_factory_menu          (slot (slot_show_factory_menu));
-    _panel_agent->signal_connect_show_preedit_string        (slot (slot_show_preedit_string));
-    _panel_agent->signal_connect_show_aux_string            (slot (slot_show_aux_string));
-    _panel_agent->signal_connect_show_lookup_table          (slot (slot_show_lookup_table));
-    _panel_agent->signal_connect_hide_preedit_string        (slot (slot_hide_preedit_string));
-    _panel_agent->signal_connect_hide_aux_string            (slot (slot_hide_aux_string));
-    _panel_agent->signal_connect_hide_lookup_table          (slot (slot_hide_lookup_table));
-    _panel_agent->signal_connect_update_preedit_string      (slot (slot_update_preedit_string));
-    _panel_agent->signal_connect_update_preedit_caret       (slot (slot_update_preedit_caret));
-    _panel_agent->signal_connect_update_aux_string          (slot (slot_update_aux_string));
-    _panel_agent->signal_connect_update_lookup_table        (slot (slot_update_lookup_table));
     _panel_agent->signal_connect_register_properties        (slot (slot_register_properties));
     _panel_agent->signal_connect_update_property            (slot (slot_update_property));
     _panel_agent->signal_connect_register_helper_properties (slot (slot_register_helper_properties));
@@ -2548,11 +2026,6 @@ slot_update_screen (int num)
     marshal_to_main ([num]{ do_slot_update_screen (num); });
 }
 
-static void
-slot_update_spot_location (int x, int y)
-{
-    marshal_to_main ([x, y]{ do_slot_update_spot_location (x, y); });
-}
 
 static void
 slot_update_factory_info (const PanelFactoryInfo &info)
@@ -2575,87 +2048,15 @@ slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
     marshal_to_main ([copy]{ do_slot_show_factory_menu (copy); });
 }
 
-static void
-slot_show_preedit_string (void)
-{
-    marshal_to_main ([]{ do_slot_show_preedit_string (); });
-}
 
-static void
-slot_show_aux_string (void)
-{
-    marshal_to_main ([]{ do_slot_show_aux_string (); });
-}
 
-static void
-slot_show_lookup_table (void)
-{
-    marshal_to_main ([]{ do_slot_show_lookup_table (); });
-}
 
-static void
-slot_hide_preedit_string (void)
-{
-    marshal_to_main ([]{ do_slot_hide_preedit_string (); });
-}
 
-static void
-slot_hide_aux_string (void)
-{
-    marshal_to_main ([]{ do_slot_hide_aux_string (); });
-}
 
-static void
-slot_hide_lookup_table (void)
-{
-    marshal_to_main ([]{ do_slot_hide_lookup_table (); });
-}
 
-static void
-slot_update_preedit_string (const String &str, const AttributeList &attrs)
-{
-    String s = str;
-    AttributeList a = attrs;
-    marshal_to_main ([s, a]{ do_slot_update_preedit_string (s, a); });
-}
 
-static void
-slot_update_preedit_caret (int caret)
-{
-    marshal_to_main ([caret]{ do_slot_update_preedit_caret (caret); });
-}
 
-static void
-slot_update_aux_string (const String &str, const AttributeList &attrs)
-{
-    String s = str;
-    AttributeList a = attrs;
-    marshal_to_main ([s, a]{ do_slot_update_aux_string (s, a); });
-}
 
-static void
-slot_update_lookup_table (const LookupTable &table)
-{
-    // LookupTable is non-copyable; snapshot the current page here (agent
-    // thread) and marshal the plain data to the main thread.
-    auto p = std::make_shared<LookupTablePayload> ();
-
-    size_t n = table.get_current_page_size ();
-    p->page_size       = n;
-    p->cursor_pos      = table.get_cursor_pos_in_current_page ();
-    p->cursor_visible  = table.is_cursor_visible ();
-    p->page_start      = table.get_current_page_start ();
-    p->num_candidates  = table.number_of_candidates ();
-    p->page_size_fixed = table.is_page_size_fixed ();
-
-    for (size_t i = 0; i < n; ++i) {
-        p->candidates.push_back (table.get_candidate_in_current_page (i));
-        p->labels.push_back (table.get_candidate_label (i));
-        p->attrs.push_back (table.get_attributes_in_current_page (i));
-    }
-
-    marshal_to_main ([p]{ do_slot_update_lookup_table (*p); });
-}
 
 static void
 slot_register_properties (const PropertyList &props)
@@ -2724,12 +2125,6 @@ do_slot_turn_on (void)
     _toolbar_hidden = false;
     _panel_is_on = true;
 
-    if (_lookup_table_window)
-        gtk_widget_hide (_lookup_table_window);
-    gtk_widget_hide (_input_window);
-    gtk_widget_hide (_preedit_area);
-    gtk_widget_hide (_aux_area);
-
     if (_toolbar_always_hidden)
         return;
 
@@ -2763,13 +2158,6 @@ do_slot_turn_off (void)
     if (ui_any_menu_activated ()) return;
 
     _panel_is_on = false;
-
-    gtk_widget_hide (_input_window);
-    if (_lookup_table_window)
-        gtk_widget_hide (_lookup_table_window);
-
-    gtk_widget_hide (_preedit_area);
-    gtk_widget_hide (_aux_area);
 
     if (_frontend_properties_area)
         gtk_widget_hide (_frontend_properties_area);
@@ -2953,279 +2341,16 @@ do_slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
     }
 }
 
-static void
-do_slot_update_spot_location (int x, int y)
-{
-    if (x > 0 && x < ui_screen_width () && y > 0 && y < ui_screen_height ()) {
-        _spot_location_x = x;
-        _spot_location_y = y;
 
-        ui_settle_input_window ();
-        ui_settle_lookup_table_window ();
-    }
-}
 
-static void
-do_slot_show_preedit_string (void)
-{
-    gtk_widget_show (_preedit_area);
 
-    if (_panel_is_on && !gtk_widget_get_visible (_input_window))
-        gtk_widget_show (_input_window);
 
-    ui_settle_input_window (true, true);
-    ui_settle_lookup_table_window ();
-}
 
-static void
-do_slot_show_aux_string (void)
-{
-    gtk_widget_show (_aux_area);
 
-    if (_panel_is_on && !gtk_widget_get_visible (_input_window))
-        gtk_widget_show (_input_window);
 
-    ui_settle_input_window (true, true);
-    ui_settle_lookup_table_window ();
-}
 
-static void
-do_slot_show_lookup_table (void)
-{
-    if (!_lookup_table_window)  // demoted: candidates drawn in-process
-        return;
 
-    gtk_widget_show (_lookup_table_window);
 
-    if (_panel_is_on && _lookup_table_embedded && !gtk_widget_get_visible (_input_window)) {
-        gtk_widget_show (_input_window);
-        ui_settle_input_window (true, true);
-    }
-
-    ui_settle_lookup_table_window (true);
-}
-
-static void
-do_slot_hide_preedit_string (void)
-{
-    gtk_widget_hide (_preedit_area);
-    scim_string_view_set_text (SCIM_STRING_VIEW (_preedit_area), "");
-
-    if (ui_can_hide_input_window ())
-        gtk_widget_hide (_input_window);
-
-    ui_settle_lookup_table_window ();
-}
-
-static void
-do_slot_hide_aux_string (void)
-{
-    gtk_widget_hide (_aux_area);
-    scim_string_view_set_text (SCIM_STRING_VIEW (_aux_area), "");
-
-    if (ui_can_hide_input_window ())
-        gtk_widget_hide (_input_window);
-
-    ui_settle_lookup_table_window ();
-}
-
-static void
-do_slot_hide_lookup_table (void)
-{
-    if (!_lookup_table_window)  // demoted: candidates drawn in-process
-        return;
-
-    gtk_widget_hide (_lookup_table_window);
-
-    if (_lookup_table_embedded && ui_can_hide_input_window ())
-        gtk_widget_hide (_input_window);
-}
-
-static void
-do_slot_update_preedit_string (const String &str, const AttributeList &attrs)
-{
-    PangoAttrList  *attrlist = create_pango_attrlist (str, attrs);
-
-    scim_string_view_set_attributes (SCIM_STRING_VIEW (_preedit_area), attrlist);
-    scim_string_view_set_text (SCIM_STRING_VIEW (_preedit_area), str.c_str ());
-
-    pango_attr_list_unref (attrlist);
-
-    ui_settle_input_window (true);
-
-    ui_settle_lookup_table_window ();
-}
-
-static void
-do_slot_update_preedit_caret (int caret)
-{
-    scim_string_view_set_position (SCIM_STRING_VIEW (_preedit_area), caret);
-}
-
-static void
-do_slot_update_aux_string (const String &str, const AttributeList &attrs)
-{
-    PangoAttrList  *attrlist = create_pango_attrlist (str, attrs);
-
-    scim_string_view_set_attributes (SCIM_STRING_VIEW (_aux_area), attrlist);
-    scim_string_view_set_text (SCIM_STRING_VIEW (_aux_area), str.c_str ());
-
-    pango_attr_list_unref (attrlist);
-
-    ui_settle_input_window (true);
-
-    ui_settle_lookup_table_window ();
-}
-
-static void
-do_slot_update_lookup_table (const LookupTablePayload &table)
-{
-    if (!_lookup_table_window)  // demoted: candidates drawn in-process
-        return;
-
-    size_t i;
-    size_t item_num = table.page_size;
-
-    String         mbs;
-    WideString     wcs;
-    WideString     label;
-    GtkRequisition size;
-    AttributeList  attrs;
-    PangoAttrList  *attrlist;
-
-    if (_lookup_table_vertical) {
-        for (i = 0; i < SCIM_LOOKUP_TABLE_MAX_PAGESIZE; ++ i) {
-            if (i < item_num) {
-                mbs = String ();
-
-                wcs = table.candidates [i];
-
-                label = table.labels [i];
-
-                if (label.length ()) {
-                    label += utf8_mbstowcs (". ");
-                } else {
-                    label = utf8_mbstowcs (" ");
-                }
-
-                mbs = utf8_wcstombs (label+wcs);
-
-                scim_string_view_set_text (SCIM_STRING_VIEW (_lookup_table_items [i]),
-                                           mbs.c_str ());
-
-                // Update attributes;
-                attrs = table.attrs [i];
-
-                if (attrs.size ()) {
-                    for (AttributeList::iterator ait = attrs.begin (); ait != attrs.end (); ++ait)
-                        ait->set_start (ait->get_start () + label.length ());
-
-                    attrlist = create_pango_attrlist (mbs, attrs);
-                    scim_string_view_set_attributes (SCIM_STRING_VIEW (_lookup_table_items [i]), attrlist);
-                    pango_attr_list_unref (attrlist);
-                } else {
-                    scim_string_view_set_attributes (SCIM_STRING_VIEW (_lookup_table_items [i]), 0);
-                }
-
-                if (i == table.cursor_pos && table.cursor_visible)
-                    scim_string_view_set_highlight (SCIM_STRING_VIEW (_lookup_table_items [i]),
-                                                    0, wcs.length () + 3);
-                else
-                    scim_string_view_set_highlight (SCIM_STRING_VIEW (_lookup_table_items [i]),
-                                                    -1, -1);
-
-                gtk_widget_show (_lookup_table_items [i]);
-            } else {
-                gtk_widget_hide (_lookup_table_items [i]);
-            }
-        }
-    } else {
-        _lookup_table_index [0] = 0;
-        for (i=0; i<SCIM_LOOKUP_TABLE_MAX_PAGESIZE; ++i) {
-            if (i<item_num) {
-                // Update attributes
-                AttributeList item_attrs = table.attrs [i];
-                size_t attr_start, attr_end;
-
-                label = table.labels [i];
-
-                if (label.length ()) {
-                    label += utf8_mbstowcs (".");
-                }
-
-                wcs += label;
-
-                attr_start = wcs.length ();
-
-                wcs += table.candidates [i];
-
-                attr_end = wcs.length ();
-
-                wcs.push_back (0x20);
-
-                _lookup_table_index [i+1] = wcs.length ();
-
-                mbs = utf8_wcstombs (wcs);
-
-                scim_string_view_set_text (SCIM_STRING_VIEW (_lookup_table_items [0]),
-                                           mbs.c_str ());
-
-                gtk_widget_get_preferred_size (_lookup_table_window, &size, NULL);
-
-                if (size.width >= ui_screen_width () / 3 && !table.page_size_fixed) {
-                    item_num = i+1;
-                }
-
-                if (item_attrs.size ()) {
-                    for (AttributeList::iterator ait = item_attrs.begin (); ait != item_attrs.end (); ++ait) {
-                        ait->set_start (ait->get_start () + attr_start);
-                        if (ait->get_end () + attr_start > attr_end)
-                            ait->set_length (attr_end - ait->get_start ());
-                    }
-
-                    attrs.insert (attrs.end (), item_attrs.begin (), item_attrs.end ());
-                }
-
-            } else {
-                _lookup_table_index [i+1] = -1;
-            }
-        }
-
-        if (attrs.size ()) {
-            attrlist = create_pango_attrlist (mbs, attrs);
-            scim_string_view_set_attributes (SCIM_STRING_VIEW (_lookup_table_items [0]), attrlist);
-            pango_attr_list_unref (attrlist);
-        } else {
-            scim_string_view_set_attributes (SCIM_STRING_VIEW (_lookup_table_items [0]), 0);
-        }
-
-        if (table.cursor_visible) {
-            int start = _lookup_table_index [table.cursor_pos];
-            int end = _lookup_table_index [table.cursor_pos+1] - 1;
-            scim_string_view_set_highlight (SCIM_STRING_VIEW (_lookup_table_items [0]), start, end);
-        } else {
-            scim_string_view_set_highlight (SCIM_STRING_VIEW (_lookup_table_items [0]), -1, -1);
-        }
-    }
-
-    if (table.page_start)
-        gtk_widget_set_sensitive (_lookup_table_up_button, TRUE);
-    else
-        gtk_widget_set_sensitive (_lookup_table_up_button, FALSE);
-
-    if (table.page_start + item_num < table.num_candidates)
-        gtk_widget_set_sensitive (_lookup_table_down_button, TRUE);
-    else
-        gtk_widget_set_sensitive (_lookup_table_down_button, FALSE);
-
-    if (item_num < table.page_size)
-        _panel_agent->update_lookup_table_page_size (item_num);
-
-    if (_lookup_table_embedded)
-        ui_settle_input_window (true);
-    else
-        ui_settle_lookup_table_window ();
-}
 
 static void
 do_slot_register_properties (const PropertyList &props)
@@ -3659,7 +2784,6 @@ int main (int argc, char *argv [])
             String ("--help") == argv [i]) {
             std::cout << "Usage: " << argv [0] << " [option]...\n\n"
                  << "The options are: \n"
-                 << "  --display DISPLAY    Run on display DISPLAY.\n"
                  << "  -l, --list           List all of available config modules.\n"
                  << "  -c, --config NAME    Uses specified Config module.\n"
                  << "  -d, --daemon         Run " << argv [0] << " as a daemon.\n"
@@ -3704,27 +2828,12 @@ int main (int argc, char *argv [])
             continue;
         }
 
-        if (String ("--display") == argv [i]) {
-            if (++i >= argc) {
-                std::cerr << "No argument for option " << argv [i-1] << "\n";
-                return -1;
-            }
-            display_name = argv [i];
-            continue;
-        }
-
         if (String ("--") == argv [i])
             break;
 
         std::cerr << "Invalid command line option: " << argv [i] << "\n";
         return -1;
     } //End of command line parsing.
-
-    // Make up DISPLAY env; GTK4's gtk_init() takes no arguments and reads
-    // the environment.
-    if (display_name.length ()) {
-        setenv ("DISPLAY", display_name.c_str (), 1);
-    }
 
     if (!config_name.length ()) {
         std::cerr << "No Config module is available!\n";
@@ -3761,7 +2870,8 @@ int main (int argc, char *argv [])
 
     ui_initialize ();
 
-    // get current display.
+    // Our own display, used only to launch helper GUIs on the same screen.
+    // The panel socket address no longer depends on it.
     {
         const char *p = gdk_display_get_name (gdk_display_get_default ());
         if (p) display_name = String (p);

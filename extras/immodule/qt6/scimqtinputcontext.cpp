@@ -147,7 +147,21 @@ static void     panel_req_show_help            (ScimQtInputContext *ic);
 static void     panel_req_show_factory_menu    (ScimQtInputContext *ic);
 static void     panel_req_update_factory_info  (ScimQtInputContext *ic);
 static void     panel_req_focus_in             (ScimQtInputContext *ic);
-static void     panel_req_update_spot_location (ScimQtInputContext *ic);
+
+#ifdef SCIM_HAS_CANDIDATES
+// Defined further down; needed by the focus/turn-on reset above it.
+static void     candidates_hide            ();
+// Renderer-side preedit/aux, used when the client cannot draw preedit inline
+// (and always for aux, which has no client-side path). Defined further down,
+// where ScimCandidatesWindow is a complete type.
+static void candidates_preedit_show   (ScimQtInputContext *ic);
+static void candidates_preedit_hide   ();
+static void candidates_preedit_update (const WideString &str, const AttributeList &attrs);
+static void candidates_preedit_caret  (int caret);
+static void candidates_aux_show       (ScimQtInputContext *ic);
+static void candidates_aux_hide       ();
+static void candidates_aux_update     (const WideString &str, const AttributeList &attrs);
+#endif
 
 static KeyEvent keyevent_qt_to_scim         (const QKeyEvent *qe);
 static void     update_preedit_in_client    (ScimQtInputContext *ic);
@@ -179,16 +193,6 @@ static void panel_slot_reload_config (int /* context */)
 static void panel_slot_exit (int /* context */)
 {
     finalize ();
-}
-
-static void panel_slot_update_lookup_table_page_size (int context, int page_size)
-{
-    ScimQtInputContext *ic = find_ic (context);
-    if (ic && ic->impl && !ic->impl->si.null ()) {
-        _panel_client.prepare (ic->impl->id);
-        ic->impl->si->update_lookup_table_page_size (page_size);
-        _panel_client.send ();
-    }
 }
 
 static void panel_slot_lookup_table_page_up (int context)
@@ -386,11 +390,6 @@ static void panel_req_focus_in (ScimQtInputContext *ic)
         _panel_client.focus_in (ic->impl->id, ic->impl->si->get_factory_uuid ());
 }
 
-static void panel_req_update_spot_location (ScimQtInputContext *ic)
-{
-    if (ic && ic->impl)
-        _panel_client.update_spot_location (ic->impl->id, ic->impl->cursor_x, ic->impl->cursor_y);
-}
 
 /* -------------------------------------------------------------------------- */
 /* Hotkeys and IC on/off.                                                     */
@@ -438,12 +437,14 @@ static void turn_on_ic (ScimQtInputContext *ic)
         if (ic == _focused_ic) {
             panel_req_focus_in (ic);
             panel_req_update_screen (ic);
-            panel_req_update_spot_location (ic);
             panel_req_update_factory_info (ic);
             _panel_client.turn_on (ic->impl->id);
-            _panel_client.hide_preedit_string (ic->impl->id);
-            _panel_client.hide_aux_string (ic->impl->id);
-            _panel_client.hide_lookup_table (ic->impl->id);
+#ifdef SCIM_HAS_CANDIDATES
+            // This context just became active. The in-process renderer is shared by
+            // every context in this process, so clear anything the previously focused
+            // one left on screen before we start drawing.
+            candidates_hide ();
+#endif
             ic->impl->si->focus_in ();
         }
 
@@ -492,14 +493,16 @@ static void do_focus_in (ScimQtInputContext *ic)
 
     panel_req_focus_in (ic);
     panel_req_update_screen (ic);
-    panel_req_update_spot_location (ic);
     panel_req_update_factory_info (ic);
 
     if (ic->impl->is_on && !ic->impl->si.null ()) {
         _panel_client.turn_on (ic->impl->id);
-        _panel_client.hide_preedit_string (ic->impl->id);
-        _panel_client.hide_aux_string (ic->impl->id);
-        _panel_client.hide_lookup_table (ic->impl->id);
+#ifdef SCIM_HAS_CANDIDATES
+        // This context just became active. The in-process renderer is shared by
+        // every context in this process, so clear anything the previously focused
+        // one left on screen before we start drawing.
+        candidates_hide ();
+#endif
         ic->impl->si->focus_in ();
     } else {
         _panel_client.turn_off (ic->impl->id);
@@ -634,19 +637,29 @@ static void slot_show_preedit_string (IMEngineInstanceBase *si)
         if (ic->impl->use_preedit) {
             ic->impl->preedit_started = true;
             update_preedit_in_client (ic);
-        } else {
-            _panel_client.show_preedit_string (ic->impl->id);
         }
+#ifdef SCIM_HAS_CANDIDATES
+        else {
+            // The client cannot draw preedit inline, so the in-process
+            // renderer does it (matching the x11 frontend).
+            candidates_preedit_show (ic);
+        }
+#endif
     }
 }
 
 static void slot_show_aux_string (IMEngineInstanceBase *si)
 {
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
-    if (ic && ic->impl && _focused_ic == ic)
-        _panel_client.show_aux_string (ic->impl->id);
-}
 
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        // There is no client-side path for the aux string; the renderer is the
+        // only place it can appear.
+        candidates_aux_show (ic);
+#endif
+    }
+}
 #ifdef SCIM_HAS_CANDIDATES
 static void candidates_route_click (CandidatesUI::HitType hit, int idx);
 
@@ -747,6 +760,57 @@ static void candidates_update (const LookupTable &table)
     _candidates_window->refresh ();
 }
 
+static void candidates_preedit_show (ScimQtInputContext *ic)
+{
+    candidates_ensure ();
+    _candidates_window->ui.show_preedit_string ();
+    _candidates_window->refresh ();
+    candidates_show (ic);
+}
+
+static void candidates_preedit_hide ()
+{
+    candidates_ensure ();
+    _candidates_window->ui.hide_preedit_string ();
+    _candidates_window->refresh ();
+}
+
+static void candidates_preedit_update (const WideString &str, const AttributeList &attrs)
+{
+    candidates_ensure ();
+    _candidates_window->ui.update_preedit_string (str, attrs);
+    _candidates_window->refresh ();
+}
+
+static void candidates_preedit_caret (int caret)
+{
+    candidates_ensure ();
+    _candidates_window->ui.update_preedit_caret (caret);
+    _candidates_window->refresh ();
+}
+
+static void candidates_aux_show (ScimQtInputContext *ic)
+{
+    candidates_ensure ();
+    _candidates_window->ui.show_aux_string ();
+    _candidates_window->refresh ();
+    candidates_show (ic);
+}
+
+static void candidates_aux_hide ()
+{
+    candidates_ensure ();
+    _candidates_window->ui.hide_aux_string ();
+    _candidates_window->refresh ();
+}
+
+static void candidates_aux_update (const WideString &str, const AttributeList &attrs)
+{
+    candidates_ensure ();
+    _candidates_window->ui.update_aux_string (str, attrs);
+    _candidates_window->refresh ();
+}
+
 static void candidates_finalize ()
 {
     if (_candidates_window) {
@@ -762,8 +826,6 @@ static void slot_show_lookup_table (IMEngineInstanceBase *si)
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
         candidates_show (ic);
-#else
-        _panel_client.show_lookup_table (ic->impl->id);
 #endif
     }
 }
@@ -776,26 +838,30 @@ static void slot_hide_preedit_string (IMEngineInstanceBase *si)
         ic->impl->preedit_caret  = 0;
         if (ic->impl->use_preedit)
             hide_preedit_in_client (ic);
-        else
-            _panel_client.hide_preedit_string (ic->impl->id);
+#ifdef SCIM_HAS_CANDIDATES
+        else {
+            candidates_preedit_hide ();
+        }
+#endif
     }
 }
 
 static void slot_hide_aux_string (IMEngineInstanceBase *si)
 {
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
-    if (ic && ic->impl && _focused_ic == ic)
-        _panel_client.hide_aux_string (ic->impl->id);
-}
 
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        candidates_aux_hide ();
+#endif
+    }
+}
 static void slot_hide_lookup_table (IMEngineInstanceBase *si)
 {
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
         candidates_hide ();
-#else
-        _panel_client.hide_lookup_table (ic->impl->id);
 #endif
     }
 }
@@ -807,8 +873,11 @@ static void slot_update_preedit_caret (IMEngineInstanceBase *si, int caret)
         ic->impl->preedit_caret = caret;
         if (ic->impl->use_preedit)
             update_preedit_in_client (ic);
-        else
-            _panel_client.update_preedit_caret (ic->impl->id, caret);
+#ifdef SCIM_HAS_CANDIDATES
+        else {
+            candidates_preedit_caret (caret);
+        }
+#endif
     }
 }
 
@@ -823,9 +892,11 @@ static void slot_update_preedit_string (IMEngineInstanceBase *si,
             ic->impl->preedit_started = true;
             ic->impl->preedit_caret   = (int) str.length ();
             update_preedit_in_client (ic);
-        } else {
-            _panel_client.update_preedit_string (ic->impl->id, str, attrs);
         }
+#ifdef SCIM_HAS_CANDIDATES
+        else
+            candidates_preedit_update (str, attrs);
+#endif
     }
 }
 
@@ -833,10 +904,13 @@ static void slot_update_aux_string (IMEngineInstanceBase *si,
                                     const WideString &str, const AttributeList &attrs)
 {
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
-    if (ic && ic->impl && _focused_ic == ic)
-        _panel_client.update_aux_string (ic->impl->id, str, attrs);
-}
 
+    if (ic && ic->impl && _focused_ic == ic) {
+#ifdef SCIM_HAS_CANDIDATES
+        candidates_aux_update (str, attrs);
+#endif
+    }
+}
 static void slot_commit_string (IMEngineInstanceBase *si, const WideString &str)
 {
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
@@ -863,8 +937,6 @@ static void slot_update_lookup_table (IMEngineInstanceBase *si, const LookupTabl
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
         candidates_update (table);
-#else
-        _panel_client.update_lookup_table (ic->impl->id, table);
 #endif
     }
 }
@@ -1030,6 +1102,11 @@ static void reload_config_callback (const ConfigPointer &config)
 
     scim_global_config_flush ();
     _keyboard_layout = scim_get_default_keyboard_layout ();
+
+    // Re-apply the candidate appearance so a font/color change takes effect
+    // without restarting.
+    if (_candidates_window)
+        _candidates_window->ui.set_theme (scim_candidates_theme_from_config (config));
 }
 
 static void fallback_commit_string_cb (IMEngineInstanceBase * /* si */, const WideString &str)
@@ -1049,7 +1126,7 @@ static bool panel_initialize (void)
     const char *p = getenv ("DISPLAY");
     if (p) display_name = String (p);
 
-    if (_panel_client.open_connection (_config->get_name (), display_name) >= 0) {
+    if (_panel_client.open_connection (_config->get_name ()) >= 0) {
         int fd = _panel_client.get_connection_number ();
 
         _panel_notifier = new QSocketNotifier (fd, QSocketNotifier::Read);
@@ -1191,7 +1268,6 @@ static void initialize (void)
 
     _panel_client.signal_connect_reload_config                 (slot (panel_slot_reload_config));
     _panel_client.signal_connect_exit                          (slot (panel_slot_exit));
-    _panel_client.signal_connect_update_lookup_table_page_size (slot (panel_slot_update_lookup_table_page_size));
     _panel_client.signal_connect_lookup_table_page_up          (slot (panel_slot_lookup_table_page_up));
     _panel_client.signal_connect_lookup_table_page_down        (slot (panel_slot_lookup_table_page_down));
     _panel_client.signal_connect_trigger_property              (slot (panel_slot_trigger_property));
@@ -1347,7 +1423,6 @@ void ScimQtInputContext::update (Qt::InputMethodQueries queries)
         // Window-local coords; candidates_show maps them per platform (absolute
         // on X11, parent-relative for the Wayland xdg_popup).
         _panel_client.prepare (impl->id);
-        panel_req_update_spot_location (this);
         _panel_client.send ();
     }
 }
