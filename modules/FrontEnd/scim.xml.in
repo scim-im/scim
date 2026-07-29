@@ -17,18 +17,24 @@
      so only system engines appear here.
 
      User-level engines: engines that live only in a user's home (e.g. a
-     scim-tables table under ~/.scim/user-tables, or a licensed engine that
+     scim-tables table under the user's data dir, or a licensed engine that
      cannot be installed system-wide) are not visible to the system generator.
      A user who has such engines runs the SAME command as themselves:
 
          scim -f ibus -- --xml > ~/.local/share/ibus/component/scim.xml
 
-     and exports IBUS_COMPONENT_PATH to that directory BEFORE ibus-daemon
-     starts (login shell or systemd user environment; ibus scans component
-     dirs once at startup). Run as the user, the generator enumerates that
-     user's full enabled set -- system engines PLUS the user's own -- so the
-     personal file substitutes for this system one for that session; it is not
-     meant to be merged with it. -->
+     and adds that directory to IBUS_COMPONENT_PATH BEFORE ibus-daemon starts
+     (login shell or systemd user environment; ibus scans component dirs once
+     at startup). IBUS_COMPONENT_PATH REPLACES ibus-daemon's default search
+     path, and no per-user dir is scanned by default, so the system component
+     directory must be listed too, e.g.
+
+         export IBUS_COMPONENT_PATH="$HOME/.local/share/ibus/component:\
+             $(pkg-config --variable=pkgdatadir ibus-1.0)/component"
+
+     ibus-daemon UNIONs the engines from every manifest it scans (duplicate
+     engine names: first loaded wins), so the personal file coexists with this
+     system one -- the user's home-only engines simply add to the system set. -->
 
 <component>
     <name>org.freedesktop.IBus.SCIM</name>

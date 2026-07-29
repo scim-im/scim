@@ -147,29 +147,33 @@ For users -- exposing a user-level engine
 An engine that lives only in your home directory -- e.g. a scim-tables table
 you installed for your user, or a licensed engine that cannot be installed
 system-wide -- is invisible to the system generator.  To use it under IBus,
-generate your own manifest and point ibus-daemon at it:
+generate your own manifest and add its directory to ibus-daemon's search path:
 
   1. Generate a personal manifest as yourself.  Run as you, the generator sees
-     both the system-wide engines AND the ones in your home, so your personal
-     manifest lists your full ENABLED set from both -- a superset of the system
-     manifest in that sense (it still lists only enabled engines, not disabled
-     ones; see the note below):
+     both the system-wide engines AND the ones in your home, so it lists your
+     full enabled set (it lists only enabled engines, not disabled ones; see
+     the note below):
 
        mkdir -p ~/.local/share/ibus/component
        scim -f ibus -- --xml > ~/.local/share/ibus/component/scim.xml
 
-  2. Tell ibus-daemon to scan that directory by exporting IBUS_COMPONENT_PATH
-     BEFORE ibus-daemon starts (in your login shell profile or systemd user
-     environment):
+  2. Point IBUS_COMPONENT_PATH at BOTH your directory AND the system component
+     directory, BEFORE ibus-daemon starts (in your login shell profile or
+     systemd user environment):
 
-       export IBUS_COMPONENT_PATH=$HOME/.local/share/ibus/component
+       export IBUS_COMPONENT_PATH="$HOME/.local/share/ibus/component:$(pkg-config --variable=pkgdatadir ibus-1.0)/component"
 
   3. Restart the session (or ibus-daemon) so it re-scans.
 
-The personal manifest SUBSTITUTES for the system one for your session (it is
-not merged with it), so it must carry every engine you want, both system and
-personal.  Regenerate it whenever you enable/disable engines or install a new
-user-level engine.
+IMPORTANT: IBUS_COMPONENT_PATH REPLACES ibus-daemon's default search path
+rather than adding to it, and ibus-daemon does not scan any per-user directory
+by default.  So you must list the system directory too, or ibus-daemon will
+stop seeing every other component installed there (the system SCIM manifest and
+any other input methods).  ibus-daemon merges the manifests it finds: engines
+from all scanned files are UNIONed by engine name (on a duplicate name the
+first one loaded wins), so your personal manifest and the system one coexist --
+your home-only engines simply add to the system set.  Regenerate your manifest
+whenever you enable/disable engines or install a new user-level engine.
 
 Why enabled-only?  The manifest lists the engines SCIM currently offers, which
 is what the input-source coordinator keeps in sync with GNOME.  To expose an
