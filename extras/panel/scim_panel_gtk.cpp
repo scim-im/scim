@@ -76,6 +76,15 @@ using namespace scim;
 #include "icons/pin-down.xpm"
 #include "icons/menu.xpm"
 
+#ifdef SCIM_HAS_SNI
+#include <libdbusmenu-glib/server.h>
+#include <libdbusmenu-glib/menuitem.h>
+#endif
+
+#ifdef SCIM_HAS_LAYER_SHELL
+#include <gtk4-layer-shell.h>
+#endif
+
 #define SCIM_CONFIG_PANEL_GTK_FONT                      "/Panel/Gtk/Font"
 #define SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_BG           "/Panel/Gtk/Color/NormalBackground"
 #define SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_BG           "/Panel/Gtk/Color/ActiveBackground"
@@ -420,6 +429,9 @@ static bool               _window_sticked              = false;
 
 static bool               _toolbar_always_show         = false;
 static bool               _toolbar_always_hidden       = false;
+#ifdef SCIM_HAS_SNI
+static bool               _sni_enabled                 = false;  // an SNI host was found
+#endif
 static bool               _toolbar_auto_snap           = true;
 static bool               _toolbar_show_factory_icon   = true;
 static bool               _toolbar_show_factory_name   = false;
@@ -586,6 +598,16 @@ ui_load_config (void)
         if (_toolbar_always_show && _toolbar_always_hidden)
             _toolbar_always_hidden = false;
 
+#ifdef SCIM_HAS_SNI
+        // The tray replaces the toolbar window entirely. Applied here rather
+        // than once at startup so a config reload cannot bring the toolbar back
+        // while we are sitting in the tray.
+        if (_sni_enabled) {
+            _toolbar_always_show   = false;
+            _toolbar_always_hidden = true;
+        }
+#endif
+
         _toolbar_auto_snap =
             _config->read (String (SCIM_CONFIG_PANEL_GTK_TOOLBAR_AUTO_SNAP),
                            _toolbar_auto_snap);
@@ -686,10 +708,66 @@ ui_apply_panel_style (void)
 
 // Absolute window positioning.  GTK4 removed gtk_window_move; on X11 we move
 // the underlying override-ish toplevel with XMoveWindow.
+#ifdef SCIM_HAS_LAYER_SHELL
+// True when the compositor implements zwlr_layer_shell_v1 (KDE, wlroots). mutter
+// does not, so this is always false on GNOME and the toolbar stays an ordinary
+// toplevel there.
+static bool
+layer_shell_usable (void)
+{
+    return gtk_layer_is_supported () ? true : false;
+}
+
+// Wayland gives a client no way to place a toplevel, so the toolbar cannot honour
+// its saved position and cannot stay above other windows. layer-shell does both:
+// anchor it to a screen edge and put it on the overlay layer. Must run before the
+// window is realized.
+static void
+layer_shell_setup_toolbar (GtkWidget *win)
+{
+    if (!win || !layer_shell_usable ()) return;
+
+    gtk_layer_init_for_window (GTK_WINDOW (win));
+    gtk_layer_set_namespace (GTK_WINDOW (win), "scim-panel");
+    gtk_layer_set_layer (GTK_WINDOW (win), GTK_LAYER_SHELL_LAYER_OVERLAY);
+    // Bottom-right, matching where the toolbar defaults to on X11.
+    gtk_layer_set_anchor (GTK_WINDOW (win), GTK_LAYER_SHELL_EDGE_BOTTOM, TRUE);
+    gtk_layer_set_anchor (GTK_WINDOW (win), GTK_LAYER_SHELL_EDGE_RIGHT,  TRUE);
+    // A status toolbar must never take keyboard focus from the text field.
+    gtk_layer_set_keyboard_mode (GTK_WINDOW (win), GTK_LAYER_SHELL_KEYBOARD_MODE_NONE);
+}
+
+// On layer-shell the position is expressed as margins from the anchored edges.
+static void
+layer_shell_move_toolbar (GtkWidget *win, int x, int y)
+{
+    if (!win || !layer_shell_usable ()) return;
+
+    int sw = ui_screen_width ();
+    int sh = ui_screen_height ();
+    GtkRequisition ws;
+    gtk_widget_get_preferred_size (win, &ws, NULL);
+
+    int right  = sw - x - ws.width;
+    int bottom = sh - y - ws.height;
+    gtk_layer_set_margin (GTK_WINDOW (win), GTK_LAYER_SHELL_EDGE_RIGHT,
+                          right  > 0 ? right  : 0);
+    gtk_layer_set_margin (GTK_WINDOW (win), GTK_LAYER_SHELL_EDGE_BOTTOM,
+                          bottom > 0 ? bottom : 0);
+}
+#endif // SCIM_HAS_LAYER_SHELL
+
 static void
 panel_window_move (GtkWidget *w, int x, int y)
 {
     if (!w) return;
+
+#ifdef SCIM_HAS_LAYER_SHELL
+    if (layer_shell_usable ()) {
+        layer_shell_move_toolbar (w, x, y);
+        return;
+    }
+#endif
 
 #if defined(GDK_WINDOWING_X11) && defined(SCIM_ENABLE_X11)
     GdkDisplay *display = gtk_widget_get_display (w);
@@ -738,6 +816,10 @@ ui_initialize (void)
         _toolbar_window = gtk_window_new ();
         gtk_window_set_decorated (GTK_WINDOW (_toolbar_window), FALSE);
         gtk_window_set_resizable (GTK_WINDOW (_toolbar_window), FALSE);
+#ifdef SCIM_HAS_LAYER_SHELL
+        // Before realization, so the surface is created as a layer surface.
+        layer_shell_setup_toolbar (_toolbar_window);
+#endif
 
         ui_toolbar_add_drag_controllers (_toolbar_window, DRAG_TARGET_TOOLBAR);
 
@@ -1911,6 +1993,503 @@ action_show_command_menu (void)
     ui_menu_popup_at (_command_menu, anchor);
 }
 
+
+#ifdef SCIM_HAS_SNI
+/////////////////////////////////////////////////////////////////////////////
+// StatusNotifierItem tray
+//
+// On a desktop with an SNI host (KDE, XFCE, ...) the panel presents itself as a
+// tray item instead of a floating toolbar: wayland gives a client no way to
+// place or raise a toplevel, so the toolbar is unusable there, while a tray item
+// is drawn by the host and needs no positioning at all.
+//
+// The icon identifies the active engine, the tooltip carries its status, and the
+// exported dbusmenu carries the engine's properties. ItemIsMenu tells the host
+// to open that menu on primary click, which is what clicking the old toolbar's
+// factory button did.
+/////////////////////////////////////////////////////////////////////////////
+
+static guint             _sni_name_id       = 0;   // our own bus name
+static guint             _sni_watch_id      = 0;   // watching for a host
+static guint             _sni_object_id     = 0;   // exported SNI object
+static GDBusConnection  *_sni_conn          = 0;
+static DbusmenuServer   *_sni_menu          = 0;
+static bool              _sni_registered    = false;
+static String            _sni_bus_name;
+static String            _sni_icon;                // absolute path of the engine icon
+static String            _sni_title;                // engine name
+static String            _sni_status_text;          // status property label, for the tooltip
+static std::vector<PanelFactoryInfo> _sni_factories;  // engine list, for the menu
+
+#define SCIM_SNI_OBJECT_PATH  "/StatusNotifierItem"
+#define SCIM_SNI_MENU_PATH    "/StatusNotifierItem/Menu"
+#define SCIM_SNI_WATCHER      "org.kde.StatusNotifierWatcher"
+
+static const gchar _sni_introspection_xml[] =
+    "<node>"
+    "  <interface name='org.kde.StatusNotifierItem'>"
+    "    <property name='Category'   type='s' access='read'/>"
+    "    <property name='Id'         type='s' access='read'/>"
+    "    <property name='Title'      type='s' access='read'/>"
+    "    <property name='Status'     type='s' access='read'/>"
+    "    <property name='IconName'   type='s' access='read'/>"
+    "    <property name='IconPixmap' type='a(iiay)' access='read'/>"
+    "    <property name='ItemIsMenu' type='b' access='read'/>"
+    "    <property name='Menu'       type='o' access='read'/>"
+    "    <property name='ToolTip'    type='(sa(iiay)ss)' access='read'/>"
+    "    <method name='Activate'>"
+    "      <arg name='x' type='i' direction='in'/>"
+    "      <arg name='y' type='i' direction='in'/>"
+    "    </method>"
+    "    <method name='SecondaryActivate'>"
+    "      <arg name='x' type='i' direction='in'/>"
+    "      <arg name='y' type='i' direction='in'/>"
+    "    </method>"
+    "    <method name='ContextMenu'>"
+    "      <arg name='x' type='i' direction='in'/>"
+    "      <arg name='y' type='i' direction='in'/>"
+    "    </method>"
+    "    <signal name='NewIcon'/>"
+    "    <signal name='NewTitle'/>"
+    "    <signal name='NewToolTip'/>"
+    "    <signal name='NewStatus'><arg name='status' type='s'/></signal>"
+    "  </interface>"
+    "</node>";
+
+static void sni_rebuild_menu (void);
+
+// Tell the host something changed. Hosts re-read the properties themselves.
+static void
+sni_emit (const char *signal_name)
+{
+    if (!_sni_conn || !_sni_object_id) return;
+
+    g_dbus_connection_emit_signal (_sni_conn, 0, SCIM_SNI_OBJECT_PATH,
+                                   "org.kde.StatusNotifierItem", signal_name,
+                                   0, 0);
+}
+
+static void
+sni_method_call (GDBusConnection * /*conn*/, const gchar * /*sender*/,
+                 const gchar * /*path*/, const gchar * /*iface*/,
+                 const gchar *method, GVariant * /*params*/,
+                 GDBusMethodInvocation *invocation, gpointer /*data*/)
+{
+    // ItemIsMenu is true, so a well-behaved host opens the menu itself on
+    // primary click and never calls Activate. Hosts that call it anyway get the
+    // same thing the old toolbar did on a left click: the engine list, which
+    // lives in the menu we already export.
+    // SecondaryActivate (middle click) is deliberately inert: cycling engines
+    // needs the factory list, which only arrives asynchronously after
+    // request_factory_menu (), and the toolbar's reply path pops a GTK window
+    // that has nothing to anchor to in tray mode. The engine list belongs in the
+    // exported menu instead.
+
+    g_dbus_method_invocation_return_value (invocation, 0);
+}
+
+// Publish the engine icon as raw pixels. IconName cannot carry it: that
+// property is a freedesktop icon-theme *name*, which hosts resolve through the
+// theme (QIcon::fromTheme on Plasma), so an absolute path like
+// /usr/local/share/scim/icons/Array30.png resolves to nothing and the item
+// renders blank. IconPixmap is the spec's answer for icons that live at an
+// arbitrary path, and every SNI host supports it.
+static GVariant *
+sni_icon_pixmap (void)
+{
+    // a(iiay): width, height, ARGB32 in network byte order.
+    GVariantBuilder b;
+    g_variant_builder_init (&b, G_VARIANT_TYPE ("a(iiay)"));
+
+    String path = _sni_icon;
+    if (path.length () && path [0] != SCIM_PATH_DELIM)
+        path = String (SCIM_ICONDIR) + String (SCIM_PATH_DELIM_STRING) + path;
+
+    GdkPixbuf *pb = 0;
+    if (path.length ())
+        pb = gdk_pixbuf_new_from_file_at_size (path.c_str (), 22, 22, 0);
+    // Always show something: an engine with no icon of its own, or a missing
+    // file, would otherwise leave an invisible tray item.
+    if (!pb)
+        pb = gdk_pixbuf_new_from_file_at_size (SCIM_TRADEMARK_ICON_FILE, 22, 22, 0);
+    if (!pb)
+        return g_variant_builder_end (&b);
+
+    int w      = gdk_pixbuf_get_width (pb);
+    int h      = gdk_pixbuf_get_height (pb);
+    int stride = gdk_pixbuf_get_rowstride (pb);
+    int nch    = gdk_pixbuf_get_n_channels (pb);
+    const guchar *px = gdk_pixbuf_get_pixels (pb);
+
+    gsize n = (gsize) w * (gsize) h * 4;
+    guchar *argb = (guchar *) g_malloc (n);
+    guchar *o = argb;
+    for (int y = 0; y < h; ++y) {
+        const guchar *row = px + (gsize) y * stride;
+        for (int x = 0; x < w; ++x) {
+            const guchar *s = row + (gsize) x * nch;
+            *o++ = (nch == 4) ? s [3] : 0xFF;   // A
+            *o++ = s [0];                       // R
+            *o++ = s [1];                       // G
+            *o++ = s [2];                       // B
+        }
+    }
+    g_object_unref (pb);
+
+    g_variant_builder_add (&b, "(ii@ay)", w, h,
+                           g_variant_new_from_data (G_VARIANT_TYPE ("ay"),
+                                                    argb, n, TRUE,
+                                                    g_free, argb));
+    return g_variant_builder_end (&b);
+}
+
+static GVariant *
+sni_get_property (GDBusConnection * /*conn*/, const gchar * /*sender*/,
+                  const gchar * /*path*/, const gchar * /*iface*/,
+                  const gchar *name, GError ** /*error*/, gpointer /*data*/)
+{
+    if (!g_strcmp0 (name, "Category"))   return g_variant_new_string ("SystemServices");
+    if (!g_strcmp0 (name, "Id"))         return g_variant_new_string ("scim");
+    // Constant on purpose. Hosts sort tray items by title, so returning the
+    // engine name here made our icon hop between neighbouring items on every
+    // engine switch. Which engine is active is shown by the icon, and named in
+    // the tooltip; the title is our identity, not our state.
+    if (!g_strcmp0 (name, "Title"))      return g_variant_new_string ("SCIM");
+    if (!g_strcmp0 (name, "Status"))     return g_variant_new_string ("Active");
+    // Deliberately empty: see sni_icon_pixmap (). Hosts fall back to
+    // IconPixmap when no themed name is offered.
+    if (!g_strcmp0 (name, "IconName"))   return g_variant_new_string ("");
+    if (!g_strcmp0 (name, "IconPixmap")) return sni_icon_pixmap ();
+    if (!g_strcmp0 (name, "ItemIsMenu")) return g_variant_new_boolean (TRUE);
+    if (!g_strcmp0 (name, "Menu"))       return g_variant_new_object_path (SCIM_SNI_MENU_PATH);
+
+    if (!g_strcmp0 (name, "ToolTip")) {
+        // (icon name, pixmap array, title, body). The body carries the status so
+        // hovering shows the current mode without opening the menu.
+        GVariantBuilder pix;
+        g_variant_builder_init (&pix, G_VARIANT_TYPE ("a(iiay)"));
+        return g_variant_new ("(sa(iiay)ss)",
+                              "",
+                              &pix,
+                              _sni_title.length () ? _sni_title.c_str () : "SCIM",
+                              _sni_status_text.c_str ());
+    }
+
+    return 0;
+}
+
+static const GDBusInterfaceVTable _sni_vtable = {
+    sni_method_call, sni_get_property, 0, { 0, 0, 0, 0, 0, 0, 0, 0 }
+};
+
+// A property was chosen in the tray menu: hand the key back to the engine, which
+// advances it and reports the new label through update_property ().
+static void
+sni_menu_item_activated (DbusmenuMenuitem *item, guint /*timestamp*/, gpointer /*data*/)
+{
+    const gchar *key = (const gchar *) g_object_get_data (G_OBJECT (item), "scim-property-key");
+    if (key && _panel_agent)
+        _panel_agent->trigger_property (String (key));
+}
+
+// Mirror scim's property tree into dbusmenu items. scim ships a flat, key-sorted
+// list whose nesting is implied by the keys (Property::is_a_leaf_of ()), the same
+// walk the toolbar and the ibus frontend use.
+// Attach an icon that lives at a path. ICON_NAME is a freedesktop icon-theme
+// *name*, so a path like /usr/local/share/scim/icons/Array30.png never resolves
+// and the entry ends up bare. ICON_DATA carries the image itself: raw PNG bytes,
+// which is what libdbusmenu-gtk's property_set_image () produces -- we cannot
+// call that directly because it lives in the gtk flavour of the library, and the
+// panel links the toolkit-agnostic glib one.
+static void
+sni_menuitem_set_icon (DbusmenuMenuitem *item, const String &iconfile,
+                       const char *fallback = 0)
+{
+    String path = iconfile;
+    if (path.length () && path [0] != SCIM_PATH_DELIM)
+        path = String (SCIM_ICONDIR) + String (SCIM_PATH_DELIM_STRING) + path;
+
+    // Loading through gdk-pixbuf rather than reading the file verbatim also
+    // scales the icon down and accepts whatever format the engine shipped.
+    GdkPixbuf *pb = 0;
+    if (path.length ())
+        pb = gdk_pixbuf_new_from_file_at_size (path.c_str (),
+                                               MENU_ICON_SIZE, MENU_ICON_SIZE, 0);
+    if (!pb && path.length ())
+        SCIM_DEBUG_MAIN (1) << "Panel: no usable icon at \"" << path << "\".\n";
+    // Engines fall back to the SCIM logo so the list stays aligned when one of
+    // them reports an icon that cannot be loaded. Properties pass no fallback:
+    // many legitimately have only a label, and a logo on each would be noise.
+    if (!pb && fallback)
+        pb = gdk_pixbuf_new_from_file_at_size (fallback, MENU_ICON_SIZE, MENU_ICON_SIZE, 0);
+    if (!pb)
+        return;
+
+    gchar *png = 0;
+    gsize  len = 0;
+    if (gdk_pixbuf_save_to_buffer (pb, &png, &len, "png", 0, NULL)) {
+        dbusmenu_menuitem_property_set_byte_array (item, DBUSMENU_MENUITEM_PROP_ICON_DATA,
+                                                  (const guchar *) png, len);
+        g_free (png);
+    }
+    g_object_unref (pb);
+}
+
+static void
+sni_add_properties (DbusmenuMenuitem *parent,
+                    PropertyRepository::const_iterator begin,
+                    PropertyRepository::const_iterator end)
+{
+    PropertyRepository::const_iterator it = begin;
+
+    while (it < end) {
+        PropertyRepository::const_iterator child = it + 1;
+        while (child < end && child->property.is_a_leaf_of (it->property))
+            ++ child;
+
+        DbusmenuMenuitem *item = dbusmenu_menuitem_new ();
+        dbusmenu_menuitem_property_set (item, DBUSMENU_MENUITEM_PROP_LABEL,
+                                        it->property.get_label ().c_str ());
+        dbusmenu_menuitem_property_set_bool (item, DBUSMENU_MENUITEM_PROP_VISIBLE,
+                                             it->property.visible ());
+        dbusmenu_menuitem_property_set_bool (item, DBUSMENU_MENUITEM_PROP_ENABLED,
+                                             it->property.active ());
+        sni_menuitem_set_icon (item, it->property.get_icon ());
+
+        g_object_set_data_full (G_OBJECT (item), "scim-property-key",
+                                g_strdup (it->property.get_key ().c_str ()), g_free);
+        g_signal_connect (item, DBUSMENU_MENUITEM_SIGNAL_ITEM_ACTIVATED,
+                          G_CALLBACK (sni_menu_item_activated), 0);
+
+        if (child > it + 1) {
+            dbusmenu_menuitem_property_set (item, DBUSMENU_MENUITEM_PROP_CHILD_DISPLAY,
+                                            DBUSMENU_MENUITEM_CHILD_DISPLAY_SUBMENU);
+            sni_add_properties (item, it + 1, child);
+        }
+
+        dbusmenu_menuitem_child_append (parent, item);
+        it = child;
+    }
+}
+
+// An engine was chosen in the tray menu. The empty uuid is the forward /
+// English-keyboard mode, exactly as the toolbar's factory menu treats it.
+static void
+sni_engine_activated (DbusmenuMenuitem *item, guint /*timestamp*/, gpointer /*data*/)
+{
+    const gchar *uuid = (const gchar *) g_object_get_data (G_OBJECT (item), "scim-factory-uuid");
+    if (uuid && _panel_agent)
+        _panel_agent->change_factory (String (uuid));
+}
+
+static void
+sni_reload_activated (DbusmenuMenuitem * /*item*/, guint /*timestamp*/, gpointer /*data*/)
+{
+    if (_panel_agent) _panel_agent->reload_config ();
+    if (!_config.null ()) _config->reload ();
+}
+
+static void
+sni_exit_activated (DbusmenuMenuitem * /*item*/, guint /*timestamp*/, gpointer /*data*/)
+{
+    if (_panel_agent) _panel_agent->exit ();
+}
+
+// Opening the menu is a good moment to refresh the engine list for next time;
+// the reply arrives asynchronously via do_slot_show_factory_menu ().
+static void
+sni_menu_about_to_show (DbusmenuMenuitem * /*item*/, gpointer /*data*/)
+{
+    if (_panel_agent) _panel_agent->request_factory_menu ();
+}
+
+static DbusmenuMenuitem *
+sni_append_separator (DbusmenuMenuitem *root)
+{
+    DbusmenuMenuitem *sep = dbusmenu_menuitem_new ();
+    dbusmenu_menuitem_property_set (sep, DBUSMENU_MENUITEM_PROP_TYPE, "separator");
+    dbusmenu_menuitem_child_append (root, sep);
+    return sep;
+}
+
+static void
+sni_rebuild_menu (void)
+{
+    if (!_sni_menu) return;
+
+    DbusmenuMenuitem *root = dbusmenu_menuitem_new ();
+
+    // Turning the engine off comes first. With only engines listed there was no
+    // way back to a plain keyboard from the tray at all -- the trigger hotkey was
+    // the only route. An empty uuid is the agent's "turn off" signal, which the
+    // frontends map to turn_off_im (), so sni_engine_activated () needs no special
+    // case. The label is the same string the panel already shows as the engine
+    // name while off, so it reads consistently and needs no new translation.
+    {
+        DbusmenuMenuitem *off = dbusmenu_menuitem_new ();
+        dbusmenu_menuitem_property_set (off, DBUSMENU_MENUITEM_PROP_LABEL,
+                                        _("English/Keyboard"));
+        // A themed name, not a path: ICON_NAME is resolved through the icon
+        // theme, and libdbusmenu-glib has no way to carry an arbitrary file
+        // (property_set_image () lives in libdbusmenu-gtk, which we do not link).
+        dbusmenu_menuitem_property_set (off, DBUSMENU_MENUITEM_PROP_ICON_NAME,
+                                        "input-keyboard");
+        g_object_set_data_full (G_OBJECT (off), "scim-factory-uuid",
+                                g_strdup (""), g_free);
+        g_signal_connect (off, DBUSMENU_MENUITEM_SIGNAL_ITEM_ACTIVATED,
+                          G_CALLBACK (sni_engine_activated), 0);
+        dbusmenu_menuitem_child_append (root, off);
+        sni_append_separator (root);
+    }
+
+    // Then the engines: this is what clicking the old toolbar's factory button
+    // offered, and it is the only way to switch engines from the tray.
+    for (size_t i = 0; i < _sni_factories.size (); ++i) {
+        DbusmenuMenuitem *item = dbusmenu_menuitem_new ();
+        dbusmenu_menuitem_property_set (item, DBUSMENU_MENUITEM_PROP_LABEL,
+                                        _sni_factories[i].name.c_str ());
+        sni_menuitem_set_icon (item, _sni_factories[i].icon,
+                               SCIM_TRADEMARK_ICON_FILE);
+        g_object_set_data_full (G_OBJECT (item), "scim-factory-uuid",
+                                g_strdup (_sni_factories[i].uuid.c_str ()), g_free);
+        g_signal_connect (item, DBUSMENU_MENUITEM_SIGNAL_ITEM_ACTIVATED,
+                          G_CALLBACK (sni_engine_activated), 0);
+        dbusmenu_menuitem_child_append (root, item);
+    }
+
+    if (_sni_factories.size ())
+        sni_append_separator (root);
+
+    sni_add_properties (root, _frontend_property_repository.begin (),
+                        _frontend_property_repository.end ());
+
+    sni_append_separator (root);
+
+    DbusmenuMenuitem *reload = dbusmenu_menuitem_new ();
+    dbusmenu_menuitem_property_set (reload, DBUSMENU_MENUITEM_PROP_LABEL, _("Reload Configuration"));
+    g_signal_connect (reload, DBUSMENU_MENUITEM_SIGNAL_ITEM_ACTIVATED,
+                      G_CALLBACK (sni_reload_activated), 0);
+    dbusmenu_menuitem_child_append (root, reload);
+
+    DbusmenuMenuitem *quit = dbusmenu_menuitem_new ();
+    dbusmenu_menuitem_property_set (quit, DBUSMENU_MENUITEM_PROP_LABEL, _("Exit"));
+    g_signal_connect (quit, DBUSMENU_MENUITEM_SIGNAL_ITEM_ACTIVATED,
+                      G_CALLBACK (sni_exit_activated), 0);
+    dbusmenu_menuitem_child_append (root, quit);
+
+    g_signal_connect (root, DBUSMENU_MENUITEM_SIGNAL_ABOUT_TO_SHOW,
+                      G_CALLBACK (sni_menu_about_to_show), 0);
+
+    dbusmenu_server_set_root (_sni_menu, root);
+    g_object_unref (root);
+}
+
+// The engine changed: refresh what the tray shows about it.
+static void
+sni_set_engine (const String &name, const String &icon)
+{
+    _sni_title = name;
+    _sni_icon  = icon;
+    sni_emit ("NewIcon");
+    sni_emit ("NewToolTip");
+}
+
+static void
+sni_set_status (const String &text)
+{
+    _sni_status_text = text;
+    sni_emit ("NewToolTip");
+}
+
+static void
+sni_register_with_host (void)
+{
+    if (!_sni_conn || _sni_registered) return;
+
+    g_dbus_connection_call (_sni_conn, SCIM_SNI_WATCHER,
+                            "/StatusNotifierWatcher", SCIM_SNI_WATCHER,
+                            "RegisterStatusNotifierItem",
+                            g_variant_new ("(s)", _sni_bus_name.c_str ()),
+                            0, G_DBUS_CALL_FLAGS_NONE, -1, 0, 0, 0);
+    _sni_registered = true;
+}
+
+static void
+sni_name_acquired (GDBusConnection *conn, const gchar * /*name*/, gpointer /*data*/)
+{
+    _sni_conn = conn;
+
+    GDBusNodeInfo *info = g_dbus_node_info_new_for_xml (_sni_introspection_xml, 0);
+    if (info) {
+        _sni_object_id = g_dbus_connection_register_object (
+            conn, SCIM_SNI_OBJECT_PATH, info->interfaces[0],
+            &_sni_vtable, 0, 0, 0);
+        g_dbus_node_info_unref (info);
+    }
+
+    if (!_sni_menu) {
+        _sni_menu = dbusmenu_server_new (SCIM_SNI_MENU_PATH);
+        sni_rebuild_menu ();
+    }
+
+    sni_register_with_host ();
+}
+
+// A host may appear after us (or restart), so registration is driven by the
+// watcher's presence rather than done once at startup.
+static void
+sni_watcher_appeared (GDBusConnection * /*conn*/, const gchar * /*name*/,
+                      const gchar * /*owner*/, gpointer /*data*/)
+{
+    _sni_registered = false;
+    sni_register_with_host ();
+}
+
+static void
+sni_watcher_vanished (GDBusConnection * /*conn*/, const gchar * /*name*/, gpointer /*data*/)
+{
+    _sni_registered = false;
+}
+
+// True when some host is offering the SNI watcher, i.e. a tray exists to sit in.
+static bool
+sni_host_present (void)
+{
+    GError *err = 0;
+    GDBusConnection *bus = g_bus_get_sync (G_BUS_TYPE_SESSION, 0, &err);
+    if (!bus) { if (err) g_error_free (err); return false; }
+
+    GVariant *r = g_dbus_connection_call_sync (
+        bus, "org.freedesktop.DBus", "/org/freedesktop/DBus",
+        "org.freedesktop.DBus", "NameHasOwner",
+        g_variant_new ("(s)", SCIM_SNI_WATCHER),
+        G_VARIANT_TYPE ("(b)"), G_DBUS_CALL_FLAGS_NONE, -1, 0, &err);
+
+    bool present = false;
+    if (r) { g_variant_get (r, "(b)", &present); g_variant_unref (r); }
+    if (err) g_error_free (err);
+    g_object_unref (bus);
+    return present;
+}
+
+static void
+sni_start (void)
+{
+    gchar *n = g_strdup_printf ("org.kde.StatusNotifierItem-%d-1", (int) getpid ());
+    _sni_bus_name = String (n);
+
+    _sni_name_id = g_bus_own_name (G_BUS_TYPE_SESSION, n,
+                                   G_BUS_NAME_OWNER_FLAGS_NONE,
+                                   0, sni_name_acquired, 0, 0, 0);
+    g_free (n);
+
+    _sni_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION, SCIM_SNI_WATCHER,
+                                      G_BUS_NAME_WATCHER_FLAGS_NONE,
+                                      sni_watcher_appeared, sni_watcher_vanished,
+                                      0, 0);
+}
+#endif // SCIM_HAS_SNI
+
 //////////////////////////////////////////////////////////////////////
 // Start of PanelAgent Functions
 //////////////////////////////////////////////////////////////////////
@@ -2199,6 +2778,14 @@ do_slot_update_screen (int num)
 static void
 do_slot_update_factory_info (const PanelFactoryInfo &info)
 {
+#ifdef SCIM_HAS_SNI
+    if (_sni_enabled) {
+        sni_set_engine (info.name, info.icon);
+        if (_sni_factories.empty () && _panel_agent)
+            _panel_agent->request_factory_menu ();   // warm the engine list
+    }
+#endif
+
     if (_factory_button) {
         GtkWidget * newlabel = 0;
 
@@ -2241,6 +2828,17 @@ do_slot_show_help (const String &help)
 static void
 do_slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
 {
+#ifdef SCIM_HAS_SNI
+    // Tray mode: cache the list for the exported menu. Popping the toolbar's
+    // GTK menu here would put an unanchorable window on screen, which is the
+    // very thing the tray avoids.
+    if (_sni_enabled) {
+        _sni_factories = factories;
+        sni_rebuild_menu ();
+        return;
+    }
+#endif
+
     if (!_factory_menu_activated && factories.size ()) {
         size_t i;
 
@@ -2579,12 +3177,27 @@ register_frontend_properties (const PropertyList &properties)
     }
 
     ui_settle_toolbar_window ();
+
+#ifdef SCIM_HAS_SNI
+    if (_sni_enabled)
+        sni_rebuild_menu ();
+#endif
 }
 
 static void
 update_frontend_property (const Property &property)
 {
     update_property (_frontend_property_repository, property);
+
+#ifdef SCIM_HAS_SNI
+    if (_sni_enabled) {
+        // The status property is what the tooltip reports; everything else only
+        // needs the menu redrawn with its new label.
+        if (property.get_key ().find ("Status") != String::npos)
+            sni_set_status (property.get_label ());
+        sni_rebuild_menu ();
+    }
+#endif
 }
 
 static void
@@ -2866,6 +3479,16 @@ int main (int argc, char *argv [])
     signal(SIGINT,  signalhandler);
     signal(SIGHUP,  signalhandler);
 
+    // Daemonize before touching GTK or D-Bus. Both cache a shared session-bus
+    // connection whose I/O is served by a worker thread, and fork () does not
+    // carry threads over -- so a connection opened before the fork is inert in
+    // the child, and every call on it stalls until it times out. That silently
+    // disabled the StatusNotifierItem path: not only did the host probe fail,
+    // but g_bus_own_name () and the exported tray object would have used the
+    // same dead connection.
+    if (daemon)
+        scim_daemon ();
+
     gtk_init ();
 
     ui_initialize ();
@@ -2882,11 +3505,20 @@ int main (int argc, char *argv [])
         return -1;
     }
 
-    if (daemon)
-        scim_daemon ();
-
     // connect the configuration reload signal.
     _config->signal_connect_reload (slot (ui_config_reload_callback));
+
+#ifdef SCIM_HAS_SNI
+    // Prefer a tray item when the desktop offers a host: it needs no positioning
+    // and stays reachable, unlike a wayland toplevel. Falling back to the
+    // toolbar otherwise keeps X11 and hostless desktops working as before.
+    if (sni_host_present ()) {
+        _sni_enabled = true;
+        ui_load_config ();               // re-apply with the tray override in effect
+        sni_start ();
+        std::cerr << "SCIM Panel: StatusNotifierItem host found; using the tray.\n";
+    }
+#endif
 
     if (!run_panel_agent()) {
         std::cerr << "Failed to run Socket Server!\n";

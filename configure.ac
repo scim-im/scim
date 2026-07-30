@@ -405,6 +405,20 @@ PKG_CHECK_MODULES(DBUS, [dbus-1],
 			[SCIM_HAS_DBUS=yes],
 			[SCIM_HAS_DBUS=no])
 
+# dbusmenu-glib, for the panel's StatusNotifierItem tray menu. The glib flavour
+# carries no toolkit dependency, so it is usable from the GTK4 panel (unlike
+# libayatana-appindicator, which is GTK3-only).
+PKG_CHECK_MODULES(DBUSMENU, [dbusmenu-glib-0.4],
+			[SCIM_HAS_DBUSMENU=yes],
+			[SCIM_HAS_DBUSMENU=no])
+
+# gtk4-layer-shell, so the panel's toolbar can anchor itself on wayland
+# compositors that implement zwlr_layer_shell_v1 (KDE, wlroots). mutter does
+# not, so this changes nothing on GNOME.
+PKG_CHECK_MODULES(GTK4_LAYER_SHELL, [gtk4-layer-shell-0],
+			[SCIM_HAS_GTK4_LAYER_SHELL=yes],
+			[SCIM_HAS_GTK4_LAYER_SHELL=no])
+
 
 # X11/XWayland support is controlled by --enable-frontend-x11 (default: auto --
 # built when X11 is detected). Disabling it drops the whole X11 build (the XIM
@@ -715,6 +729,50 @@ else
   enable_candidates=no
 fi
 
+# StatusNotifierItem tray for the panel: needs dbusmenu-glib. On a desktop with
+# an SNI host (KDE, XFCE, ...) the panel presents its properties as a tray menu
+# instead of a floating toolbar, which wayland cannot position.
+AC_ARG_ENABLE([sni],
+	[AS_HELP_STRING([--disable-sni],
+		[Do not build the panel's StatusNotifierItem tray support])],
+	[],
+	[enable_sni=check])
+
+if test "$enable_sni" != "no"; then
+  if test "$SCIM_HAS_DBUSMENU" = "yes"; then
+    SCIM_BUILD_SNI=1
+    enable_sni=yes
+  elif test "$enable_sni" = "yes"; then
+    AC_MSG_ERROR([--enable-sni requires dbusmenu-glib-0.4])
+  else
+    SCIM_BUILD_SNI=0
+    enable_sni=no
+  fi
+else
+  SCIM_BUILD_SNI=0
+fi
+
+# layer-shell anchoring for the panel toolbar: needs gtk4-layer-shell.
+AC_ARG_ENABLE([layer-shell],
+	[AS_HELP_STRING([--disable-layer-shell],
+		[Do not use gtk4-layer-shell to anchor the panel toolbar on wayland])],
+	[],
+	[enable_layer_shell=check])
+
+if test "$enable_layer_shell" != "no"; then
+  if test "$SCIM_HAS_GTK4_LAYER_SHELL" = "yes"; then
+    SCIM_BUILD_LAYER_SHELL=1
+    enable_layer_shell=yes
+  elif test "$enable_layer_shell" = "yes"; then
+    AC_MSG_ERROR([--enable-layer-shell requires gtk4-layer-shell-0])
+  else
+    SCIM_BUILD_LAYER_SHELL=0
+    enable_layer_shell=no
+  fi
+else
+  SCIM_BUILD_LAYER_SHELL=0
+fi
+
 # kimpanel D-Bus candidate UI backend: needs dbus-1.
 if test "$enable_kimpanel" != "no"; then
   if test "$SCIM_HAS_DBUS" = "yes"; then
@@ -973,6 +1031,12 @@ AM_CONDITIONAL(SCIM_BUILD_IBUS_SYNC,
 AM_CONDITIONAL(SCIM_BUILD_CANDIDATES,
 		[test "$enable_candidates" = "yes"])
 
+AM_CONDITIONAL(SCIM_BUILD_SNI,
+		[test "$enable_sni" = "yes"])
+
+AM_CONDITIONAL(SCIM_BUILD_LAYER_SHELL,
+		[test "$enable_layer_shell" = "yes"])
+
 AM_CONDITIONAL(SCIM_BUILD_KIMPANEL,
 		[test "$enable_kimpanel" = "yes"])
 
@@ -1027,6 +1091,8 @@ AC_SUBST(SCIM_BUILD_FRONTEND_SOCKET)
 AC_SUBST(SCIM_BUILD_FRONTEND_WAYLAND)
 AC_SUBST(SCIM_BUILD_FRONTEND_IBUS)
 AC_SUBST(SCIM_BUILD_CANDIDATES)
+AC_SUBST(SCIM_BUILD_SNI)
+AC_SUBST(SCIM_BUILD_LAYER_SHELL)
 AC_SUBST(SCIM_BUILD_KIMPANEL)
 AC_SUBST(SCIM_BUILD_IMENGINE_RAWCODE)
 AC_SUBST(SCIM_BUILD_IMENGINE_TABLE)
@@ -1131,6 +1197,8 @@ Module options:
 
   Cairo candidate renderer $enable_candidates
   kimpanel D-Bus UI        $enable_kimpanel
+  Panel SNI tray           $enable_sni
+  Panel layer-shell anchor $enable_layer_shell
 
   RawCode IMEngine module  $enable_im_rawcode
   Socket IMEngine module   $enable_im_socket
