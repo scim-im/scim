@@ -73,6 +73,8 @@ CONFIG_FRONTEND_SOCKET_MODULE	= socket.la
 endif
 
 if SCIM_BUILD_FRONTEND_WAYLAND
+# One module for both input-method protocol generations; it binds whichever the
+# compositor offers (see scim_wayland_frontend.h).
 CONFIG_FRONTEND_WAYLAND_MODULE	= wayland.la
 endif
 
@@ -186,6 +188,7 @@ wayland_la_LIBADD	= $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
 			  $(top_builddir)/protocols/libscimwlprotocols.la \
 			  $(top_builddir)/utils/candidates/libscim-candidates-wayland.la \
 			  $(KIMPANEL_LIBS)
+
 
 
 # dlopen-ed modules, never linked: drop the installed libtool archives.

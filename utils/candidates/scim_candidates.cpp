@@ -276,6 +276,7 @@ public:
 
     bool          m_lookup_visible;
     bool          m_lookup_vertical;
+    bool          m_sections_reversed;
     std::vector<WideString> m_cand_text;
     std::vector<WideString> m_cand_label;
     int           m_cursor_in_page;      // -1 if none / hidden
@@ -303,6 +304,7 @@ public:
           m_preedit_visible (false), m_preedit_caret (0),
           m_aux_visible (false),
           m_lookup_visible (false), m_lookup_vertical (false),
+          m_sections_reversed (false),
           m_cursor_in_page (-1), m_has_prev_page (false), m_has_next_page (false),
           m_dirty (true), m_width (0), m_height (0),
           m_has_preedit_item (false),
@@ -376,6 +378,54 @@ public:
     }
 
     // Rebuild geometry from raw state.
+    // Mirror the order of the sections after they have been laid out top-down.
+    // Whole blocks are translated, never re-laid-out, so candidate rows keep
+    // their order within the table and the caret keeps its offset in the
+    // preedit line. Total height is unchanged, since the same blocks and gaps
+    // are simply visited in the opposite order.
+    void reverse_sections (int origin, int spacing)
+    {
+        struct Block { int kind; int y, h; };   // 0 preedit, 1 aux, 2 candidates
+        std::vector<Block> blocks;
+
+        if (m_has_preedit_item)
+            blocks.push_back (Block { 0, m_preedit_item.y, m_preedit_item.h });
+        if (m_has_aux_item)
+            blocks.push_back (Block { 1, m_aux_item.y, m_aux_item.h });
+        if (!m_cells.empty ()) {
+            int top = m_cells[0].item.y;
+            int bot = top;
+            for (size_t i = 0; i < m_cells.size (); ++i) {
+                const TextItem &it = m_cells[i].item;
+                if (it.y < top)          top = it.y;
+                if (it.y + it.h > bot)   bot = it.y + it.h;
+            }
+            blocks.push_back (Block { 2, top, bot - top });
+        }
+
+        if (blocks.size () < 2)
+            return;
+
+        int y = origin;
+        for (int i = (int) blocks.size () - 1; i >= 0; --i) {
+            int dy = y - blocks[i].y;
+            switch (blocks[i].kind) {
+            case 0:
+                m_preedit_item.y += dy;
+                m_caret_y       += dy;
+                break;
+            case 1:
+                m_aux_item.y += dy;
+                break;
+            default:
+                for (size_t c = 0; c < m_cells.size (); ++c)
+                    m_cells[c].item.y += dy;
+                break;
+            }
+            y += blocks[i].h + spacing;
+        }
+    }
+
     void layout ()
     {
         if (!m_dirty)
@@ -479,6 +529,9 @@ public:
             }
         }
 
+        if (m_sections_reversed)
+            reverse_sections (origin, spacing);
+
         m_width  = max_x + pad + bw;
         // Trailing spacing after the last block is folded into the padding.
         m_height = (cur_y - spacing) + pad + bw;
@@ -558,6 +611,15 @@ void
 CandidatesUI::set_theme (const CandidatesTheme &theme)
 {
     m_impl->m_theme = theme;
+    m_impl->m_dirty = true;
+}
+
+void
+CandidatesUI::set_sections_reversed (bool reversed)
+{
+    if (m_impl->m_sections_reversed == reversed)
+        return;
+    m_impl->m_sections_reversed = reversed;
     m_impl->m_dirty = true;
 }
 

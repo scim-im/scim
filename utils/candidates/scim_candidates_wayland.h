@@ -2,11 +2,16 @@
  * @file scim_candidates_wayland.h
  * @brief Wayland surface shim for the Cairo input-panel renderer.
  *
- * Owns a wl_surface used as a zwp_input_popup_surface_v2 (created from the
- * frontend's zwp_input_method_v2 object) plus an shm buffer that CandidatesUI draws
- * into. The compositor positions the popup at the text cursor; we only supply
+ * Owns a wl_surface given an input-method surface role plus an shm buffer that
+ * CandidatesUI draws into. The compositor positions the surface; we only supply
  * content and route wl_pointer input back through CandidatesUI::hit_test(). This is
  * the Wayland counterpart of CandidatesUIX11.
+ *
+ * Two roles are supported, one per input-method protocol generation:
+ * zwp_input_popup_surface_v2 (init(), positioned at the text cursor) and
+ * zwp_input_panel_surface_v1 as an overlay panel (init_input_panel(), placed by
+ * the compositor). Everything downstream of the role -- buffers, drawing,
+ * pointer routing -- is shared.
  */
 
 /*
@@ -40,6 +45,7 @@ struct wl_compositor;
 struct wl_shm;
 struct wl_seat;
 struct zwp_input_method_v2;
+struct zwp_input_panel_v1;
 
 namespace scim {
 
@@ -78,6 +84,26 @@ public:
                struct wl_shm *shm,
                struct zwp_input_method_v2 *input_method,
                struct wl_seat *seat);
+
+    /**
+     * @brief Create the surface as a zwp_input_panel_surface_v1 overlay panel.
+     *
+     * The input-method-v1 counterpart of init(). v1 has no per-text-cursor
+     * popup role: the surface is registered with the compositor's input panel
+     * as an overlay and the compositor decides where to put it.
+     *
+     * @param display     the frontend's wl_display (for flushing).
+     * @param compositor  wl_compositor global.
+     * @param shm         wl_shm global.
+     * @param panel       zwp_input_panel_v1 global.
+     * @param seat        wl_seat, for pointer input (may be null).
+     * @return true if the panel surface was created.
+     */
+    bool init_input_panel (struct wl_display *display,
+                           struct wl_compositor *compositor,
+                           struct wl_shm *shm,
+                           struct zwp_input_panel_v1 *panel,
+                           struct wl_seat *seat);
 
     /** @brief Tear down the popup surface and buffers. */
     void finish ();

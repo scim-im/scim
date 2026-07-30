@@ -22,6 +22,8 @@
 #define Uses_SCIM_FRONTEND
 #define Uses_SCIM_BACKEND
 #define Uses_SCIM_IMENGINE
+#define Uses_SCIM_PANEL_CLIENT
+#define Uses_SCIM_HOTKEY
 #define Uses_SCIM_CONFIG_BASE
 #define Uses_SCIM_CONFIG_PATH
 #define Uses_SCIM_LOOKUP_TABLE
@@ -41,6 +43,8 @@
 
 #include "scim_wayland_frontend.h"
 
+#include <iostream>
+
 #define scim_module_init           wayland_LTX_scim_module_init
 #define scim_module_exit           wayland_LTX_scim_module_exit
 #define scim_frontend_module_init  wayland_LTX_scim_frontend_module_init
@@ -49,14 +53,14 @@
 #define scim_frontend_module_process_events wayland_LTX_scim_frontend_module_process_events
 #define scim_frontend_module_has_exited     wayland_LTX_scim_frontend_module_has_exited
 
+// Shared with wayland.so: the language override applies to either protocol
+// generation, and only one of the two modules ever runs on a given desktop.
 #define SCIM_CONFIG_FRONTEND_WAYLAND_LANGUAGE  "/FrontEnd/Wayland/Language"
 
-using namespace scim;
+// Shown by the panel while the engine is off.
+#define SCIM_KEYBOARD_ICON_FILE                (SCIM_ICONDIR "/keyboard.png")
 
-// Wayland key state (from wl_keyboard, mirrored by the grab).
-#ifndef WL_KEYBOARD_KEY_STATE_PRESSED
-#define WL_KEYBOARD_KEY_STATE_PRESSED  1
-#endif
+using namespace scim;
 
 //Local static data
 static Pointer <WaylandFrontEnd> _scim_frontend (0);
@@ -123,18 +127,41 @@ static const struct wl_registry_listener registry_listener = {
     WaylandFrontEnd::handle_registry_global_remove
 };
 
-static const struct zwp_input_method_v2_listener im_listener = {
-    WaylandFrontEnd::handle_im_activate,
-    WaylandFrontEnd::handle_im_deactivate,
-    WaylandFrontEnd::handle_im_surrounding_text,
-    WaylandFrontEnd::handle_im_text_change_cause,
-    WaylandFrontEnd::handle_im_content_type,
-    WaylandFrontEnd::handle_im_done,
-    WaylandFrontEnd::handle_im_unavailable
+static const struct zwp_input_method_v1_listener v1_im_listener = {
+    WaylandFrontEnd::handle_v1_activate,
+    WaylandFrontEnd::handle_v1_deactivate
 };
 
-static const struct zwp_input_method_keyboard_grab_v2_listener kb_listener = {
+static const struct zwp_input_method_v2_listener v2_im_listener = {
+    WaylandFrontEnd::handle_v2_activate,
+    WaylandFrontEnd::handle_v2_deactivate,
+    WaylandFrontEnd::handle_v2_surrounding_text,
+    WaylandFrontEnd::handle_v2_text_change_cause,
+    WaylandFrontEnd::handle_v2_content_type,
+    WaylandFrontEnd::handle_v2_done,
+    WaylandFrontEnd::handle_v2_unavailable
+};
+
+static const struct zwp_input_method_keyboard_grab_v2_listener v2_grab_listener = {
+    WaylandFrontEnd::handle_grab_keymap,
+    WaylandFrontEnd::handle_grab_key,
+    WaylandFrontEnd::handle_grab_modifiers,
+    WaylandFrontEnd::handle_grab_repeat_info
+};
+
+static const struct zwp_input_method_context_v1_listener v1_context_listener = {
+    WaylandFrontEnd::handle_ctx_surrounding_text,
+    WaylandFrontEnd::handle_ctx_reset,
+    WaylandFrontEnd::handle_ctx_content_type,
+    WaylandFrontEnd::handle_ctx_invoke_action,
+    WaylandFrontEnd::handle_ctx_commit_state,
+    WaylandFrontEnd::handle_ctx_preferred_language
+};
+
+static const struct wl_keyboard_listener v1_kb_listener = {
     WaylandFrontEnd::handle_kb_keymap,
+    WaylandFrontEnd::handle_kb_enter,
+    WaylandFrontEnd::handle_kb_leave,
     WaylandFrontEnd::handle_kb_key,
     WaylandFrontEnd::handle_kb_modifiers,
     WaylandFrontEnd::handle_kb_repeat_info
@@ -145,33 +172,45 @@ static const struct zwp_input_method_keyboard_grab_v2_listener kb_listener = {
 /* ------------------------------------------------------------------ */
 
 WaylandFrontEnd::WaylandFrontEnd (const BackEndPointer &backend,
-                                  const ConfigPointer  &config)
+                                      const ConfigPointer  &config)
     : FrontEndBase (backend),
       m_config (config),
       m_instance (-1),
       m_focused (false),
+      m_im_on (false),
+      m_valid_key_mask (SCIM_KEY_AllMasks),
       m_display (0),
       m_registry (0),
       m_seat (0),
       m_compositor (0),
       m_shm (0),
       m_seat_name (0),
-      m_im_manager (0),
-      m_input_method (0),
-      m_grab (0),
+      m_proto (PROTO_NONE),
+      m_forced_proto (PROTO_NONE),
+      m_v1_input_method (0),
+      m_v1_input_panel (0),
+      m_v1_context (0),
+      m_v1_keyboard (0),
+      m_v2_manager (0),
+      m_v2_input_method (0),
+      m_v2_grab (0),
       m_vk_manager (0),
       m_virtual_keyboard (0),
       m_serial (0),
       m_preedit_caret (0),
+      m_preedit_shown (false),
+      m_on_the_spot (true),
       m_xkb_context (0),
       m_xkb_keymap (0),
       m_xkb_state (0),
       m_have_current_key (false),
+      m_current_key_serial (0),
       m_current_key_time (0),
       m_current_key_code (0),
       m_current_key_state (0),
       m_current_key_forwarded (false),
-      m_should_exit (false)
+      m_should_exit (false),
+      m_panel_open (false)
 {
     if (!_scim_frontend.null () && _scim_frontend != this)
         throw FrontEndError (String ("Wayland -- only one frontend can be created!"));
@@ -183,6 +222,7 @@ WaylandFrontEnd::WaylandFrontEnd (const BackEndPointer &backend,
 
 WaylandFrontEnd::~WaylandFrontEnd ()
 {
+    m_config_reload_connection.disconnect ();
     if (m_instance >= 0)
         delete_instance (m_instance);
 
@@ -190,14 +230,19 @@ WaylandFrontEnd::~WaylandFrontEnd ()
     if (m_xkb_keymap)   xkb_keymap_unref (m_xkb_keymap);
     if (m_xkb_context)  xkb_context_unref (m_xkb_context);
 
-    if (m_grab)             zwp_input_method_keyboard_grab_v2_release (m_grab);
+    drop_keyboard ();
+    if (m_v1_context)       zwp_input_method_context_v1_destroy (m_v1_context);
+    if (m_v1_input_panel)   zwp_input_panel_v1_destroy (m_v1_input_panel);
+    if (m_v1_input_method)  zwp_input_method_v1_destroy (m_v1_input_method);
+
+    if (m_v2_grab)          zwp_input_method_keyboard_grab_v2_release (m_v2_grab);
     if (m_virtual_keyboard) zwp_virtual_keyboard_v1_destroy (m_virtual_keyboard);
-    if (m_input_method)     zwp_input_method_v2_destroy (m_input_method);
-    if (m_im_manager)       zwp_input_method_manager_v2_destroy (m_im_manager);
+    if (m_v2_input_method)  zwp_input_method_v2_destroy (m_v2_input_method);
+    if (m_v2_manager)       zwp_input_method_manager_v2_destroy (m_v2_manager);
     if (m_vk_manager)       zwp_virtual_keyboard_manager_v1_destroy (m_vk_manager);
-    if (m_seat)             wl_seat_destroy (m_seat);
-    if (m_registry)         wl_registry_destroy (m_registry);
-    if (m_display)          wl_display_disconnect (m_display);
+    if (m_seat)          wl_seat_destroy (m_seat);
+    if (m_registry)      wl_registry_destroy (m_registry);
+    if (m_display)       wl_display_disconnect (m_display);
 }
 
 /* ------------------------------------------------------------------ */
@@ -205,10 +250,21 @@ WaylandFrontEnd::~WaylandFrontEnd ()
 /* ------------------------------------------------------------------ */
 
 void
-WaylandFrontEnd::init (int /*argc*/, char ** /*argv*/)
+WaylandFrontEnd::init (int argc, char **argv)
 {
+    // Escape hatch for testing against a compositor that speaks both, or for
+    // reproducing a bug on the other generation. Detection is the default.
+    for (int i = 0; i < argc; ++i) {
+        if (!argv [i]) continue;
+        if (!strcmp (argv [i], "--im-protocol=v1"))
+            m_forced_proto = PROTO_V1;
+        else if (!strcmp (argv [i], "--im-protocol=v2"))
+            m_forced_proto = PROTO_V2;
+    }
+
     reload_config_callback (m_config);
-    m_config->signal_connect_reload (slot (this, &WaylandFrontEnd::reload_config_callback));
+    m_config_reload_connection =
+        m_config->signal_connect_reload (slot (this, &WaylandFrontEnd::reload_config_callback));
 
     m_display = wl_display_connect (0);
     if (!m_display)
@@ -222,29 +278,53 @@ WaylandFrontEnd::init (int /*argc*/, char ** /*argv*/)
     wl_display_roundtrip (m_display);
     wl_display_roundtrip (m_display);
 
-    if (!m_im_manager)
-        throw FrontEndError (String ("Wayland -- compositor has no zwp_input_method_manager_v2 "
+    // Pick the generation the compositor actually offers. v2 wins when both are
+    // present: it is the protocol still being developed, and it can anchor
+    // candidates to the text cursor, which v1 gives us no way to do.
+    if (m_forced_proto == PROTO_V1 && m_v1_input_method)
+        m_proto = PROTO_V1;
+    else if (m_forced_proto == PROTO_V2 && m_v2_manager)
+        m_proto = PROTO_V2;
+    else if (m_forced_proto != PROTO_NONE)
+        throw FrontEndError (String ("Wayland -- the input-method protocol requested "
+                                     "with --im-protocol is not offered by this compositor."));
+    else if (m_v2_manager)
+        m_proto = PROTO_V2;
+    else if (m_v1_input_method)
+        m_proto = PROTO_V1;
+    else
+        throw FrontEndError (String ("Wayland -- compositor offers neither "
+                                     "zwp_input_method_manager_v2 nor zwp_input_method_v1 "
                                      "(not supported on this desktop)."));
-    if (!m_seat)
+
+    if (m_proto == PROTO_V2 && !m_seat)
         throw FrontEndError (String ("Wayland -- no wl_seat available."));
 
     m_xkb_context = xkb_context_new (XKB_CONTEXT_NO_FLAGS);
     if (!m_xkb_context)
         throw FrontEndError (String ("Wayland -- cannot create xkb context."));
 
-    m_input_method =
-        zwp_input_method_manager_v2_get_input_method (m_im_manager, m_seat);
-    zwp_input_method_v2_add_listener (m_input_method, &im_listener, this);
+    if (m_proto == PROTO_V1) {
+        // Nothing to create up front: the compositor hands us a context when a
+        // text field takes focus. Just start listening.
+        zwp_input_method_v1_add_listener (m_v1_input_method, &v1_im_listener, this);
+    } else {
+        // v2 has one long-lived input-method object for the seat, and the
+        // keyboard grab is taken once rather than per activation.
+        m_v2_input_method =
+            zwp_input_method_manager_v2_get_input_method (m_v2_manager, m_seat);
+        zwp_input_method_v2_add_listener (m_v2_input_method, &v2_im_listener, this);
 
-    if (m_vk_manager)
-        m_virtual_keyboard =
-            zwp_virtual_keyboard_manager_v1_create_virtual_keyboard (m_vk_manager, m_seat);
+        if (m_vk_manager)
+            m_virtual_keyboard =
+                zwp_virtual_keyboard_manager_v1_create_virtual_keyboard (m_vk_manager, m_seat);
 
-    start_grab ();
+        proto_start_grab ();
+    }
 
 #ifdef SCIM_HAS_KIMPANEL
-    // Prefer KDE kimpanel when running on Plasma (config override or desktop
-    // detection). When it connects it replaces the Cairo popup for candidates.
+    // The compositor that speaks v1 in practice is KWin, so kimpanel is both
+    // available and the better-placed candidate UI; prefer it when present.
     bool want_kimpanel =
         m_config->read (String ("/Panel/UseKimpanel"),
                         KimpanelAgent::desktop_prefers_kimpanel ());
@@ -262,9 +342,8 @@ WaylandFrontEnd::init (int /*argc*/, char ** /*argv*/)
 #endif
 
 #ifdef SCIM_HAS_CANDIDATES_WAYLAND
-    // Cairo renderer on an input-popup-surface-v2 for aux + candidates.
-    if (!use_kimpanel_ui () && m_compositor && m_shm &&
-        m_candidates_ui.init (m_display, m_compositor, m_shm, m_input_method, m_seat)) {
+    // Fallback candidate UI: our own overlay panel via zwp_input_panel_v1.
+    if (!use_kimpanel_ui () && proto_candidates_init ()) {
         m_candidates_ui.signal_connect_candidate_selected (
             [this] (int idx) { candidates_ui_select_candidate (idx); });
         m_candidates_ui.signal_connect_page_up (
@@ -272,15 +351,124 @@ WaylandFrontEnd::init (int /*argc*/, char ** /*argv*/)
         m_candidates_ui.signal_connect_page_down (
             [this] () { candidates_ui_page_down (); });
         configure_candidates_ui ();
-    } else {
-        SCIM_DEBUG_FRONTEND (1) << "Wayland -- no input-popup surface; "
+    } else if (!use_kimpanel_ui ()) {
+        SCIM_DEBUG_FRONTEND (1) << "Wayland -- no input panel surface; "
                                    "aux/candidates will not be shown.\n";
     }
 #endif
 
     ensure_instance ();
 
+    // Start in whatever state the user left the input method in. The default is
+    // off, so enabling SCIM as the compositor's input method never costs the
+    // user their plain-ASCII keyboard until they ask for the engine.
+    m_im_on = m_config->read (String (SCIM_CONFIG_FRONTEND_IM_OPENED_BY_DEFAULT),
+                              false);
+
     wl_display_roundtrip (m_display);
+
+    // Status/property UI. Harmless if no panel is available.
+    panel_open ();
+
+    SCIM_DEBUG_FRONTEND (1) << "Wayland -- ready: protocol=" << proto_name ()
+                            << " siid=" << m_instance
+                            << " im_on=" << m_im_on
+                            << " panel=" << m_panel_open
+                            << " input_panel=" << (m_v1_input_panel ? 1 : 0)
+                            << " seat=" << (m_seat ? 1 : 0) << "\n";
+}
+
+/* ------------------------------------------------------------------ */
+/* Panel (status / properties)                                         */
+/* ------------------------------------------------------------------ */
+
+bool
+WaylandFrontEnd::panel_open ()
+{
+    // Launches scim-panel-gtk on demand. Non-fatal: input works without it, we
+    // just lose the status/property UI.
+    if (m_panel_client.open_connection (m_config->get_name ()) < 0) {
+        SCIM_DEBUG_FRONTEND(1) << "Wayland -- cannot connect to the SCIM panel.\n";
+        m_panel_open = false;
+        return false;
+    }
+
+    m_panel_client.signal_connect_trigger_property (
+        slot (this, &WaylandFrontEnd::panel_slot_trigger_property));
+    m_panel_client.signal_connect_reload_config (
+        slot (this, &WaylandFrontEnd::panel_slot_reload_config));
+    m_panel_client.signal_connect_change_factory (
+        slot (this, &WaylandFrontEnd::panel_slot_change_factory));
+    m_panel_client.signal_connect_request_factory_menu (
+        slot (this, &WaylandFrontEnd::panel_slot_request_factory_menu));
+
+    m_panel_open = true;
+    return true;
+}
+
+void
+WaylandFrontEnd::panel_close ()
+{
+    m_panel_client.close_connection ();
+    m_panel_open = false;
+}
+
+void
+WaylandFrontEnd::panel_slot_trigger_property (int context, const String &property)
+{
+    // The user picked a property in the tray menu or on the toolbar.
+    if (context == m_instance)
+        trigger_property (context, property);
+}
+
+void
+WaylandFrontEnd::panel_slot_reload_config (int /*context*/)
+{
+    m_config->reload ();
+}
+
+void
+WaylandFrontEnd::panel_slot_change_factory (int context, const String &uuid)
+{
+    if (context != m_instance)
+        return;
+    // An empty uuid is the panel's "turn off" entry, which is how the user gets
+    // back to plain ASCII from the tray menu instead of the trigger hotkey.
+    if (!uuid.length ())
+        turn_off_im ();
+    else
+        switch_factory (uuid);
+}
+
+void
+WaylandFrontEnd::panel_slot_request_factory_menu (int context)
+{
+    // The panel is asking which engines exist -- for its tray menu, or to fill
+    // the list it shows on the toolbar. Only the frontend knows, so without this
+    // reply the panel's engine list stays empty and there is no way to switch
+    // engines from the menu at all.
+    if (context == m_instance)
+        panel_req_show_factory_menu ();
+}
+
+void
+WaylandFrontEnd::register_properties (int id, const PropertyList &properties)
+{
+    if (m_panel_open && id == m_instance) {
+        m_panel_client.prepare (id);
+        m_panel_client.register_properties (id, properties);
+        m_panel_client.send ();
+    }
+}
+
+void
+WaylandFrontEnd::update_property (int id, const Property &property)
+{
+    if (m_panel_open && id == m_instance) {
+        m_panel_client.prepare (id);
+        m_panel_client.update_property (id, property);
+        m_panel_client.send ();
+    }
 }
 
 bool
@@ -288,6 +476,11 @@ WaylandFrontEnd::poll_fds (std::vector<int> &fds)
 {
     if (m_display)
         fds.push_back (wl_display_get_fd (m_display));
+    if (m_panel_open) {
+        int pfd = m_panel_client.get_connection_number ();
+        if (pfd >= 0)
+            fds.push_back (pfd);
+    }
 #ifdef SCIM_HAS_KIMPANEL
     if (use_kimpanel_ui ()) {
         int kfd = m_kimpanel.connection_number ();
@@ -301,6 +494,27 @@ WaylandFrontEnd::poll_fds (std::vector<int> &fds)
 void
 WaylandFrontEnd::process_events ()
 {
+    // Drain the panel socket first; a dead connection is reopened so the panel
+    // (or its tray item) can come and go without taking the frontend with it.
+    if (m_panel_open && m_panel_client.has_pending_event ()) {
+        if (!m_panel_client.filter_event ()) {
+            panel_close ();
+            panel_open ();
+            // A restarted panel knows nothing about us, so tell it again --
+            // otherwise its tray item stays nameless and iconless until the
+            // next focus change.
+            if (m_panel_open && m_instance >= 0 && m_focused) {
+                m_panel_client.prepare (m_instance);
+                m_panel_client.register_input_context (m_instance, get_instance_uuid (m_instance));
+                m_panel_client.focus_in (m_instance, get_instance_uuid (m_instance));
+                if (m_im_on) m_panel_client.turn_on  (m_instance);
+                else         m_panel_client.turn_off (m_instance);
+                m_panel_client.send ();
+                panel_req_update_factory_info ();
+            }
+        }
+    }
+
 #ifdef SCIM_HAS_KIMPANEL
     if (use_kimpanel_ui ())
         m_kimpanel.process_events ();
@@ -326,11 +540,16 @@ WaylandFrontEnd::process_events ()
     }
 
     if (wl_display_dispatch_pending (m_display) < 0) {
+        std::cerr << "Wayland -- exiting: wayland dispatch failed: "
+                  << strerror (errno) << "\n";
         m_should_exit = true;
         return;
     }
-    if (wl_display_flush (m_display) < 0 && errno != EAGAIN)
+    if (wl_display_flush (m_display) < 0 && errno != EAGAIN) {
+        std::cerr << "Wayland -- exiting: wayland flush failed: "
+                  << strerror (errno) << "\n";
         m_should_exit = true;
+    }
 }
 
 void
@@ -348,8 +567,10 @@ WaylandFrontEnd::run ()
 
         std::vector<int> fds;
         poll_fds (fds);
-        if (fds.empty ())
+        if (fds.empty ()) {
+            std::cerr << "Wayland -- exiting: nothing left to poll.\n";
             break;
+        }
 
         fd_set read_fds;
         FD_ZERO (&read_fds);
@@ -362,6 +583,8 @@ WaylandFrontEnd::run ()
         if (select (max_fd + 1, &read_fds, NULL, NULL, NULL) < 0) {
             if (errno == EINTR)
                 continue;
+            std::cerr << "Wayland -- exiting: select failed: "
+                      << strerror (errno) << "\n";
             break;
         }
     }
@@ -372,10 +595,44 @@ WaylandFrontEnd::reload_config_callback (const ConfigPointer &config)
 {
     m_language = config->read (String (SCIM_CONFIG_FRONTEND_WAYLAND_LANGUAGE),
                                String (""));
+
+    // Shared with x11.so, so the preference applies to a session however its
+    // applications happen to be reaching us.
+    bool on_the_spot =
+        config->read (String (SCIM_CONFIG_FRONTEND_ON_THE_SPOT), true);
+    if (on_the_spot != m_on_the_spot) {
+        m_on_the_spot = on_the_spot;
+        // Drop whatever the path we just left is still showing.
+        if (m_on_the_spot) preedit_to_panel (false);
+        else               proto_clear_preedit ();
+    }
+
+    m_frontend_hotkey_matcher.load_hotkeys (config);
+    m_imengine_hotkey_matcher.load_hotkeys (config);
+
+    KeyEvent mask_key;
+    scim_string_to_key (mask_key,
+        config->read (String (SCIM_CONFIG_HOTKEYS_FRONTEND_VALID_KEY_MASK),
+                      String ("Shift+Control+Alt+Lock")));
+    m_valid_key_mask = (mask_key.mask > 0) ? mask_key.mask : SCIM_KEY_AllMasks;
+    m_valid_key_mask |= SCIM_KEY_ReleaseMask;
+
+    // The SCIM_DEBUG macros filter by mask/level themselves, so this costs
+    // only the hotkey lookup when debugging is off.
+    KeyEventList hk;
+    m_frontend_hotkey_matcher.find_hotkeys (SCIM_FRONTEND_HOTKEY_TRIGGER, hk);
+    SCIM_DEBUG_FRONTEND (2) << "Wayland -- valid key mask 0x"
+                            << std::hex << m_valid_key_mask << std::dec
+                            << ", " << hk.size () << " trigger hotkey(s).\n";
+    for (size_t i = 0; i < hk.size (); ++i) {
+        String ks;
+        scim_key_to_string (ks, hk [i]);
+        SCIM_DEBUG_FRONTEND (2) << "  trigger: " << ks << "\n";
+    }
 }
 
 /* ------------------------------------------------------------------ */
-/* Instance / grab helpers                                             */
+/* Instance helper                                                      */
 /* ------------------------------------------------------------------ */
 
 void
@@ -396,87 +653,111 @@ WaylandFrontEnd::ensure_instance ()
         SCIM_DEBUG_FRONTEND(1) << "Wayland -- failed to create an IMEngine instance.\n";
 }
 
-void
-WaylandFrontEnd::start_grab ()
-{
-    if (!m_input_method || m_grab)
-        return;
-    m_grab = zwp_input_method_v2_grab_keyboard (m_input_method);
-    if (m_grab)
-        zwp_input_method_keyboard_grab_v2_add_listener (m_grab, &kb_listener, this);
-}
-
 /* ------------------------------------------------------------------ */
-/* Registry                                                            */
+/* Hotkeys                                                             */
 /* ------------------------------------------------------------------ */
 
-void
-WaylandFrontEnd::registry_global (uint32_t name, const char *interface, uint32_t version)
+bool
+WaylandFrontEnd::filter_hotkeys (const KeyEvent &scimkey)
 {
-    if (!strcmp (interface, wl_seat_interface.name)) {
-        if (!m_seat) {
-            uint32_t v = version < 7 ? version : 7;
-            m_seat = static_cast<wl_seat *> (
-                wl_registry_bind (m_registry, name, &wl_seat_interface, v));
-            m_seat_name = name;
-        }
-    } else if (!strcmp (interface, zwp_input_method_manager_v2_interface.name)) {
-        m_im_manager = static_cast<zwp_input_method_manager_v2 *> (
-            wl_registry_bind (m_registry, name,
-                              &zwp_input_method_manager_v2_interface, 1));
-    } else if (!strcmp (interface, zwp_virtual_keyboard_manager_v1_interface.name)) {
-        m_vk_manager = static_cast<zwp_virtual_keyboard_manager_v1 *> (
-            wl_registry_bind (m_registry, name,
-                              &zwp_virtual_keyboard_manager_v1_interface, 1));
-    } else if (!strcmp (interface, wl_compositor_interface.name)) {
-        uint32_t v = version < 4 ? version : 4;
-        m_compositor = static_cast<wl_compositor *> (
-            wl_registry_bind (m_registry, name, &wl_compositor_interface, v));
-    } else if (!strcmp (interface, wl_shm_interface.name)) {
-        m_shm = static_cast<wl_shm *> (
-            wl_registry_bind (m_registry, name, &wl_shm_interface, 1));
+    bool ok = false;
+
+    // Both matchers see every event, presses and releases alike: the default
+    // next/previous-factory bindings are release-triggered
+    // ("Control+Shift+Shift_L+KeyRelease"), so dropping releases here would
+    // make them unmatchable.
+    m_frontend_hotkey_matcher.push_key_event (scimkey);
+    m_imengine_hotkey_matcher.push_key_event (scimkey);
+
+    FrontEndHotkeyAction action = m_frontend_hotkey_matcher.get_match_result ();
+
+    if (action == SCIM_FRONTEND_HOTKEY_TRIGGER) {
+        if (m_im_on) turn_off_im ();
+        else         turn_on_im ();
+        ok = true;
+    } else if (action == SCIM_FRONTEND_HOTKEY_ON) {
+        if (!m_im_on) turn_on_im ();
+        ok = true;
+    } else if (action == SCIM_FRONTEND_HOTKEY_OFF) {
+        if (m_im_on) turn_off_im ();
+        ok = true;
+    } else if (action == SCIM_FRONTEND_HOTKEY_NEXT_FACTORY) {
+        if (m_instance >= 0)
+            switch_factory (get_next_factory (String (""), String ("UTF-8"),
+                                              get_instance_uuid (m_instance)));
+        ok = true;
+    } else if (action == SCIM_FRONTEND_HOTKEY_PREVIOUS_FACTORY) {
+        if (m_instance >= 0)
+            switch_factory (get_previous_factory (String (""), String ("UTF-8"),
+                                                  get_instance_uuid (m_instance)));
+        ok = true;
+    } else if (action == SCIM_FRONTEND_HOTKEY_SHOW_FACTORY_MENU) {
+        panel_req_show_factory_menu ();
+        ok = true;
+    } else if (m_imengine_hotkey_matcher.is_matched ()) {
+        switch_factory (m_imengine_hotkey_matcher.get_match_result ());
+        ok = true;
     }
+
+    return ok;
 }
 
 void
-WaylandFrontEnd::registry_global_remove (uint32_t name)
+WaylandFrontEnd::turn_on_im ()
 {
-    if (name == m_seat_name)
-        m_should_exit = true;
-}
-
-/* ------------------------------------------------------------------ */
-/* input-method-v2 events                                              */
-/* ------------------------------------------------------------------ */
-
-void
-WaylandFrontEnd::im_activate ()
-{
-    ensure_instance ();
-    if (m_instance < 0)
+    if (m_im_on || m_instance < 0)
         return;
-    m_preedit_str = WideString ();
-    m_preedit_caret = 0;
-    m_focused = true;
+
+    m_im_on = true;
+    // One input method serves every application here, so the state is global
+    // and worth remembering across restarts.
+    m_config->write (String (SCIM_CONFIG_FRONTEND_IM_OPENED_BY_DEFAULT), true);
+
+    panel_req_update_factory_info ();
+
+    if (m_panel_open) {
+        m_panel_client.prepare (m_instance);
+        m_panel_client.turn_on (m_instance);
+        m_panel_client.send ();
+    }
 #ifdef SCIM_HAS_KIMPANEL
     if (use_kimpanel_ui ())
         m_kimpanel.enable (true);
 #endif
-    focus_in (m_instance);
 }
 
 void
-WaylandFrontEnd::im_deactivate ()
+WaylandFrontEnd::turn_off_im ()
 {
-    if (m_instance < 0)
+    if (!m_im_on)
         return;
-    if (m_focused) {
-        focus_out (m_instance);
+
+    m_im_on = false;
+    m_config->write (String (SCIM_CONFIG_FRONTEND_IM_OPENED_BY_DEFAULT), false);
+
+    panel_req_update_factory_info ();
+
+    // Drop whatever was being composed; leaving a preedit on screen that no
+    // further key can affect would strand the text in the application.
+    if (m_instance >= 0)
         reset (m_instance);
-    }
-    m_focused = false;
     m_preedit_str = WideString ();
+    m_preedit_attrs = AttributeList ();
     m_preedit_caret = 0;
+    m_preedit_shown = false;
+    if (m_on_the_spot) {
+        clear_preedit_on_app ();
+        if (m_display)
+            wl_display_flush (m_display);
+    } else {
+        preedit_to_panel (false);
+    }
+
+    if (m_panel_open && m_instance >= 0) {
+        m_panel_client.prepare (m_instance);
+        m_panel_client.turn_off (m_instance);
+        m_panel_client.send ();
+    }
 #ifdef SCIM_HAS_KIMPANEL
     if (use_kimpanel_ui ()) {
         m_kimpanel.show_aux_string (false);
@@ -494,37 +775,373 @@ WaylandFrontEnd::im_deactivate ()
 }
 
 void
-WaylandFrontEnd::im_surrounding_text (const char * /*text*/, uint32_t /*cursor*/,
-                                      uint32_t /*anchor*/)
+WaylandFrontEnd::switch_factory (const String &sfid)
 {
-    // TODO(5b+): feed surrounding text to the engine
-    // (update_surrounding_text) once the engine-side plumbing is wired.
+    if (m_instance < 0 || !sfid.length ())
+        return;
+
+    String encoding = String ("UTF-8");
+    if (!validate_factory (sfid, encoding))
+        return;
+
+    String language = m_language;
+    if (!language.length ())
+        language = scim_get_locale_language (scim_get_current_locale ());
+
+    turn_off_im ();
+
+    // replace_instance () builds a fresh IMEngineInstance, and a new instance has
+    // never been focused -- an engine only becomes active, and only registers its
+    // properties, on focus_in. Without this bracket the icon and the panel would
+    // show the new engine while keys were still handed to an unfocused one, so
+    // switching appeared to do nothing. Switching from the tray menu happened to
+    // work only because clicking the tray moved focus off the text field and
+    // back, and that activate delivered the focus_in as a side effect.
+    if (m_focused)
+        focus_out (m_instance);
+
+    replace_instance (m_instance, sfid);
+
+    if (m_panel_open) {
+        m_panel_client.prepare (m_instance);
+        m_panel_client.register_input_context (m_instance, get_instance_uuid (m_instance));
+        m_panel_client.send ();
+    }
+
+    set_default_factory (language, sfid);
+
+    if (m_focused)
+        focus_in (m_instance);
+
+    // Picking an engine means wanting to use it, so end up on regardless of the
+    // state we were in.
+    turn_on_im ();
 }
 
 void
-WaylandFrontEnd::im_done ()
+WaylandFrontEnd::panel_req_show_factory_menu ()
 {
-    // Each done event bumps the serial that commit() must echo back.
+    if (!m_panel_open || m_instance < 0)
+        return;
+
+    std::vector<String> uuids;
+    if (!get_factory_list_for_encoding (uuids, String ("UTF-8")))
+        return;
+
+    std::vector<PanelFactoryInfo> menu;
+    for (size_t i = 0; i < uuids.size (); ++i)
+        menu.push_back (PanelFactoryInfo (uuids [i],
+                                          utf8_wcstombs (get_factory_name (uuids [i])),
+                                          get_factory_language (uuids [i]),
+                                          get_factory_icon_file (uuids [i])));
+
+    m_panel_client.prepare (m_instance);
+    m_panel_client.show_factory_menu (m_instance, menu);
+    m_panel_client.send ();
+}
+
+void
+WaylandFrontEnd::panel_req_update_factory_info ()
+{
+    // Without this the panel never learns which engine is active, so its tray
+    // item has no name and no icon to show -- it registers and then renders as
+    // nothing. x11.so has always sent this; the wayland frontends did not.
+    if (!m_panel_open || m_instance < 0)
+        return;
+
+    PanelFactoryInfo info;
+    if (m_im_on) {
+        String uuid = get_instance_uuid (m_instance);
+        info = PanelFactoryInfo (uuid,
+                                 utf8_wcstombs (get_factory_name (uuid)),
+                                 get_factory_language (uuid),
+                                 get_factory_icon_file (uuid));
+    } else {
+        info = PanelFactoryInfo (String (""), String (_("English/Keyboard")),
+                                 String ("C"), String (SCIM_KEYBOARD_ICON_FILE));
+    }
+
+    m_panel_client.prepare (m_instance);
+    m_panel_client.update_factory_info (m_instance, info);
+    m_panel_client.send ();
+}
+
+void
+WaylandFrontEnd::drop_keyboard ()
+{
+    if (!m_v1_keyboard)
+        return;
+    // Destroy the proxy rather than sending wl_keyboard::release: that request
+    // only exists since wl_keyboard version 3, and grab_keyboard creates the
+    // keyboard as a child new_id of the version-1 zwp_input_method_context_v1,
+    // so the proxy inherits version 1. Sending release is a fatal protocol
+    // error ("invalid method 0 (since 1 < 3)") that kills the connection. v1
+    // has no ungrab request; the grab ends with the context.
+    wl_keyboard_destroy (m_v1_keyboard);
+    m_v1_keyboard = 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Registry                                                            */
+/* ------------------------------------------------------------------ */
+
+void
+WaylandFrontEnd::registry_global (uint32_t name, const char *interface, uint32_t version)
+{
+    if (!strcmp (interface, wl_seat_interface.name)) {
+        if (!m_seat) {
+            uint32_t v = version < 7 ? version : 7;
+            m_seat = static_cast<wl_seat *> (
+                wl_registry_bind (m_registry, name, &wl_seat_interface, v));
+            m_seat_name = name;
+        }
+    } else if (!strcmp (interface, zwp_input_method_v1_interface.name)) {
+        m_v1_input_method = static_cast<zwp_input_method_v1 *> (
+            wl_registry_bind (m_registry, name, &zwp_input_method_v1_interface, 1));
+    } else if (!strcmp (interface, zwp_input_method_manager_v2_interface.name)) {
+        m_v2_manager = static_cast<zwp_input_method_manager_v2 *> (
+            wl_registry_bind (m_registry, name,
+                              &zwp_input_method_manager_v2_interface, 1));
+    } else if (!strcmp (interface, zwp_virtual_keyboard_manager_v1_interface.name)) {
+        m_vk_manager = static_cast<zwp_virtual_keyboard_manager_v1 *> (
+            wl_registry_bind (m_registry, name,
+                              &zwp_virtual_keyboard_manager_v1_interface, 1));
+    } else if (!strcmp (interface, zwp_input_panel_v1_interface.name)) {
+        m_v1_input_panel = static_cast<zwp_input_panel_v1 *> (
+            wl_registry_bind (m_registry, name, &zwp_input_panel_v1_interface, 1));
+    } else if (!strcmp (interface, wl_compositor_interface.name)) {
+        uint32_t v = version < 4 ? version : 4;
+        m_compositor = static_cast<wl_compositor *> (
+            wl_registry_bind (m_registry, name, &wl_compositor_interface, v));
+    } else if (!strcmp (interface, wl_shm_interface.name)) {
+        m_shm = static_cast<wl_shm *> (
+            wl_registry_bind (m_registry, name, &wl_shm_interface, 1));
+    }
+}
+
+void
+WaylandFrontEnd::registry_global_remove (uint32_t name)
+{
+    if (name == m_seat_name && m_seat) {
+        std::cerr << "Wayland -- exiting: the seat went away.\n";
+        m_should_exit = true;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* input-method-v1 events                                              */
+/* ------------------------------------------------------------------ */
+
+void
+WaylandFrontEnd::v1_activate (struct zwp_input_method_context_v1 *context)
+{
+    // A text field took focus. The context is the only object that accepts text
+    // requests, and it lives exactly until the matching deactivate.
+    if (m_v1_context)
+        zwp_input_method_context_v1_destroy (m_v1_context);
+    drop_keyboard ();
+
+    m_v1_context = context;
+    m_serial  = 0;
+    zwp_input_method_context_v1_add_listener (m_v1_context, &v1_context_listener, this);
+
+    // Take the hardware keyboard: without this the compositor keeps routing
+    // keys to the application and we never see them. The returned object is a
+    // plain wl_keyboard, so the standard listener applies.
+    m_v1_keyboard = zwp_input_method_context_v1_grab_keyboard (m_v1_context);
+    if (m_v1_keyboard)
+        wl_keyboard_add_listener (m_v1_keyboard, &v1_kb_listener, this);
+
+    // A keymap we already compiled stays valid across contexts, but the new
+    // context needs its modifier names before it can read our bitmasks.
+    send_modifiers_map ();
+
+    enter_focus ();
+}
+
+void
+WaylandFrontEnd::v2_activate ()
+{
+    // v2 keeps one input-method object and one grab for the whole session, so
+    // there is nothing to create here -- only the focus transition.
+    enter_focus ();
+}
+
+void
+WaylandFrontEnd::v2_deactivate ()
+{
+    leave_focus ();
+}
+
+void
+WaylandFrontEnd::v2_done ()
+{
+    // Each done event bumps the serial that commit () must echo back.
     ++m_serial;
 }
 
 void
-WaylandFrontEnd::im_unavailable ()
+WaylandFrontEnd::v2_unavailable ()
 {
     // Another input method owns this seat; we cannot run.
+    std::cerr << "Wayland -- exiting: another input method owns this seat.\n";
     m_should_exit = true;
 }
 
 /* ------------------------------------------------------------------ */
-/* Keyboard grab events                                                */
+/* Focus transitions (shared)                                          */
+/* ------------------------------------------------------------------ */
+
+void
+WaylandFrontEnd::enter_focus ()
+{
+    ensure_instance ();
+    if (m_instance < 0)
+        return;
+
+    m_preedit_str = WideString ();
+    m_preedit_caret = 0;
+    m_focused = true;
+    SCIM_DEBUG_FRONTEND (2) << "Wayland -- activate: protocol=" << proto_name ()
+                            << " siid=" << m_instance
+                            << " xkb=" << (m_xkb_state ? 1 : 0) << "\n";
+
+    if (m_panel_open) {
+        m_panel_client.prepare (m_instance);
+        m_panel_client.register_input_context (m_instance, get_instance_uuid (m_instance));
+        m_panel_client.focus_in (m_instance, get_instance_uuid (m_instance));
+        // Report the real state: turning the panel on unconditionally would
+        // show the engine as active while keys still go straight to the app.
+        if (m_im_on) m_panel_client.turn_on  (m_instance);
+        else         m_panel_client.turn_off (m_instance);
+        m_panel_client.send ();
+        panel_req_update_factory_info ();
+    }
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ())
+        m_kimpanel.enable (true);
+#endif
+    focus_in (m_instance);
+}
+
+void
+WaylandFrontEnd::leave_focus ()
+{
+    if (m_instance >= 0 && m_focused) {
+        if (m_panel_open) {
+            m_panel_client.prepare (m_instance);
+            m_panel_client.turn_off (m_instance);
+            m_panel_client.focus_out (m_instance);
+            m_panel_client.send ();
+        }
+        focus_out (m_instance);
+        reset (m_instance);
+    }
+
+    m_focused = false;
+    m_preedit_str = WideString ();
+    m_preedit_attrs = AttributeList ();
+    m_preedit_caret = 0;
+    m_preedit_shown = false;
+    if (!m_on_the_spot)
+        preedit_to_panel (false);
+
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ()) {
+        m_kimpanel.show_aux_string (false);
+        m_kimpanel.show_lookup_table (false);
+        m_kimpanel.enable (false);
+    }
+#endif
+#ifdef SCIM_HAS_CANDIDATES_WAYLAND
+    if (m_candidates_ui.is_ready ()) {
+        m_candidates_ui.ui ().hide_aux_string ();
+        m_candidates_ui.ui ().hide_lookup_table ();
+        m_candidates_ui.hide ();
+    }
+#endif
+}
+
+void
+WaylandFrontEnd::v1_deactivate (struct zwp_input_method_context_v1 *context)
+{
+    leave_focus ();
+
+    drop_keyboard ();
+    // The compositor names the context it is retiring; destroying anything else
+    // would kill a context we still need.
+    if (context && context == m_v1_context) {
+        zwp_input_method_context_v1_destroy (m_v1_context);
+        m_v1_context = 0;
+    } else if (context) {
+        zwp_input_method_context_v1_destroy (context);
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* input-method-context-v1 events                                      */
+/* ------------------------------------------------------------------ */
+
+void
+WaylandFrontEnd::ctx_surrounding_text (const char * /*text*/, uint32_t /*cursor*/,
+                                         uint32_t /*anchor*/)
+{
+    // TODO: feed surrounding text to the engine (update_surrounding_text) once
+    // the engine-side plumbing is wired. Same gap as the v2 frontend.
+}
+
+void
+WaylandFrontEnd::ctx_reset ()
+{
+    // The application dropped its input state (e.g. the text changed under us).
+    if (m_instance >= 0)
+        reset (m_instance);
+    m_preedit_str = WideString ();
+    m_preedit_caret = 0;
+}
+
+void
+WaylandFrontEnd::ctx_content_type (uint32_t /*hint*/, uint32_t /*purpose*/)
+{
+    // TODO: suppress the engine for password / digit-only fields once the
+    // backend exposes a way to bypass conversion per context.
+}
+
+void
+WaylandFrontEnd::ctx_invoke_action (uint32_t /*button*/, uint32_t index)
+{
+    // The user clicked inside our input panel surface. v2 has no equivalent
+    // event -- there we hit-test wl_pointer ourselves.
+    if (m_instance >= 0 && m_focused)
+        select_candidate (m_instance, index);
+}
+
+void
+WaylandFrontEnd::ctx_commit_state (uint32_t serial)
+{
+    // Every commit_string / preedit_string must echo the newest serial, or the
+    // compositor discards the request as stale.
+    m_serial = serial;
+}
+
+void
+WaylandFrontEnd::ctx_preferred_language (const char * /*language*/)
+{
+    // The engine is chosen by SCIM config, not per text field; ignoring this
+    // keeps the active engine stable while the user moves between fields.
+}
+
+/* ------------------------------------------------------------------ */
+/* Grabbed keyboard events                                             */
 /* ------------------------------------------------------------------ */
 
 void
 WaylandFrontEnd::kb_keymap (uint32_t format, int32_t fd, uint32_t size)
 {
-    // Mirror the keymap onto the virtual keyboard so forwarded keycodes are
-    // interpreted identically by the compositor.
-    if (m_virtual_keyboard)
+    // Mirror the keymap onto the virtual keyboard so keycodes we forward are
+    // interpreted identically by the compositor. v1 forwards through the
+    // context, which already shares the seat keymap, so this is v2 only.
+    if (m_proto == PROTO_V2 && m_virtual_keyboard)
         zwp_virtual_keyboard_v1_keymap (m_virtual_keyboard, format, fd, size);
 
     if (format == XKB_KEYMAP_FORMAT_TEXT_V1 && m_xkb_context) {
@@ -540,6 +1157,7 @@ WaylandFrontEnd::kb_keymap (uint32_t format, int32_t fd, uint32_t size)
                 if (m_xkb_keymap) xkb_keymap_unref (m_xkb_keymap);
                 m_xkb_keymap = keymap;
                 m_xkb_state  = xkb_state_new (m_xkb_keymap);
+                send_modifiers_map ();
             }
         }
     }
@@ -548,28 +1166,68 @@ WaylandFrontEnd::kb_keymap (uint32_t format, int32_t fd, uint32_t size)
 }
 
 void
-WaylandFrontEnd::kb_key (uint32_t /*serial*/, uint32_t time, uint32_t key, uint32_t state)
+WaylandFrontEnd::kb_key (uint32_t serial, uint32_t time, uint32_t key, uint32_t state)
 {
-    if (m_instance < 0 || !m_xkb_state) {
-        // No engine / keymap yet: pass the key straight through.
-        if (m_virtual_keyboard) {
-            zwp_virtual_keyboard_v1_key (m_virtual_keyboard, time, key, state);
+    // v1 can only speak through a live context; v2 through its input method.
+    bool can_send = (m_proto == PROTO_V2) ? (m_v2_input_method != 0)
+                                          : (m_v1_context != 0);
+    if (m_instance < 0 || !m_xkb_state || !can_send) {
+        // No engine / keymap / context yet: pass the key straight through.
+        if (can_send) {
+            m_have_current_key      = true;
+            m_current_key_serial    = serial;
+            m_current_key_time      = time;
+            m_current_key_code      = key;
+            m_current_key_state     = state;
+            m_current_key_forwarded = false;
+            proto_forward_key ();
+            m_have_current_key      = false;
             wl_display_flush (m_display);
         }
         return;
     }
 
     m_have_current_key      = true;
+    m_current_key_serial    = serial;
     m_current_key_time      = time;
     m_current_key_code      = key;
     m_current_key_state     = state;
     m_current_key_forwarded = false;
 
     KeyEvent scimkey = wayland_key_to_scim (key, state);
+    scimkey.mask &= m_valid_key_mask;
 
+    // Hotkeys come first and are checked whether or not the engine is on --
+    // otherwise the trigger that turns it back on would itself be swallowed.
+    // Focus is still required: with no active text input there is nowhere to
+    // send a commit, so toggling the engine could only mislead, and consuming
+    // the key would take it from an application that may use it as a shortcut.
     bool consumed = false;
-    if (m_focused)
+    bool hotkey = false;
+    if (m_focused && filter_hotkeys (scimkey)) {
+        consumed = true;
+        hotkey = true;
+    } else if (m_focused && m_im_on) {
         consumed = process_key_event (m_instance, scimkey);
+    }
+
+    SCIM_DEBUG_FRONTEND (3) << "Wayland key: evdev=" << key
+                            << " sym=0x" << std::hex << scimkey.code
+                            << " mask=0x" << scimkey.mask << std::dec
+                            << " state=" << state
+                            << " focused=" << m_focused
+                            << " im_on=" << m_im_on
+                            << " siid=" << m_instance
+                            << " hotkey=" << hotkey
+                            << " consumed=" << consumed << "\n";
+
+    // A key release is never consumed, whatever the engine says. Engines report
+    // releases as handled (scim-tables returns true for every one) because they
+    // have no use for them, but swallowing a release leaves the compositor
+    // believing the key is still held, and it autorepeats forever. Same fix as
+    // the ibus frontend's IBUS_RELEASE_MASK guard.
+    if (state != WL_KEYBOARD_KEY_STATE_PRESSED)
+        consumed = false;
 
     if (!consumed && !m_current_key_forwarded)
         forward_current_key ();
@@ -579,20 +1237,56 @@ WaylandFrontEnd::kb_key (uint32_t /*serial*/, uint32_t time, uint32_t key, uint3
 }
 
 void
-WaylandFrontEnd::kb_modifiers (uint32_t /*serial*/, uint32_t mods_depressed,
-                               uint32_t mods_latched, uint32_t mods_locked, uint32_t group)
+WaylandFrontEnd::kb_modifiers (uint32_t serial, uint32_t mods_depressed,
+                                 uint32_t mods_latched, uint32_t mods_locked, uint32_t group)
 {
     if (m_xkb_state)
         xkb_state_update_mask (m_xkb_state, mods_depressed, mods_latched,
                                mods_locked, 0, 0, group);
-    if (m_virtual_keyboard)
-        zwp_virtual_keyboard_v1_modifiers (m_virtual_keyboard, mods_depressed,
-                                           mods_latched, mods_locked, group);
+    // Mirror the modifier state back so the application sees the same shift /
+    // ctrl state we do while we hold the grab.
+    if (m_proto == PROTO_V2) {
+        if (m_virtual_keyboard)
+            zwp_virtual_keyboard_v1_modifiers (m_virtual_keyboard, mods_depressed,
+                                               mods_latched, mods_locked, group);
+    } else if (m_v1_context) {
+        zwp_input_method_context_v1_modifiers (m_v1_context, serial, mods_depressed,
+                                              mods_latched, mods_locked, group);
+    }
 }
 
 /* ------------------------------------------------------------------ */
 /* Key translation / forwarding                                        */
 /* ------------------------------------------------------------------ */
+
+void
+WaylandFrontEnd::send_modifiers_map ()
+{
+    // The bitmasks we pass to the context's modifiers/keysym requests are the
+    // seat keymap's, so hand over that keymap's modifier names in index order
+    // for the compositor to interpret them. wl_array holds the names as a
+    // sequence of NUL-terminated strings.
+    if (!m_v1_context || !m_xkb_keymap)
+        return;
+
+    struct wl_array map;
+    wl_array_init (&map);
+
+    xkb_mod_index_t num = xkb_keymap_num_mods (m_xkb_keymap);
+    for (xkb_mod_index_t i = 0; i < num; ++i) {
+        const char *name = xkb_keymap_mod_get_name (m_xkb_keymap, i);
+        if (!name)
+            name = "";
+        size_t len = strlen (name) + 1;
+        void *p = wl_array_add (&map, len);
+        if (!p)
+            break;
+        memcpy (p, name, len);
+    }
+
+    zwp_input_method_context_v1_modifiers_map (m_v1_context, &map);
+    wl_array_release (&map);
+}
 
 KeyEvent
 WaylandFrontEnd::wayland_key_to_scim (uint32_t key, uint32_t state) const
@@ -631,10 +1325,9 @@ WaylandFrontEnd::wayland_key_to_scim (uint32_t key, uint32_t state) const
 void
 WaylandFrontEnd::forward_current_key ()
 {
-    if (!m_have_current_key || m_current_key_forwarded || !m_virtual_keyboard)
+    if (!m_have_current_key || m_current_key_forwarded)
         return;
-    zwp_virtual_keyboard_v1_key (m_virtual_keyboard, m_current_key_time,
-                                 m_current_key_code, m_current_key_state);
+    proto_forward_key ();
     m_current_key_forwarded = true;
 }
 
@@ -645,21 +1338,179 @@ WaylandFrontEnd::forward_current_key ()
 void
 WaylandFrontEnd::send_preedit ()
 {
-    if (!m_input_method)
-        return;
-
+    // No protocol guard here: proto_send_preedit () checks the object that the
+    // negotiated generation actually uses. Testing m_v1_context would silently
+    // drop every preedit on v2, where that pointer is always null because v2 has
+    // no per-activation context.
     String utf8 = utf8_wcstombs (m_preedit_str);
 
     int caret = m_preedit_caret;
     if (caret < 0) caret = 0;
     if (caret > (int) m_preedit_str.length ()) caret = (int) m_preedit_str.length ();
     String prefix = utf8_wcstombs (m_preedit_str.substr (0, caret));
-    int32_t cursor = static_cast<int32_t> (prefix.length ());
 
-    zwp_input_method_v2_set_preedit_string (m_input_method, utf8.c_str (),
-                                            cursor, cursor);
-    zwp_input_method_v2_commit (m_input_method, m_serial);
+    proto_send_preedit (utf8, static_cast<int32_t> (prefix.length ()));
     wl_display_flush (m_display);
+}
+
+/* ------------------------------------------------------------------ */
+/* Protocol-specific operations                                        */
+/* ------------------------------------------------------------------ */
+
+const char *
+WaylandFrontEnd::proto_name () const
+{
+    return m_proto == PROTO_V2 ? "input-method-v2"
+         : m_proto == PROTO_V1 ? "input-method-v1"
+                               : "none";
+}
+
+void
+WaylandFrontEnd::proto_start_grab ()
+{
+    if (m_proto == PROTO_V2) {
+        if (!m_v2_input_method || m_v2_grab)
+            return;
+        m_v2_grab = zwp_input_method_v2_grab_keyboard (m_v2_input_method);
+        if (m_v2_grab)
+            zwp_input_method_keyboard_grab_v2_add_listener (m_v2_grab,
+                                                           &v2_grab_listener, this);
+    }
+    // v1 grabs per context, from v1_activate ().
+}
+
+void
+WaylandFrontEnd::proto_send_preedit (const String &utf8, int32_t cursor)
+{
+    // An empty preedit must hide the cursor rather than place one at offset 0.
+    // Both protocols spell this the same way -- a negative index means "no
+    // cursor" -- and an application told to draw a cursor inside an empty
+    // preedit hides its own to make room: VTE terminals lose their blinking
+    // cursor entirely until the text input is reset by a focus change.
+    if (!utf8.length ())
+        cursor = -1;
+
+
+    if (m_proto == PROTO_V2) {
+        if (!m_v2_input_method)
+            return;
+        zwp_input_method_v2_set_preedit_string (m_v2_input_method, utf8.c_str (),
+                                               cursor, cursor);
+        zwp_input_method_v2_commit (m_v2_input_method, m_serial);
+        return;
+    }
+
+    if (!m_v1_context)
+        return;
+    // preedit_cursor is consumed by the following preedit_string, so it has to
+    // be sent first; the index is a byte offset into the preedit text.
+    zwp_input_method_context_v1_preedit_cursor (m_v1_context, cursor);
+    // The "commit" argument is what the application should keep if the preedit
+    // is dropped without us committing (e.g. on unfocus). Empty: SCIM discards
+    // uncommitted input on reset / focus_out, and every other frontend behaves
+    // that way, so leaving raw phonetic keys behind would be inconsistent.
+    zwp_input_method_context_v1_preedit_string (m_v1_context, m_serial,
+                                               utf8.c_str (), "");
+}
+
+void
+WaylandFrontEnd::proto_clear_preedit ()
+{
+    proto_send_preedit (String (""), 0);
+}
+
+void
+WaylandFrontEnd::proto_commit_string (const String &utf8)
+{
+    if (m_proto == PROTO_V2) {
+        if (!m_v2_input_method)
+            return;
+        // Clear the preedit in the same batch, with the cursor explicitly
+        // hidden. Relying on the double-buffered state to empty it is not
+        // enough: the reset value of cursor_begin/cursor_end the compositor
+        // then forwards is 0, not -1, so the application is told to draw a
+        // cursor inside an empty preedit and hides its own to make room.
+        zwp_input_method_v2_set_preedit_string (m_v2_input_method, "", -1, -1);
+        zwp_input_method_v2_commit_string (m_v2_input_method, utf8.c_str ());
+        zwp_input_method_v2_commit (m_v2_input_method, m_serial);
+        return;
+    }
+
+    if (!m_v1_context)
+        return;
+    // Drop the preedit before committing: the application would otherwise keep
+    // showing the composing text next to the text we just committed.
+    proto_clear_preedit ();
+    zwp_input_method_context_v1_commit_string (m_v1_context, m_serial, utf8.c_str ());
+}
+
+void
+WaylandFrontEnd::proto_forward_key ()
+{
+    // Forward the original evdev keycode rather than reconstructing one from the
+    // keysym, so the compositor sees exactly what the user pressed.
+    if (m_proto == PROTO_V2) {
+        if (m_virtual_keyboard)
+            zwp_virtual_keyboard_v1_key (m_virtual_keyboard, m_current_key_time,
+                                         m_current_key_code, m_current_key_state);
+        return;
+    }
+
+    if (m_v1_context)
+        // v1 also wants the keyboard event's own serial, as the protocol
+        // requires: "the arguments should be the ones from the
+        // wl_keyboard::key event".
+        zwp_input_method_context_v1_key (m_v1_context, m_current_key_serial,
+                                         m_current_key_time, m_current_key_code,
+                                         m_current_key_state);
+}
+
+bool
+WaylandFrontEnd::proto_candidates_init ()
+{
+#ifdef SCIM_HAS_CANDIDATES_WAYLAND
+    if (!m_compositor || !m_shm)
+        return false;
+    if (m_proto == PROTO_V2)
+        return m_v2_input_method &&
+               m_candidates_ui.init (m_display, m_compositor, m_shm,
+                                     m_v2_input_method, m_seat);
+    return m_v1_input_panel &&
+           m_candidates_ui.init_input_panel (m_display, m_compositor, m_shm,
+                                             m_v1_input_panel, m_seat);
+#else
+    return false;
+#endif
+}
+
+void
+WaylandFrontEnd::clear_preedit_on_app ()
+{
+    proto_clear_preedit ();
+}
+
+void
+WaylandFrontEnd::preedit_to_panel (bool visible)
+{
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ()) {
+        m_kimpanel.update_preedit_string (m_preedit_str);
+        m_kimpanel.update_preedit_caret (m_preedit_caret);
+        m_kimpanel.show_preedit_string (visible);
+        return;
+    }
+#endif
+#ifdef SCIM_HAS_CANDIDATES_WAYLAND
+    if (m_candidates_ui.is_ready ()) {
+        m_candidates_ui.ui ().update_preedit_string (m_preedit_str, m_preedit_attrs);
+        m_candidates_ui.ui ().update_preedit_caret (m_preedit_caret);
+        if (visible) m_candidates_ui.ui ().show_preedit_string ();
+        else         m_candidates_ui.ui ().hide_preedit_string ();
+        refresh_candidates_ui ();
+    }
+#else
+    (void) visible;
+#endif
 }
 
 void
@@ -667,47 +1518,54 @@ WaylandFrontEnd::update_preedit_caret (int id, int caret)
 {
     if (id != m_instance) return;
     m_preedit_caret = caret;
-    send_preedit ();
+    if (m_on_the_spot) send_preedit ();
+    else               preedit_to_panel (m_preedit_shown);
 }
 
 void
 WaylandFrontEnd::update_preedit_string (int id, const WideString & str,
-                                        const AttributeList & /*attrs*/)
+                                          const AttributeList & attrs)
 {
     if (id != m_instance) return;
-    m_preedit_str = str;
+    m_preedit_str   = str;
+    m_preedit_attrs = attrs;
     if (m_preedit_caret > (int) str.length ())
         m_preedit_caret = (int) str.length ();
-    send_preedit ();
+    if (m_on_the_spot) send_preedit ();
+    else               preedit_to_panel (m_preedit_shown);
 }
 
 void
 WaylandFrontEnd::show_preedit_string (int id)
 {
     if (id != m_instance) return;
-    send_preedit ();
+    m_preedit_shown = true;
+    if (m_on_the_spot) send_preedit ();
+    else               preedit_to_panel (true);
 }
 
 void
 WaylandFrontEnd::hide_preedit_string (int id)
 {
     if (id != m_instance) return;
-    m_preedit_str = WideString ();
+    m_preedit_shown = false;
+    m_preedit_str   = WideString ();
+    m_preedit_attrs = AttributeList ();
     m_preedit_caret = 0;
-    if (m_input_method) {
-        zwp_input_method_v2_set_preedit_string (m_input_method, "", 0, 0);
-        zwp_input_method_v2_commit (m_input_method, m_serial);
-        wl_display_flush (m_display);
+    if (m_on_the_spot) {
+        clear_preedit_on_app ();
+        if (m_display)
+            wl_display_flush (m_display);
+    } else {
+        preedit_to_panel (false);
     }
 }
 
 void
 WaylandFrontEnd::commit_string (int id, const WideString & str)
 {
-    if (id != m_instance || !m_input_method) return;
-    String utf8 = utf8_wcstombs (str);
-    zwp_input_method_v2_commit_string (m_input_method, utf8.c_str ());
-    zwp_input_method_v2_commit (m_input_method, m_serial);
+    if (id != m_instance) return;
+    proto_commit_string (utf8_wcstombs (str));
     wl_display_flush (m_display);
 }
 
@@ -722,7 +1580,7 @@ WaylandFrontEnd::forward_key_event (int id, const KeyEvent & /*key*/)
 }
 
 /* ------------------------------------------------------------------ */
-/* Aux + candidate lookup table -> popup renderer or kimpanel           */
+/* Aux + candidate lookup table -> panel renderer or kimpanel           */
 /* ------------------------------------------------------------------ */
 
 #ifdef SCIM_HAS_CANDIDATES_WAYLAND
@@ -739,7 +1597,6 @@ WaylandFrontEnd::configure_candidates_ui ()
 {
     if (!m_candidates_ui.is_ready ())
         return;
-    // Apply the configured font AND colors, matching the legacy GTK panel.
     m_candidates_ui.ui ().set_theme (scim_candidates_theme_from_config (m_config));
 }
 
@@ -770,7 +1627,7 @@ WaylandFrontEnd::candidates_ui_page_down ()
 
 void
 WaylandFrontEnd::update_aux_string (int id, const WideString & str,
-                                    const AttributeList & attrs)
+                                      const AttributeList & attrs)
 {
     if (id != m_instance) return;
 #ifdef SCIM_HAS_KIMPANEL
@@ -781,6 +1638,8 @@ WaylandFrontEnd::update_aux_string (int id, const WideString & str,
         m_candidates_ui.ui ().update_aux_string (str, attrs);
         refresh_candidates_ui ();
     }
+#else
+    (void) attrs;
 #endif
 }
 
@@ -826,6 +1685,8 @@ WaylandFrontEnd::update_lookup_table (int id, const LookupTable & table)
         m_candidates_ui.ui ().update_lookup_table (table);
         refresh_candidates_ui ();
     }
+#else
+    (void) table;
 #endif
 }
 
@@ -867,88 +1728,184 @@ WaylandFrontEnd::hide_lookup_table (int id)
 
 void
 WaylandFrontEnd::handle_registry_global (void *data, struct wl_registry *,
-                                         uint32_t name, const char *interface,
-                                         uint32_t version)
+                                           uint32_t name, const char *interface,
+                                           uint32_t version)
 {
     static_cast<WaylandFrontEnd *> (data)->registry_global (name, interface, version);
 }
 
 void
 WaylandFrontEnd::handle_registry_global_remove (void *data, struct wl_registry *,
-                                                uint32_t name)
+                                                  uint32_t name)
 {
     static_cast<WaylandFrontEnd *> (data)->registry_global_remove (name);
 }
 
 void
-WaylandFrontEnd::handle_im_activate (void *data, struct zwp_input_method_v2 *)
+WaylandFrontEnd::handle_v1_activate (void *data, struct zwp_input_method_v1 *,
+                                       struct zwp_input_method_context_v1 *context)
 {
-    static_cast<WaylandFrontEnd *> (data)->im_activate ();
+    static_cast<WaylandFrontEnd *> (data)->v1_activate (context);
 }
 
 void
-WaylandFrontEnd::handle_im_deactivate (void *data, struct zwp_input_method_v2 *)
+WaylandFrontEnd::handle_v1_deactivate (void *data, struct zwp_input_method_v1 *,
+                                         struct zwp_input_method_context_v1 *context)
 {
-    static_cast<WaylandFrontEnd *> (data)->im_deactivate ();
+    static_cast<WaylandFrontEnd *> (data)->v1_deactivate (context);
 }
 
 void
-WaylandFrontEnd::handle_im_surrounding_text (void *data, struct zwp_input_method_v2 *,
+WaylandFrontEnd::handle_ctx_surrounding_text (void *data, struct zwp_input_method_context_v1 *,
+                                                const char *text, uint32_t cursor, uint32_t anchor)
+{
+    static_cast<WaylandFrontEnd *> (data)->ctx_surrounding_text (text, cursor, anchor);
+}
+
+void
+WaylandFrontEnd::handle_ctx_reset (void *data, struct zwp_input_method_context_v1 *)
+{
+    static_cast<WaylandFrontEnd *> (data)->ctx_reset ();
+}
+
+void
+WaylandFrontEnd::handle_ctx_content_type (void *data, struct zwp_input_method_context_v1 *,
+                                            uint32_t hint, uint32_t purpose)
+{
+    static_cast<WaylandFrontEnd *> (data)->ctx_content_type (hint, purpose);
+}
+
+void
+WaylandFrontEnd::handle_ctx_invoke_action (void *data, struct zwp_input_method_context_v1 *,
+                                             uint32_t button, uint32_t index)
+{
+    static_cast<WaylandFrontEnd *> (data)->ctx_invoke_action (button, index);
+}
+
+void
+WaylandFrontEnd::handle_ctx_commit_state (void *data, struct zwp_input_method_context_v1 *,
+                                            uint32_t serial)
+{
+    static_cast<WaylandFrontEnd *> (data)->ctx_commit_state (serial);
+}
+
+void
+WaylandFrontEnd::handle_ctx_preferred_language (void *data, struct zwp_input_method_context_v1 *,
+                                                  const char *language)
+{
+    static_cast<WaylandFrontEnd *> (data)->ctx_preferred_language (language);
+}
+
+void
+WaylandFrontEnd::handle_v2_activate (void *data, struct zwp_input_method_v2 *)
+{
+    static_cast<WaylandFrontEnd *> (data)->v2_activate ();
+}
+
+void
+WaylandFrontEnd::handle_v2_deactivate (void *data, struct zwp_input_method_v2 *)
+{
+    static_cast<WaylandFrontEnd *> (data)->v2_deactivate ();
+}
+
+void
+WaylandFrontEnd::handle_v2_surrounding_text (void *data, struct zwp_input_method_v2 *,
                                              const char *text, uint32_t cursor, uint32_t anchor)
 {
-    static_cast<WaylandFrontEnd *> (data)->im_surrounding_text (text, cursor, anchor);
+    static_cast<WaylandFrontEnd *> (data)->ctx_surrounding_text (text, cursor, anchor);
 }
 
 void
-WaylandFrontEnd::handle_im_text_change_cause (void *, struct zwp_input_method_v2 *,
-                                              uint32_t)
+WaylandFrontEnd::handle_v2_text_change_cause (void *, struct zwp_input_method_v2 *, uint32_t)
 {
 }
 
 void
-WaylandFrontEnd::handle_im_content_type (void *, struct zwp_input_method_v2 *,
-                                         uint32_t, uint32_t)
+WaylandFrontEnd::handle_v2_content_type (void *data, struct zwp_input_method_v2 *,
+                                         uint32_t hint, uint32_t purpose)
 {
+    static_cast<WaylandFrontEnd *> (data)->ctx_content_type (hint, purpose);
 }
 
 void
-WaylandFrontEnd::handle_im_done (void *data, struct zwp_input_method_v2 *)
+WaylandFrontEnd::handle_v2_done (void *data, struct zwp_input_method_v2 *)
 {
-    static_cast<WaylandFrontEnd *> (data)->im_done ();
+    static_cast<WaylandFrontEnd *> (data)->v2_done ();
 }
 
 void
-WaylandFrontEnd::handle_im_unavailable (void *data, struct zwp_input_method_v2 *)
+WaylandFrontEnd::handle_v2_unavailable (void *data, struct zwp_input_method_v2 *)
 {
-    static_cast<WaylandFrontEnd *> (data)->im_unavailable ();
+    static_cast<WaylandFrontEnd *> (data)->v2_unavailable ();
 }
 
 void
-WaylandFrontEnd::handle_kb_keymap (void *data, struct zwp_input_method_keyboard_grab_v2 *,
-                                   uint32_t format, int32_t fd, uint32_t size)
+WaylandFrontEnd::handle_grab_keymap (void *data, struct zwp_input_method_keyboard_grab_v2 *,
+                                     uint32_t format, int32_t fd, uint32_t size)
 {
     static_cast<WaylandFrontEnd *> (data)->kb_keymap (format, fd, size);
 }
 
 void
-WaylandFrontEnd::handle_kb_key (void *data, struct zwp_input_method_keyboard_grab_v2 *,
-                                uint32_t serial, uint32_t time, uint32_t key, uint32_t state)
+WaylandFrontEnd::handle_grab_key (void *data, struct zwp_input_method_keyboard_grab_v2 *,
+                                  uint32_t serial, uint32_t time, uint32_t key, uint32_t state)
 {
     static_cast<WaylandFrontEnd *> (data)->kb_key (serial, time, key, state);
 }
 
 void
-WaylandFrontEnd::handle_kb_modifiers (void *data, struct zwp_input_method_keyboard_grab_v2 *,
-                                      uint32_t serial, uint32_t mods_depressed,
-                                      uint32_t mods_latched, uint32_t mods_locked, uint32_t group)
+WaylandFrontEnd::handle_grab_modifiers (void *data, struct zwp_input_method_keyboard_grab_v2 *,
+                                        uint32_t serial, uint32_t mods_depressed,
+                                        uint32_t mods_latched, uint32_t mods_locked, uint32_t group)
 {
     static_cast<WaylandFrontEnd *> (data)->kb_modifiers (serial, mods_depressed,
-                                                         mods_latched, mods_locked, group);
+                                                        mods_latched, mods_locked, group);
 }
 
 void
-WaylandFrontEnd::handle_kb_repeat_info (void *, struct zwp_input_method_keyboard_grab_v2 *,
-                                        int32_t, int32_t)
+WaylandFrontEnd::handle_grab_repeat_info (void *, struct zwp_input_method_keyboard_grab_v2 *,
+                                          int32_t, int32_t)
+{
+}
+
+void
+WaylandFrontEnd::handle_kb_keymap (void *data, struct wl_keyboard *,
+                                     uint32_t format, int32_t fd, uint32_t size)
+{
+    static_cast<WaylandFrontEnd *> (data)->kb_keymap (format, fd, size);
+}
+
+void
+WaylandFrontEnd::handle_kb_enter (void *, struct wl_keyboard *, uint32_t,
+                                    struct wl_surface *, struct wl_array *)
+{
+    // The grab is not tied to a surface; focus is tracked via activate.
+}
+
+void
+WaylandFrontEnd::handle_kb_leave (void *, struct wl_keyboard *, uint32_t,
+                                    struct wl_surface *)
+{
+}
+
+void
+WaylandFrontEnd::handle_kb_key (void *data, struct wl_keyboard *, uint32_t serial,
+                                  uint32_t time, uint32_t key, uint32_t state)
+{
+    static_cast<WaylandFrontEnd *> (data)->kb_key (serial, time, key, state);
+}
+
+void
+WaylandFrontEnd::handle_kb_modifiers (void *data, struct wl_keyboard *, uint32_t serial,
+                                        uint32_t mods_depressed, uint32_t mods_latched,
+                                        uint32_t mods_locked, uint32_t group)
+{
+    static_cast<WaylandFrontEnd *> (data)->kb_modifiers (serial, mods_depressed,
+                                                           mods_latched, mods_locked, group);
+}
+
+void
+WaylandFrontEnd::handle_kb_repeat_info (void *, struct wl_keyboard *, int32_t, int32_t)
 {
 }
 

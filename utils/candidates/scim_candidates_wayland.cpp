@@ -30,6 +30,7 @@
 #include "scim_candidates_wayland.h"
 
 #include <wayland-client.h>
+#include "input-method-unstable-v1-client-protocol.h"
 #include "input-method-unstable-v2-client-protocol.h"
 
 #include <cairo.h>
@@ -76,8 +77,14 @@ public:
     struct wl_seat       *m_seat;
 
     struct wl_surface    *m_surface;
+    // Exactly one role is set, depending on which init() was used.
     struct zwp_input_popup_surface_v2 *m_popup;
+    struct zwp_input_panel_surface_v1 *m_panel_surface;
     struct wl_pointer    *m_pointer;
+
+    // Set from the input-popup surface's text_input_rectangle: true when the
+    // compositor placed us above the text rather than below it.
+    bool     m_text_below;
 
     // Pointer state.
     bool     m_pointer_on_surface;
@@ -90,7 +97,8 @@ public:
 
     CandidatesWaylandImpl ()
         : m_display (0), m_compositor (0), m_shm (0), m_input_method (0),
-          m_seat (0), m_surface (0), m_popup (0), m_pointer (0),
+          m_seat (0), m_surface (0), m_popup (0), m_panel_surface (0), m_pointer (0),
+          m_text_below (false),
           m_pointer_on_surface (false), m_ptr_x (0), m_ptr_y (0),
           m_enter_serial (0)
     {
@@ -105,6 +113,10 @@ public:
     {
         if (m_pointer) { wl_pointer_destroy (m_pointer); m_pointer = 0; }
         if (m_popup)   { zwp_input_popup_surface_v2_destroy (m_popup); m_popup = 0; }
+        if (m_panel_surface) {
+            zwp_input_panel_surface_v1_destroy (m_panel_surface);
+            m_panel_surface = 0;
+        }
         if (m_surface) { wl_surface_destroy (m_surface); m_surface = 0; }
     }
 
@@ -302,11 +314,31 @@ const struct wl_pointer_listener pointer_listener = {
     ptr_axis_relative_direction,
 };
 
-// input-popup-surface: the compositor tells us where the text cursor is
-// within our surface. Not used yet (compositor default-positions the popup).
-// TODO(5c): use this rectangle to align the candidate window to the cursor.
-void popup_text_input_rectangle (void *, struct zwp_input_popup_surface_v2 *,
-                                 int32_t, int32_t, int32_t, int32_t) {}
+// input-popup-surface: the compositor reports the text input area as a rectangle
+// in *our* surface coordinates. It cannot be used to position the panel -- the
+// compositor owns placement, and the surface is sized exactly to the content, so
+// there is nothing to align within and nothing to move. What it does tell us is
+// which side of the panel the text sits on: a positive y means the text is below
+// us, i.e. the compositor put the panel above the text (typically near the
+// bottom of the screen). In that case mirror the section order so the block
+// nearest the text is the one closest to it.
+//
+// input-method-v1 has no equivalent event, so this refinement is v2 only; there
+// the section order simply stays as laid out.
+void popup_text_input_rectangle (void *data, struct zwp_input_popup_surface_v2 *,
+                                 int32_t, int32_t y, int32_t, int32_t)
+{
+    CandidatesWaylandImpl *d = static_cast<CandidatesWaylandImpl *> (data);
+    bool text_below = (y > 0);
+    if (d->m_text_below == text_below)
+        return;
+    d->m_text_below = text_below;
+    d->m_ui.set_sections_reversed (text_below);
+    // Re-render only when something is already on screen; otherwise the next
+    // update () picks the new order up.
+    if (d->m_ui.is_visible ())
+        d->update ();
+}
 
 const struct zwp_input_popup_surface_v2_listener popup_listener = {
     popup_text_input_rectangle,
@@ -367,6 +399,50 @@ CandidatesWayland::init (struct wl_display *display,
     return true;
 }
 
+bool
+CandidatesWayland::init_input_panel (struct wl_display *display,
+                                     struct wl_compositor *compositor,
+                                     struct wl_shm *shm,
+                                     struct zwp_input_panel_v1 *panel,
+                                     struct wl_seat *seat)
+{
+    CandidatesWaylandImpl *d = m_impl;
+    if (!display || !compositor || !shm || !panel)
+        return false;
+
+    d->m_display    = display;
+    d->m_compositor = compositor;
+    d->m_shm        = shm;
+    d->m_seat       = seat;
+
+    d->m_surface = wl_compositor_create_surface (compositor);
+    if (!d->m_surface)
+        return false;
+
+    d->m_panel_surface =
+        zwp_input_panel_v1_get_input_panel_surface (panel, d->m_surface);
+    if (!d->m_panel_surface) {
+        wl_surface_destroy (d->m_surface);
+        d->m_surface = 0;
+        return false;
+    }
+
+    // Overlay panel rather than set_toplevel (): a candidate window follows the
+    // text being typed, so it should float over the app instead of being docked
+    // as a full-width on-screen keyboard. zwp_input_panel_surface_v1 has no
+    // listener -- unlike the v2 popup there is no cursor-rectangle event, so the
+    // compositor's placement is all we get.
+    zwp_input_panel_surface_v1_set_overlay_panel (d->m_panel_surface);
+
+    if (seat) {
+        d->m_pointer = wl_seat_get_pointer (seat);
+        if (d->m_pointer)
+            wl_pointer_add_listener (d->m_pointer, &pointer_listener, d);
+    }
+
+    return true;
+}
+
 void
 CandidatesWayland::finish ()
 {
@@ -376,7 +452,7 @@ CandidatesWayland::finish ()
 bool
 CandidatesWayland::is_ready () const
 {
-    return m_impl->m_popup != 0;
+    return m_impl->m_popup != 0 || m_impl->m_panel_surface != 0;
 }
 
 CandidatesUI &

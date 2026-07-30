@@ -129,6 +129,15 @@ public:
     const CandidatesTheme & get_theme () const;
     /** @brief Convenience: override just the font description. */
     void set_font (const String &font_desc);
+    /**
+     * @brief Mirror the order of the sections within the panel.
+     *
+     * Each section keeps its own layout; only their order top-to-bottom is
+     * reversed, so candidate rows and the caret stay put relative to their
+     * own block. Used when the panel sits above the text being edited, to
+     * keep the section nearest the text closest to it.
+     */
+    void set_sections_reversed (bool reversed);
     /** @} */
 
     /** @name State updates (mirror PanelClient cursor-relative calls) @{ */

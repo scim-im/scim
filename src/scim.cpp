@@ -316,8 +316,17 @@ int main (int argc, char *argv [])
     // activation is instant and learned state survives ibus-daemon killing and
     // relaunching ibus.so) plus the "ibussync" coordinator frontend, which keeps
     // the enabled engines in sync with GNOME's input-source list off that same
-    // backend directly. Both run in one daemon over one backend. This is decided
-    // BEFORE the frontend/config availability checks; skipped when -f was given.
+    // backend.
+    //
+    // The two cannot share a launcher: SocketFrontEnd drives its own blocking
+    // SocketServer::run() loop and does not implement the cooperative
+    // (poll-fds / process-events) frontend interface, so scim-launcher refuses
+    // "socket,ibussync" outright. Run the backend as its own daemon and
+    // supervise the coordinator as a separate process that reaches the backend
+    // over the socket (ibussync supports being loaded alone).
+    //
+    // This is decided BEFORE the frontend/config availability checks; skipped
+    // when -f was given.
     if (ibus_session && !frontend_forced) {
         bool have_socket =
             std::find (frontend_list.begin (), frontend_list.end (),
@@ -326,17 +335,51 @@ int main (int argc, char *argv [])
             std::find (frontend_list.begin (), frontend_list.end (),
                        String ("ibussync")) != frontend_list.end ();
 
-        String fe;
-        if (have_socket)   fe = String ("socket");
-        if (have_ibussync) fe += (fe.length () ? String (",") : String ()) + String ("ibussync");
+        if (have_socket || have_ibussync) {
+            cerr << "GNOME/ibus session: running the shared SCIM backend daemon"
+                 << (have_socket   ? " (socket)" : "")
+                 << (have_ibussync ? " with the ibussync coordinator" : "")
+                 << "...\n";
 
-        if (fe.length ()) {
-            cerr << "GNOME/ibus session: running the shared SCIM backend daemon ("
-                 << fe << ")...\n";
             if (daemon)
                 scim_daemon ();   // background ourselves; become the supervisor
+
+            if (!have_ibussync) {
+                // Nothing to coordinate: just keep the warm backend running.
+                int rc = run_supervised (daemon, [&] () {
+                    return scim_launch (false, def_config, "all", "socket", new_argv);
+                });
+                return rc == 0 ? 0 : rc;
+            }
+
+            // Bring up (or adopt) the warm SocketFrontEnd. Launched with
+            // daemon=true so it backgrounds itself and outlives any single
+            // coordinator restart, and without --no-stay so it does not exit
+            // while ibus-daemon is between ibus.so instances.
+            std::function<bool ()> ensure_backend = [&] () -> bool {
+                if (!have_socket)
+                    return true;
+                if (check_socket_frontend ())
+                    return true;
+                scim_launch (true, def_config, "all", "socket", 0);
+                for (int i = 0; i < 100; ++i) {
+                    if (check_socket_frontend ())
+                        return true;
+                    scim_usleep (100000);
+                }
+                cerr << "SCIM: the socket backend did not come up.\n";
+                return false;
+            };
+
+            // With the backend up, the coordinator reaches the engine list and
+            // config through it rather than loading its own copy.
+            String co_config  = have_socket ? String ("socket") : def_config;
+            String co_engines = have_socket ? String ("socket") : String ("all");
+
             int rc = run_supervised (daemon, [&] () {
-                return scim_launch (false, def_config, "all", fe, new_argv);
+                ensure_backend ();
+                return scim_launch (false, co_config, co_engines,
+                                    String ("ibussync"), new_argv);
             });
             return rc == 0 ? 0 : rc;
         }
