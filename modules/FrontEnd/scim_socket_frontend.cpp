@@ -509,6 +509,8 @@ SocketFrontEnd::socket_receive_callback (SocketServer *server, const Socket &cli
             socket_get_factory_icon_file (id);
         else if (cmd == SCIM_TRANS_CMD_GET_FACTORY_LANGUAGE)
             socket_get_factory_language (id);
+        else if (cmd == SCIM_TRANS_CMD_GET_FACTORY_SYMBOL)
+            socket_get_factory_symbol (id);
         else if (cmd == SCIM_TRANS_CMD_NEW_INSTANCE)
             socket_new_instance (id);
         else if (cmd == SCIM_TRANS_CMD_DELETE_INSTANCE)
@@ -763,6 +765,23 @@ SocketFrontEnd::socket_get_factory_language (int /*client_id*/)
         SCIM_DEBUG_FRONTEND (3) << "  Language (" << language << ").\n";
 
         m_send_trans.put_data (language);
+        m_send_trans.put_command (SCIM_TRANS_CMD_OK);
+    }
+}
+
+void
+SocketFrontEnd::socket_get_factory_symbol (int /*client_id*/)
+{
+    String sfid;
+
+    SCIM_DEBUG_FRONTEND (2) << " socket_get_factory_symbol.\n";
+
+    if (m_receive_trans.get_data (sfid)) {
+        String symbol = get_factory_symbol (sfid);
+
+        SCIM_DEBUG_FRONTEND (3) << "  Symbol (" << symbol << ").\n";
+
+        m_send_trans.put_data (symbol);
         m_send_trans.put_command (SCIM_TRANS_CMD_OK);
     }
 }

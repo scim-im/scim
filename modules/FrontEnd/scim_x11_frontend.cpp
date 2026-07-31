@@ -2078,7 +2078,8 @@ X11FrontEnd::panel_req_show_factory_menu (const X11IC *ic)
                                     uuids [i],
                                     utf8_wcstombs (get_factory_name (uuids [i])),
                                     get_factory_language (uuids [i]),
-                                    get_factory_icon_file (uuids [i])));
+                                    get_factory_icon_file (uuids [i]),
+                                    get_factory_symbol (uuids [i])));
         }
         m_panel_client.show_factory_menu (ic->icid, menu);
     }
@@ -2097,9 +2098,9 @@ X11FrontEnd::panel_req_update_factory_info (const X11IC *ic)
         PanelFactoryInfo info;
         if (ic->xims_on) {
             String uuid = get_instance_uuid (ic->siid);
-            info = PanelFactoryInfo (uuid, utf8_wcstombs (get_factory_name (uuid)), get_factory_language (uuid), get_factory_icon_file (uuid));
+            info = PanelFactoryInfo (uuid, utf8_wcstombs (get_factory_name (uuid)), get_factory_language (uuid), get_factory_icon_file (uuid), get_factory_symbol (uuid));
         } else {
-            info = PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE));
+            info = PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE), String (_("En")));
         }
         m_panel_client.update_factory_info (ic->icid, info);
     }

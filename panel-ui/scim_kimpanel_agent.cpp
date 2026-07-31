@@ -43,6 +43,10 @@ namespace scim {
 // The panel widget owns this name. Nothing renders our candidates without it.
 #define KIMPANEL_PANEL_NAME    "org.kde.impanel"
 
+// Key of the engine indicator property. Properties are colon separated fields
+// -- "key:label:icon:tooltip:hint" -- so the key itself must not contain ':'.
+#define KIMPANEL_ENGINE_PROP_KEY "/SCIM/Engine"
+
 class KimpanelAgent::KimpanelAgentImpl
 {
 public:
@@ -53,8 +57,11 @@ public:
     VoidSlot  m_page_down;
     IntSlot   m_move_caret;
     VoidSlot  m_exit;
+    VoidSlot  m_trigger_engine;
 
-    KimpanelAgentImpl () : m_conn (0) { }
+    bool      m_engine_registered;
+
+    KimpanelAgentImpl () : m_conn (0), m_engine_registered (false) { }
 
     ~KimpanelAgentImpl () { close (); }
 
@@ -211,6 +218,31 @@ public:
         dbus_message_unref (msg);
     }
 
+    void emit_string (const char *name, const String &value)
+    {
+        if (!m_conn) return;
+        DBusMessage *msg = dbus_message_new_signal (
+            KIMPANEL_IM_PATH, KIMPANEL_IM_INTERFACE, name);
+        if (!msg) return;
+        const char *s = value.c_str ();
+        dbus_message_append_args (msg, DBUS_TYPE_STRING, &s, DBUS_TYPE_INVALID);
+        dbus_connection_send (m_conn, msg, 0);
+        dbus_message_unref (msg);
+    }
+
+    void emit_string_array (const char *name, const std::vector<String> &items)
+    {
+        if (!m_conn) return;
+        DBusMessage *msg = dbus_message_new_signal (
+            KIMPANEL_IM_PATH, KIMPANEL_IM_INTERFACE, name);
+        if (!msg) return;
+        DBusMessageIter iter;
+        dbus_message_iter_init_append (msg, &iter);
+        append_string_array (&iter, items);
+        dbus_connection_send (m_conn, msg, 0);
+        dbus_message_unref (msg);
+    }
+
     void flush ()
     {
         if (m_conn)
@@ -243,6 +275,19 @@ public:
         if (dbus_message_is_signal (msg, KIMPANEL_PANEL_IFACE, "MovePreeditCaret")) {
             int pos = get_int_arg (msg);
             if (m_move_caret) m_move_caret (pos);
+            return DBUS_HANDLER_RESULT_HANDLED;
+        }
+        if (dbus_message_is_signal (msg, KIMPANEL_PANEL_IFACE, "TriggerProperty")) {
+            // The panel echoes back the whole property key it was given.
+            const char *key = 0;
+            DBusError err;
+            dbus_error_init (&err);
+            if (dbus_message_get_args (msg, &err, DBUS_TYPE_STRING, &key,
+                                       DBUS_TYPE_INVALID) &&
+                key && String (key) == String (KIMPANEL_ENGINE_PROP_KEY)) {
+                if (m_trigger_engine) m_trigger_engine ();
+            }
+            dbus_error_free (&err);
             return DBUS_HANDLER_RESULT_HANDLED;
         }
         if (dbus_message_is_signal (msg, KIMPANEL_PANEL_IFACE, "Exit")) {
@@ -416,6 +461,37 @@ KimpanelAgent::update_spot_location (int x, int y)
 }
 
 void
+KimpanelAgent::update_engine_property (const String &symbol, const String &name)
+{
+    // "key:label:icon:tooltip:hint". The icon field is left empty on purpose:
+    // given an icon the panel draws that instead of the label, and an icon
+    // cannot adapt to the panel's light or dark colours the way text does.
+    String prop = String (KIMPANEL_ENGINE_PROP_KEY) + ":" +
+                  symbol + "::" + name + ":";
+
+    if (!m_impl->m_engine_registered) {
+        std::vector<String> props;
+        props.push_back (prop);
+        m_impl->emit_string_array ("RegisterProperties", props);
+        m_impl->m_engine_registered = true;
+    }
+
+    m_impl->emit_string ("UpdateProperty", prop);
+    m_impl->flush ();
+}
+
+void
+KimpanelAgent::remove_engine_property ()
+{
+    if (!m_impl->m_engine_registered)
+        return;
+
+    m_impl->emit_string ("RemoveProperty", String (KIMPANEL_ENGINE_PROP_KEY));
+    m_impl->m_engine_registered = false;
+    m_impl->flush ();
+}
+
+void
 KimpanelAgent::signal_connect_select_candidate (IntSlot slot)
 {
     m_impl->m_select_candidate = slot;
@@ -437,6 +513,12 @@ void
 KimpanelAgent::signal_connect_move_preedit_caret (IntSlot slot)
 {
     m_impl->m_move_caret = slot;
+}
+
+void
+KimpanelAgent::signal_connect_trigger_engine (VoidSlot slot)
+{
+    m_impl->m_trigger_engine = slot;
 }
 
 void

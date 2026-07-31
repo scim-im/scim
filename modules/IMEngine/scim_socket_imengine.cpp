@@ -385,6 +385,7 @@ SocketFactory::SocketFactory (const String &peer_uuid)
 {
     String locales;
     String iconfile;
+    String symbol;
     int cmd;
     bool m_name_ok = false;
     bool m_locale_ok = false;
@@ -455,6 +456,20 @@ SocketFactory::SocketFactory (const String &peer_uuid)
             trans.get_data (iconfile) &&
             trans.get_command (cmd) && cmd == SCIM_TRANS_CMD_OK) {
             m_icon_file = global->load_icon (iconfile);
+        }
+    }
+
+    // Get symbol. An older SocketFrontEnd does not know this command and
+    // replies FAIL, which just leaves the base class' name derived default.
+    global->init_transaction (trans);
+    trans.put_command (SCIM_TRANS_CMD_GET_FACTORY_SYMBOL);
+    trans.put_data (m_peer_uuid);
+    if (global->send_transaction (trans)) {
+        if (global->receive_transaction (trans) &&
+            trans.get_command (cmd) && cmd == SCIM_TRANS_CMD_REPLY &&
+            trans.get_data (symbol) &&
+            trans.get_command (cmd) && cmd == SCIM_TRANS_CMD_OK) {
+            set_symbol (symbol);
         }
     }
 

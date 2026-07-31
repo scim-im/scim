@@ -352,6 +352,7 @@ public:
                 m_send_trans.put_data (menu [i].name);
                 m_send_trans.put_data (menu [i].lang);
                 m_send_trans.put_data (menu [i].icon);
+                m_send_trans.put_data (menu [i].symbol);
             }
         }
     }
@@ -375,6 +376,7 @@ public:
             m_send_trans.put_data (info.name);
             m_send_trans.put_data (info.lang);
             m_send_trans.put_data (info.icon);
+            m_send_trans.put_data (info.symbol);
         }
     }
     void update_spot_location   (int icid, int x, int y)

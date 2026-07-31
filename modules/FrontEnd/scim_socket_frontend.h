@@ -137,6 +137,7 @@ private:
     void socket_get_factory_locales         (int client_id);
     void socket_get_factory_icon_file       (int client_id);
     void socket_get_factory_language        (int client_id);
+    void socket_get_factory_symbol          (int client_id);
 
     void socket_new_instance                (int client_id);
     void socket_delete_instance             (int client_id);

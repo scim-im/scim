@@ -1335,7 +1335,8 @@ panel_req_show_factory_menu (GtkIMContextSCIM *ic)
                                     factories [i]->get_uuid (),
                                     utf8_wcstombs (factories [i]->get_name ()),
                                     factories [i]->get_language (),
-                                    factories [i]->get_icon_file ()));
+                                    factories [i]->get_icon_file (),
+                                    factories [i]->get_symbol ()));
     }
 
     if (menu.size ())
@@ -1349,9 +1350,9 @@ panel_req_update_factory_info (GtkIMContextSCIM *ic)
         PanelFactoryInfo info;
         if (ic->impl->is_on) {
             IMEngineFactoryPointer sf = _backend->get_factory (ic->impl->si->get_factory_uuid ());
-            info = PanelFactoryInfo (sf->get_uuid (), utf8_wcstombs (sf->get_name ()), sf->get_language (), sf->get_icon_file ());
+            info = PanelFactoryInfo (sf->get_uuid (), utf8_wcstombs (sf->get_name ()), sf->get_language (), sf->get_icon_file (), sf->get_symbol ());
         } else {
-            info = PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE));
+            info = PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE), String (_("En")));
         }
         _panel_client.update_factory_info (ic->id, info);
     }

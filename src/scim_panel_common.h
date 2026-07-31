@@ -27,8 +27,7 @@
  * $Id: scim_panel_common.h,v 1.4 2005/05/13 04:21:29 suzhe Exp $
  */
 
-#ifndef __SCIM_PANEL_COMMON_H
-#define __SCIM_PANEL_COMMON_H
+#pragma once
 
 namespace scim {
 
@@ -55,17 +54,21 @@ struct PanelFactoryInfo
     String name;
     String lang;
     String icon;
+    /** A few characters identifying the engine, to be drawn as text where an
+     *  icon would not follow the theme's colours.
+     *  See IMEngineFactoryBase::get_symbol (). */
+    String symbol;
 
     PanelFactoryInfo () { }
-    PanelFactoryInfo (const String &u, const String &n, const String &l, const String &i)
-        : uuid (u), name (n), lang (l), icon (i) { }
+    PanelFactoryInfo (const String &u, const String &n, const String &l, const String &i,
+                      const String &s = String ())
+        : uuid (u), name (n), lang (l), icon (i), symbol (s) { }
 };
 
 /**  @} */
 
 } // namespace scim
 
-#endif //__SCIM_PANEL_COMMON_H
 
 /*
 vi:ts=4:nowrap:ai:expandtab

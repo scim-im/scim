@@ -362,7 +362,8 @@ static void panel_req_show_factory_menu (ScimQtInputContext *ic)
         menu.push_back (PanelFactoryInfo (factories [i]->get_uuid (),
                                           utf8_wcstombs (factories [i]->get_name ()),
                                           factories [i]->get_language (),
-                                          factories [i]->get_icon_file ()));
+                                          factories [i]->get_icon_file (),
+                                    factories [i]->get_symbol ()));
 
     if (menu.size ())
         _panel_client.show_factory_menu (ic->impl->id, menu);
@@ -375,10 +376,11 @@ static void panel_req_update_factory_info (ScimQtInputContext *ic)
         if (ic->impl->is_on && !ic->impl->si.null ()) {
             IMEngineFactoryPointer sf = _backend->get_factory (ic->impl->si->get_factory_uuid ());
             info = PanelFactoryInfo (sf->get_uuid (), utf8_wcstombs (sf->get_name ()),
-                                     sf->get_language (), sf->get_icon_file ());
+                                     sf->get_language (), sf->get_icon_file (), sf->get_symbol ());
         } else {
             info = PanelFactoryInfo (String (""), String (_("English/Keyboard")),
-                                     String ("C"), String (SCIM_KEYBOARD_ICON_FILE));
+                                     String ("C"), String (SCIM_KEYBOARD_ICON_FILE),
+                                     String (_("En")));
         }
         _panel_client.update_factory_info (ic->impl->id, info);
     }

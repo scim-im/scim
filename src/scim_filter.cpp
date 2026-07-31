@@ -47,10 +47,15 @@ FilterFactoryBase::attach_imengine_factory (const IMEngineFactoryPointer &orig)
 {
     m_orig = orig;
 
-    if (!m_orig.null ())
+    if (!m_orig.null ()) {
         set_locales (m_orig->get_locales ());
-    else
+        // get_symbol () is not virtual, so it cannot be forwarded the way
+        // get_name () is; copy the filtered engine's symbol instead.
+        set_symbol (m_orig->get_symbol ());
+    } else {
         set_locales ("");
+        set_symbol ("");
+    }
 }
 
 WideString

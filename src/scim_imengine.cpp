@@ -82,6 +82,7 @@ public:
     std::vector<String> m_encoding_list;
     std::vector<String> m_locale_list;
     String              m_language;
+    String              m_symbol;
 };
 
 class IMEngineInstanceBase::IMEngineInstanceBaseImpl
@@ -165,6 +166,37 @@ String
 IMEngineFactoryBase::get_language () const
 {
     return m_impl->m_language;
+}
+
+String
+IMEngineFactoryBase::get_symbol () const
+{
+    if (m_impl->m_symbol.length ())
+        return m_impl->m_symbol;
+
+    // No explicit symbol: fall back to the first character of the localized
+    // name. That is the right character for engines named after what they
+    // produce (注音 -> 注), and merely unhelpful for the rest, which should
+    // call set_symbol ().
+    WideString name = get_name ();
+
+    if (name.length ())
+        return utf8_wcstombs (name.substr (0, 1));
+
+    return String ();
+}
+
+void
+IMEngineFactoryBase::set_symbol (const String &symbol)
+{
+    WideString wide = utf8_mbstowcs (symbol);
+
+    // A symbol is drawn in a tray item or a status label, so cap it rather
+    // than let an engine push an entire name through this path.
+    if (wide.length () > 4)
+        wide.erase (4);
+
+    m_impl->m_symbol = utf8_wcstombs (wide);
 }
 
 WideString
@@ -626,6 +658,7 @@ IMEngineInstanceBase::delete_surrounding_text (int offset, int len)
 DummyIMEngineFactory::DummyIMEngineFactory ()
 {
     set_locales ("C");
+    set_symbol (_("En"));
 }
 
 DummyIMEngineFactory::~DummyIMEngineFactory ()

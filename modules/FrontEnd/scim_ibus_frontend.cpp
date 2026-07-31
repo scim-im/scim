@@ -223,24 +223,18 @@ IBusFrontEnd::run ()
 /* Engine enumeration / component manifest                             */
 /* ------------------------------------------------------------------ */
 
-// First character of an engine's name, for the ibus panel's indicator.
+// The engine symbol comes from IMEngineFactoryBase::get_symbol (), which an
+// engine can set explicitly and which otherwise falls back to the first
+// character of the localized name.
 //
 // gnome-shell shows <symbol> verbatim and otherwise falls back to the language
 // code, so two engines for one language both read as "zh" and get numbered.
-// One character disambiguates them.
+// A symbol disambiguates them.
 //
-// The name is already localized -- TableFactory::get_name () asks the table for
-// scim_get_current_locale () -- so generating the component XML under, say,
-// zh_TW yields the CJK name and a CJK symbol, while a C or English locale
-// yields the latin name and a latin initial. Note the table's STATUS_PROMPT is
-// not usable here: it reports input mode ("full/half", "Chinese/English") and is
-// commonly identical across engines.
-static String
-engine_symbol (const WideString &name)
-{
-    if (name.empty ()) return String ();
-    return utf8_wcstombs (WideString (1, name[0]));
-}
+// The name behind the default is already localized -- TableFactory::get_name ()
+// asks the table for scim_get_current_locale () -- so generating the component
+// XML under, say, zh_TW yields the CJK name and a CJK symbol, while a C or
+// English locale yields the latin name and a latin initial.
 
 void
 IBusFrontEnd::enumerate_engines (std::vector<IBusEngineInfo> &out)
@@ -266,7 +260,7 @@ IBusFrontEnd::enumerate_engines (std::vector<IBusEngineInfo> &out)
         IBusEngineInfo info;
         info.uuid     = factory->get_uuid ();
         info.name     = utf8_wcstombs (factory->get_name ());
-        info.symbol   = engine_symbol (factory->get_name ());
+        info.symbol   = factory->get_symbol ();
         info.language = scim_get_normalized_language (factory->get_language ());
         info.icon     = factory->get_icon_file ();
         if (!info.name.length ()) info.name = info.uuid;
@@ -292,7 +286,7 @@ IBusFrontEnd::enumerate_engines (std::vector<IBusEngineInfo> &out)
                 IBusEngineInfo info;
                 info.uuid     = uuid;
                 info.name     = utf8_wcstombs (factory->get_name ());
-                info.symbol   = engine_symbol (factory->get_name ());
+                info.symbol   = factory->get_symbol ();
                 info.language = scim_get_normalized_language (factory->get_language ());
                 info.icon     = factory->get_icon_file ();
                 if (!info.name.length ()) info.name = uuid;

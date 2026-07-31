@@ -27,8 +27,7 @@
  * $Id: scim_trans_commands.h,v 1.9 2005/06/26 16:35:33 suzhe Exp $
  */
 
-#ifndef __SCIM_TRANS_COMMANDS_H
-#define __SCIM_TRANS_COMMANDS_H
+#pragma once
 
 namespace scim {
 
@@ -122,6 +121,7 @@ namespace scim {
  *     - #SCIM_TRANS_CMD_GET_FACTORY_LOCALES
  *     - #SCIM_TRANS_CMD_GET_FACTORY_ICON_FILE
  *     - #SCIM_TRANS_CMD_GET_FACTORY_LANGUAGE
+ *     - #SCIM_TRANS_CMD_GET_FACTORY_SYMBOL
  *     - #SCIM_TRANS_CMD_PROCESS_KEY_EVENT
  *     - #SCIM_TRANS_CMD_MOVE_PREEDIT_CARET
  *     - #SCIM_TRANS_CMD_SELECT_CANDIDATE
@@ -508,6 +508,7 @@ const int SCIM_TRANS_CMD_GET_FACTORY_HELP                 = 207;
 const int SCIM_TRANS_CMD_GET_FACTORY_LOCALES              = 208;
 const int SCIM_TRANS_CMD_GET_FACTORY_ICON_FILE            = 209;
 const int SCIM_TRANS_CMD_GET_FACTORY_LANGUAGE             = 210;
+const int SCIM_TRANS_CMD_GET_FACTORY_SYMBOL               = 211;
 
 // Socket Config to Socket FrontEnd
 const int SCIM_TRANS_CMD_FLUSH_CONFIG                     = 300;
@@ -578,7 +579,6 @@ const int SCIM_TRANS_CMD_USER_DEFINED                     = 10000;
 
 } // namespace scim
 
-#endif //__SCIM_TRANS_COMMANDS_H
 
 /*
 vi:ts=4:nowrap:ai:expandtab

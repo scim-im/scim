@@ -95,6 +95,21 @@ public:
     void update_lookup_table  (const LookupTable &table);
     void show_lookup_table    (bool visible);
     void update_spot_location (int x, int y);
+
+    /**
+     * @brief Advertise the engine indicator property to the panel.
+     *
+     * kimpanel renders a property's label as text in the panel's own colours,
+     * which is why the engine symbol is passed here rather than an icon: an
+     * icon is fixed pixels and cannot follow a light or dark theme.
+     *
+     * @param symbol a few characters identifying the engine, drawn by the panel.
+     * @param name   the full engine name, used as the tooltip.
+     */
+    void update_engine_property (const String &symbol, const String &name);
+
+    /** @brief Withdraw the engine indicator property. */
+    void remove_engine_property ();
     /** @} */
 
     /** @name Panel -> frontend callbacks @{ */
@@ -103,6 +118,8 @@ public:
     void signal_connect_page_down          (VoidSlot slot);
     void signal_connect_move_preedit_caret (IntSlot slot);
     void signal_connect_exit               (VoidSlot slot);
+    /** @brief The user clicked the engine indicator in the panel. */
+    void signal_connect_trigger_engine     (VoidSlot slot);
     /** @} */
 };
 

@@ -338,6 +338,10 @@ WaylandFrontEnd::init (int argc, char **argv)
             [this] () { if (m_instance >= 0 && m_focused) lookup_table_page_down (m_instance); });
         m_kimpanel.signal_connect_move_preedit_caret (
             [this] (int pos) { if (m_instance >= 0 && m_focused) move_preedit_caret (m_instance, pos); });
+        // Clicking the indicator does what the trigger hotkey does. kimpanel
+        // has no menu of ours to open, so a toggle is the useful action.
+        m_kimpanel.signal_connect_trigger_engine (
+            [this] () { if (m_im_on) turn_off_im (); else turn_on_im (); });
     }
 #endif
 
@@ -833,7 +837,8 @@ WaylandFrontEnd::panel_req_show_factory_menu ()
         menu.push_back (PanelFactoryInfo (uuids [i],
                                           utf8_wcstombs (get_factory_name (uuids [i])),
                                           get_factory_language (uuids [i]),
-                                          get_factory_icon_file (uuids [i])));
+                                          get_factory_icon_file (uuids [i]),
+                                          get_factory_symbol (uuids [i])));
 
     m_panel_client.prepare (m_instance);
     m_panel_client.show_factory_menu (m_instance, menu);
@@ -846,7 +851,7 @@ WaylandFrontEnd::panel_req_update_factory_info ()
     // Without this the panel never learns which engine is active, so its tray
     // item has no name and no icon to show -- it registers and then renders as
     // nothing. x11.so has always sent this; the wayland frontends did not.
-    if (!m_panel_open || m_instance < 0)
+    if (m_instance < 0)
         return;
 
     PanelFactoryInfo info;
@@ -855,11 +860,24 @@ WaylandFrontEnd::panel_req_update_factory_info ()
         info = PanelFactoryInfo (uuid,
                                  utf8_wcstombs (get_factory_name (uuid)),
                                  get_factory_language (uuid),
-                                 get_factory_icon_file (uuid));
+                                 get_factory_icon_file (uuid),
+                                 get_factory_symbol (uuid));
     } else {
         info = PanelFactoryInfo (String (""), String (_("English/Keyboard")),
-                                 String ("C"), String (SCIM_KEYBOARD_ICON_FILE));
+                                 String ("C"), String (SCIM_KEYBOARD_ICON_FILE),
+                                 String (_("En")));
     }
+
+    // kimpanel draws the symbol as text in the panel's own colours, which is
+    // the one indicator on this desktop that follows a light or dark theme.
+    // Independent of the scim panel: either, both or neither may be running.
+#ifdef SCIM_HAS_KIMPANEL
+    if (use_kimpanel_ui ())
+        m_kimpanel.update_engine_property (info.symbol, info.name);
+#endif
+
+    if (!m_panel_open)
+        return;
 
     m_panel_client.prepare (m_instance);
     m_panel_client.update_factory_info (m_instance, info);

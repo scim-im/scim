@@ -27,8 +27,7 @@
  * $Id: scim_frontend.h,v 1.42 2005/10/06 18:02:06 liuspider Exp $
  */
 
-#ifndef __SCIM_FRONTEND_H
-#define __SCIM_FRONTEND_H
+#pragma once
 
 namespace scim {
 
@@ -195,6 +194,14 @@ protected:
      * @return the icon file name of the IMEngine factory.
      */
     String get_factory_icon_file (const String &uuid) const;
+
+    /**
+     * @brief get the short symbol of an IMEngine factory.
+     * @param uuid the uuid of the IMEngine factory
+     * @return the symbol of the IMEngine factory, see
+     *         IMEngineFactoryBase::get_symbol ().
+     */
+    String get_factory_symbol (const String &uuid) const;
 
     /**
      * @brief get the supported locales of an IMEngine  factory.
@@ -610,7 +617,6 @@ public:
 
 } // namespace scim
 
-#endif //__SCIM_FRONTEND_H
 
 /*
 vi:ts=4:nowrap:ai:expandtab

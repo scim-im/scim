@@ -200,8 +200,8 @@ public:
           m_socket_timeout (scim_get_default_socket_timeout ()),
           m_current_socket_client (-1), m_current_client_context (0),
           m_last_socket_client (-1), m_last_client_context (0),
-          m_currentFactoryInfo (PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE))),
-          m_defaultFactoryInfo (PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE)))
+          m_currentFactoryInfo (PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE), String (_("En")))),
+          m_defaultFactoryInfo (PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE), String (_("En"))))
     {
         m_socket_server.signal_connect_accept (slot (this, &PanelAgentImpl::socket_accept_callback));
         m_socket_server.signal_connect_receive (slot (this, &PanelAgentImpl::socket_receive_callback));
@@ -1237,7 +1237,8 @@ private:
 
         PanelFactoryInfo info;
         if (m_recv_trans.get_data (info.uuid) && m_recv_trans.get_data (info.name) &&
-            m_recv_trans.get_data (info.lang) && m_recv_trans.get_data (info.icon)) {
+            m_recv_trans.get_data (info.lang) && m_recv_trans.get_data (info.icon) &&
+            m_recv_trans.get_data (info.symbol)) {
             SCIM_DEBUG_MAIN(4) << "New Factory info uuid=" << info.uuid << " name=" << info.name << "\n";
             info.lang = scim_get_normalized_language (info.lang);
             m_currentFactoryInfo = info;            
@@ -1263,6 +1264,7 @@ private:
 		        m_send_trans.put_data (info.name);
 		        m_send_trans.put_data (info.lang);
 		        m_send_trans.put_data (info.icon);
+		        m_send_trans.put_data (info.symbol);
 		        m_send_trans.write_to_socket (client_socket);
 			
 				SCIM_DEBUG_MAIN (2) << "Forwarded message " << "SCIM_TRANS_CMD_PANEL_UPDATE_FACTORY_INFO" << "to " << it->first << "\n";
@@ -1303,6 +1305,7 @@ private:
         m_send_trans.put_data (m_currentFactoryInfo.name);
         m_send_trans.put_data (m_currentFactoryInfo.lang);
         m_send_trans.put_data (m_currentFactoryInfo.icon);
+        m_send_trans.put_data (m_currentFactoryInfo.symbol);
         m_send_trans.write_to_socket (client_socket);
         m_client_repository[client_id].awaitedTransCommand = 0;
         SCIM_DEBUG_MAIN (2) << "Forwarded message " << "SCIM_TRANS_CMD_PANEL_RETURN_CURRENT_FACTORY_INFO\n";
@@ -1325,7 +1328,8 @@ private:
         std::vector <PanelFactoryInfo> vec;
 		
         while (m_recv_trans.get_data (info.uuid) && m_recv_trans.get_data (info.name) &&
-               m_recv_trans.get_data (info.lang) && m_recv_trans.get_data (info.icon)) {
+               m_recv_trans.get_data (info.lang) && m_recv_trans.get_data (info.icon) &&
+               m_recv_trans.get_data (info.symbol)) {
             info.lang = scim_get_normalized_language (info.lang);
             vec.push_back (info);
         }
@@ -1355,6 +1359,7 @@ private:
 	                m_send_trans.put_data (menu [i].name);
 	                m_send_trans.put_data (menu [i].lang);
 	                m_send_trans.put_data (menu [i].icon);
+	                m_send_trans.put_data (menu [i].symbol);
 	            }
 		        m_send_trans.write_to_socket (client_socket);
 			

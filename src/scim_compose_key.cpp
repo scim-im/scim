@@ -116,6 +116,10 @@ static uint16 __scim_compose_ignores [] = {
 ComposeKeyFactory::ComposeKeyFactory ()
 {
     set_locales ("C");
+
+    // "E" alone would be indistinguishable from any other engine whose name
+    // starts with English.
+    set_symbol (_("En"));
 }
 
 ComposeKeyFactory::~ComposeKeyFactory ()

@@ -108,6 +108,7 @@ extern "C" {
 RawCodeFactory::RawCodeFactory ()
 {
     set_locales (__rawcode_locales);
+    set_symbol (_("RAW"));
 }
 
 RawCodeFactory::~RawCodeFactory ()

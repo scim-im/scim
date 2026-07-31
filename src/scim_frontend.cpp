@@ -328,6 +328,14 @@ FrontEndBase::get_factory_icon_file (const String &uuid) const
     return String ();
 }
 
+String
+FrontEndBase::get_factory_symbol (const String &uuid) const
+{
+    IMEngineFactoryPointer factory = m_impl->m_backend->get_factory (uuid);
+    if (!factory.null ()) return factory->get_symbol ();
+    return String ();
+}
+
 bool
 FrontEndBase::validate_factory (const String &uuid, const String &encoding) const
 {

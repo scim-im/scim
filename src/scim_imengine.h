@@ -32,8 +32,7 @@
  * $Id: scim_imengine.h,v 1.19 2005/08/15 12:45:46 suzhe Exp $
  */
 
-#ifndef __SCIM_IMENGINE_H
-#define __SCIM_IMENGINE_H
+#pragma once
 
 namespace scim {
 /**
@@ -273,6 +272,28 @@ public:
     virtual String get_language () const;
 
     /**
+     * @brief Get a short symbol identifying this input method engine.
+     *
+     * A symbol is one or a few characters, meant to be drawn as *text* where an
+     * engine must be identified in a small space: a tray item, a status area,
+     * a menu. Unlike get_icon_file (), which yields fixed pixels, a symbol
+     * inherits the surrounding theme's text colour, so it stays legible on both
+     * light and dark backgrounds.
+     *
+     * If the engine did not set one with set_symbol (), the first character of
+     * get_name () is used, which is a reasonable identifier for engines whose
+     * localized name begins with a distinctive character.
+     *
+     * This method is intentionally not virtual, so that it can be added without
+     * changing the vtable layout of the derived classes. Engines provide their
+     * symbol through set_symbol () instead of overriding.
+     *
+     * @return A UTF-8 String holding at most 4 characters, possibly empty if
+     *         the engine has neither a symbol nor a name.
+     */
+    String get_symbol () const;
+
+    /**
      * @brief Get the original key string of a composed string.
      *
      * For example, in the pinyin input method of Simplified Chinese:
@@ -348,6 +369,18 @@ protected:
      *                    The first language is the default one.
      */
     void set_languages (const String &languages);
+
+    /**
+     * @brief Set the short symbol identifying this input method engine.
+     *
+     * This method should be called within the constructors of the derived
+     * classes. See get_symbol () for what a symbol is used for.
+     *
+     * @param symbol - a UTF-8 string of a few characters, for example "En" or
+     *                 "注". Anything longer than 4 characters is truncated,
+     *                 since a symbol has to fit in a tray icon.
+     */
+    void set_symbol (const String &symbol);
 };
 
 /**
@@ -829,8 +862,6 @@ public:
 /**  @} */
 
 } // namespace scim
-
-#endif //__SCIM_IMENGINE_H
 
 /*
 vi:ts=4:nowrap:ai:expandtab

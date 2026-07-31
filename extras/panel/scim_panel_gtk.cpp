@@ -2017,6 +2017,11 @@ static DbusmenuServer   *_sni_menu          = 0;
 static bool              _sni_registered    = false;
 static String            _sni_bus_name;
 static String            _sni_icon;                // absolute path of the engine icon
+static String            _sni_symbol;               // engine symbol, drawn as the tray icon
+static String            _sni_icon_name;            // themed name, when one applies
+static bool              _sni_is_keyboard   = false; // is the IM off (plain keyboard)?
+static bool              _sni_prefer_dark   = false; // is the tray dark?
+static bool              _sni_dark_from_theme = false; // ... and did the GTK theme say so
 static String            _sni_title;                // engine name
 static String            _sni_status_text;          // status property label, for the tooltip
 static std::vector<PanelFactoryInfo> _sni_factories;  // engine list, for the menu
@@ -2088,6 +2093,175 @@ sni_method_call (GDBusConnection * /*conn*/, const gchar * /*sender*/,
     g_dbus_method_invocation_return_value (invocation, 0);
 }
 
+#define SNI_ICON_SIZE 22
+
+// Draw the engine symbol as the tray image.
+//
+// The point of a symbol is that it survives both a light and a dark tray, which
+// a fixed PNG cannot: an engine icon drawn in a light ink vanishes on a light
+// panel and vice versa. Note that SNI does not actually let us hand over text
+// -- it has no label property at all, and hosts recolour only themed symbolic
+// icon *names*, which cannot express a glyph like a Han character. So we still
+// choose the ink ourselves. What a glyph buys us is that it can be drawn in a
+// way that works either way: a dark fill inside a light outline stays legible
+// against any background, which is the same trick subtitles use.
+static bool
+sni_render_symbol (const String &symbol, int size,
+                   std::vector<guchar> &argb, int &out_w, int &out_h)
+{
+    if (!symbol.length ())
+        return false;
+
+    cairo_surface_t *surf =
+        cairo_image_surface_create (CAIRO_FORMAT_ARGB32, size, size);
+    if (cairo_surface_status (surf) != CAIRO_STATUS_SUCCESS) {
+        cairo_surface_destroy (surf);
+        return false;
+    }
+
+    cairo_t *cr = cairo_create (surf);
+    PangoLayout *layout = pango_cairo_create_layout (cr);
+
+    // Take the family from the desktop's UI font, so the symbol looks like the
+    // panel's own text. Naming no family at all is not neutral: pango then falls
+    // back to its default, which resolves to a serif face (DejaVu Serif for
+    // latin, a Ming style for Han) -- wrong for a tray indicator, and thin
+    // strokes lose against a sans/Hei face at 22 pixels. The family is only a
+    // starting point either way; fontconfig still falls back per script, so a
+    // CJK or Indic symbol resolves whatever the UI font itself lacks.
+    PangoFontDescription *desc = 0;
+    {
+        gchar *ui_font = 0;
+        GtkSettings *settings = gtk_settings_get_default ();
+        if (settings)
+            g_object_get (settings, "gtk-font-name", &ui_font, NULL);
+        if (ui_font && *ui_font)
+            desc = pango_font_description_from_string (ui_font);
+        g_free (ui_font);
+    }
+    if (!desc)
+        desc = pango_font_description_from_string ("Sans");
+
+    // The size carried by gtk-font-name is irrelevant: the fitting loop below
+    // sets an absolute size to fill the box.
+    pango_font_description_set_weight (desc, PANGO_WEIGHT_BOLD);
+
+    // Keep the glyph off the very edge of the box.
+    double margin = size * 0.07;
+    if (margin < 1.0) margin = 1.0;
+    double avail = size - 2.0 * margin;
+
+    // Fit the text to the box, then drop a character and retry if fitting drove
+    // the font below what can still be read: three latin letters in a 22 pixel
+    // tray come out five pixels tall, which is a smudge rather than a symbol.
+    // The engine's full symbol survives untouched everywhere it is drawn as
+    // real text; this only bounds what we rasterize.
+    String text = symbol;
+    double px = avail;
+    PangoRectangle ink;
+
+    for (;;) {
+        pango_layout_set_text (layout, text.c_str (), -1);
+
+        // Start from a guess and correct once against the measured ink; text
+        // scales closely enough to linearly for one correction to land.
+        px = avail;
+        for (int pass = 0; pass < 2; ++pass) {
+            pango_font_description_set_absolute_size (desc, px * PANGO_SCALE);
+            pango_layout_set_font_description (layout, desc);
+
+            pango_layout_get_pixel_extents (layout, &ink, 0);
+            if (ink.width <= 0 || ink.height <= 0)
+                break;
+
+            double sx = avail / (double) ink.width;
+            double sy = avail / (double) ink.height;
+            double scale = (sx < sy) ? sx : sy;
+            if (pass == 0 || scale < 1.0)
+                px *= scale;
+        }
+
+        long chars = g_utf8_strlen (text.c_str (), -1);
+        if (px >= avail * 0.5 || chars <= 1)
+            break;
+
+        const char *end = g_utf8_offset_to_pointer (text.c_str (), chars - 1);
+        text.erase (end - text.c_str ());
+    }
+
+    pango_layout_get_pixel_extents (layout, &ink, 0);
+
+    // Centre on the ink, not the logical box: line spacing and side bearings
+    // differ per font, and an off-centre glyph is obvious at this size.
+    cairo_move_to (cr,
+                   (size - ink.width) / 2.0 - ink.x,
+                   (size - ink.height) / 2.0 - ink.y);
+    pango_cairo_layout_path (cr, layout);
+
+    // Ink follows the tray's shade; the halo is always its opposite, so the
+    // symbol survives a wrong guess. See sni_set_dark ().
+    double ink_v  = _sni_prefer_dark ? 0.93 : 0.09;
+    double halo_v = _sni_prefer_dark ? 0.05 : 1.00;
+
+    // The outline has to scale with the glyph's own stroke weight, not with the
+    // box: sized off the box it swallows small text whole -- a two letter symbol
+    // at a 12 pixel font has stems barely 2 pixels wide, so a 4 pixel outline
+    // merges them into one blob with the letters showing through as holes.
+    // A hairline is all the insurance we need.
+    double outline = px * 0.10;
+    if (outline < 0.8) outline = 0.8;
+    if (outline > 2.0) outline = 2.0;
+
+    cairo_set_line_width (cr, outline);      // half of it lies outside the path
+    cairo_set_line_join (cr, CAIRO_LINE_JOIN_ROUND);
+    cairo_set_source_rgba (cr, halo_v, halo_v, halo_v, 0.94);
+    cairo_stroke_preserve (cr);
+    cairo_set_source_rgb (cr, ink_v, ink_v, ink_v);
+    cairo_fill (cr);
+
+    g_object_unref (layout);
+    pango_font_description_free (desc);
+    cairo_destroy (cr);
+    cairo_surface_flush (surf);
+
+    const guchar *data = cairo_image_surface_get_data (surf);
+    int stride = cairo_image_surface_get_stride (surf);
+    if (!data) {
+        cairo_surface_destroy (surf);
+        return false;
+    }
+
+    out_w = size;
+    out_h = size;
+    argb.resize ((size_t) size * (size_t) size * 4);
+    guchar *o = &argb [0];
+
+    for (int y = 0; y < size; ++y) {
+        // Cairo keeps ARGB32 as native-endian premultiplied words; SNI wants
+        // plain ARGB bytes, so unpack and undo the premultiplication.
+        const guint32 *row = (const guint32 *) (data + (size_t) y * stride);
+        for (int x = 0; x < size; ++x) {
+            guint32 p = row [x];
+            guchar a = (p >> 24) & 0xFF;
+            guchar r = (p >> 16) & 0xFF;
+            guchar g = (p >>  8) & 0xFF;
+            guchar bl = p & 0xFF;
+            if (a && a != 0xFF) {
+                r = (guchar) ((r * 255 + a / 2) / a);
+                g = (guchar) ((g * 255 + a / 2) / a);
+                bl = (guchar) ((bl * 255 + a / 2) / a);
+            }
+            *o++ = a;
+            *o++ = r;
+            *o++ = g;
+            *o++ = bl;
+        }
+    }
+
+    cairo_surface_destroy (surf);
+    return true;
+}
+
 // Publish the engine icon as raw pixels. IconName cannot carry it: that
 // property is a freedesktop icon-theme *name*, which hosts resolve through the
 // theme (QIcon::fromTheme on Plasma), so an absolute path like
@@ -2101,17 +2275,31 @@ sni_icon_pixmap (void)
     GVariantBuilder b;
     g_variant_builder_init (&b, G_VARIANT_TYPE ("a(iiay)"));
 
+    // Prefer the symbol: see sni_render_symbol ().
+    {
+        std::vector<guchar> sym;
+        int sw = 0, sh = 0;
+        if (sni_render_symbol (_sni_symbol, SNI_ICON_SIZE, sym, sw, sh)) {
+            guchar *copy = (guchar *) g_memdup2 (&sym [0], sym.size ());
+            g_variant_builder_add (&b, "(ii@ay)", sw, sh,
+                                   g_variant_new_from_data (G_VARIANT_TYPE ("ay"),
+                                                            copy, sym.size (), TRUE,
+                                                            g_free, copy));
+            return g_variant_builder_end (&b);
+        }
+    }
+
     String path = _sni_icon;
     if (path.length () && path [0] != SCIM_PATH_DELIM)
         path = String (SCIM_ICONDIR) + String (SCIM_PATH_DELIM_STRING) + path;
 
     GdkPixbuf *pb = 0;
     if (path.length ())
-        pb = gdk_pixbuf_new_from_file_at_size (path.c_str (), 22, 22, 0);
+        pb = gdk_pixbuf_new_from_file_at_size (path.c_str (), SNI_ICON_SIZE, SNI_ICON_SIZE, 0);
     // Always show something: an engine with no icon of its own, or a missing
     // file, would otherwise leave an invisible tray item.
     if (!pb)
-        pb = gdk_pixbuf_new_from_file_at_size (SCIM_TRADEMARK_ICON_FILE, 22, 22, 0);
+        pb = gdk_pixbuf_new_from_file_at_size (SCIM_TRADEMARK_ICON_FILE, SNI_ICON_SIZE, SNI_ICON_SIZE, 0);
     if (!pb)
         return g_variant_builder_end (&b);
 
@@ -2156,9 +2344,13 @@ sni_get_property (GDBusConnection * /*conn*/, const gchar * /*sender*/,
     // the tooltip; the title is our identity, not our state.
     if (!g_strcmp0 (name, "Title"))      return g_variant_new_string ("SCIM");
     if (!g_strcmp0 (name, "Status"))     return g_variant_new_string ("Active");
-    // Deliberately empty: see sni_icon_pixmap (). Hosts fall back to
-    // IconPixmap when no themed name is offered.
-    if (!g_strcmp0 (name, "IconName"))   return g_variant_new_string ("");
+    // A themed name only for the keyboard state, and only when the theme really
+    // has it; empty otherwise. The pixmap stays published either way: the spec
+    // tells hosts to prefer names, so a conforming host shows the themed icon,
+    // and one that only reads pixmaps still shows the rendered symbol instead of
+    // an empty item.
+    if (!g_strcmp0 (name, "IconName"))
+        return g_variant_new_string (_sni_icon_name.c_str ());
     if (!g_strcmp0 (name, "IconPixmap")) return sni_icon_pixmap ();
     if (!g_strcmp0 (name, "ItemIsMenu")) return g_variant_new_boolean (TRUE);
     if (!g_strcmp0 (name, "Menu"))       return g_variant_new_object_path (SCIM_SNI_MENU_PATH);
@@ -2385,13 +2577,68 @@ sni_rebuild_menu (void)
 }
 
 // The engine changed: refresh what the tray shows about it.
-static void
-sni_set_engine (const String &name, const String &icon)
+// The keyboard (IM off) state is the one case where a themed icon name applies,
+// and a name beats anything we can rasterize: the host resolves it through the
+// icon theme and recolours the symbolic variant for its own panel, so it is
+// always in the desktop's own idiom. "input-keyboard" is a standard name -- the
+// Icon Naming Specification lists it under Devices as "the icon used for the
+// keyboard input device" -- and Adwaita and Breeze both ship it. The symbolic
+// variant is not in the spec but is common and looks better in a panel, so try
+// it first.
+//
+// Still verified rather than assumed: a theme may be incomplete, or the
+// configured theme may not even be installed, and an unresolvable IconName
+// leaves an invisible tray item. When nothing resolves we fall back to drawing
+// the symbol.
+static String
+sni_themed_keyboard_icon (void)
 {
-    _sni_title = name;
-    _sni_icon  = icon;
+    static const char * const names[] = {
+        "input-keyboard-symbolic",
+        "input-keyboard",
+        0
+    };
+
+    GdkDisplay *display = gdk_display_get_default ();
+    if (!display)
+        return String ();
+
+    GtkIconTheme *theme = gtk_icon_theme_get_for_display (display);
+    if (!theme)
+        return String ();
+
+    for (int i = 0; names [i]; ++i)
+        if (gtk_icon_theme_has_icon (theme, names [i]))
+            return String (names [i]);
+
+    return String ();
+}
+
+static void
+sni_set_engine (const String &name, const String &icon, const String &symbol,
+                bool is_keyboard)
+{
+    _sni_title       = name;
+    _sni_icon        = icon;
+    _sni_symbol      = symbol;
+    _sni_is_keyboard = is_keyboard;
+    // Engines carry icon *files*, which IconName cannot express, so only the
+    // keyboard state can use a themed name.
+    _sni_icon_name   = is_keyboard ? sni_themed_keyboard_icon () : String ();
+
     sni_emit ("NewIcon");
     sni_emit ("NewToolTip");
+}
+
+static void
+sni_icon_theme_changed_cb (GObject * /*settings*/, GParamSpec * /*pspec*/,
+                           gpointer /*data*/)
+{
+    // A theme switch can make the keyboard icon appear or disappear.
+    String was = _sni_icon_name;
+    _sni_icon_name = _sni_is_keyboard ? sni_themed_keyboard_icon () : String ();
+    if (_sni_icon_name != was)
+        sni_emit ("NewIcon");
 }
 
 static void
@@ -2414,6 +2661,146 @@ sni_register_with_host (void)
     _sni_registered = true;
 }
 
+#define SNI_PORTAL_NAME  "org.freedesktop.portal.Desktop"
+#define SNI_PORTAL_PATH  "/org/freedesktop/portal/desktop"
+#define SNI_PORTAL_IFACE "org.freedesktop.portal.Settings"
+
+// Which way to ink the symbol.
+//
+// Nothing tells us the tray's actual background colour -- SNI hands the host
+// pixels and never discusses colours -- so this is a hint, not a fact, and it
+// can disagree with the panel we end up sitting in. sni_render_symbol () draws
+// the halo in the opposite shade for exactly that reason: when the hint is
+// right the symbol looks native, and when it is wrong it is still readable.
+static void
+sni_set_dark (bool dark, bool from_theme)
+{
+    // The GTK theme wins. It is the better signal by a wide margin: the theme's
+    // own text colour is what every widget on the panel is drawn with, whereas
+    // the portal is only a stated preference and can flatly contradict the
+    // desktop -- on an XFCE session with the light "Xfce" theme it reports
+    // "prefer dark", which inked the symbol light on a light panel.
+    if (!from_theme && _sni_dark_from_theme)
+        return;
+    if (from_theme)
+        _sni_dark_from_theme = true;
+
+    if (dark == _sni_prefer_dark)
+        return;
+
+    _sni_prefer_dark = dark;
+    sni_emit ("NewIcon");
+}
+
+// Ask the GTK theme for its text colour and infer the tray's shade from it.
+//
+// The widget has to be realized inside a root before the theme applies -- a
+// detached one reports the CSS default (opaque white) and would fool us every
+// time. Realizing is not showing: the window is never presented, so nothing
+// appears on screen, and it is destroyed immediately.
+static void
+sni_query_theme_dark (void)
+{
+    GtkWidget *win = gtk_window_new ();
+    GtkWidget *label = gtk_label_new ("");
+
+    gtk_window_set_child (GTK_WINDOW (win), label);
+    gtk_widget_realize (win);
+
+    GdkRGBA c;
+    gtk_widget_get_color (label, &c);
+    gtk_window_destroy (GTK_WINDOW (win));
+
+    if (c.alpha < 0.1)
+        return;                     // nothing usable; leave the portal's answer
+
+    // Light text means a dark theme, and vice versa.
+    double lum = 0.30 * c.red + 0.59 * c.green + 0.11 * c.blue;
+    sni_set_dark (lum > 0.5, true);
+}
+
+static void
+sni_theme_changed_cb (GObject * /*settings*/, GParamSpec * /*pspec*/,
+                      gpointer /*data*/)
+{
+    sni_query_theme_dark ();
+}
+
+static void
+sni_color_scheme_read_cb (GObject *src, GAsyncResult *res, gpointer /*data*/)
+{
+    GError *err = 0;
+    GVariant *r = g_dbus_connection_call_finish (G_DBUS_CONNECTION (src), res, &err);
+    if (!r) {
+        // No portal (or an old one without this key): keep the default, which
+        // inks the symbol dark with a light halo.
+        if (err) g_error_free (err);
+        return;
+    }
+
+    // Read () returns the value boxed twice: (v) holding a v holding the uint32.
+    GVariant *outer = 0;
+    g_variant_get (r, "(v)", &outer);
+    if (outer) {
+        GVariant *val = g_variant_is_of_type (outer, G_VARIANT_TYPE_VARIANT)
+                      ? g_variant_get_variant (outer) : g_variant_ref (outer);
+        if (val && g_variant_is_of_type (val, G_VARIANT_TYPE_UINT32))
+            sni_set_dark (g_variant_get_uint32 (val) == 1, false);
+        if (val) g_variant_unref (val);
+        g_variant_unref (outer);
+    }
+    g_variant_unref (r);
+}
+
+static void
+sni_setting_changed_cb (GDBusConnection * /*conn*/, const gchar * /*sender*/,
+                        const gchar * /*path*/, const gchar * /*iface*/,
+                        const gchar * /*signal*/, GVariant *params,
+                        gpointer /*data*/)
+{
+    const gchar *ns = 0, *key = 0;
+    GVariant *val = 0;
+    g_variant_get (params, "(&s&sv)", &ns, &key, &val);
+
+    if (ns && key && val &&
+        !g_strcmp0 (ns, "org.freedesktop.appearance") &&
+        !g_strcmp0 (key, "color-scheme") &&
+        g_variant_is_of_type (val, G_VARIANT_TYPE_UINT32))
+        sni_set_dark (g_variant_get_uint32 (val) == 1, false);
+
+    if (val) g_variant_unref (val);
+}
+
+static void
+sni_watch_color_scheme (GDBusConnection *conn)
+{
+    // Preferred source first, and follow it when the user switches theme.
+    sni_query_theme_dark ();
+    GtkSettings *settings = gtk_settings_get_default ();
+    if (settings) {
+        g_signal_connect (settings, "notify::gtk-theme-name",
+                          G_CALLBACK (sni_theme_changed_cb), 0);
+        g_signal_connect (settings, "notify::gtk-application-prefer-dark-theme",
+                          G_CALLBACK (sni_theme_changed_cb), 0);
+        g_signal_connect (settings, "notify::gtk-icon-theme-name",
+                          G_CALLBACK (sni_icon_theme_changed_cb), 0);
+    }
+
+    // Asynchronous on purpose: the portal may be slow to start, or absent, and
+    // the tray must not wait for it.
+    g_dbus_connection_call (conn, SNI_PORTAL_NAME, SNI_PORTAL_PATH,
+                            SNI_PORTAL_IFACE, "Read",
+                            g_variant_new ("(ss)", "org.freedesktop.appearance",
+                                           "color-scheme"),
+                            G_VARIANT_TYPE ("(v)"), G_DBUS_CALL_FLAGS_NONE,
+                            -1, 0, sni_color_scheme_read_cb, 0);
+
+    g_dbus_connection_signal_subscribe (conn, SNI_PORTAL_NAME, SNI_PORTAL_IFACE,
+                                        "SettingChanged", SNI_PORTAL_PATH, 0,
+                                        G_DBUS_SIGNAL_FLAGS_NONE,
+                                        sni_setting_changed_cb, 0, 0);
+}
+
 static void
 sni_name_acquired (GDBusConnection *conn, const gchar * /*name*/, gpointer /*data*/)
 {
@@ -2431,6 +2818,8 @@ sni_name_acquired (GDBusConnection *conn, const gchar * /*name*/, gpointer /*dat
         _sni_menu = dbusmenu_server_new (SCIM_SNI_MENU_PATH);
         sni_rebuild_menu ();
     }
+
+    sni_watch_color_scheme (conn);
 
     sni_register_with_host ();
 }
@@ -2780,7 +3169,8 @@ do_slot_update_factory_info (const PanelFactoryInfo &info)
 {
 #ifdef SCIM_HAS_SNI
     if (_sni_enabled) {
-        sni_set_engine (info.name, info.icon);
+        sni_set_engine (info.name, info.icon, info.symbol,
+                        info.uuid.length () == 0);
         if (_sni_factories.empty () && _panel_agent)
             _panel_agent->request_factory_menu ();   // warm the engine list
     }
@@ -2928,7 +3318,7 @@ do_slot_show_factory_menu (const std::vector <PanelFactoryInfo> &factories)
         }
 
         //Append an entry for forward mode.
-        info = PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE));
+        info = PanelFactoryInfo (String (""), String (_("English/Keyboard")), String ("C"), String (SCIM_KEYBOARD_ICON_FILE), String (_("En")));
         ui_create_factory_menu_entry (info, -1, box, false, true);
 
         g_signal_connect (G_OBJECT (_factory_menu), "closed",
