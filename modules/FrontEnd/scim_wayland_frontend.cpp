@@ -1400,20 +1400,28 @@ WaylandFrontEnd::proto_start_grab ()
 void
 WaylandFrontEnd::proto_send_preedit (const String &utf8, int32_t cursor)
 {
-    // An empty preedit must hide the cursor rather than place one at offset 0.
-    // Both protocols spell this the same way -- a negative index means "no
-    // cursor" -- and an application told to draw a cursor inside an empty
-    // preedit hides its own to make room: VTE terminals lose their blinking
-    // cursor entirely until the text input is reset by a focus change.
+    // An empty preedit must reach the application as a null string rather than
+    // as "". set_preedit_string's text argument is not nullable, so the only way
+    // to send null is to skip the request entirely and let commit apply the
+    // pending state's initial value. It matters because GTK raises preedit-start
+    // and preedit-end on that string becoming non-null and null again, not on
+    // its length: an empty-but-not-null preedit leaves VTE terminals with
+    // im_preedit_active still set, and they stop painting their cursor until a
+    // focus change. gnome-shell normalises "" to null on its own, so the symptom
+    // only shows on compositors that relay what we send verbatim.
+    //
+    // A negative cursor index means "no cursor" and is still wanted by v1 below,
+    // whose text argument leaves us no equivalent of null.
     if (!utf8.length ())
         cursor = -1;
-
 
     if (m_proto == PROTO_V2) {
         if (!m_v2_input_method)
             return;
-        zwp_input_method_v2_set_preedit_string (m_v2_input_method, utf8.c_str (),
-                                               cursor, cursor);
+        if (utf8.length ())
+            zwp_input_method_v2_set_preedit_string (m_v2_input_method,
+                                                   utf8.c_str (),
+                                                   cursor, cursor);
         zwp_input_method_v2_commit (m_v2_input_method, m_serial);
         return;
     }
@@ -1443,12 +1451,11 @@ WaylandFrontEnd::proto_commit_string (const String &utf8)
     if (m_proto == PROTO_V2) {
         if (!m_v2_input_method)
             return;
-        // Clear the preedit in the same batch, with the cursor explicitly
-        // hidden. Relying on the double-buffered state to empty it is not
-        // enough: the reset value of cursor_begin/cursor_end the compositor
-        // then forwards is 0, not -1, so the application is told to draw a
-        // cursor inside an empty preedit and hides its own to make room.
-        zwp_input_method_v2_set_preedit_string (m_v2_input_method, "", -1, -1);
+        // The preedit is cleared by omission: not sending set_preedit_string in
+        // this batch leaves the pending preedit at its initial value, and commit
+        // replaces the current state with the pending one. Sending "" instead
+        // would clear the text but keep it non-null, which is the case VTE
+        // terminals mishandle (see proto_send_preedit ()).
         zwp_input_method_v2_commit_string (m_v2_input_method, utf8.c_str ());
         zwp_input_method_v2_commit (m_v2_input_method, m_serial);
         return;
