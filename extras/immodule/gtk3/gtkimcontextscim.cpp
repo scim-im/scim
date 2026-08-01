@@ -98,6 +98,8 @@ struct _GtkIMContextSCIMImpl
     gint                     cursor_y;
     gint                     cand_x;
     gint                     cand_y;
+    gint                     cand_w;
+    gint                     cand_h;
     gboolean                 use_preedit;
     bool                     is_on;
     bool                     shared_si;
@@ -326,6 +328,8 @@ static GtkWidget                                       *_candidates_area        
 #endif
 
 static bool                                             _on_the_spot                = true;
+
+static bool     preedit_in_client (const GtkIMContextSCIM *ic);
 static bool                                             _shared_input_method        = false;
 static bool                                             _use_key_snooper            = false;
 
@@ -582,9 +586,13 @@ gtk_im_context_scim_init (GtkIMContextSCIM      *context_scim,
     context_scim->impl->cursor_y = 0;
     context_scim->impl->cand_x = 0;
     context_scim->impl->cand_y = 0;
+    context_scim->impl->cand_w = 0;
+    context_scim->impl->cand_h = 0;
     context_scim->impl->is_on = FALSE;
     context_scim->impl->shared_si = _shared_input_method;
-    context_scim->impl->use_preedit = _on_the_spot;
+    // The toolkit's answer, not ours: GTK reports it through set_use_preedit ()
+    // for widgets that cannot host a preedit, and defaults to being able to.
+    context_scim->impl->use_preedit = TRUE;
     context_scim->impl->preedit_started = false;
     context_scim->impl->preedit_updating = false;
 
@@ -871,8 +879,15 @@ gtk_im_context_scim_set_cursor_location (GtkIMContext *context,
             context_scim->impl->cursor_y != y + area->y + area->height + 8) {
             context_scim->impl->cursor_x = x + area->x + area->width;
             context_scim->impl->cursor_y = y + area->y + area->height + 8;
-            context_scim->impl->cand_x = area->x + area->width;
-            context_scim->impl->cand_y = area->y + area->height + 8;
+            // The popover is told to point at the caret rectangle itself, not
+            // at a nudged-away point: it places itself clear of that rectangle,
+            // so an offset here only pushes the candidates further from the
+            // text. Keep it in client-window coordinates, which is the space
+            // GtkPopover reads pointing_to in.
+            context_scim->impl->cand_x = area->x;
+            context_scim->impl->cand_y = area->y;
+            context_scim->impl->cand_w = area->width;
+            context_scim->impl->cand_h = area->height;
             _panel_client.prepare (context_scim->id);
             _panel_client.send ();
             SCIM_DEBUG_FRONTEND(2) << "new cursor location = " << context_scim->impl->cursor_x << "," << context_scim->impl->cursor_y << "\n";
@@ -887,8 +902,6 @@ gtk_im_context_scim_set_use_preedit (GtkIMContext *context,
     SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_set_use_preedit = " << (use_preedit ? "true" : "false") << "...\n";
 
     GtkIMContextSCIM *context_scim = GTK_IM_CONTEXT_SCIM (context);
-
-    if (!_on_the_spot) return;
 
     if (context_scim && context_scim->impl) {
         bool old = context_scim->impl->use_preedit;
@@ -1547,6 +1560,19 @@ candidates_resize ()
     gtk_widget_queue_draw (_candidates_area);
 }
 
+// Re-evaluate the popover after anything that can empty it. A popover whose
+// sections have all gone has to come down: resizing it to nothing leaves an
+// empty frame on screen, which is what stayed behind after a tab switch or
+// after backspacing the preedit away.
+static void
+candidates_refresh ()
+{
+    if (_candidates_ui.is_visible ())
+        candidates_refresh ();
+    else
+        candidates_hide ();
+}
+
 static void
 candidates_show (GtkIMContextSCIM *ic)
 {
@@ -1554,9 +1580,31 @@ candidates_show (GtkIMContextSCIM *ic)
         return;
     GtkWidget *widget = 0;
     gdk_window_get_user_data (ic->impl->client_window, (gpointer *) &widget);
+    // Nothing to show: make sure we are down rather than popping up an empty
+    // frame, which is what happened when a section was cleared while hidden.
+    if (!_candidates_ui.is_visible ()) {
+        candidates_hide ();
+        return;
+    }
+
     if (!candidates_ensure (widget))
         return;
-    GdkRectangle rect = { ic->impl->cand_x, ic->impl->cand_y, 1, 1 };
+    // Ask for the bottom edge so the top of the candidates lands under the
+    // caret rather than over the preedit the application draws on that line.
+    //
+    // A popover centres itself on the rectangle it points at, so pointing at
+    // the caret alone would centre the list on the caret and grow it in both
+    // directions as candidates are added. Widening the rectangle to the panel's
+    // own width puts its centre half a panel to the right of the caret, which
+    // is where the centred popover has to sit for its left edge to line up with
+    // the caret and stay there however many candidates appear.
+    int panel_w = 0, panel_h = 0;
+    _candidates_ui.measure (panel_w, panel_h);
+
+    GdkRectangle rect = { ic->impl->cand_x, ic->impl->cand_y,
+                          panel_w > 0 ? panel_w : 1,
+                          ic->impl->cand_h > 0 ? ic->impl->cand_h : 1 };
+    gtk_popover_set_position (GTK_POPOVER (_candidates_popover), GTK_POS_BOTTOM);
     gtk_popover_set_pointing_to (GTK_POPOVER (_candidates_popover), &rect);
     candidates_resize ();
     gtk_popover_popup (GTK_POPOVER (_candidates_popover));
@@ -1604,7 +1652,7 @@ turn_on_ic (GtkIMContextSCIM *ic)
         if (_shared_input_method)
             _config->write (String (SCIM_CONFIG_FRONTEND_IM_OPENED_BY_DEFAULT), true);
 
-        if (ic->impl->use_preedit && ic->impl->preedit_string.length ()) {
+        if (preedit_in_client (ic) && ic->impl->preedit_string.length ()) {
             g_signal_emit_by_name(ic, "preedit-start");
             g_signal_emit_by_name(ic, "preedit-changed");
             ic->impl->preedit_started = true;
@@ -1629,12 +1677,22 @@ turn_off_ic (GtkIMContextSCIM *ic)
         if (_shared_input_method)
             _config->write (String (SCIM_CONFIG_FRONTEND_IM_OPENED_BY_DEFAULT), false);
 
-        if (ic->impl->use_preedit && ic->impl->preedit_string.length ()) {
+        if (preedit_in_client (ic) && ic->impl->preedit_string.length ()) {
             g_signal_emit_by_name(ic, "preedit-changed");
             g_signal_emit_by_name(ic, "preedit-end");
             ic->impl->preedit_started = false;
         }
     }
+}
+
+// Whether the preedit should be handed to the application at all: the user has
+// to want it there (/FrontEnd/OnTheSpot) and the client has to be able to host
+// it (what the toolkit reports through set_use_preedit ()). Either reason alone
+// sends us to the local candidate window instead.
+static bool
+preedit_in_client (const GtkIMContextSCIM *ic)
+{
+    return _on_the_spot && ic && ic->impl && ic->impl->use_preedit;
 }
 
 static void
@@ -1643,7 +1701,10 @@ set_ic_capabilities (GtkIMContextSCIM *ic)
     if (ic && ic->impl) {
         unsigned int cap = SCIM_CLIENT_CAP_ALL_CAPABILITIES;
 
-        if (!_on_the_spot || !ic->impl->use_preedit)
+        // Strictly what the client can do. Where the preedit is drawn is the
+        // user's preference (/FrontEnd/OnTheSpot) and says nothing about the
+        // client's ability, so it must not be folded in here.
+        if (!ic->impl->use_preedit)
             cap -= SCIM_CLIENT_CAP_ONTHESPOT_PREEDIT;
 
         ic->impl->si->update_client_capabilities (cap);
@@ -2177,7 +2238,7 @@ slot_show_preedit_string (IMEngineInstanceBase *si)
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
     if (ic && ic->impl && _focused_ic == ic) {
-        if (ic->impl->use_preedit) {
+        if (preedit_in_client (ic)) {
             if (!ic->impl->preedit_started) {
                 g_signal_emit_by_name(_focused_ic, "preedit-start");
                 ic->impl->preedit_started = true;
@@ -2222,12 +2283,15 @@ slot_show_lookup_table (IMEngineInstanceBase *si)
 
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
+        // Without this the renderer keeps its table section hidden, so the
+        // popover measures to nothing and comes up empty.
+        _candidates_ui.show_lookup_table ();
         candidates_show (ic);
 #endif
     }
 }
 
-static void 
+static void
 slot_hide_preedit_string (IMEngineInstanceBase *si)
 {
     SCIM_DEBUG_FRONTEND(1) << "slot_hide_preedit_string...\n";
@@ -2242,7 +2306,7 @@ slot_hide_preedit_string (IMEngineInstanceBase *si)
             ic->impl->preedit_attrlist.clear ();
             emit = true;
         }
-        if (ic->impl->use_preedit) {
+        if (preedit_in_client (ic)) {
             if (emit) g_signal_emit_by_name(ic, "preedit-changed");
             if (ic->impl->preedit_started) {
                 g_signal_emit_by_name(ic, "preedit-end");
@@ -2252,7 +2316,7 @@ slot_hide_preedit_string (IMEngineInstanceBase *si)
 #ifdef SCIM_HAS_CANDIDATES
         else {
             _candidates_ui.hide_preedit_string ();
-            candidates_resize ();
+            candidates_refresh ();
         }
 #endif
     }
@@ -2268,7 +2332,7 @@ slot_hide_aux_string (IMEngineInstanceBase *si)
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
         _candidates_ui.hide_aux_string ();
-        candidates_resize ();
+        candidates_refresh ();
 #endif
     }
 }
@@ -2282,12 +2346,13 @@ slot_hide_lookup_table (IMEngineInstanceBase *si)
 
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
-        candidates_hide ();
+        _candidates_ui.hide_lookup_table ();
+        candidates_refresh ();
 #endif
     }
 }
 
-static void 
+static void
 slot_update_preedit_caret (IMEngineInstanceBase *si, int caret)
 {
     SCIM_DEBUG_FRONTEND(1) << "slot_update_preedit_caret...\n";
@@ -2296,7 +2361,7 @@ slot_update_preedit_caret (IMEngineInstanceBase *si, int caret)
 
     if (ic && ic->impl && _focused_ic == ic && ic->impl->preedit_caret != caret) {
         ic->impl->preedit_caret = caret;
-        if (ic->impl->use_preedit) {
+        if (preedit_in_client (ic)) {
             if (!ic->impl->preedit_started) {
                 g_signal_emit_by_name(_focused_ic, "preedit-start");
                 ic->impl->preedit_started = true;
@@ -2306,7 +2371,7 @@ slot_update_preedit_caret (IMEngineInstanceBase *si, int caret)
 #ifdef SCIM_HAS_CANDIDATES
         else {
             _candidates_ui.update_preedit_caret (caret);
-            candidates_resize ();
+            candidates_refresh ();
         }
 #endif
     }
@@ -2324,7 +2389,7 @@ slot_update_preedit_string (IMEngineInstanceBase *si,
     if (ic && ic->impl && _focused_ic == ic && (ic->impl->preedit_string != str || str.length ())) {
         ic->impl->preedit_string   = str;
         ic->impl->preedit_attrlist = attrs;
-        if (ic->impl->use_preedit) {
+        if (preedit_in_client (ic)) {
             if (!ic->impl->preedit_started) {
                 g_signal_emit_by_name(_focused_ic, "preedit-start");
                 ic->impl->preedit_started = true;
@@ -2337,7 +2402,7 @@ slot_update_preedit_string (IMEngineInstanceBase *si,
 #ifdef SCIM_HAS_CANDIDATES
         else {
             _candidates_ui.update_preedit_string (str, attrs);
-            candidates_resize ();
+            candidates_refresh ();
         }
 #endif
     }
@@ -2355,7 +2420,7 @@ slot_update_aux_string (IMEngineInstanceBase *si,
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
         _candidates_ui.update_aux_string (str, attrs);
-        candidates_resize ();
+        candidates_refresh ();
 #endif
     }
 }
@@ -2407,7 +2472,7 @@ slot_update_lookup_table (IMEngineInstanceBase *si,
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
         _candidates_ui.update_lookup_table (table);
-        candidates_resize ();
+        candidates_refresh ();
 #endif
     }
 }

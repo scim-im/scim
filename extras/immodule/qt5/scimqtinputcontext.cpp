@@ -473,11 +473,22 @@ static void turn_off_ic (ScimQtInputContext *ic)
     }
 }
 
+// Whether the preedit should be handed to the application at all: the user has
+// to want it there (/FrontEnd/OnTheSpot) and the client has to be able to host
+// it. Either reason alone sends us to the local candidate window instead.
+static bool preedit_in_client (const ScimQtInputContext *ic)
+{
+    return _on_the_spot && ic && ic->impl && ic->impl->use_preedit;
+}
+
 static void set_ic_capabilities (ScimQtInputContext *ic)
 {
     if (ic && ic->impl && !ic->impl->si.null ()) {
         unsigned int cap = SCIM_CLIENT_CAP_ALL_CAPABILITIES;
-        if (!_on_the_spot || !ic->impl->use_preedit)
+        // Strictly what the client can do. Where the preedit is drawn is the
+        // user's preference (/FrontEnd/OnTheSpot) and says nothing about the
+        // client's ability, so it must not be folded in here.
+        if (!ic->impl->use_preedit)
             cap -= SCIM_CLIENT_CAP_ONTHESPOT_PREEDIT;
         ic->impl->si->update_client_capabilities (cap);
     }
@@ -636,7 +647,7 @@ static void slot_show_preedit_string (IMEngineInstanceBase *si)
 {
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
     if (ic && ic->impl && _focused_ic == ic) {
-        if (ic->impl->use_preedit) {
+        if (preedit_in_client (ic)) {
             ic->impl->preedit_started = true;
             update_preedit_in_client (ic);
         }
@@ -837,7 +848,7 @@ static void slot_hide_preedit_string (IMEngineInstanceBase *si)
     if (ic && ic->impl && _focused_ic == ic) {
         ic->impl->preedit_string = WideString ();
         ic->impl->preedit_caret  = 0;
-        if (ic->impl->use_preedit)
+        if (preedit_in_client (ic))
             hide_preedit_in_client (ic);
 #ifdef SCIM_HAS_CANDIDATES
         else {
@@ -872,7 +883,7 @@ static void slot_update_preedit_caret (IMEngineInstanceBase *si, int caret)
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
     if (ic && ic->impl && _focused_ic == ic && ic->impl->preedit_caret != caret) {
         ic->impl->preedit_caret = caret;
-        if (ic->impl->use_preedit)
+        if (preedit_in_client (ic))
             update_preedit_in_client (ic);
 #ifdef SCIM_HAS_CANDIDATES
         else {
@@ -889,7 +900,7 @@ static void slot_update_preedit_string (IMEngineInstanceBase *si,
     if (ic && ic->impl && _focused_ic == ic) {
         ic->impl->preedit_string   = str;
         ic->impl->preedit_attrlist = attrs;
-        if (ic->impl->use_preedit) {
+        if (preedit_in_client (ic)) {
             ic->impl->preedit_started = true;
             ic->impl->preedit_caret   = (int) str.length ();
             update_preedit_in_client (ic);
@@ -1324,7 +1335,8 @@ ScimQtInputContext::ScimQtInputContext ()
     impl->id              = _context_count++;
     impl->preedit_caret   = 0;
     impl->is_on           = false;
-    impl->use_preedit     = _on_the_spot;
+    // The toolkit's answer, not the user's preference.
+    impl->use_preedit     = true;
     impl->preedit_started = false;
     impl->shared_si       = false;
     impl->cursor_x        = 0;

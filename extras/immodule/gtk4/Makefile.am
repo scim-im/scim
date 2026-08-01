@@ -18,8 +18,13 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 				  -DSCIM_TEMPDIR=\"@SCIM_TEMPDIR@\" \
 				  -DSCIM_KEYBOARD_ICON_FILE=\"@SCIM_ICONDIR@/keyboard.png\"
 
+# The "lib" prefix is mandatory, not cosmetic: GTK4 finds input methods through
+# GIO's module scanner, whose is_valid_module_name() skips any file on Unix that
+# is not lib*.so -- silently, with no diagnostic. ibus-gtk4 installs
+# libim-ibus.so into this same directory for the same reason. (GTK3 is
+# unaffected: it has its own immodules.cache and no such rule.)
 if SCIM_BUILD_GTK4_IMMODULE
-CONFIG_GTK4_IMMODULE = im-scim.la
+CONFIG_GTK4_IMMODULE = libim-scim.la
 endif
 
 if SCIM_LD_VERSION_SCRIPT
@@ -43,20 +48,20 @@ moduledir = @GTK4_IM_MODULEDIR@
 
 module_LTLIBRARIES = $(CONFIG_GTK4_IMMODULE)
 
-im_scim_la_SOURCES = scimgtkimcontext.cpp imscim.cpp
+libim_scim_la_SOURCES = scimgtkimcontext.cpp imscim.cpp
 
-im_scim_la_CXXFLAGS = @GTK4_CFLAGS@ $(CANDIDATES_CFLAGS)
-im_scim_la_CFLAGS   = @GTK4_CFLAGS@ $(CANDIDATES_CFLAGS)
+libim_scim_la_CXXFLAGS = @GTK4_CFLAGS@ $(CANDIDATES_CFLAGS)
+libim_scim_la_CFLAGS   = @GTK4_CFLAGS@ $(CANDIDATES_CFLAGS)
 
-im_scim_la_LDFLAGS = -rpath $(moduledir) \
+libim_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     -avoid-version \
 		     -module \
 		     $(LD_VERSION_SCRIPT_OPTION) \
 		     @GTK4_LIBS@
 
-im_scim_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(CANDIDATES_LIBS)
+libim_scim_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(CANDIDATES_LIBS)
 
 # Immodules are dlopen-ed, never linked: drop the installed libtool archive.
 # The dir is shared with other IMEs, so remove only our own file.
 install-data-hook:
-	rm -f "$(DESTDIR)$(moduledir)/im-scim.la"
+	rm -f "$(DESTDIR)$(moduledir)/libim-scim.la"

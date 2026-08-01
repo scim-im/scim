@@ -324,6 +324,8 @@ static guint                                            _candidates_iochannel_so
 #endif
 
 static bool                                             _on_the_spot                = true;
+
+static bool     preedit_in_client (const GtkIMContextSCIM *ic);
 static bool                                             _shared_input_method        = false;
 static bool                                             _use_key_snooper            = false;
 
@@ -580,7 +582,9 @@ gtk_im_context_scim_init (GtkIMContextSCIM      *context_scim,
     context_scim->impl->cursor_y = 0;
     context_scim->impl->is_on = FALSE;
     context_scim->impl->shared_si = _shared_input_method;
-    context_scim->impl->use_preedit = _on_the_spot;
+    // The toolkit's answer, not ours: GTK reports it through set_use_preedit ()
+    // for widgets that cannot host a preedit, and defaults to being able to.
+    context_scim->impl->use_preedit = TRUE;
     context_scim->impl->preedit_started = false;
     context_scim->impl->preedit_updating = false;
 
@@ -881,8 +885,6 @@ gtk_im_context_scim_set_use_preedit (GtkIMContext *context,
     SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_set_use_preedit = " << (use_preedit ? "true" : "false") << "...\n";
 
     GtkIMContextSCIM *context_scim = GTK_IM_CONTEXT_SCIM (context);
-
-    if (!_on_the_spot) return;
 
     if (context_scim && context_scim->impl) {
         bool old = context_scim->impl->use_preedit;
@@ -1557,7 +1559,7 @@ turn_on_ic (GtkIMContextSCIM *ic)
         if (_shared_input_method)
             _config->write (String (SCIM_CONFIG_FRONTEND_IM_OPENED_BY_DEFAULT), true);
 
-        if (ic->impl->use_preedit && ic->impl->preedit_string.length ()) {
+        if (preedit_in_client (ic) && ic->impl->preedit_string.length ()) {
             g_signal_emit_by_name(ic, "preedit-start");
             g_signal_emit_by_name(ic, "preedit-changed");
             ic->impl->preedit_started = true;
@@ -1582,12 +1584,22 @@ turn_off_ic (GtkIMContextSCIM *ic)
         if (_shared_input_method)
             _config->write (String (SCIM_CONFIG_FRONTEND_IM_OPENED_BY_DEFAULT), false);
 
-        if (ic->impl->use_preedit && ic->impl->preedit_string.length ()) {
+        if (preedit_in_client (ic) && ic->impl->preedit_string.length ()) {
             g_signal_emit_by_name(ic, "preedit-changed");
             g_signal_emit_by_name(ic, "preedit-end");
             ic->impl->preedit_started = false;
         }
     }
+}
+
+// Whether the preedit should be handed to the application at all: the user has
+// to want it there (/FrontEnd/OnTheSpot) and the client has to be able to host
+// it (what the toolkit reports through set_use_preedit ()). Either reason alone
+// sends us to the local candidate window instead.
+static bool
+preedit_in_client (const GtkIMContextSCIM *ic)
+{
+    return _on_the_spot && ic && ic->impl && ic->impl->use_preedit;
 }
 
 static void
@@ -1596,7 +1608,10 @@ set_ic_capabilities (GtkIMContextSCIM *ic)
     if (ic && ic->impl) {
         unsigned int cap = SCIM_CLIENT_CAP_ALL_CAPABILITIES;
 
-        if (!_on_the_spot || !ic->impl->use_preedit)
+        // Strictly what the client can do. Where the preedit is drawn is the
+        // user's preference (/FrontEnd/OnTheSpot) and says nothing about the
+        // client's ability, so it must not be folded in here.
+        if (!ic->impl->use_preedit)
             cap -= SCIM_CLIENT_CAP_ONTHESPOT_PREEDIT;
 
         ic->impl->si->update_client_capabilities (cap);
@@ -2136,7 +2151,7 @@ slot_show_preedit_string (IMEngineInstanceBase *si)
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
     if (ic && ic->impl && _focused_ic == ic) {
-        if (ic->impl->use_preedit) {
+        if (preedit_in_client (ic)) {
             if (!ic->impl->preedit_started) {
                 g_signal_emit_by_name(_focused_ic, "preedit-start");
                 ic->impl->preedit_started = true;
@@ -2206,7 +2221,7 @@ slot_hide_preedit_string (IMEngineInstanceBase *si)
             ic->impl->preedit_attrlist.clear ();
             emit = true;
         }
-        if (ic->impl->use_preedit) {
+        if (preedit_in_client (ic)) {
             if (emit) g_signal_emit_by_name(ic, "preedit-changed");
             if (ic->impl->preedit_started) {
                 g_signal_emit_by_name(ic, "preedit-end");
@@ -2260,7 +2275,7 @@ slot_update_preedit_caret (IMEngineInstanceBase *si, int caret)
 
     if (ic && ic->impl && _focused_ic == ic && ic->impl->preedit_caret != caret) {
         ic->impl->preedit_caret = caret;
-        if (ic->impl->use_preedit) {
+        if (preedit_in_client (ic)) {
             if (!ic->impl->preedit_started) {
                 g_signal_emit_by_name(_focused_ic, "preedit-start");
                 ic->impl->preedit_started = true;
@@ -2288,7 +2303,7 @@ slot_update_preedit_string (IMEngineInstanceBase *si,
     if (ic && ic->impl && _focused_ic == ic && (ic->impl->preedit_string != str || str.length ())) {
         ic->impl->preedit_string   = str;
         ic->impl->preedit_attrlist = attrs;
-        if (ic->impl->use_preedit) {
+        if (preedit_in_client (ic)) {
             if (!ic->impl->preedit_started) {
                 g_signal_emit_by_name(_focused_ic, "preedit-start");
                 ic->impl->preedit_started = true;
