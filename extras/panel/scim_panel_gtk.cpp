@@ -2144,7 +2144,13 @@ sni_render_symbol (const String &symbol, int size,
 
     // The size carried by gtk-font-name is irrelevant: the fitting loop below
     // sets an absolute size to fill the box.
-    pango_font_description_set_weight (desc, PANGO_WEIGHT_BOLD);
+    //
+    // Draw at a regular weight, whatever weight the UI font itself names. A bold
+    // face is what turns a dense glyph into a smudge at this size: the gaps
+    // inside a 15 or 20 stroke Han character are about a pixel wide when it is
+    // fitted to 20 pixels, and the extra stroke weight closes them, so the
+    // character collapses into a block. A regular face keeps the strokes apart.
+    pango_font_description_set_weight (desc, PANGO_WEIGHT_NORMAL);
 
     // Keep the glyph off the very edge of the box.
     double margin = size * 0.07;
@@ -2207,10 +2213,12 @@ sni_render_symbol (const String &symbol, int size,
     // box: sized off the box it swallows small text whole -- a two letter symbol
     // at a 12 pixel font has stems barely 2 pixels wide, so a 4 pixel outline
     // merges them into one blob with the letters showing through as holes.
-    // A hairline is all the insurance we need.
-    double outline = px * 0.10;
-    if (outline < 0.8) outline = 0.8;
-    if (outline > 2.0) outline = 2.0;
+    // A hairline is all the insurance we need. Keep it thin for the same reason
+    // the fill is not bold: half the line width lies inside the path, so a fat
+    // halo eats into a dense glyph's gaps from both sides.
+    double outline = px * 0.07;
+    if (outline < 0.7) outline = 0.7;
+    if (outline > 1.4) outline = 1.4;
 
     cairo_set_line_width (cr, outline);      // half of it lies outside the path
     cairo_set_line_join (cr, CAIRO_LINE_JOIN_ROUND);
@@ -2826,10 +2834,16 @@ sni_name_acquired (GDBusConnection *conn, const gchar * /*name*/, gpointer /*dat
 
 // A host may appear after us (or restart), so registration is driven by the
 // watcher's presence rather than done once at startup.
+static void sni_enable (void);
+
 static void
 sni_watcher_appeared (GDBusConnection * /*conn*/, const gchar * /*name*/,
                       const gchar * /*owner*/, gpointer /*data*/)
 {
+    // Becoming a tray item has to be driven from here rather than from a check
+    // at startup: at login the panel and the tray host come up together, and
+    // losing that race once meant no tray for the rest of the session.
+    sni_enable ();
     _sni_registered = false;
     sni_register_with_host ();
 }
@@ -2861,9 +2875,18 @@ sni_host_present (void)
     return present;
 }
 
+// Claim the item name and export the object, i.e. actually become a tray item.
+// Idempotent: whichever of startup or the watcher-appeared callback gets here
+// first does the work.
 static void
-sni_start (void)
+sni_enable (void)
 {
+    if (_sni_enabled)
+        return;
+    _sni_enabled = true;
+
+    ui_load_config ();               // re-apply with the tray override in effect
+
     gchar *n = g_strdup_printf ("org.kde.StatusNotifierItem-%d-1", (int) getpid ());
     _sni_bus_name = String (n);
 
@@ -2871,7 +2894,13 @@ sni_start (void)
                                    G_BUS_NAME_OWNER_FLAGS_NONE,
                                    0, sni_name_acquired, 0, 0, 0);
     g_free (n);
+}
 
+// Watch unconditionally. Whether a tray exists is not settled at the moment the
+// panel starts, so the watch -- not a one-shot probe -- is what decides.
+static void
+sni_start (void)
+{
     _sni_watch_id = g_bus_watch_name (G_BUS_TYPE_SESSION, SCIM_SNI_WATCHER,
                                       G_BUS_NAME_WATCHER_FLAGS_NONE,
                                       sni_watcher_appeared, sni_watcher_vanished,
@@ -3902,10 +3931,9 @@ int main (int argc, char *argv [])
     // Prefer a tray item when the desktop offers a host: it needs no positioning
     // and stays reachable, unlike a wayland toplevel. Falling back to the
     // toolbar otherwise keeps X11 and hostless desktops working as before.
+    sni_start ();                        // watch for a host, now or later
     if (sni_host_present ()) {
-        _sni_enabled = true;
-        ui_load_config ();               // re-apply with the tray override in effect
-        sni_start ();
+        sni_enable ();
         std::cerr << "SCIM Panel: StatusNotifierItem host found; using the tray.\n";
     }
 #endif
