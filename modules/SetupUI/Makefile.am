@@ -25,7 +25,9 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_srcdir)/intl \
 			  -I$(top_srcdir)/data \
 			  -I$(top_srcdir)/utils/gtkutils \
+			  -I$(top_srcdir)/utils/candidates \
 			  -I$(top_srcdir)/modules/IMEngine \
+			  @CAIRO_CFLAGS@ \
 			  -DSCIM_DATADIR=\"@SCIM_DATADIR@\" \
 			  -DSCIM_LOCALEDIR=\"@SCIM_LOCALEDIR@\" \
 			  -DSCIM_SYSCONFDIR=\"@SCIM_SYSCONFDIR@\" \
@@ -42,6 +44,9 @@ endif
 
 CONFIG_FRONTEND_SETUP_MODULE= aaa-frontend-setup.la
 CONFIG_IMENGINE_SETUP_MODULE= aaa-imengine-setup.la
+# Always built: the candidate renderer it configures is part of libscim, not of
+# any one frontend or panel.
+CONFIG_CANDIDATES_SETUP_MODULE= candidates-setup.la
 
 endif
 
@@ -50,6 +55,7 @@ setupmoduledir           = $(libdir)/scim@SCIM_EPOCH@/$(SCIM_BINARY_VERSION)/Set
 
 setupmodule_LTLIBRARIES  = $(CONFIG_FRONTEND_SETUP_MODULE) \
 			   $(CONFIG_IMENGINE_SETUP_MODULE) \
+			   $(CONFIG_CANDIDATES_SETUP_MODULE) \
 			   $(CONFIG_PANEL_GTK_SETUP_MODULE)
 
 aaa_frontend_setup_la_SOURCES = scim_frontend_setup.cpp
@@ -76,6 +82,20 @@ aaa_imengine_setup_la_LDFLAGS = -avoid-version \
 				@LTLIBINTL@
 aaa_imengine_setup_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
 				$(top_builddir)/utils/gtkutils/libscim-gtkutils@SCIM_EPOCH@.la
+
+
+candidates_setup_la_SOURCES   = scim_candidates_setup.cpp
+candidates_setup_la_CFLAGS    = @GTK_CFLAGS@
+candidates_setup_la_CXXFLAGS  = @GTK_CFLAGS@
+candidates_setup_la_LDFLAGS   = -avoid-version \
+				-rpath $(setupmoduledir) \
+				-module \
+				@LIBTOOL_EXPORT_OPTIONS@ \
+				@GTK_LIBS@ \
+				@CAIRO_LIBS@ \
+				@LTLIBINTL@
+candidates_setup_la_LIBADD    = $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
+				$(top_builddir)/utils/candidates/libscim-candidates@SCIM_EPOCH@.la
 
 
 panel_gtk_setup_la_SOURCES     = scim_panel_gtk_setup.cpp

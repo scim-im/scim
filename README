@@ -166,7 +166,7 @@ On any other desktop (2.2), the hotkeys are SCIM's:
                       the next engine, Control last for the previous one
 
 Run scim-setup to change these, choose which engines are offered, and set the
-candidate window's font and colours.
+candidate window's fonts, colors and shape.
 
 If nothing happens, restart the application first -- toolkits read their
 input-method settings only at startup.

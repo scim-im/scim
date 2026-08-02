@@ -26,6 +26,7 @@
 #include "scim_candidates_x11.h"
 
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>       // XVisualInfo / XGetVisualInfo
 #include <cairo.h>
 #include <cairo-xlib.h>
 
@@ -40,6 +41,7 @@ public:
     int              m_screen;
     Window           m_root;
     Window           m_window;
+    Colormap         m_colormap;    // None unless we made one for an ARGB visual
     cairo_surface_t *m_surface;
 
     int              m_win_w, m_win_h;
@@ -51,7 +53,8 @@ public:
     PageSlot         m_page_down_slot;
 
     CandidatesUIX11Impl ()
-        : m_display (0), m_screen (0), m_root (0), m_window (0), m_surface (0),
+        : m_display (0), m_screen (0), m_root (0), m_window (0),
+          m_colormap (None), m_surface (0),
           m_win_w (1), m_win_h (1), m_spot_x (0), m_spot_y (0), m_mapped (false)
     {
     }
@@ -59,6 +62,46 @@ public:
     ~CandidatesUIX11Impl ()
     {
         destroy ();
+    }
+
+    // Is a compositing manager running on this screen? Only then is an ARGB
+    // visual worth asking for: without one the X server ignores the alpha and
+    // the window shows uninitialized framebuffer through every transparent
+    // pixel, which looks far worse than an opaque panel.
+    bool compositor_running () const
+    {
+        char name [32];
+        snprintf (name, sizeof name, "_NET_WM_CM_S%d", m_screen);
+        Atom sel = XInternAtom (m_display, name, False);
+        return sel != None && XGetSelectionOwner (m_display, sel) != None;
+    }
+
+    // A depth-32 TrueColor visual, or 0 when the server offers none. Depth 32
+    // with 24 bits of RGB is the alpha-capable case; checking the render format
+    // instead would mean linking libXrender for no practical gain.
+    Visual * find_argb_visual (int &depth_out) const
+    {
+        XVisualInfo tmpl;
+        tmpl.screen  = m_screen;
+        tmpl.depth   = 32;
+        tmpl.c_class = TrueColor;
+
+        int n = 0;
+        XVisualInfo *vi = XGetVisualInfo (
+            m_display, VisualScreenMask | VisualDepthMask | VisualClassMask,
+            &tmpl, &n);
+        if (!vi)
+            return 0;
+
+        Visual *found = 0;
+        for (int i = 0; i < n && !found; ++i)
+            if (vi[i].red_mask && vi[i].green_mask && vi[i].blue_mask)
+                found = vi[i].visual;
+
+        if (found)
+            depth_out = 32;
+        XFree (vi);
+        return found;
     }
 
     bool create (const String &display_name)
@@ -70,34 +113,63 @@ public:
         m_screen = DefaultScreen (m_display);
         m_root   = RootWindow (m_display, m_screen);
 
+        int     depth  = DefaultDepth (m_display, m_screen);
+        Visual *visual = DefaultVisual (m_display, m_screen);
+        Colormap cmap  = None;
+
+        if (compositor_running ()) {
+            int argb_depth = 0;
+            Visual *argb = find_argb_visual (argb_depth);
+            if (argb) {
+                visual = argb;
+                depth  = argb_depth;
+                cmap   = XCreateColormap (m_display, m_root, visual, AllocNone);
+            }
+        }
+
         XSetWindowAttributes attrs;
         attrs.override_redirect = True;
         attrs.save_under        = True;
-        attrs.background_pixel   = WhitePixel (m_display, m_screen);
-        attrs.border_pixel       = BlackPixel (m_display, m_screen);
+        attrs.border_pixel      = 0;
         attrs.event_mask =
             ExposureMask | ButtonPressMask | StructureNotifyMask;
+
+        unsigned long mask =
+            CWOverrideRedirect | CWSaveUnder | CWBorderPixel | CWEventMask;
+
+        if (cmap != None) {
+            // No background pixel on the ARGB path: letting X prefill the window
+            // would paint over the corners we are about to cut out, and flash
+            // them opaque on every resize. Cairo supplies every pixel instead.
+            attrs.colormap        = cmap;
+            attrs.background_pixmap = None;
+            mask |= CWColormap | CWBackPixmap;
+        } else {
+            attrs.background_pixel = WhitePixel (m_display, m_screen);
+            mask |= CWBackPixel;
+        }
 
         m_window = XCreateWindow (
             m_display, m_root,
             0, 0, m_win_w, m_win_h, 0,
-            DefaultDepth (m_display, m_screen),
+            depth,
             InputOutput,
-            DefaultVisual (m_display, m_screen),
-            CWOverrideRedirect | CWSaveUnder | CWBackPixel | CWBorderPixel |
-            CWEventMask,
+            visual,
+            mask,
             &attrs);
 
         if (!m_window) {
+            if (cmap != None)
+                XFreeColormap (m_display, cmap);
             XCloseDisplay (m_display);
             m_display = 0;
             return false;
         }
 
+        m_colormap = cmap;
+
         m_surface = cairo_xlib_surface_create (
-            m_display, m_window,
-            DefaultVisual (m_display, m_screen),
-            m_win_w, m_win_h);
+            m_display, m_window, visual, m_win_w, m_win_h);
 
         return true;
     }
@@ -112,6 +184,11 @@ public:
             if (m_window) {
                 XDestroyWindow (m_display, m_window);
                 m_window = 0;
+            }
+            // After the window, which referenced it.
+            if (m_colormap != None) {
+                XFreeColormap (m_display, m_colormap);
+                m_colormap = None;
             }
             XCloseDisplay (m_display);
             m_display = 0;

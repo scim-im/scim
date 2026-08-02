@@ -38,6 +38,7 @@
 #include "scim.h"
 
 #include "scim_ibus_frontend.h"
+#include "scim_ibus_sync.h"
 
 #define scim_module_init           ibus_LTX_scim_module_init
 #define scim_module_exit           ibus_LTX_scim_module_exit
@@ -307,7 +308,7 @@ IBusFrontEnd::build_component ()
         "Smart Common Input Method",
         SCIM_VERSION,
         "LGPL",
-        "SCIM developers",
+        SCIM_IBUS_COMPONENT_AUTHOR,
         "https://github.com/scim-im/scim",
         "",
         "scim");
@@ -322,7 +323,8 @@ IBusFrontEnd::build_component ()
             "description", engines[i].name.c_str (),
             "language",    engines[i].language.length () ? engines[i].language.c_str () : "other",
             "license",     "GPL",
-            "author",      "SCIM developers",
+            "author",      SCIM_IBUS_COMPONENT_AUTHOR,
+            "textdomain",  SCIM_IBUS_ENGINE_TEXTDOMAIN,
             "icon",        engines[i].icon.c_str (),
             "layout",      "us",
             "symbol",      engines[i].symbol.c_str (),
@@ -367,7 +369,7 @@ IBusFrontEnd::print_component_xml ()
         "    <description>Smart Common Input Method</description>\n"
         "    <exec>" SCIM_BINDIR "/scim -f ibus -- --ibus</exec>\n"
         "    <version>" SCIM_VERSION "</version>\n"
-        "    <author>SCIM developers</author>\n"
+        "    <author>" SCIM_IBUS_COMPONENT_AUTHOR "</author>\n"
         "    <license>LGPL</license>\n"
         "    <homepage>https://github.com/scim-im/scim</homepage>\n"
         "    <textdomain>scim</textdomain>\n"
@@ -385,7 +387,8 @@ IBusFrontEnd::print_component_xml ()
             "            <symbol>"      << xml_escape (engines[i].symbol) << "</symbol>\n";
         std::cout <<
             "            <license>GPL</license>\n"
-            "            <author>SCIM developers</author>\n"
+            "            <author>" SCIM_IBUS_COMPONENT_AUTHOR "</author>\n"
+            "            <textdomain>" SCIM_IBUS_ENGINE_TEXTDOMAIN "</textdomain>\n"
             "            <icon>"        << xml_escape (engines[i].icon) << "</icon>\n"
             "            <layout>us</layout>\n"
             "            <rank>1</rank>\n"

@@ -16,6 +16,7 @@ modules/FrontEnd/scim_x11_frontend.cpp
 modules/FrontEnd/scim_x11_ic.cpp
 modules/IMEngine/scim_rawcode_imengine.cpp
 modules/IMEngine/scim_socket_imengine.cpp
+modules/SetupUI/scim_candidates_setup.cpp
 modules/SetupUI/scim_frontend_setup.cpp
 modules/SetupUI/scim_imengine_setup.cpp
 modules/SetupUI/scim_panel_gtk_setup.cpp

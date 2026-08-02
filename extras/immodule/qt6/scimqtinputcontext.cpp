@@ -62,6 +62,7 @@
 #ifdef SCIM_HAS_CANDIDATES
 #include "scim_candidates.h"
 #include <QtGui/QRasterWindow>
+#include <QtGui/QSurfaceFormat>
 #include <QtGui/QPainter>
 #include <QtGui/QImage>
 #include <QtGui/QMouseEvent>
@@ -682,7 +683,15 @@ class ScimCandidatesWindow : public QRasterWindow
 {
 public:
     CandidatesUI ui;
-    ScimCandidatesWindow () { setFlags (Qt::ToolTip | Qt::FramelessWindowHint); }
+    ScimCandidatesWindow () {
+        setFlags (Qt::ToolTip | Qt::FramelessWindowHint);
+        // Ask for an alpha channel, so a translucent background or a rounded
+        // corner has something to be transparent against. Without it the raster
+        // window is opaque and the corners the renderer cuts out come back black.
+        QSurfaceFormat fmt = format ();
+        fmt.setAlphaBufferSize (8);
+        setFormat (fmt);
+    }
 
     void refresh () {
         int w = 0, h = 0;
@@ -703,6 +712,10 @@ protected:
                     cairo_image_surface_get_stride (surf),
                     QImage::Format_ARGB32_Premultiplied);
         QPainter p (this);
+        // Source, not the default SourceOver: the cleared corners must replace
+        // the backing store rather than blend into the previous frame, or the
+        // panel leaves a square ghost of itself behind.
+        p.setCompositionMode (QPainter::CompositionMode_Source);
         p.drawImage (0, 0, img);
         cairo_destroy (cr);
         cairo_surface_destroy (surf);

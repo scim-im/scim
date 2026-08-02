@@ -42,16 +42,19 @@ CandidatesTheme
 CandidatesTheme::light ()
 {
     CandidatesTheme t;
-    t.font         = "Sans 12";
-    t.bg           = { 0.98, 0.98, 0.98, 1.0 };
-    t.fg           = { 0.10, 0.10, 0.10, 1.0 };
-    t.label        = { 0.45, 0.45, 0.45, 1.0 };
-    t.highlight_bg = { 0.20, 0.50, 0.90, 1.0 };
-    t.highlight_fg = { 1.00, 1.00, 1.00, 1.0 };
-    t.border       = { 0.60, 0.60, 0.60, 1.0 };
-    t.border_width = 1;
-    t.padding      = 6;
-    t.spacing      = 6;
+    t.font          = "Sans 12";
+    t.preedit_font  = "";
+    t.bg            = { 0.98, 0.98, 0.98, 0.9 };
+    t.fg            = { 0.10, 0.10, 0.10, 1.0 };
+    t.preedit_fg    = { 0.10, 0.10, 0.10, 1.0 };
+    t.label         = { 0.45, 0.45, 0.45, 1.0 };
+    t.highlight_bg  = { 0.20, 0.50, 0.90, 1.0 };
+    t.highlight_fg  = { 1.00, 1.00, 1.00, 1.0 };
+    t.border        = { 0.60, 0.60, 0.60, 1.0 };
+    t.border_width  = 1;
+    t.corner_radius = 2;
+    t.padding       = 6;
+    t.spacing       = 6;
     return t;
 }
 
@@ -59,31 +62,188 @@ CandidatesTheme
 CandidatesTheme::dark ()
 {
     CandidatesTheme t;
-    t.font         = "Sans 12";
-    t.bg           = { 0.16, 0.16, 0.16, 1.0 };
-    t.fg           = { 0.92, 0.92, 0.92, 1.0 };
-    t.label        = { 0.60, 0.60, 0.60, 1.0 };
-    t.highlight_bg = { 0.24, 0.52, 0.90, 1.0 };
-    t.highlight_fg = { 1.00, 1.00, 1.00, 1.0 };
-    t.border       = { 0.40, 0.40, 0.40, 1.0 };
-    t.border_width = 1;
-    t.padding      = 6;
-    t.spacing      = 6;
+    t.font          = "Sans 12";
+    t.preedit_font  = "";
+    t.bg            = { 0.16, 0.16, 0.16, 0.9 };
+    t.fg            = { 0.92, 0.92, 0.92, 1.0 };
+    t.preedit_fg    = { 0.92, 0.92, 0.92, 1.0 };
+    t.label         = { 0.60, 0.60, 0.60, 1.0 };
+    t.highlight_bg  = { 0.24, 0.52, 0.90, 1.0 };
+    t.highlight_fg  = { 1.00, 1.00, 1.00, 1.0 };
+    t.border        = { 0.40, 0.40, 0.40, 1.0 };
+    t.border_width  = 1;
+    t.corner_radius = 2;
+    t.padding       = 6;
+    t.spacing       = 6;
     return t;
 }
 
-// Parse a CSS/X11 color string ("gray92", "light blue", "#rrggbb") into an
-// RGBA color, using Pango (no GDK dependency). Alpha defaults to 1.
+// Parse "rgb(r,g,b)" / "rgba(r,g,b,a)" -- the form a GTK color chooser writes
+// through gdk_rgba_to_string (), and the only CSS syntax that can carry an
+// alpha besides "#rrggbbaa". Components are 0-255 or percentages, alpha is a
+// float in [0,1]. Locale-independent on purpose: the config file is not
+// localized, so a comma decimal separator must never be accepted here.
+static bool
+parse_rgba_function (const String &s, CandidatesColor &out)
+{
+    const char *p = s.c_str ();
+    while (g_ascii_isspace (*p)) ++p;
+
+    bool has_alpha;
+    if (g_ascii_strncasecmp (p, "rgba", 4) == 0) { has_alpha = true;  p += 4; }
+    else if (g_ascii_strncasecmp (p, "rgb", 3) == 0) { has_alpha = false; p += 3; }
+    else return false;
+
+    while (g_ascii_isspace (*p)) ++p;
+    if (*p != '(') return false;
+    ++p;
+
+    double v[4] = { 0.0, 0.0, 0.0, 1.0 };
+    const int n = has_alpha ? 4 : 3;
+    for (int i = 0; i < n; ++i) {
+        while (g_ascii_isspace (*p)) ++p;
+        char *end = 0;
+        double d = g_ascii_strtod (p, &end);
+        if (end == p) return false;
+        p = end;
+        if (*p == '%') {
+            d /= 100.0;
+            ++p;
+        } else if (i < 3) {
+            d /= 255.0;      // plain rgb components are 0-255
+        }
+        v[i] = d < 0.0 ? 0.0 : (d > 1.0 ? 1.0 : d);
+
+        while (g_ascii_isspace (*p)) ++p;
+        if (i + 1 < n) {
+            // A comma is conventional but CSS also allows bare spaces.
+            if (*p == ',') ++p;
+        }
+    }
+
+    while (g_ascii_isspace (*p)) ++p;
+    if (*p != ')') return false;
+
+    out.r = v[0]; out.g = v[1]; out.b = v[2]; out.a = v[3];
+    return true;
+}
+
+// Parse "#rrggbbaa". Pango handles every other hex length, but not the one that
+// carries an alpha, so only the 8-digit form is claimed here.
+static bool
+parse_hex_rgba (const String &s, CandidatesColor &out)
+{
+    if (s.length () != 9 || s[0] != '#')
+        return false;
+
+    unsigned int v[4];
+    for (int i = 0; i < 4; ++i) {
+        int hi = g_ascii_xdigit_value (s[1 + i * 2]);
+        int lo = g_ascii_xdigit_value (s[2 + i * 2]);
+        if (hi < 0 || lo < 0)
+            return false;
+        v[i] = (unsigned int) (hi * 16 + lo);
+    }
+
+    out.r = v[0] / 255.0; out.g = v[1] / 255.0;
+    out.b = v[2] / 255.0; out.a = v[3] / 255.0;
+    return true;
+}
+
+// Parse a CSS/X11 color string ("gray92", "light blue", "#rrggbb", "#rrggbbaa",
+// "rgb()", "rgba()") into an RGBA color. Pango covers the names and the shorter
+// hex forms (no GDK dependency); the alpha-carrying forms are handled above.
+// Alpha defaults to 1 when the syntax cannot express one.
 static CandidatesColor
 parse_color (const String &s, const CandidatesColor &fallback)
 {
-    PangoColor pc;
-    if (s.length () && pango_color_parse (&pc, s.c_str ())) {
-        CandidatesColor c = { pc.red / 65535.0, pc.green / 65535.0, pc.blue / 65535.0, 1.0 };
+    if (!s.length ())
+        return fallback;
+
+    CandidatesColor c;
+    if (parse_hex_rgba (s, c) || parse_rgba_function (s, c))
         return c;
+
+    PangoColor pc;
+    if (pango_color_parse (&pc, s.c_str ())) {
+        CandidatesColor p = { pc.red / 65535.0, pc.green / 65535.0, pc.blue / 65535.0, 1.0 };
+        return p;
     }
     return fallback;
 }
+
+bool
+scim_candidates_parse_color (const String &str, CandidatesColor &out)
+{
+    if (!str.length ())
+        return false;
+
+    if (parse_hex_rgba (str, out) || parse_rgba_function (str, out))
+        return true;
+
+    PangoColor pc;
+    if (pango_color_parse (&pc, str.c_str ())) {
+        out.r = pc.red / 65535.0;
+        out.g = pc.green / 65535.0;
+        out.b = pc.blue / 65535.0;
+        out.a = 1.0;
+        return true;
+    }
+    return false;
+}
+
+String
+scim_candidates_format_color (const CandidatesColor &color)
+{
+    auto byte = [] (double v) -> int {
+        double d = v * 255.0 + 0.5;
+        if (d < 0.0)   d = 0.0;
+        if (d > 255.0) d = 255.0;
+        return (int) d;
+    };
+
+    const int r = byte (color.r), g = byte (color.g), b = byte (color.b);
+    const int a = byte (color.a);
+
+    gchar *s = (a >= 255)
+        ? g_strdup_printf ("#%02x%02x%02x", r, g, b)
+        : g_strdup_printf ("#%02x%02x%02x%02x", r, g, b, a);
+    String out (s);
+    g_free (s);
+    return out;
+}
+
+// Append a rectangle to the current path, with the corners rounded to radius r.
+// r <= 0 gives a plain rectangle; a radius larger than half the shorter side is
+// clamped, which turns a small panel into a stadium rather than a tangle.
+static void
+rounded_rect (cairo_t *cr, double x, double y, double w, double h, double r)
+{
+    if (r <= 0.0 || w <= 0.0 || h <= 0.0) {
+        cairo_rectangle (cr, x, y, w, h);
+        return;
+    }
+
+    const double max = (w < h ? w : h) / 2.0;
+    if (r > max) r = max;
+
+    const double pi = 3.14159265358979323846;
+    cairo_new_sub_path (cr);
+    cairo_arc (cr, x + w - r, y + r,     r, -pi / 2.0, 0.0);
+    cairo_arc (cr, x + w - r, y + h - r, r, 0.0,        pi / 2.0);
+    cairo_arc (cr, x + r,     y + h - r, r, pi / 2.0,   pi);
+    cairo_arc (cr, x + r,     y + r,     r, pi,         3.0 * pi / 2.0);
+    cairo_close_path (cr);
+}
+
+// Which level of the layered lookup answered. Worth telling apart because the
+// legacy panel keys predate alpha in these values: a color inherited from there
+// says nothing about opacity, while one set under /Candidates/ is deliberate.
+enum KeyLevel {
+    KEY_UNSET,
+    KEY_CANDIDATES,     // /Candidates/<renderer>/ or /Candidates/Default/
+    KEY_LEGACY_PANEL    // /Panel/Gtk/
+};
 
 // Read an appearance key with a layered fallback:
 //   /Candidates/<renderer>/<key>  ->  /Candidates/Default/<key>  ->
@@ -94,7 +254,36 @@ parse_color (const String &s, const CandidatesColor &fallback)
 // level, so writing "default" in setup does not shadow a lower level.
 static String
 read_layered_key (const ConfigPointer &config, const String &renderer,
-                  const String &key, bool skip_default = false)
+                  const String &key, bool skip_default = false,
+                  KeyLevel *level_out = 0)
+{
+    const String levels[] = {
+        String ("/Candidates/") + renderer + "/" + key,
+        renderer == String ("Default") ? String () : String ("/Candidates/Default/") + key,
+        String ("/Panel/Gtk/") + key,
+    };
+    if (level_out)
+        *level_out = KEY_UNSET;
+    for (size_t i = 0; i < sizeof levels / sizeof levels[0]; ++i) {
+        if (levels[i].empty ())
+            continue;
+        String v = config->read (levels[i], String ());
+        if (v.length () && (!skip_default || v != String ("default"))) {
+            if (level_out)
+                *level_out = (i == 2) ? KEY_LEGACY_PANEL : KEY_CANDIDATES;
+            return v;
+        }
+    }
+    return String ();
+}
+
+// The int counterpart of read_layered_key (): same levels, but "unset" has to be
+// told apart from a meaningful 0 (no border, square corners), so this uses the
+// ConfigBase overload that reports whether the key existed rather than a
+// sentinel default.
+static bool
+read_layered_int (const ConfigPointer &config, const String &renderer,
+                  const String &key, int &out)
 {
     const String levels[] = {
         String ("/Candidates/") + renderer + "/" + key,
@@ -104,11 +293,13 @@ read_layered_key (const ConfigPointer &config, const String &renderer,
     for (const String &path : levels) {
         if (path.empty ())
             continue;
-        String v = config->read (path, String ());
-        if (v.length () && (!skip_default || v != String ("default")))
-            return v;
+        int v = 0;
+        if (config->read (path, &v)) {
+            out = v;
+            return true;
+        }
     }
-    return String ();
+    return false;
 }
 
 CandidatesTheme
@@ -122,17 +313,50 @@ scim_candidates_theme_from_config (const ConfigPointer &config, const String &re
     if (font.length ())
         t.font = font;
 
+    // Empty keeps the preedit on the shared font, which is the default.
+    t.preedit_font = read_layered_key (config, renderer, String ("PreeditFont"), true);
+
     // parse_color () keeps the light() field when its string is empty/unparsable,
     // so pass the historical default string when every level is unset.
     auto color = [&] (const char *key, const char *deflt) -> String {
         String v = read_layered_key (config, renderer, String (key));
         return v.length () ? v : String (deflt);
     };
-    t.bg           = parse_color (color ("Color/NormalBackground", "gray92"),     t.bg);
+    // The panel is slightly translucent by default (see light ()). A background
+    // set under /Candidates/ is taken exactly as written, which is how to ask for
+    // a fully opaque panel -- "#rrggbbff", or any name/#rrggbb, since those parse
+    // as opaque. A value inherited from the legacy /Panel/Gtk/ keys carries no
+    // opinion about alpha, so the default opacity is kept rather than letting an
+    // old config silently turn the translucency off.
+    const double default_bg_alpha = t.bg.a;
+    KeyLevel bg_level = KEY_UNSET;
+    String bg_str = read_layered_key (config, renderer,
+                                      String ("Color/NormalBackground"), false,
+                                      &bg_level);
+    t.bg = parse_color (bg_str.length () ? bg_str : String ("gray92"), t.bg);
+    if (bg_level != KEY_CANDIDATES)
+        t.bg.a = default_bg_alpha;
     t.fg           = parse_color (color ("Color/NormalText",       "black"),      t.fg);
     t.highlight_bg = parse_color (color ("Color/ActiveBackground", "light blue"), t.highlight_bg);
     t.highlight_fg = parse_color (color ("Color/ActiveText",       "black"),      t.highlight_fg);
-    // label/border have no config keys yet; keep the light() defaults.
+    t.label        = parse_color (color ("Color/Label",            ""),           t.label);
+    t.border       = parse_color (color ("Color/Border",           ""),           t.border);
+    // The preedit shares the normal text color unless it is given its own, so
+    // that setting only NormalText still colors the whole panel consistently.
+    t.preedit_fg   = parse_color (color ("Color/PreeditText",      ""),           t.fg);
+
+    read_layered_int (config, renderer, String ("BorderWidth"),  t.border_width);
+    read_layered_int (config, renderer, String ("CornerRadius"), t.corner_radius);
+    read_layered_int (config, renderer, String ("Padding"),      t.padding);
+    read_layered_int (config, renderer, String ("Spacing"),      t.spacing);
+
+    // Nonsense values would corrupt the layout arithmetic rather than merely
+    // look wrong, so clamp instead of trusting the config.
+    if (t.border_width  < 0) t.border_width  = 0;
+    if (t.corner_radius < 0) t.corner_radius = 0;
+    if (t.padding       < 0) t.padding       = 0;
+    if (t.spacing       < 0) t.spacing       = 0;
+
     return t;
 }
 
@@ -146,6 +370,7 @@ namespace {
 struct TextItem {
     String         utf8;         // the text
     PangoAttrList *attrs;        // owned; may be null
+    String         font;         // pango font description; empty = the theme font
     int            x, y;         // top-left, panel-relative px
     int            w, h;         // pixel extents
 
@@ -351,13 +576,14 @@ public:
         m_has_caret = false;
     }
 
-    // Build a PangoLayout on cr for utf8 with attrs (font from theme).
+    // Build a PangoLayout on cr for utf8 with attrs. An empty font falls back to
+    // the theme font, so only the sections that were given their own carry one.
     PangoLayout * make_layout (cairo_t *cr, const String &utf8,
-                               PangoAttrList *attrs)
+                               PangoAttrList *attrs, const String &font)
     {
         PangoLayout *layout = pango_cairo_create_layout (cr);
-        PangoFontDescription *desc =
-            pango_font_description_from_string (m_theme.font.c_str ());
+        PangoFontDescription *desc = pango_font_description_from_string (
+            font.length () ? font.c_str () : m_theme.font.c_str ());
         pango_layout_set_font_description (layout, desc);
         pango_font_description_free (desc);
         pango_layout_set_text (layout, utf8.c_str (),
@@ -369,7 +595,7 @@ public:
 
     void measure_item (cairo_t *cr, TextItem &it)
     {
-        PangoLayout *layout = make_layout (cr, it.utf8, it.attrs);
+        PangoLayout *layout = make_layout (cr, it.utf8, it.attrs, it.font);
         int w = 0, h = 0;
         pango_layout_get_pixel_size (layout, &w, &h);
         it.w = w;
@@ -446,7 +672,8 @@ public:
         if (m_preedit_visible && m_preedit_str.length ()) {
             m_preedit_item.utf8  = utf8_wcstombs (m_preedit_str);
             m_preedit_item.attrs =
-                make_pango_attrs (m_preedit_str, m_preedit_attrs, m_theme.fg);
+                make_pango_attrs (m_preedit_str, m_preedit_attrs, m_theme.preedit_fg);
+            m_preedit_item.font = m_theme.preedit_font;
             m_preedit_item.x = origin;
             m_preedit_item.y = cur_y;
             measure_item (cr, m_preedit_item);
@@ -460,7 +687,8 @@ public:
             if (caret > (int) m_preedit_str.length ())
                 caret = (int) m_preedit_str.length ();
             PangoLayout *pl =
-                make_layout (cr, m_preedit_item.utf8, m_preedit_item.attrs);
+                make_layout (cr, m_preedit_item.utf8, m_preedit_item.attrs,
+                             m_preedit_item.font);
             PangoRectangle strong;
             pango_layout_get_cursor_pos (pl, off[caret], &strong, 0);
             m_caret_x = m_preedit_item.x + strong.x / PANGO_SCALE;
@@ -585,7 +813,7 @@ public:
 
     void paint_item (cairo_t *cr, const TextItem &it, const CandidatesColor &fg)
     {
-        PangoLayout *layout = make_layout (cr, it.utf8, it.attrs);
+        PangoLayout *layout = make_layout (cr, it.utf8, it.attrs, it.font);
         cairo_move_to (cr, it.x, it.y);
         cairo_set_source_rgba (cr, fg.r, fg.g, fg.b, fg.a);
         pango_cairo_show_layout (cr, layout);
@@ -754,12 +982,34 @@ CandidatesUI::draw (cairo_t *cr)
 
     const CandidatesTheme &t = d->m_theme;
 
-    // Background.
+    // Rounding and translucency both need somewhere for the missing pixels to
+    // go. On a surface with no alpha channel there is nowhere: a cut corner
+    // comes out black rather than showing the window behind, and a translucent
+    // background composites over black and just looks muddy. That happens on
+    // X11 with no compositor running, so rather than make the config responsible
+    // for knowing which surface it landed on, ask the surface and fall back to
+    // an opaque rectangle.
+    const bool alpha_ok =
+        cairo_surface_get_content (cairo_get_target (cr)) != CAIRO_CONTENT_COLOR;
+    const double radius = alpha_ok ? t.corner_radius : 0.0;
+    const double bg_a   = alpha_ok ? t.bg.a : 1.0;
+
+    // Background: clear first, then fill only the rounded shape, so the corners
+    // really are absent from the surface instead of being filled with the
+    // background color.
     cairo_save (cr);
-    cairo_set_source_rgba (cr, t.bg.r, t.bg.g, t.bg.b, t.bg.a);
-    cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
+    cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
     cairo_paint (cr);
     cairo_restore (cr);
+
+    cairo_save (cr);
+    rounded_rect (cr, 0.0, 0.0, d->m_width, d->m_height, radius);
+    cairo_set_source_rgba (cr, t.bg.r, t.bg.g, t.bg.b, bg_a);
+    cairo_fill_preserve (cr);
+    // Keep the content inside the rounded outline: a highlight on the first or
+    // last candidate reaches the panel edge and would otherwise square off the
+    // corner it sits in.
+    cairo_clip (cr);
 
     // Highlight backgrounds behind selected candidates.
     for (size_t i = 0; i < d->m_cells.size (); ++i) {
@@ -775,10 +1025,11 @@ CandidatesUI::draw (cairo_t *cr)
 
     // Text.
     if (d->m_has_preedit_item)
-        d->paint_item (cr, d->m_preedit_item, t.fg);
+        d->paint_item (cr, d->m_preedit_item, t.preedit_fg);
 
     if (d->m_has_caret) {
-        cairo_set_source_rgba (cr, t.fg.r, t.fg.g, t.fg.b, t.fg.a);
+        cairo_set_source_rgba (cr, t.preedit_fg.r, t.preedit_fg.g,
+                               t.preedit_fg.b, t.preedit_fg.a);
         cairo_set_line_width (cr, 1.0);
         cairo_move_to (cr, d->m_caret_x + 0.5, d->m_caret_y);
         cairo_line_to (cr, d->m_caret_x + 0.5, d->m_caret_y + d->m_caret_h);
@@ -795,16 +1046,22 @@ CandidatesUI::draw (cairo_t *cr)
     // report them from hit_test() as HIT_PREV_PAGE/HIT_NEXT_PAGE (wheel paging
     // already works; this adds click targets). Also HiDPI: scale by output scale.
 
-    // Border.
+    // Border. Stroked on a path inset by half the line width so the whole line
+    // lands inside the panel, with the radius pulled in by the same amount to
+    // stay concentric with the background's curve.
     if (t.border_width > 0) {
+        double half = t.border_width / 2.0;
+        double r    = radius - half;
+        if (r < 0.0) r = 0.0;
         cairo_set_source_rgba (cr, t.border.r, t.border.g, t.border.b, t.border.a);
         cairo_set_line_width (cr, t.border_width);
-        double half = t.border_width / 2.0;
-        cairo_rectangle (cr, half, half,
-                         d->m_width - t.border_width,
-                         d->m_height - t.border_width);
+        rounded_rect (cr, half, half,
+                      d->m_width - t.border_width,
+                      d->m_height - t.border_width, r);
         cairo_stroke (cr);
     }
+
+    cairo_restore (cr);
 }
 
 CandidatesUI::HitType

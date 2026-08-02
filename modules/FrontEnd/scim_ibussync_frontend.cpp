@@ -176,16 +176,19 @@ public:
     bool has_exited () const { return m_should_exit; }
 
 private:
-    // All installed SCIM engines that ibus actually knows: our full installed
-    // set intersected with ibus_bus_list_engines() (matched by UUID; a SCIM
-    // factory UUID never collides with another engine's name). Empty (safely)
-    // when ibus is unreachable -- ScimIBusSync then bails.
+    // Every engine SCIM registers with ibus carries our markers, so the ibus
+    // registry itself tells us which engines are ours --
+    // and ibus.so builds that registry by walking the IMEngine modules
+    // directly, without consulting the disabled list. It is therefore the
+    // authoritative "everything installed" set, enabled or not.
     //
-    // "All installed" = enabled (the loaded factories) UNION the disabled list
-    // from global config. ScimIBusSync derives enabled = all - disabled, so it
-    // needs the FULL set here, not just the enabled one: otherwise an engine
-    // the user has disabled (or a user-installed engine turned off by default)
-    // could never be enabled from GNOME.
+    // Deriving it from our own backend instead would be wrong here: this
+    // process reaches factories through the socket proxy, whose factory list is
+    // fixed when the module loads. An engine enabled afterwards is in neither
+    // that list nor the disabled list, so it fell out of the union entirely and
+    // could never be pushed to GNOME.
+    //
+    // Empty (safely) when ibus is unreachable -- ScimIBusSync then bails.
     std::vector<String> compute_all_installed ()
     {
         std::vector<String> result;
@@ -193,27 +196,20 @@ private:
         if (!m_bus || !ibus_bus_is_connected (m_bus))
             return result;
 
-        std::set<String> ours;
-
-        std::vector<String> enabled;
-        get_factory_list_for_encoding (enabled, String (""));
-        ours.insert (enabled.begin (), enabled.end ());
-
-        std::vector<String> disabled;
-        disabled = scim_global_config_read (
-            String (SCIM_GLOBAL_CONFIG_DISABLED_IMENGINE_FACTORIES), disabled);
-        ours.insert (disabled.begin (), disabled.end ());
-
-        if (ours.empty ())
-            return result;
-
         GList *engines = ibus_bus_list_engines (m_bus);
+
         for (GList *p = engines; p; p = p->next) {
-            const gchar *name = ibus_engine_desc_get_name (IBUS_ENGINE_DESC (p->data));
-            if (name && *name && ours.count (String (name)))
+            IBusEngineDesc *desc = IBUS_ENGINE_DESC (p->data);
+            const gchar    *name = ibus_engine_desc_get_name (desc);
+            const gchar    *dom  = ibus_engine_desc_get_textdomain (desc);
+
+            if (name && *name && dom &&
+                !g_strcmp0 (dom, SCIM_IBUS_ENGINE_TEXTDOMAIN))
                 result.push_back (String (name));
         }
-        g_list_free_full (engines, g_object_unref);
+
+        g_list_foreach (engines, (GFunc) g_object_unref, 0);
+        g_list_free (engines);
 
         return result;
     }

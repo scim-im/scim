@@ -65,13 +65,31 @@ struct CandidatesColor {
  */
 struct CandidatesTheme {
     String       font;          ///< Pango font description, e.g. "Sans 12".
-    CandidatesColor bg;            ///< Window background.
+    /**
+     * @brief Pango font description for the preedit line.
+     *
+     * Empty means "same as font", which is the default. Set this to give the
+     * string being composed its own family or size.
+     */
+    String       preedit_font;
+    CandidatesColor bg;            ///< Window background; its alpha is honored
+                                   ///< (0.9 by default, i.e. faintly see-through).
     CandidatesColor fg;            ///< Normal text.
+    CandidatesColor preedit_fg;    ///< Preedit text.
     CandidatesColor label;         ///< Candidate label ("1." "2." ...).
     CandidatesColor highlight_bg;  ///< Selected-candidate background.
     CandidatesColor highlight_fg;  ///< Selected-candidate text.
     CandidatesColor border;        ///< Window border.
-    int          border_width;  ///< Border thickness in px.
+    int          border_width;  ///< Border thickness in px; 0 draws none.
+    /**
+     * @brief Corner radius in px; 0 draws a plain rectangle. Defaults to 2.
+     *
+     * Rounding cuts the corners out of the surface, so it only looks right
+     * where the surface carries an alpha channel -- always on Wayland, on X11
+     * only under a compositor (see CandidatesUIX11). Without one the renderer
+     * falls back to a square, opaque panel by itself.
+     */
+    int          corner_radius;
     int          padding;       ///< Inner padding in px.
     int          spacing;       ///< Gap between rows / candidates in px.
 
@@ -84,8 +102,9 @@ struct CandidatesTheme {
 /**
  * @brief Build a theme from the SCIM config for a candidate renderer.
  *
- * Reads Font and Color/{NormalText,NormalBackground,ActiveText,ActiveBackground}
- * (CSS/X11 color strings) with a layered fallback:
+ * Reads the appearance keys -- Font, PreeditFont, BorderWidth, CornerRadius,
+ * Padding, Spacing and Color/{NormalText,NormalBackground,PreeditText,
+ * ActiveText,ActiveBackground,Label,Border} -- with a layered fallback:
  *   /Candidates/<renderer>/<key>  ->  /Candidates/Default/<key>  ->
  *   /Panel/Gtk/<key> (legacy, shared with the panel)  ->  CandidatesTheme::light().
  * So the candidate appearance is configured independently of the panel under
@@ -93,9 +112,40 @@ struct CandidatesTheme {
  * "/Candidates/Gtk/" or "/Candidates/Qt/"), while existing setups that only set
  * the old "/Panel/Gtk/" keys keep working unchanged. @p renderer selects the top
  * level and defaults to "Default" (the toolkit-agnostic Cairo renderer).
+ *
+ * Color values are CSS/X11 strings. Besides the names and "#rrggbb" that Pango
+ * understands, "#rrggbbaa" and "rgb()"/"rgba()" are accepted, so a value can
+ * carry an alpha -- that is how a translucent background is configured, and it
+ * is the syntax a GTK color chooser with alpha enabled writes.
+ *
+ * The background is the one value whose alpha is not taken literally from every
+ * level: set under "/Candidates/" it is, but a color inherited from the legacy
+ * "/Panel/Gtk/" keys keeps CandidatesTheme::light()'s default opacity, since
+ * those keys predate alpha and say nothing about it.
  */
 CandidatesTheme scim_candidates_theme_from_config (const ConfigPointer &config,
                                                    const String &renderer = String ("Default"));
+
+/**
+ * @brief Parse a color string exactly as the theme loader does.
+ *
+ * Accepts CSS/X11 names, "#rgb", "#rrggbb", "#rrggbbaa", "rgb()" and "rgba()".
+ * Exposed so a settings UI writes only values the renderer can read back.
+ *
+ * @param str  the string to parse.
+ * @param out  set to the parsed color on success; untouched on failure.
+ * @return     true when @p str was understood.
+ */
+bool scim_candidates_parse_color (const String &str, CandidatesColor &out);
+
+/**
+ * @brief Format a color for the config, as the shortest form that round-trips.
+ *
+ * "#rrggbb" for an opaque color, "#rrggbbaa" when it carries an alpha -- so a
+ * fully opaque value stays readable by anything that only understands the plain
+ * hex form, including the older /Panel/Gtk/ color keys.
+ */
+String scim_candidates_format_color (const CandidatesColor &color);
 
 /**
  * @brief Backend-agnostic layout/draw of the input panel.
