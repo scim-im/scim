@@ -42,6 +42,12 @@ FilterFactoryBase::~FilterFactoryBase ()
 {
 }
 
+IMEngineFactoryPointer
+FilterFactoryBase::get_attached_factory () const
+{
+    return m_orig;
+}
+
 void
 FilterFactoryBase::attach_imengine_factory (const IMEngineFactoryPointer &orig)
 {

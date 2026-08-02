@@ -242,6 +242,15 @@ protected:
      */
     void reload_disabled_factories ();
 
+    /**
+     * @brief Re-apply the filter configuration to the backend's factories.
+     *
+     * Asks the backend to rebuild the filter chains of its loaded factories
+     * (see CommonBackEnd::reload_filters). A no-op for backends that are not a
+     * CommonBackEnd.
+     */
+    void reload_filters ();
+
     // IMEngine instance related functions.
 
     /**

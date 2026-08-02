@@ -114,6 +114,15 @@ public:
     virtual void attach_imengine_factory (const IMEngineFactoryPointer &orig);
 
     /**
+     * @brief Return the IMEngineFactory object this filter wraps.
+     *
+     * Lets a backend peel the filter chain off a factory and rebuild it, which
+     * is how a changed filter configuration is applied to factories that are
+     * already loaded. Returns a null pointer when nothing is attached.
+     */
+    IMEngineFactoryPointer get_attached_factory () const;
+
+    /**
      * @brief Return the name of the original IMEngineFactory object
      * specified in contructor or by attach_imengine_factory() method.
      *

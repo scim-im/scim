@@ -1193,8 +1193,21 @@ SocketFrontEnd::socket_reload_config (int /*client_id*/)
 
     gettimeofday (&timestamp, 0);
 
-    if (timestamp.tv_sec > last_timestamp.tv_sec + 1)
+    if (timestamp.tv_sec > last_timestamp.tv_sec + 1) {
         m_config->reload ();
+
+        // This daemon owns the only real CommonBackEnd in the session; every
+        // other process reaches its factories through the socket proxy and can
+        // never resurrect one this daemon dropped. So the enabled set has to be
+        // reconciled here, or enabling an engine stays invisible until the
+        // daemon is restarted -- which is what made scim-setup's changes look
+        // like they had not been applied.
+        reload_disabled_factories ();
+
+        // Filters are bound to a factory at creation, so a changed filter list
+        // has to be re-applied here too, for the same reason.
+        reload_filters ();
+    }
 
     gettimeofday (&last_timestamp, 0);
 

@@ -108,7 +108,16 @@ public:
 
         m_sync = new ScimIBusSync (
             [this] () { return compute_all_installed (); },
-            [this] () { reload_disabled_factories (); });
+            [this] () {
+                // Ask the socket daemon first: it holds the only real backend,
+                // so reconciling ours alone would just re-filter a factory list
+                // that is itself stale. The reload command travels over the
+                // config connection, and the daemon reconciles its factories as
+                // part of handling it.
+                if (!m_config.null ())
+                    m_config->reload ();
+                reload_disabled_factories ();
+            });
         m_sync->start ();
     }
 

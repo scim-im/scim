@@ -29,6 +29,7 @@
 #define Uses_SCIM_IMENGINE_MODULE
 #define Uses_SCIM_CONFIG_PATH
 #define Uses_STL_ALGORITHM
+#include <set>
 #include "scim_private.h"
 #include "scim.h"
 #include "scim_stl_map.h"
@@ -400,6 +401,9 @@ struct CommonBackEnd::CommonBackEndImpl {
     FilterManager       *m_filter_manager;
     ConfigPointer        m_config;         // kept for on-demand module reload
     std::vector<String>  m_modules;        // module names, indexes m_engine_modules
+    // UUIDs served by the socket proxy: the remote side has already applied its
+    // own filters, so reload_filters () must leave these alone.
+    std::set<String>     m_unfiltered;
 
     CommonBackEndImpl () : m_engine_modules (0), m_filter_manager (0) { }
 };
@@ -475,6 +479,8 @@ CommonBackEnd::CommonBackEnd (const ConfigPointer       &config,
                         // Only load filter for none socket IMEngines.
                         if (new_modules [i] != "socket")
                             factory = m_impl->m_filter_manager->attach_filters_to_factory (factory);
+                        else
+                            m_impl->m_unfiltered.insert (factory->get_uuid ());
 
                         add_factory (factory);
 
@@ -519,6 +525,71 @@ CommonBackEnd::~CommonBackEnd ()
     delete [] m_impl->m_engine_modules;
     delete m_impl->m_filter_manager;
     delete m_impl;
+}
+
+// Re-apply the filter configuration to factories that are already loaded.
+//
+// Filters are wrapped around a factory when the factory is created, so a
+// changed /Filter/FilteredIMEngines list would otherwise only reach factories
+// loaded afterwards. Peel the existing chain off, rebuild it from the current
+// configuration and swap the factory in the repository.
+//
+// As with reload_disabled_factories (), existing IMEngine instances keep the
+// chain they were created with; the change applies to instances created later.
+void
+CommonBackEnd::reload_filters ()
+{
+    if (!m_impl || m_impl->m_filter_manager == 0)
+        return;
+
+    std::vector<IMEngineFactoryPointer> current;
+    get_factories_for_encoding (current, String ());
+
+    for (size_t i = 0; i < current.size (); ++i) {
+        IMEngineFactoryPointer factory = current [i];
+
+        if (factory.null ())
+            continue;
+
+        const String uuid = factory->get_uuid ();
+
+        // The socket proxy is filtered on the far side; wrapping it here would
+        // apply every filter twice.
+        if (m_impl->m_unfiltered.count (uuid))
+            continue;
+
+        // Peel off however many filters are currently wrapped around it.
+        IMEngineFactoryPointer base = factory;
+        for (;;) {
+            IMEngineFactoryBase *raw = base;
+            FilterFactoryBase   *ff  = dynamic_cast <FilterFactoryBase *> (raw);
+
+            if (!ff)
+                break;
+
+            IMEngineFactoryPointer inner = ff->get_attached_factory ();
+
+            if (inner.null ())
+                break;
+
+            base = inner;
+        }
+
+        IMEngineFactoryPointer rebuilt =
+            m_impl->m_filter_manager->attach_filters_to_factory (base);
+
+        // Unchanged when the engine has no filters configured: attach_filters_
+        // to_factory () hands the original straight back, so there is nothing
+        // to swap and no churn on engines nobody filters.
+        IMEngineFactoryBase *before = factory;
+        IMEngineFactoryBase *after  = rebuilt;
+
+        if (before == after)
+            continue;
+
+        remove_factory (uuid);
+        add_factory (rebuilt);
+    }
 }
 
 void
@@ -582,6 +653,8 @@ CommonBackEnd::reload_disabled_factories ()
             // Only load filter for none socket IMEngines.
             if (name != "socket")
                 factory = m_impl->m_filter_manager->attach_filters_to_factory (factory);
+            else
+                m_impl->m_unfiltered.insert (uuid);
 
             if (add_factory (factory))
                 ++added;

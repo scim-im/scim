@@ -215,6 +215,19 @@ public:
      * subsequently created instances.
      */
     void reload_disabled_factories ();
+
+    /**
+     * @brief Re-apply the filter configuration to loaded factories.
+     *
+     * Filters are wrapped around a factory when it is created, so a changed
+     * /Filter/FilteredIMEngines list otherwise only affects factories loaded
+     * afterwards. This rebuilds the filter chain of every loaded factory from
+     * the current configuration.
+     *
+     * Existing IMEngine instances are not affected; the change takes effect for
+     * subsequently created instances.
+     */
+    void reload_filters ();
 };
 
 } // namespace scim

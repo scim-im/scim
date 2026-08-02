@@ -227,6 +227,15 @@ FrontEndBase::reload_disabled_factories ()
         cb->reload_disabled_factories ();
 }
 
+void
+FrontEndBase::reload_filters ()
+{
+    BackEndBase   *backend = m_impl->m_backend;   // Pointer<> -> raw
+    CommonBackEnd *cb      = dynamic_cast <CommonBackEnd *> (backend);
+    if (cb)
+        cb->reload_filters ();
+}
+
 uint32
 FrontEndBase::get_factory_list_for_language (std::vector<String>& uuids, const String &language) const
 {
