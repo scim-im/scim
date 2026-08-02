@@ -1,220 +1,194 @@
 SCIM -- Smart Common Input Method
 =================================
 
-SCIM is a modular input-method platform.  A single backend hosts the IMEngine
-modules (pinyin, table, rawcode, ...); frontends expose it to applications, a
-candidate renderer shows the preedit and candidate list at the cursor, and a
-panel provides the toolbar and status area.
+SCIM is an input method framework to help you type languages other than English.
+The input methods themselves come as separate packages:
 
-Source-derived developer documentation is generated with doxygen.  Look for
-scim-doc-$(VERSION).tar.gz on our website or browse it online.
+  scim-tables        many languages https://github.com/scim-im/scim-tables
+  scim-m17n          many languages https://github.com/scim-im/scim-m17n
+  scim-uim           many languages https://github.com/scim-im/scim-uim
+  scim-pinyin        Chinese        https://github.com/scim-im/scim-pinyin
+  scim-novel-pinyin  Chinese        https://github.com/scim-im/scim-novel-pinyin
+  scim-ccinput       Chinese        https://github.com/scim-im/scim-ccinput
+  scim-chewing       Chinese        https://github.com/chewing/scim-chewing
+  scim-array         Chinese        https://github.com/tzhuan/scim-array
+  scim-anthy         Japanese       https://github.com/scim-im/scim-anthy
+  scim-wnn           Japanese       https://github.com/scim-im/scim-wnn
+  scim-skk           Japanese       https://github.com/tzhuan/scim-skk
+  scim-prime         Japanese       https://github.com/tzhuan/scim-prime
+  scim-canna         Japanese       https://github.com/tzhuan/scim-canna
+  scim-hangul        Korean         https://github.com/tzhuan/scim-hangul
+  scim-sinhala       Sinhala        https://github.com/tzhuan/scim-sinhala
+  scim-unikey        Vietnamese     https://github.com/scim-im/scim-unikey
 
-Building
+SCIM alone ships only rawcode, which enters a character by its code (hex
+Unicode, or the current encoding's bytes).
+
+
+Contents
 ========
 
-To build from VCS, run the bootstrap script in the top-level directory first:
-
-  ./bootstrap && ./configure && make
-
-To prepare a release tarball, adjust AC_INIT, SCIM_*_VERSION, SCIM_CURRENT and
-SCIM_REVISION in configure.ac as needed, then run
-
-  ./bootstrap && ./configure && make dist && make docs
-
-The GUI (panel and setup) targets GTK4.  Native IM modules are built for GTK2,
-GTK3, GTK4, Qt5 and Qt6 when the respective toolkits are present.
+  1. Install
+  2. Set up your desktop
+       2.1  GNOME, or any desktop where you want IBus
+       2.2  Everything else
+  3. Using it
+  4. Packaging notes
 
 
-Running scim
-============
+1. Install
+==========
 
-  scim [option]...
+  ./configure && make && sudo make install
 
-  The options are:
-    -l, --list            List all of the available modules.
-    -f, --frontend name   Use the specified FrontEnd module (e.g. x11, socket,
-                          wayland, ibus); auto-detected from the session when
-                          not given.
-    -c, --config name     Use the specified Config module.
-    -e, --engines name    Load the specified set of IMEngines.
-    -ne,--no-engines name Do not load that set of IMEngines.
-    -d, --daemon          Run in the background as a supervisor (restarts its
-                          children; on a GNOME/IBus session it runs the
-                          input-source coordinator instead of a frontend).
-    --no-socket           Do not try to start a SCIM SocketFrontEnd daemon.
-    --xml                 With '-f ibus' (after '--'), print the IBus component
-                          manifest for the installed engines and exit.
-    -h, --help            Show this help message.
+From a git checkout, run ./bootstrap first.
 
-When no frontend is given, scim picks one from the session: a GNOME/IBus
-session is served by the IBus frontend (see below), a plain X11 session by the
-x11 frontend, and a Wayland session by the wayland frontend when it is built.
+Frontends, IM modules and GUI parts are built when their development packages
+are present and skipped otherwise, so check the summary ./configure prints if
+something you expected is missing.  To leave a part out deliberately, pass
+--disable-NAME for any of:
 
-`scim -d` daemonizes itself and stays as a persistent supervisor: it launches
-the appropriate worker(s) and restarts them if they crash.  Install
-data/scim.desktop as an XDG autostart entry (the build does this) so the
-session starts `scim -d` automatically; scim then self-selects its role.
+  frontend-x11  frontend-wayland  frontend-ibus  frontend-socket
+  gtk2-immodule  gtk3-immodule  gtk4-immodule  qt5-immodule  qt6-immodule
+  panel-gtk  setup-ui  sni  kimpanel  filter-hanconv
+
+Then log out and back in.  On a full desktop an autostart entry starts SCIM for
+you; pointing your desktop at it is section 2.
 
 
-Client/server architecture (Socket FrontEnd)
-============================================
+2. Set up your desktop
+======================
 
-By default scim runs a single per-user client/server environment.  One process
--- the SocketFrontEnd daemon -- owns the real backend and the config files;
-everything else is a thin client that relays to it over a local socket:
+2.1  GNOME, or any desktop where you want IBus
+----------------------------------------------
 
-  * the GTK2/3/4 and Qt5/6 IM modules load the Socket IMEngine + Socket Config
-    proxies and relay key processing AND configuration to the daemon (they
-    embed the backend directly only as a fallback -- e.g. no socket module
-    built, manual mode, or a mismatched socket address);
-  * the x11, wayland and ibus frontends do the same when a daemon is present.
+On GNOME/Wayland, IBus is the only way in -- not optional -- and SCIM registers
+with it as an engine.  Follow this section too if you prefer IBus on another
+desktop.
 
-So there is exactly one process reading the config files and running the
-engines; activation is instant and learned state is shared.  Pass --no-socket
-(or -c/-e explicitly) to opt out and embed the backend in-process instead.
-
-The default socket address is local:$XDG_RUNTIME_DIR/scim-socket-frontend (and
-local:/tmp/scim-socket-frontend when XDG_RUNTIME_DIR is not set); the local:
-prefix means a unix socket.  Use an inet: prefix for a TCP socket, e.g.
-SCIM_SOCKET_ADDRESS=inet:localhost:12345.
-
-The IM modules use the Socket IMEngine/Config modules by default.  To load
-other modules directly instead, set for example:
-
-  $ export GTK_IM_SCIM_CONFIG_MODULE=simple
-  $ export GTK_IM_SCIM_IMENGINE_MODULES=table
-
-
-GNOME / IBus sessions
-=====================
-
-On a GNOME (or any IBus) session the IME is served by ibus-daemon through the
-scim IBus engine, not by our own input frontend.  Here `scim -d` runs a single
-supervised daemon that hosts one shared backend for two co-loaded frontends:
-
-  scim -f socket,ibussync
-
-  * socket   -- a warm SocketFrontEnd: the shared backend the relay-mode IBus
-                engine attaches to, so activating an engine is instant and
-                learned state survives ibus-daemon killing and relaunching the
-                engine process;
-  * ibussync -- a coordinator that keeps the set of enabled SCIM engines and
-                GNOME's input-source list (org.gnome.desktop.input-sources) in
-                sync, both directions, off that same backend.
-
-IBus discovers SCIM engines from a component manifest (scim.xml); see below.
-
-
-IBus component manifest (scim.xml)
-==================================
-
-NOTE: This whole section applies to GNOME/IBus sessions ONLY.  On a plain X11
-or Wayland session the x11/wayland frontend hosts the backend directly and
-discovers engines from it, so no IBus component manifest is involved -- neither
-packagers nor users need to generate or install scim.xml there.
-
-ibus-daemon reads a component manifest to learn which engines exist and how to
-launch them.  SCIM installs a bootstrap manifest to the IBus component
-directory (`pkg-config --variable=pkgdatadir ibus-1.0`/component, typically
-/usr/share/ibus/component/scim.xml) that lists only the generic "scim" engine.
-
-To expose every *installed* SCIM engine as its own IBus entry, regenerate the
-manifest:
+Give IBus the list of engines SCIM offers.  System-wide, as root:
 
   scim -f ibus -- --xml > /usr/share/ibus/component/scim.xml
 
-This lists all installed engines, enabled or not: the manifest is the set of
-engines GNOME/IBus can OFFER, and which of them are actually active is a
-separate dimension the ibussync coordinator keeps in sync with GNOME.  So you
-regenerate only when engines are INSTALLED or removed, not when you enable or
-disable one.  The generator enumerates the engines visible in the environment
-it runs in, so run it as the identity whose engines you want to appear.
-ibus-daemon scans the component directories once at startup, so restart
-ibus-daemon afterwards (e.g. `ibus restart`).
+That lists the engines installed system-wide.  If an engine also supports user
+data -- scim-tables, for example, reads tables from your home directory -- a
+manifest generated as root cannot see those, and only a personal manifest lets
+IBus scan your own engines.
 
-For packagers
--------------
+For that, IBUS_COMPONENT_PATH has to include your own component directory, and
+it has to be set before ibus starts.  It replaces IBus's default search path
+instead of adding to it, so list the system directory as well, or every other
+input method on the system disappears:
 
-Regenerate the system manifest whenever the set of installed SCIM IMEngine
-packages changes -- i.e. watch the IMEngine module directory
-(`$(libdir)/scim-1.0/*/IMEngine/`) and, on any install or removal, run
+  IBUS_COMPONENT_PATH=/home/your-user-name/.local/share/ibus/component:/usr/share/ibus/component
+
+Then generate the manifest as yourself rather than as root, into whichever
+directory you listed:
+
+  mkdir -p ~/.local/share/ibus/component
+  scim -f ibus -- --xml > ~/.local/share/ibus/component/scim.xml
+
+Any directory you can read will do -- ~/.local/share/ibus/component is only the
+conventional choice, and IBus scans exactly what IBUS_COMPONENT_PATH names.
+
+On a systemd system, ibus runs as a user service and reads
+~/.config/environment.d, so the variable goes there:
+
+  mkdir -p ~/.config/environment.d
+  echo 'IBUS_COMPONENT_PATH=${HOME}/.local/share/ibus/component:/usr/share/ibus/component' \
+      > ~/.config/environment.d/scim-ibus.conf
+
+On other systems, set it wherever your session's environment is defined; all
+that matters is that ibus inherits it.
+
+Log out and back in, then add SCIM's engines under Settings -> Keyboard -> Input
+Sources.
+
+Whenever an engine is installed or removed, regenerate the manifests you use --
+the system one, the personal one, or both -- so they reflect what is actually
+there, then log out and back in again.  Merely enabling or disabling an engine
+needs nothing: GNOME and SCIM keep that in step by themselves.
+
+Do not set GTK_IM_MODULE or QT_IM_MODULE to scim here: that takes applications
+off IBus and breaks it.  Install IBus's own GTK2, GTK3 and GTK4 IM modules if
+you use GTK applications under XWayland, or any GTK2 application; your
+distribution may package them separately from ibus itself.  Qt needs nothing
+extra.
+
+2.2  Everything else
+--------------------
+
+On Wayland it works as installed: no variables, no IM modules.  On KDE Plasma,
+first select SCIM under System Settings -> Keyboard -> Virtual Keyboard.
+
+A compositor running on its own -- sway, river, labwc without a session manager
+-- reads no XDG autostart entries, so nothing starts SCIM and section 1's
+autostart entry is never used.  Start it from the compositor's own config
+instead; in sway that is:
+
+  exec scim -d
+
+For X11 -- and for XWayland applications on a Wayland session -- set these
+somewhere your session reads before it starts: ~/.xprofile, which the X session
+startup scripts read on most distributions, or ~/.config/environment.d/*.conf,
+which systemd reads.  Then log out and back in:
+
+  GTK_IM_MODULE=scim
+  QT_IM_MODULE=scim
+  XMODIFIERS=@im=SCIM
+
+The first two use SCIM's GTK and Qt IM modules.  XMODIFIERS covers everything
+else through XIM, xterm and emacs included, but not GTK4: GTK4 dropped XIM, so a
+GTK4 application on X11 needs the GTK4 IM module.
+
+On KDE Plasma, the "Input Method Panel" applet -- kimpanel -- lets Plasma draw
+the candidate window instead of SCIM, and SCIM uses it whenever it is there.  On
+Wayland it may place that window at the top-left corner of the screen; leave the
+applet off the panel, or set /Panel/UseKimpanel to false in
+~/.config/scim/config, and SCIM draws the candidates itself.
+
+GNOME on X11 can be an IBus session, but it does not have to be: 2.1 is one
+option there, and setting these variables so SCIM is the input method itself is
+the other.  Both work.
+
+
+3. Using it
+===========
+
+On an IBus desktop (2.1), IBus and the desktop own the hotkeys.  Both default to
+Super+space for the next input source, and GNOME adds Shift+Super+space for the
+previous one.  Change them in GNOME's keyboard settings, or with ibus-setup.
+
+On any other desktop (2.2), the hotkeys are SCIM's:
+
+  Control+space       turn the input method on or off
+  Control+Shift       switch engine -- hold both, then release Shift last for
+                      the next engine, Control last for the previous one
+
+Run scim-setup to change these, choose which engines are offered, and set the
+candidate window's font and colours.
+
+If nothing happens, restart the application first -- toolkits read their
+input-method settings only at startup.
+
+
+4. Packaging notes
+==================
+
+Regenerate the system IBus manifest from a package hook watching
+$(libdir)/scim-1.0/$(SCIM_BINARY_VERSION)/IMEngine/, so it tracks which engines
+are installed:
 
   scim -f ibus -- --xml > /usr/share/ibus/component/scim.xml
 
-Wire this to your package manager's hooks: a dpkg trigger, an rpm file trigger,
-or a pacman hook on that directory.  Run it as root, so it enumerates only the
-system-wide engines -- exactly what belongs in the system manifest.  (Tables
-and other engines that live only in a user's home are handled per-user below.)
+Run it as root, so it lists system-wide engines only; a user's own engines are
+their business (2.1).  This matters only for IBus desktops.
 
-For users -- exposing a user-level engine
------------------------------------------
+Consider packaging the GTK and Qt IM modules separately from the core: GNOME
+users want IBus's IM modules instead, other desktops want SCIM's.
 
-An engine that lives only in your home directory -- e.g. a scim-tables table
-you installed for your user, or a licensed engine that cannot be installed
-system-wide -- is invisible to the system generator.  To use it under IBus,
-generate your own manifest and add its directory to ibus-daemon's search path:
-
-  1. Generate a personal manifest as yourself.  Run as you, the generator sees
-     both the system-wide engines AND the ones in your home, so it lists every
-     installed engine from both (enabled or not):
-
-       mkdir -p ~/.local/share/ibus/component
-       scim -f ibus -- --xml > ~/.local/share/ibus/component/scim.xml
-
-  2. Point IBUS_COMPONENT_PATH at BOTH your directory AND the system component
-     directory, in a way that reaches ibus-daemon.  On modern desktops
-     ibus-daemon runs as a systemd USER service (org.freedesktop.IBus.session.
-     *.service), so it inherits the systemd user manager's environment, NOT your
-     login shell profile -- setting the variable in ~/.bashrc or ~/.profile does
-     NOT reach it.  Set it in the systemd user environment instead, via
-     ~/.config/environment.d/ (read by systemd --user at login, before it starts
-     ibus-daemon).  Find your system component dir once:
-
-       pkg-config --variable=pkgdatadir ibus-1.0     # e.g. /usr/share/ibus
-
-     then create ~/.config/environment.d/scim-ibus.conf with the resolved paths
-     (environment.d does no command substitution; ${HOME} is fine):
-
-       IBUS_COMPONENT_PATH=${HOME}/.local/share/ibus/component:/usr/share/ibus/component
-
-  3. Log out and back in so systemd --user re-reads environment.d and restarts
-     ibus-daemon with the new value (a plain `ibus restart` may not pick it up,
-     since it keeps the old environment).
-
-     (Sessions that still start ibus-daemon from an X startup script rather than
-     systemd read ~/.xprofile; a system-wide alternative that reaches any
-     session is /etc/environment, but it needs root and affects all users.)
-
-IMPORTANT: IBUS_COMPONENT_PATH REPLACES ibus-daemon's default search path
-rather than adding to it, and ibus-daemon does not scan any per-user directory
-by default.  So you must list the system directory too, or ibus-daemon will
-stop seeing every other component installed there (the system SCIM manifest and
-any other input methods).  ibus-daemon merges the manifests it finds: engines
-from all scanned files are UNIONed by engine name (on a duplicate name the
-first one loaded wins), so your personal manifest and the system one coexist --
-your home-only engines simply add to the system set.  Regenerate your manifest
-whenever you install or remove a user-level engine.
-
-Enable vs. install: the manifest lists every installed engine, so you do NOT
-regenerate it when you enable or disable an engine.  Enabling/disabling is the
-"active" dimension -- the ibussync coordinator keeps SCIM's enabled set and
-GNOME's input-source list in sync, both directions -- while the manifest is the
-"available" dimension that only changes when engines are installed or removed.
-Because a user-installed engine now appears in the manifest even while disabled,
-you can add it straight from GNOME's input-source chooser.
-
-
-Tips
-====
-
-* The candidate window (preedit and candidate list) has its own appearance,
-  configured under /Candidates/Default/* -- scim-setup exposes the font
-  ("Candidate font") and the four colors ("Candidate colors").  Each setting
-  falls back to the panel's /Panel/Gtk/* value until you give it a
-  candidate-specific value (e.g. a larger candidate font), so existing setups
-  look unchanged.  Changes are applied on the fly, without restarting.
-* Panel appearance (font/colors of the toolbar and status area) is configured
-  in scim-setup; changes are pushed to running clients and applied on the fly.
-* The panel's toolbar window -- and, when the panel draws candidates itself
-  (built without the candidate renderer), its input and lookup windows -- can be
-  dragged with the mouse.
+SCIM ships an XDG autostart entry (scim.desktop) that runs `scim -d`, which
+works on any desktop with XDG autostart support.  Keep it, or start the daemon
+whichever way suits your platform -- a systemd user unit, your distribution's
+own session mechanism, anything else -- as long as it comes up with the session.
+That choice is yours.

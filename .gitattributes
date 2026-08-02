@@ -1,0 +1,6 @@
+# Translation catalogues are edited by hand, by gettext tools and by
+# translators on every platform, so they drift to CRLF easily. Twelve of them
+# had already done so, which silently defeats any grep or sed run across po/.
+# Pin them to LF so that cannot happen again.
+*.po    text eol=lf
+*.pot   text eol=lf
