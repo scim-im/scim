@@ -49,18 +49,23 @@ INST_ICONS		= pin-up.png \
 			  keyboard.png \
 			  menu.png
 
-SCTC_FILTER_ICONS	= sctc.png \
-			  sctc-sc-to-tc.png \
-			  sctc-tc-to-sc.png
+HANCONV_FILTER_ICONS	= hanconv.png \
+			  hanconv-sc-tc.png \
+			  hanconv-tc-sc.png \
+			  hanconv-tc-jp.png \
+			  hanconv-jp-tc.png \
+			  hanconv-sc-jp.png \
+			  hanconv-jp-sc.png
 
-if SCIM_BUILD_FILTER_SCTC
-INST_SCTC_ICONS		= $(SCTC_FILTER_ICONS)
+if SCIM_BUILD_FILTER_HANCONV
+INST_HANCONV_ICONS	= $(HANCONV_FILTER_ICONS)
 endif
 
 EXTRA_DIST		= $(NOINST_ICONS) \
 			  $(INST_ICONS) \
-			  $(SCTC_FILTER_ICONS)
+			  $(HANCONV_FILTER_ICONS) \
+			  gen_hanconv_icons.sh
 
 icondir			= @SCIM_ICONDIR@
-icon_DATA		= $(INST_ICONS) $(INST_SCTC_ICONS)
+icon_DATA		= $(INST_ICONS) $(INST_HANCONV_ICONS)
 

@@ -32,23 +32,31 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -DSCIM_MODULE_PATH=\"@SCIM_MODULE_PATH@\" \
 			  -DSCIM_TEMPDIR=\"@SCIM_TEMPDIR@\"
 
-if SCIM_BUILD_FILTER_SCTC
-CONFIG_FILTER_SCTC = sctc.la
+if SCIM_BUILD_FILTER_HANCONV
+CONFIG_FILTER_HANCONV = hanconv.la
 endif
 
-noinst_HEADERS		= scim_sctc_filter.h \
-			  scim_sctc_filter_data.h
+noinst_HEADERS		= scim_hanconv_filter.h \
+			  scim_hanconv_sctc_data.h \
+			  scim_hanconv_jp_data.h
+
+# The Japanese tables are generated; ship the generator so they can be rebuilt.
+EXTRA_DIST		= gen_hanconv_jp_data.py
 
 moduledir		= $(libdir)/scim@SCIM_EPOCH@/$(SCIM_BINARY_VERSION)/Filter
-module_LTLIBRARIES	= $(CONFIG_FILTER_SCTC)
+module_LTLIBRARIES	= $(CONFIG_FILTER_HANCONV)
 
-sctc_la_SOURCES 	= scim_sctc_filter.cpp
+hanconv_la_SOURCES 	= scim_hanconv_filter.cpp
 
-sctc_la_LDFLAGS		= -avoid-version \
+hanconv_la_LDFLAGS		= -avoid-version \
 		     	  -rpath $(moduledir) \
 			  -module \
 			  @LIBTOOL_EXPORT_OPTIONS@ \
 			  @LTLIBINTL@
 
-sctc_la_LIBADD	= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
+hanconv_la_LIBADD	= $(top_builddir)/src/libscim@SCIM_EPOCH@.la
 
+
+# dlopen-ed modules, never linked: drop the installed libtool archives.
+install-data-hook:
+	rm -f $(DESTDIR)$(moduledir)/*.la

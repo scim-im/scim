@@ -1,5 +1,6 @@
-/** @file scim_sctc_filter.h
- * definition of SCTCFilter (Simplified Chinese <-> Traditional Chinese Filter) related classes.
+/** @file scim_hanconv_filter.h
+ * definition of the HanConv filter: conversion between Han script variants
+ * (Simplified Chinese, Traditional Chinese and Japanese shinjitai).
  */
 
 /* 
@@ -23,25 +24,35 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA  02111-1307  USA
  *
- * $Id: scim_sctc_filter.h,v 1.2 2005/05/17 14:56:39 suzhe Exp $
+ * $Id: scim_hanconv_filter.h,v 1.2 2005/05/17 14:56:39 suzhe Exp $
  */
 
-#if !defined (__SCIM_SCTC_FILTER_H)
-#define __SCIM_SCTC_FILTER_H
+#if !defined (__SCIM_HANCONV_FILTER_H)
+#define __SCIM_HANCONV_FILTER_H
 
 using namespace scim;
 
-enum SCTCWorkMode
+// Persisted as an int in the configuration, so values may only ever be
+// appended -- renumbering would silently reinterpret a saved mode.
+//
+// The FORCE_* modes are not user-selectable. create_instance () picks one when
+// the client's encoding leaves no choice, and trigger_property () refuses to
+// change a mode that was forced.
+enum HanConvWorkMode
 {
-    SCTC_MODE_OFF = 0,
-    SCTC_MODE_SC_TO_TC,
-    SCTC_MODE_TC_TO_SC,
-    SCTC_MODE_FORCE_OFF,
-    SCTC_MODE_FORCE_SC_TO_TC,
-    SCTC_MODE_FORCE_TC_TO_SC
+    HANCONV_MODE_OFF = 0,
+    HANCONV_MODE_SC_TO_TC,
+    HANCONV_MODE_TC_TO_SC,
+    HANCONV_MODE_FORCE_OFF,
+    HANCONV_MODE_FORCE_SC_TO_TC,
+    HANCONV_MODE_FORCE_TC_TO_SC,
+    HANCONV_MODE_TC_TO_JP,
+    HANCONV_MODE_JP_TO_TC,
+    HANCONV_MODE_SC_TO_JP,
+    HANCONV_MODE_JP_TO_SC
 };
 
-class SCTCFilterFactory : public FilterFactoryBase
+class HanConvFilterFactory : public FilterFactoryBase
 {
     bool   m_sc_ok;
     String m_sc_encoding;
@@ -49,10 +60,10 @@ class SCTCFilterFactory : public FilterFactoryBase
     bool   m_tc_ok;
     String m_tc_encoding;
 
-    friend class SCTCFilterInstance;
+    friend class HanConvFilterInstance;
 
 public:
-    SCTCFilterFactory ();
+    HanConvFilterFactory ();
 
     virtual void attach_imengine_factory (const IMEngineFactoryPointer &orig);
     virtual WideString  get_name () const;
@@ -65,17 +76,17 @@ public:
     virtual IMEngineInstancePointer create_instance (const String& encoding, int id = -1);
 };
 
-class SCTCFilterInstance : public FilterInstanceBase
+class HanConvFilterInstance : public FilterInstanceBase
 {
-    SCTCFilterFactory *m_factory;
+    HanConvFilterFactory *m_factory;
 
     bool               m_props_registered;
 
-    SCTCWorkMode       m_work_mode;
+    HanConvWorkMode       m_work_mode;
 
 public:
-    SCTCFilterInstance (SCTCFilterFactory *factory,
-                        const SCTCWorkMode &mode,
+    HanConvFilterInstance (HanConvFilterFactory *factory,
+                        const HanConvWorkMode &mode,
                         const String &client_encoding,
                         const IMEngineInstancePointer &orig_inst);
 

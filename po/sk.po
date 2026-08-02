@@ -238,14 +238,14 @@ msgstr "James Su <suzhe@tsinghua.org.cn>"
 #: ../modules/Filter/scim_sctc_filter.cpp:425
 #: ../modules/Filter/scim_sctc_filter.cpp:555
 #: ../modules/Filter/scim_sctc_filter.cpp:571
-msgid "SC->TC"
-msgstr "ZČ->TČ"
+msgid "SC→TC"
+msgstr "ZČ→TČ"
 
 #: ../modules/Filter/scim_sctc_filter.cpp:431
 #: ../modules/Filter/scim_sctc_filter.cpp:559
 #: ../modules/Filter/scim_sctc_filter.cpp:575
-msgid "TC->SC"
-msgstr "TČ->ZČ"
+msgid "TC→SC"
+msgstr "TČ→ZČ"
 
 #: ../modules/IMEngine/scim_rawcode_imengine.cpp:120
 msgid "RAW CODE"

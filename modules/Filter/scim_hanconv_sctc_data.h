@@ -25,8 +25,8 @@
  * $Id: scim_sctc_filter_data.h,v 1.1 2005/05/16 05:22:49 suzhe Exp $
  */
 
-#if !defined (__SCIM_SCTC_FILTER_DATA_H)
-#define __SCIM_SCTC_FILTER_DATA_H
+#if !defined (__SCIM_HANCONV_SCTC_DATA_H)
+#define __SCIM_HANCONV_SCTC_DATA_H
 struct UShortPair
 {
     unsigned short first;

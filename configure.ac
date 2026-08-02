@@ -571,11 +571,11 @@ AC_ARG_ENABLE([im-socket],
 	[],
 	[enable_im_socket=yes])
 
-AC_ARG_ENABLE([filter-sctc],
-	[AS_HELP_STRING([--disable-filter-sctc],
-		[Do not build Simplified/Traditional Chinese conversion Filter module])],
+AC_ARG_ENABLE([filter-hanconv],
+	[AS_HELP_STRING([--disable-filter-hanconv],
+		[Do not build the Han script variant conversion Filter module])],
 	[],
-	[enable_filter_sctc=yes])
+	[enable_filter_hanconv=yes])
 
 AC_ARG_ENABLE([gtk2-immodule],
 	[AS_HELP_STRING([--enable-gtk2-immodule],
@@ -802,11 +802,11 @@ else
   enable_im_socket=no
 fi
 
-if test "$enable_filter_sctc" = "yes"; then
-  SCIM_BUILD_FILTER_SCTC=1
+if test "$enable_filter_hanconv" = "yes"; then
+  SCIM_BUILD_FILTER_HANCONV=1
 else
-  SCIM_BUILD_FILTER_SCTC=0
-  enable_filter_sctc=no
+  SCIM_BUILD_FILTER_HANCONV=0
+  enable_filter_hanconv=no
 fi
 
 # The gtk2/gtk3 IM modules are the X11/XWayland integration path and use the
@@ -1061,8 +1061,8 @@ AM_CONDITIONAL(SCIM_BUILD_QT5_IMMODULE,
 AM_CONDITIONAL(SCIM_BUILD_QT6_IMMODULE,
 		[test "$enable_qt6_immodule" = "yes"])
 
-AM_CONDITIONAL(SCIM_BUILD_FILTER_SCTC,
-		[test "$enable_filter_sctc" = "yes"])
+AM_CONDITIONAL(SCIM_BUILD_FILTER_HANCONV,
+		[test "$enable_filter_hanconv" = "yes"])
 
 AM_CONDITIONAL(SCIM_BUILD_GTK3_LEGACY_SETUP,
 		[test "$SCIM_BUILD_GTK3_LEGACY_SETUP" = "1"])
@@ -1097,7 +1097,7 @@ AC_SUBST(SCIM_BUILD_KIMPANEL)
 AC_SUBST(SCIM_BUILD_IMENGINE_RAWCODE)
 AC_SUBST(SCIM_BUILD_IMENGINE_TABLE)
 AC_SUBST(SCIM_BUILD_IMENGINE_SOCKET)
-AC_SUBST(SCIM_BUILD_FILTER_SCTC)
+AC_SUBST(SCIM_BUILD_FILTER_HANCONV)
 AC_SUBST(SCIM_BUILD_SCIM_SETUP)
 AC_SUBST(SCIM_BUILD_PANEL_GTK)
 AC_SUBST(SCIM_BUILD_GTK_UTILS)
@@ -1203,7 +1203,7 @@ Module options:
   RawCode IMEngine module  $enable_im_rawcode
   Socket IMEngine module   $enable_im_socket
 
-  SCTC Filter module       $enable_filter_sctc
+  HanConv Filter module    $enable_filter_hanconv
 
   GTK Utility Library      $enable_gtk_utils
   X11 Utility Library      $enable_x11_utils

@@ -233,13 +233,13 @@ msgstr "蘇哲 <suzhe@tsinghua.org.cn>"
 #: ../modules/Filter/scim_sctc_filter.cpp:425
 #: ../modules/Filter/scim_sctc_filter.cpp:555
 #: ../modules/Filter/scim_sctc_filter.cpp:571
-msgid "SC->TC"
+msgid "SC→TC"
 msgstr "簡轉繁體"
 
 #: ../modules/Filter/scim_sctc_filter.cpp:431
 #: ../modules/Filter/scim_sctc_filter.cpp:559
 #: ../modules/Filter/scim_sctc_filter.cpp:575
-msgid "TC->SC"
+msgid "TC→SC"
 msgstr "繁轉簡體"
 
 #: ../modules/IMEngine/scim_rawcode_imengine.cpp:120
@@ -1448,3 +1448,43 @@ msgstr "方位"
 #: ../utils/scimtrayicon.c:110
 msgid "The orientation of the tray."
 msgstr "狀態列的方位。"
+
+#: modules/Filter/scim_hanconv_filter.cpp
+msgid "hanconv"
+msgstr "漢字轉換"
+
+#: modules/Filter/scim_hanconv_filter.cpp
+msgid "off"
+msgstr "關閉"
+
+#: modules/Filter/scim_hanconv_filter.cpp
+msgid "TC→JP"
+msgstr "正體→日文"
+
+#: modules/Filter/scim_hanconv_filter.cpp
+msgid "JP→TC"
+msgstr "日文→正體"
+
+#: modules/Filter/scim_hanconv_filter.cpp
+msgid "SC→JP"
+msgstr "簡體→日文"
+
+#: modules/Filter/scim_hanconv_filter.cpp
+msgid "JP→SC"
+msgstr "日文→簡體"
+
+#: modules/Filter/scim_hanconv_filter.cpp
+msgid "Traditional to Japanese"
+msgstr "正體轉日文新字體"
+
+#: modules/Filter/scim_hanconv_filter.cpp
+msgid "Japanese to Traditional"
+msgstr "日文新字體轉正體"
+
+#: modules/Filter/scim_hanconv_filter.cpp
+msgid "Simplified to Japanese"
+msgstr "簡體轉日文新字體"
+
+#: modules/Filter/scim_hanconv_filter.cpp
+msgid "Japanese to Simplified"
+msgstr "日文新字體轉簡體"

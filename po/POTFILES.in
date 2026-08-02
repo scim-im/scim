@@ -10,7 +10,7 @@ extras/setup/scim_setup_module.cpp
 extras/setup/scim_setup_ui.cpp
 modules/Config/scim_simple_config.cpp
 modules/Config/scim_socket_config.cpp
-modules/Filter/scim_sctc_filter.cpp
+modules/Filter/scim_hanconv_filter.cpp
 modules/FrontEnd/scim_socket_frontend.cpp
 modules/FrontEnd/scim_x11_frontend.cpp
 modules/FrontEnd/scim_x11_ic.cpp
