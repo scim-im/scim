@@ -1237,7 +1237,7 @@ String scim_get_default_socket_config_address ()
 // all) computed a different path, failed to connect, and started a second panel
 // with its own tray icon.
 //
-// So key on the display, canonicalised. Derived here and nowhere else: callers
+// So key on the display, canonicalized. Derived here and nowhere else: callers
 // used to pass their own idea of a display name and the rules differed between
 // them, on Wayland the frontends preferring $DISPLAY (":0") while a panel
 // started without --display took GDK's name ("wayland-0"), so the two never met.

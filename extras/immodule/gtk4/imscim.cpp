@@ -41,7 +41,7 @@ g_io_module_load (GIOModule *io_module)
     // Priority has to stay below GTK's own contexts. With no GTK_IM_MODULE and
     // no gtk-im-module setting, GTK walks this extension point in priority
     // order and takes the first entry whose name matches the display backend --
-    // and an unrecognised name like "scim" matches every backend. Registering at
+    // and an unrecognized name like "scim" matches every backend. Registering at
     // 100 tied us with GTK's "wayland" context and sorted us ahead of it, so
     // every GTK4 application silently used SCIM instead of text-input-v3, which
     // on GNOME cut IBus (and therefore our own ibus.so engine) out of the loop

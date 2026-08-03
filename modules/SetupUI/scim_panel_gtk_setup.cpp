@@ -147,7 +147,7 @@ static String __config_panel_active_text             = "black";
 
 static bool   __have_changed                     = false;
 
-static GtkWidget * __widget_toolbar_show_behaviour    = 0;
+static GtkWidget * __widget_toolbar_show_behavior    = 0;
 static GtkWidget * __widget_toolbar_auto_snap         = 0;
 static GtkWidget * __widget_toolbar_hide_timeout      = 0;
 static GtkWidget * __widget_toolbar_show_factory_icon  = 0;
@@ -172,7 +172,7 @@ enum ToolbarShowFlavourType {
     SCIM_TOOLBAR_SHOW_NEVER
 };
 
-static const char * __toolbar_show_behaviour_text[] = {
+static const char * __toolbar_show_behavior_text[] = {
     N_("Always"),
     N_("On demand"),
     N_("Never")
@@ -188,7 +188,7 @@ on_default_spin_button_changed       (GtkSpinButton   *spinbutton,
                                       gpointer         user_data);
 
 static void
-on_toolbar_show_behaviour_changed      (GtkComboBox     *combobox,
+on_toolbar_show_behavior_changed      (GtkComboBox     *combobox,
                                       gpointer         user_data);
 
 static void
@@ -247,15 +247,15 @@ create_setup_window ()
         gtk_widget_set_margin_end (label, 4);
         gtk_box_append (GTK_BOX (hbox), label);
 
-        __widget_toolbar_show_behaviour = gtk_combo_box_text_new ();
-        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_toolbar_show_behaviour),
-                                   _(__toolbar_show_behaviour_text[SCIM_TOOLBAR_SHOW_ALWAYS]));
-        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_toolbar_show_behaviour),
-                                   _(__toolbar_show_behaviour_text[SCIM_TOOLBAR_SHOW_ON_DEMAND]));
-        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_toolbar_show_behaviour),
-                                   _(__toolbar_show_behaviour_text[SCIM_TOOLBAR_SHOW_NEVER]));
-        gtk_box_append (GTK_BOX (hbox), __widget_toolbar_show_behaviour);
-        gtk_label_set_mnemonic_widget (GTK_LABEL (label), __widget_toolbar_show_behaviour);
+        __widget_toolbar_show_behavior = gtk_combo_box_text_new ();
+        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_toolbar_show_behavior),
+                                   _(__toolbar_show_behavior_text[SCIM_TOOLBAR_SHOW_ALWAYS]));
+        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_toolbar_show_behavior),
+                                   _(__toolbar_show_behavior_text[SCIM_TOOLBAR_SHOW_ON_DEMAND]));
+        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_toolbar_show_behavior),
+                                   _(__toolbar_show_behavior_text[SCIM_TOOLBAR_SHOW_NEVER]));
+        gtk_box_append (GTK_BOX (hbox), __widget_toolbar_show_behavior);
+        gtk_label_set_mnemonic_widget (GTK_LABEL (label), __widget_toolbar_show_behavior);
 
         __widget_toolbar_auto_snap = gtk_check_button_new_with_mnemonic (_("Auto s_nap"));
         __widget_toolbar_show_factory_icon = gtk_check_button_new_with_mnemonic (_("Show _input method icon"));
@@ -394,8 +394,8 @@ create_setup_window ()
         }
 
         // Connect all signals.
-        g_signal_connect ((gpointer) __widget_toolbar_show_behaviour, "changed",
-                          G_CALLBACK (on_toolbar_show_behaviour_changed),
+        g_signal_connect ((gpointer) __widget_toolbar_show_behavior, "changed",
+                          G_CALLBACK (on_toolbar_show_behavior_changed),
                           NULL);
 
         g_signal_connect ((gpointer) __widget_toolbar_auto_snap, "toggled",
@@ -451,7 +451,7 @@ create_setup_window ()
                           NULL);
 
         // Set all tooltips.
-        gtk_widget_set_tooltip_text (__widget_toolbar_show_behaviour,
+        gtk_widget_set_tooltip_text (__widget_toolbar_show_behavior,
                               _("If option \"Always\" is selected, "
                                 "the toolbar will always be shown on the screen. "
                                 "If option \"On demand\" is selected, it will only be shown when SCIM "
@@ -528,18 +528,18 @@ create_setup_window ()
 void
 setup_widget_value ()
 {
-    if (__widget_toolbar_show_behaviour) {
+    if (__widget_toolbar_show_behavior) {
         if (__config_toolbar_always_hidden) {
             gtk_combo_box_set_active (
-                GTK_COMBO_BOX (__widget_toolbar_show_behaviour),
+                GTK_COMBO_BOX (__widget_toolbar_show_behavior),
                 SCIM_TOOLBAR_SHOW_NEVER);
         } else if (__config_toolbar_always_show) {
             gtk_combo_box_set_active (
-                GTK_COMBO_BOX (__widget_toolbar_show_behaviour),
+                GTK_COMBO_BOX (__widget_toolbar_show_behavior),
                 SCIM_TOOLBAR_SHOW_ALWAYS);
         } else {
             gtk_combo_box_set_active (
-                GTK_COMBO_BOX (__widget_toolbar_show_behaviour),
+                GTK_COMBO_BOX (__widget_toolbar_show_behavior),
                 SCIM_TOOLBAR_SHOW_ON_DEMAND);
         }
     }
@@ -770,7 +770,7 @@ on_default_check_button_toggled (GtkCheckButton *checkbutton,
 }
 
 static void
-on_toolbar_show_behaviour_changed (GtkComboBox *combobox,
+on_toolbar_show_behavior_changed (GtkComboBox *combobox,
                                  gpointer     user_data)
 {
     gint active;

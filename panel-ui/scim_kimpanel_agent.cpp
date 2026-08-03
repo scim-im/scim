@@ -465,7 +465,7 @@ KimpanelAgent::update_engine_property (const String &symbol, const String &name)
 {
     // "key:label:icon:tooltip:hint". The icon field is left empty on purpose:
     // given an icon the panel draws that instead of the label, and an icon
-    // cannot adapt to the panel's light or dark colours the way text does.
+    // cannot adapt to the panel's light or dark colors the way text does.
     String prop = String (KIMPANEL_ENGINE_PROP_KEY) + ":" +
                   symbol + "::" + name + ":";
 

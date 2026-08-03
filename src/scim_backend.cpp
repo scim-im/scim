@@ -661,7 +661,7 @@ CommonBackEnd::reload_disabled_factories ()
         }
 
         // If we freshly loaded this module for the reload but nothing came of
-        // it, drop it again (matches constructor behaviour). Never unload a
+        // it, drop it again (matches constructor behavior). Never unload a
         // module that was already resident: live IMEngine instances may still
         // reference its factories.
         if (!was_loaded && added == 0)

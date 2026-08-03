@@ -61,7 +61,7 @@ using namespace scim;
 #define SCIM_CONFIG_CANDIDATES_SPACING             "/Candidates/Default/Spacing"
 
 // Read, never written here: what an unset color falls back to, so the pickers
-// can show the color actually in effect rather than a meaningless grey.
+// can show the color actually in effect rather than a meaningless gray.
 #define SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_BG      "/Panel/Gtk/Color/NormalBackground"
 #define SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_TEXT    "/Panel/Gtk/Color/NormalText"
 #define SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_BG      "/Panel/Gtk/Color/ActiveBackground"
@@ -275,7 +275,7 @@ create_setup_window ()
                 gtk_grid_attach (GTK_GRID (grid), label, 0, i, 1, 1);
 
                 *rows[i].widget = gtk_color_button_new ();
-                // Alpha is how transparency is configured: the renderer honours
+                // Alpha is how transparency is configured: the renderer honors
                 // it on the background and the border.
                 gtk_color_chooser_set_use_alpha (
                     GTK_COLOR_CHOOSER (*rows[i].widget), TRUE);

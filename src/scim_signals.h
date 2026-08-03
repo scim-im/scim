@@ -170,7 +170,7 @@ struct signal_marshal_of<R(Args...)>
 //! @class SignalN
 //! @brief A template for a signal passing Args... and returning R.
 //!
-//! The fixed-arity aliases Signal0 .. Signal6 below name specialisations of
+//! The fixed-arity aliases Signal0 .. Signal6 below name specializations of
 //! this template. The signature is given in function-type form, e.g.
 //! SignalN<void(int, int)>, so that the Marshal policy can follow the argument
 //! list.

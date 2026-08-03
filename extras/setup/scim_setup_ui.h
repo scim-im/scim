@@ -77,7 +77,7 @@ public:
                                 const String &display);
 
     // Add an informational entry listing setup plugins that cannot be shown
-    // (GTK2 / unrecognised toolkit) with a rebuild hint.
+    // (GTK2 / unrecognized toolkit) with a rebuild hint.
     void add_unsupported_notice (const std::vector<String> &names);
 
     void run ();

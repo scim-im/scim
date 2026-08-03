@@ -109,7 +109,7 @@ extern "C" {
                 } else if (tk == SETUP_TOOLKIT_GTK3) {
                     gtk3_legacy.push_back (setup_list [i]);
                 } else {
-                    // GTK2 or unrecognised toolkit.
+                    // GTK2 or unrecognized toolkit.
                     unsupported.push_back (setup_list [i]);
                 }
             }

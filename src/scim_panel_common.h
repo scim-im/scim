@@ -55,7 +55,7 @@ struct PanelFactoryInfo
     String lang;
     String icon;
     /** A few characters identifying the engine, to be drawn as text where an
-     *  icon would not follow the theme's colours.
+     *  icon would not follow the theme's colors.
      *  See IMEngineFactoryBase::get_symbol (). */
     String symbol;
 

@@ -44,7 +44,7 @@
 //
 // ibus offers no way to ask which engines came from which component --
 // ibus_bus_list_engines () returns descriptions with no back-reference -- so
-// the sync recognises them from a field we set. textdomain is the right one: a
+// the sync recognizes them from a field we set. textdomain is the right one: a
 // machine field rather than prose, and "scim" is simply true, our strings do
 // live in that gettext domain. (Verified that ibus round-trips a per-engine
 // <textdomain> from a component XML; nothing else on a typical system sets one,

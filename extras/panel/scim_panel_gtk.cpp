@@ -718,7 +718,7 @@ layer_shell_usable (void)
     return gtk_layer_is_supported () ? true : false;
 }
 
-// Wayland gives a client no way to place a toplevel, so the toolbar cannot honour
+// Wayland gives a client no way to place a toplevel, so the toolbar cannot honor
 // its saved position and cannot stay above other windows. layer-shell does both:
 // anchor it to a screen edge and put it on the overlay layer. Must run before the
 // window is realized.
@@ -2100,7 +2100,7 @@ sni_method_call (GDBusConnection * /*conn*/, const gchar * /*sender*/,
 // The point of a symbol is that it survives both a light and a dark tray, which
 // a fixed PNG cannot: an engine icon drawn in a light ink vanishes on a light
 // panel and vice versa. Note that SNI does not actually let us hand over text
-// -- it has no label property at all, and hosts recolour only themed symbolic
+// -- it has no label property at all, and hosts recolor only themed symbolic
 // icon *names*, which cannot express a glyph like a Han character. So we still
 // choose the ink ourselves. What a glyph buys us is that it can be drawn in a
 // way that works either way: a dark fill inside a light outline stays legible
@@ -2197,8 +2197,8 @@ sni_render_symbol (const String &symbol, int size,
 
     pango_layout_get_pixel_extents (layout, &ink, 0);
 
-    // Centre on the ink, not the logical box: line spacing and side bearings
-    // differ per font, and an off-centre glyph is obvious at this size.
+    // Center on the ink, not the logical box: line spacing and side bearings
+    // differ per font, and an off-center glyph is obvious at this size.
     cairo_move_to (cr,
                    (size - ink.width) / 2.0 - ink.x,
                    (size - ink.height) / 2.0 - ink.y);
@@ -2587,7 +2587,7 @@ sni_rebuild_menu (void)
 // The engine changed: refresh what the tray shows about it.
 // The keyboard (IM off) state is the one case where a themed icon name applies,
 // and a name beats anything we can rasterize: the host resolves it through the
-// icon theme and recolours the symbolic variant for its own panel, so it is
+// icon theme and recolors the symbolic variant for its own panel, so it is
 // always in the desktop's own idiom. "input-keyboard" is a standard name -- the
 // Icon Naming Specification lists it under Devices as "the icon used for the
 // keyboard input device" -- and Adwaita and Breeze both ship it. The symbolic
@@ -2675,8 +2675,8 @@ sni_register_with_host (void)
 
 // Which way to ink the symbol.
 //
-// Nothing tells us the tray's actual background colour -- SNI hands the host
-// pixels and never discusses colours -- so this is a hint, not a fact, and it
+// Nothing tells us the tray's actual background color -- SNI hands the host
+// pixels and never discusses colors -- so this is a hint, not a fact, and it
 // can disagree with the panel we end up sitting in. sni_render_symbol () draws
 // the halo in the opposite shade for exactly that reason: when the hint is
 // right the symbol looks native, and when it is wrong it is still readable.
@@ -2684,7 +2684,7 @@ static void
 sni_set_dark (bool dark, bool from_theme)
 {
     // The GTK theme wins. It is the better signal by a wide margin: the theme's
-    // own text colour is what every widget on the panel is drawn with, whereas
+    // own text color is what every widget on the panel is drawn with, whereas
     // the portal is only a stated preference and can flatly contradict the
     // desktop -- on an XFCE session with the light "Xfce" theme it reports
     // "prefer dark", which inked the symbol light on a light panel.
@@ -2700,7 +2700,7 @@ sni_set_dark (bool dark, bool from_theme)
     sni_emit ("NewIcon");
 }
 
-// Ask the GTK theme for its text colour and infer the tray's shade from it.
+// Ask the GTK theme for its text color and infer the tray's shade from it.
 //
 // The widget has to be realized inside a root before the theme applies -- a
 // detached one reports the CSS default (opaque white) and would fool us every

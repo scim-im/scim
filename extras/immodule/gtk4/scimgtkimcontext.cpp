@@ -285,9 +285,9 @@ static GdkRGBA                                          _normal_text;
 static GdkRGBA                                          _active_bg;
 static GdkRGBA                                          _active_text;
 
-// GdkRGBA carries each channel as a double in [0,1], while Pango's colour
+// GdkRGBA carries each channel as a double in [0,1], while Pango's color
 // attributes take 16-bit components. Handing a GdkRGBA channel straight to
-// pango_attr_foreground_new () truncates every colour to 0, which paints the
+// pango_attr_foreground_new () truncates every color to 0, which paints the
 // preedit black on black -- a solid rectangle where the text should be.
 static inline guint16
 rgba_to_pango (double channel)
@@ -1533,8 +1533,8 @@ candidates_show (GtkIMContextSCIM *ic)
         return;
     // Ask for the bottom edge so the top of the candidates lands under the
     // caret rather than over the preedit drawn on that line, and widen the
-    // rectangle to the panel's own width: a popover centres itself on what it
-    // points at, so pointing at the bare caret would centre the list there and
+    // rectangle to the panel's own width: a popover centers itself on what it
+    // points at, so pointing at the bare caret would center the list there and
     // grow it in both directions as candidates are added.
     int panel_w = 0, panel_h = 0;
     _candidates_ui.measure (panel_w, panel_h);

@@ -99,7 +99,7 @@ public:
     /**
      * @brief Advertise the engine indicator property to the panel.
      *
-     * kimpanel renders a property's label as text in the panel's own colours,
+     * kimpanel renders a property's label as text in the panel's own colors,
      * which is why the engine symbol is passed here rather than an icon: an
      * icon is fixed pixels and cannot follow a light or dark theme.
      *

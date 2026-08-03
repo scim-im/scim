@@ -151,7 +151,7 @@ int main (int argc, char *argv [])
     // GNOME (and any ibus session) serves the IME through ibus.so, launched by
     // ibus-daemon -- not through our own frontends. There, this process's job
     // is the persistent, backend-free engine-list sync coordinator instead. If
-    // the user explicitly forces our GTK module (GTK_IM_MODULE=scim), honour
+    // the user explicitly forces our GTK module (GTK_IM_MODULE=scim), honor
     // that and stay a normal daemon.
     {
         const char *desktop   = getenv ("XDG_CURRENT_DESKTOP");

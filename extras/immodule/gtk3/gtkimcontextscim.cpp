@@ -1592,11 +1592,11 @@ candidates_show (GtkIMContextSCIM *ic)
     // Ask for the bottom edge so the top of the candidates lands under the
     // caret rather than over the preedit the application draws on that line.
     //
-    // A popover centres itself on the rectangle it points at, so pointing at
-    // the caret alone would centre the list on the caret and grow it in both
+    // A popover centers itself on the rectangle it points at, so pointing at
+    // the caret alone would center the list on the caret and grow it in both
     // directions as candidates are added. Widening the rectangle to the panel's
-    // own width puts its centre half a panel to the right of the caret, which
-    // is where the centred popover has to sit for its left edge to line up with
+    // own width puts its center half a panel to the right of the caret, which
+    // is where the centered popover has to sit for its left edge to line up with
     // the caret and stay there however many candidates appear.
     int panel_w = 0, panel_h = 0;
     _candidates_ui.measure (panel_w, panel_h);

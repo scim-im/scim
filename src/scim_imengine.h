@@ -277,7 +277,7 @@ public:
      * A symbol is one or a few characters, meant to be drawn as *text* where an
      * engine must be identified in a small space: a tray item, a status area,
      * a menu. Unlike get_icon_file (), which yields fixed pixels, a symbol
-     * inherits the surrounding theme's text colour, so it stays legible on both
+     * inherits the surrounding theme's text color, so it stays legible on both
      * light and dark backgrounds.
      *
      * If the engine did not set one with set_symbol (), the first character of

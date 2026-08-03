@@ -868,7 +868,7 @@ WaylandFrontEnd::panel_req_update_factory_info ()
                                  String (_("En")));
     }
 
-    // kimpanel draws the symbol as text in the panel's own colours, which is
+    // kimpanel draws the symbol as text in the panel's own colors, which is
     // the one indicator on this desktop that follows a light or dark theme.
     // Independent of the scim panel: either, both or neither may be running.
 #ifdef SCIM_HAS_KIMPANEL
@@ -1407,7 +1407,7 @@ WaylandFrontEnd::proto_send_preedit (const String &utf8, int32_t cursor)
     // and preedit-end on that string becoming non-null and null again, not on
     // its length: an empty-but-not-null preedit leaves VTE terminals with
     // im_preedit_active still set, and they stop painting their cursor until a
-    // focus change. gnome-shell normalises "" to null on its own, so the symptom
+    // focus change. gnome-shell normalizes "" to null on its own, so the symptom
     // only shows on compositors that relay what we send verbatim.
     //
     // A negative cursor index means "no cursor" and is still wanted by v1 below,

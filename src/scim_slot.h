@@ -70,7 +70,7 @@ protected:
 //! @brief Base class template for slots passing Args... and returning R.
 //!
 //! The fixed-arity aliases Slot0<R>, Slot1<R,P1>, ... Slot6<R,...> below name
-//! specialisations of this template.
+//! specializations of this template.
 
 template <typename R, typename... Args>
 class SlotN : public Slot
