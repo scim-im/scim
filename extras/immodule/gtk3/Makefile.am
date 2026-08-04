@@ -36,6 +36,16 @@ CANDIDATES_LIBS   = $(top_builddir)/utils/candidates/libscim-candidates@SCIM_EPO
 		    @CAIRO_LIBS@
 endif
 
+# Let Plasma draw the candidates instead, when a kimpanel widget is there. The
+# agent needs no cairo and no display connection of its own, only libdbus.
+if SCIM_BUILD_KIMPANEL
+KIMPANEL_CFLAGS   = -DSCIM_HAS_KIMPANEL \
+		    -I$(top_srcdir)/utils/candidates \
+		    @DBUS_CFLAGS@
+KIMPANEL_LIBS     = $(top_builddir)/utils/candidates/libscim-candidates-kimpanel@SCIM_EPOCH@.la \
+		    @DBUS_LIBS@
+endif
+
 if SCIM_LD_VERSION_SCRIPT
 LD_VERSION_SCRIPT_OPTION="-Wl,--version-script=$(srcdir)/im-scim.version-script"
 endif
@@ -48,8 +58,8 @@ module_LTLIBRARIES = $(CONFIG_GTK3_IMMODULE)
 
 im_scim_la_SOURCES = gtkimcontextscim.cpp imscim.cpp
 
-im_scim_la_CXXFLAGS=@GTK3_CFLAGS@ $(CANDIDATES_CFLAGS)
-im_scim_la_CFLAGS  =@GTK3_CFLAGS@ $(CANDIDATES_CFLAGS)
+im_scim_la_CXXFLAGS=@GTK3_CFLAGS@ $(CANDIDATES_CFLAGS) $(KIMPANEL_CFLAGS)
+im_scim_la_CFLAGS  =@GTK3_CFLAGS@ $(CANDIDATES_CFLAGS) $(KIMPANEL_CFLAGS)
 
 im_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     -avoid-version \
@@ -57,7 +67,7 @@ im_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     $(LD_VERSION_SCRIPT_OPTION) \
 		     @GTK3_LIBS@
 
-im_scim_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(X11_UTILS) $(CANDIDATES_LIBS)
+im_scim_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(X11_UTILS) $(CANDIDATES_LIBS) $(KIMPANEL_LIBS)
 
 # Immodules are dlopen-ed, never linked: drop the installed libtool archive.
 # The dir is shared with other IMEs, so remove only our own file.

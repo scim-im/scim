@@ -30,6 +30,15 @@ CANDIDATES_LIBS   = $(top_builddir)/utils/candidates/libscim-candidates@SCIM_EPO
 		    @CAIRO_LIBS@
 endif
 
+# Let Plasma draw the candidates instead, when a kimpanel widget is there.
+if SCIM_BUILD_KIMPANEL
+KIMPANEL_CFLAGS   = -DSCIM_HAS_KIMPANEL \
+		    -I$(top_srcdir)/utils/candidates \
+		    @DBUS_CFLAGS@
+KIMPANEL_LIBS     = $(top_builddir)/utils/candidates/libscim-candidates-kimpanel@SCIM_EPOCH@.la \
+		    @DBUS_LIBS@
+endif
+
 moduledir = @QT6_IM_MODULEDIR@
 
 module_LTLIBRARIES = $(CONFIG_QT6_IMMODULE)
@@ -39,14 +48,14 @@ noinst_HEADERS = scimqtinputcontext.h
 libscimqtinputcontextplugin_la_SOURCES = scimqtinputcontext.cpp
 nodist_libscimqtinputcontextplugin_la_SOURCES = moc_scimqtinputcontext.cpp
 
-libscimqtinputcontextplugin_la_CXXFLAGS = @QT6_CFLAGS@ -fPIC $(CANDIDATES_CFLAGS)
-libscimqtinputcontextplugin_la_CFLAGS   = @QT6_CFLAGS@ -fPIC $(CANDIDATES_CFLAGS)
+libscimqtinputcontextplugin_la_CXXFLAGS = @QT6_CFLAGS@ -fPIC $(CANDIDATES_CFLAGS) $(KIMPANEL_CFLAGS)
+libscimqtinputcontextplugin_la_CFLAGS   = @QT6_CFLAGS@ -fPIC $(CANDIDATES_CFLAGS) $(KIMPANEL_CFLAGS)
 
 libscimqtinputcontextplugin_la_LDFLAGS = -rpath $(moduledir) \
 				  -avoid-version -no-undefined -module \
 				  @QT6_LIBS@
 
-libscimqtinputcontextplugin_la_LIBADD = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(CANDIDATES_LIBS)
+libscimqtinputcontextplugin_la_LIBADD = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(CANDIDATES_LIBS) $(KIMPANEL_LIBS)
 
 MOC = @QT6_MOC@
 

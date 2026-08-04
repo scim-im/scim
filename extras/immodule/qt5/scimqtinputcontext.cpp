@@ -69,6 +69,11 @@
 #include <cairo.h>
 #endif
 
+#include "scim_candidates_sink.h"
+#ifdef SCIM_HAS_KIMPANEL
+#include "scim_kimpanel_agent.h"
+#endif
+
 #include "scimqtinputcontext.h"
 
 using namespace scim;
@@ -111,6 +116,21 @@ static IMEngineInstancePointer  _fallback_instance;
 
 static PanelClient              _panel_client;
 static QSocketNotifier         *_panel_notifier    = 0;
+
+// The candidate UI in use: the window below, or kimpanel when a Plasma panel
+// widget is there to draw for us.
+static CandidatesSink          *_sink              = 0;
+
+#ifdef SCIM_HAS_KIMPANEL
+static KimpanelAgent            _kimpanel;
+static QSocketNotifier         *_kimpanel_notifier = 0;
+#endif
+
+static void     select_sink                 ();
+static void     sink_select_candidate       (int index);
+static void     sink_page_up                ();
+static void     sink_page_down              ();
+static void     sink_move_preedit_caret     (int pos);
 
 static ScimQtInputContext      *_focused_ic        = 0;
 static ScimQtInputContext      *_the_context       = 0;
@@ -161,6 +181,8 @@ static void candidates_preedit_update (const WideString &str, const AttributeLis
 static void candidates_preedit_caret  (int caret);
 static void candidates_aux_show       (ScimQtInputContext *ic);
 static void candidates_aux_hide       ();
+static void candidates_lookup_show    (ScimQtInputContext *ic);
+static void candidates_lookup_hide    ();
 static void candidates_aux_update     (const WideString &str, const AttributeList &attrs);
 #endif
 
@@ -656,7 +678,7 @@ static void slot_show_preedit_string (IMEngineInstanceBase *si)
         else {
             // The client cannot draw preedit inline, so the in-process
             // renderer does it (matching the x11 frontend).
-            candidates_preedit_show (ic);
+            if (_sink) _sink->show_preedit_string (true);
         }
 #endif
     }
@@ -670,7 +692,7 @@ static void slot_show_aux_string (IMEngineInstanceBase *si)
 #ifdef SCIM_HAS_CANDIDATES
         // There is no client-side path for the aux string; the renderer is the
         // only place it can appear.
-        candidates_aux_show (ic);
+        if (_sink) _sink->show_aux_string (true);
 #endif
     }
 }
@@ -829,12 +851,98 @@ static void candidates_aux_hide ()
     _candidates_window->refresh ();
 }
 
+// The lookup table needs the same pair as the aux string: showing the window is
+// not enough, the renderer keeps its table section hidden until told otherwise
+// and measures to a panel with only the preedit in it.
+static void candidates_lookup_show (ScimQtInputContext *ic)
+{
+    candidates_ensure ();
+    _candidates_window->ui.show_lookup_table ();
+    _candidates_window->refresh ();
+    candidates_show (ic);
+}
+
+static void candidates_lookup_hide ()
+{
+    candidates_ensure ();
+    _candidates_window->ui.hide_lookup_table ();
+    _candidates_window->refresh ();
+    // Down only once there is nothing left to draw: a preedit still being
+    // composed has to stay on screen after the candidates go away.
+    if (!_candidates_window->ui.is_visible ())
+        candidates_hide ();
+}
+
 static void candidates_aux_update (const WideString &str, const AttributeList &attrs)
 {
     candidates_ensure ();
     _candidates_window->ui.update_aux_string (str, attrs);
     _candidates_window->refresh ();
 }
+
+/* -------------------------------------------------------------------------- */
+/* The candidate window as a CandidatesSink.                                  */
+/*                                                                            */
+/* State goes into the shared renderer and the window follows, exactly as the  */
+/* slots did inline. It reads _focused_ic itself: the interface carries no     */
+/* context, and that is the context every caller here was already using.       */
+class WindowSink : public CandidatesSink
+{
+public:
+    void enable (bool enabled) override
+    {
+        if (enabled)
+            return;
+        candidates_ensure ();
+        _candidates_window->ui.hide_preedit_string ();
+        _candidates_window->ui.hide_aux_string ();
+        _candidates_window->ui.hide_lookup_table ();
+        candidates_hide ();
+    }
+
+    void update_preedit_string (const WideString &str,
+                                const AttributeList &attrs) override
+    { candidates_preedit_update (str, attrs); }
+
+    void update_preedit_caret (int caret) override
+    { candidates_preedit_caret (caret); }
+
+    void show_preedit_string (bool visible) override
+    {
+        if (visible && _focused_ic) candidates_preedit_show (_focused_ic);
+        else                        candidates_preedit_hide ();
+    }
+
+    void update_aux_string (const WideString &str,
+                            const AttributeList &attrs) override
+    { candidates_aux_update (str, attrs); }
+
+    void show_aux_string (bool visible) override
+    {
+        if (visible && _focused_ic) candidates_aux_show (_focused_ic);
+        else                        candidates_aux_hide ();
+    }
+
+    void update_lookup_table (const LookupTable &table) override
+    { candidates_update (table); }
+
+    void show_lookup_table (bool visible) override
+    {
+        if (visible && _focused_ic) candidates_lookup_show (_focused_ic);
+        else                        candidates_lookup_hide ();
+    }
+
+    /** @brief Nothing to do: the window is placed from the focused context. */
+    void update_spot_location (int x, int y) override { (void) x; (void) y; }
+
+    // The window handles its own mouse events and calls the same handlers
+    // directly (see candidates_route_click), so there is nothing to connect.
+    void signal_connect_select_candidate (IntSlot) override { }
+    void signal_connect_page_up (VoidSlot) override { }
+    void signal_connect_page_down (VoidSlot) override { }
+};
+
+static WindowSink _window_sink;
 
 static void candidates_finalize ()
 {
@@ -845,12 +953,122 @@ static void candidates_finalize ()
 }
 #endif // SCIM_HAS_CANDIDATES
 
+/* -------------------------------------------------------------------------- */
+/* Candidate UI actions -> the focused engine.                                */
+/*                                                                            */
+/* Shared by the window's own mouse handling and by kimpanel, which reports    */
+/* the same things over D-Bus.                                                */
+static void sink_select_candidate (int index)
+{
+    if (!_focused_ic || !_focused_ic->impl || _focused_ic->impl->si.null ())
+        return;
+    _panel_client.prepare (_focused_ic->impl->id);
+    _focused_ic->impl->si->select_candidate (index);
+    _panel_client.send ();
+}
+
+static void sink_page_up ()
+{
+    if (!_focused_ic || !_focused_ic->impl || _focused_ic->impl->si.null ())
+        return;
+    _panel_client.prepare (_focused_ic->impl->id);
+    _focused_ic->impl->si->lookup_table_page_up ();
+    _panel_client.send ();
+}
+
+static void sink_page_down ()
+{
+    if (!_focused_ic || !_focused_ic->impl || _focused_ic->impl->si.null ())
+        return;
+    _panel_client.prepare (_focused_ic->impl->id);
+    _focused_ic->impl->si->lookup_table_page_down ();
+    _panel_client.send ();
+}
+
+static void sink_move_preedit_caret (int pos)
+{
+    if (!_focused_ic || !_focused_ic->impl || _focused_ic->impl->si.null ())
+        return;
+    _panel_client.prepare (_focused_ic->impl->id);
+    _focused_ic->impl->si->move_preedit_caret (pos);
+    _panel_client.send ();
+}
+
+#ifdef SCIM_HAS_KIMPANEL
+// Connect the agent if this desktop wants kimpanel, and watch its fd through the
+// Qt event loop. Watched whether or not a panel widget is there yet: that
+// connection is how one appearing later is announced, and select_sink () acts.
+static void kimpanel_initialize ()
+{
+    bool want = _config.null ()
+                ? KimpanelAgent::desktop_prefers_kimpanel ()
+                : _config->read (String ("/Panel/UseKimpanel"),
+                                 KimpanelAgent::desktop_prefers_kimpanel ());
+    if (!want || !_kimpanel.connect ())
+        return;
+
+    _kimpanel.signal_connect_panel_presence_changed ([] (bool) { select_sink (); });
+
+    int fd = _kimpanel.event_fd ();
+    if (fd >= 0) {
+        _kimpanel_notifier = new QSocketNotifier (fd, QSocketNotifier::Read);
+        QObject::connect (_kimpanel_notifier, &QSocketNotifier::activated,
+                          [] () { _kimpanel.process_events (); });
+    }
+}
+#endif
+
+// Choose between kimpanel and the candidate window from what is available now,
+// handing over if that changed.
+static void select_sink ()
+{
+    CandidatesSink *want = 0;
+
+#ifdef SCIM_HAS_KIMPANEL
+    if (_kimpanel.is_connected () && _kimpanel.panel_present ())
+        want = &_kimpanel;
+#endif
+#ifdef SCIM_HAS_CANDIDATES
+    if (!want)
+        want = &_window_sink;
+#endif
+
+    if (want == _sink)
+        return;
+
+    // Empty the outgoing one, or it leaves a candidate window behind for good.
+    if (_sink) {
+        _sink->show_preedit_string (false);
+        _sink->show_aux_string (false);
+        _sink->show_lookup_table (false);
+        _sink->remove_engine_property ();
+        _sink->enable (false);
+    }
+
+    _sink = want;
+    if (!_sink)
+        return;
+
+    _sink->signal_connect_select_candidate (
+        [] (int idx) { sink_select_candidate (idx); });
+    _sink->signal_connect_page_up ([] () { sink_page_up (); });
+    _sink->signal_connect_page_down ([] () { sink_page_down (); });
+    _sink->signal_connect_move_preedit_caret (
+        [] (int pos) { sink_move_preedit_caret (pos); });
+
+    // Nothing in flight is replayed: no copy of the aux string or lookup table
+    // is kept, and this happens when a panel widget is added or removed rather
+    // than mid-composition. The next update fills the new one in.
+    if (_focused_ic && _focused_ic->impl && _focused_ic->impl->is_on)
+        _sink->enable (true);
+}
+
 static void slot_show_lookup_table (IMEngineInstanceBase *si)
 {
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
-        candidates_show (ic);
+        if (_sink) _sink->show_lookup_table (true);
 #endif
     }
 }
@@ -865,7 +1083,7 @@ static void slot_hide_preedit_string (IMEngineInstanceBase *si)
             hide_preedit_in_client (ic);
 #ifdef SCIM_HAS_CANDIDATES
         else {
-            candidates_preedit_hide ();
+            if (_sink) _sink->show_preedit_string (false);
         }
 #endif
     }
@@ -877,7 +1095,7 @@ static void slot_hide_aux_string (IMEngineInstanceBase *si)
 
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
-        candidates_aux_hide ();
+        if (_sink) _sink->show_aux_string (false);
 #endif
     }
 }
@@ -886,7 +1104,7 @@ static void slot_hide_lookup_table (IMEngineInstanceBase *si)
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
-        candidates_hide ();
+        if (_sink) _sink->show_lookup_table (false);
 #endif
     }
 }
@@ -900,7 +1118,7 @@ static void slot_update_preedit_caret (IMEngineInstanceBase *si, int caret)
             update_preedit_in_client (ic);
 #ifdef SCIM_HAS_CANDIDATES
         else {
-            candidates_preedit_caret (caret);
+            if (_sink) _sink->update_preedit_caret (caret);
         }
 #endif
     }
@@ -920,7 +1138,7 @@ static void slot_update_preedit_string (IMEngineInstanceBase *si,
         }
 #ifdef SCIM_HAS_CANDIDATES
         else
-            candidates_preedit_update (str, attrs);
+            if (_sink) _sink->update_preedit_string (str, attrs);
 #endif
     }
 }
@@ -932,7 +1150,7 @@ static void slot_update_aux_string (IMEngineInstanceBase *si,
 
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
-        candidates_aux_update (str, attrs);
+        if (_sink) _sink->update_aux_string (str, attrs);
 #endif
     }
 }
@@ -961,7 +1179,7 @@ static void slot_update_lookup_table (IMEngineInstanceBase *si, const LookupTabl
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
-        candidates_update (table);
+        if (_sink) _sink->update_lookup_table (table);
 #endif
     }
 }
@@ -1098,8 +1316,38 @@ static KeyEvent keyevent_qt_to_scim (const QKeyEvent *qe)
     if (mods & Qt::MetaModifier)    key.mask |= SCIM_KEY_MetaMask;
     if (mods & Qt::KeypadModifier)  key.mask |= SCIM_KEY_NumLockMask;
 
-    if (qe->type () == QEvent::KeyRelease)
+    if (qe->type () == QEvent::KeyRelease) {
         key.mask |= SCIM_KEY_ReleaseMask;
+        // Put back the modifier that is being released. Qt reports the modifiers
+        // as they are after the event and X11 as they were before it, and the
+        // hotkeys are written in X11's terms -- the engine switch is
+        // "Control+Shift+Shift_L+KeyRelease", which expects Shift to still be in
+        // the mask on the release of Shift itself. Without this the chord never
+        // matches from a Qt application, while an ordinary Control+space does,
+        // because Control is genuinely held either side of that event.
+        switch (key.code) {
+        case SCIM_KEY_Shift_L:
+        case SCIM_KEY_Shift_R:
+            key.mask |= SCIM_KEY_ShiftMask;
+            break;
+        case SCIM_KEY_Control_L:
+        case SCIM_KEY_Control_R:
+            key.mask |= SCIM_KEY_ControlMask;
+            break;
+        case SCIM_KEY_Alt_L:
+        case SCIM_KEY_Alt_R:
+            key.mask |= SCIM_KEY_AltMask;
+            break;
+        case SCIM_KEY_Meta_L:
+        case SCIM_KEY_Meta_R:
+        case SCIM_KEY_Super_L:
+        case SCIM_KEY_Super_R:
+            key.mask |= SCIM_KEY_MetaMask;
+            break;
+        default:
+            break;
+        }
+    }
 
     key.mask  &= _valid_key_mask;
     key.layout = _keyboard_layout;
@@ -1306,6 +1554,11 @@ static void initialize (void)
     _panel_client.signal_connect_request_factory_menu          (slot (panel_slot_request_factory_menu));
     _panel_client.signal_connect_change_factory                (slot (panel_slot_change_factory));
 
+#ifdef SCIM_HAS_KIMPANEL
+    kimpanel_initialize ();
+#endif
+    select_sink ();
+
     if (!panel_initialize ())
         std::cerr << "SCIM Qt IM Module: Cannot connect to Panel!\n";
 }
@@ -1448,6 +1701,20 @@ void ScimQtInputContext::update (Qt::InputMethodQueries queries)
         impl->cursor_y = y;
         // Window-local coords; candidates_show maps them per platform (absolute
         // on X11, parent-relative for the Wayland xdg_popup).
+        //
+        // A delegated panel draws its own window and has to be told where the
+        // caret is on the screen, so map it the same way candidates_show does.
+        // Only X11 can answer that; on Wayland a client cannot know, and the
+        // spot goes unsent rather than being reported as window-local -- which
+        // is what would put the candidates in a corner.
+        if (_sink) {
+            QWindow *fw = QGuiApplication::focusWindow ();
+            if (fw && !QGuiApplication::platformName ()
+                          .startsWith (QLatin1String ("wayland"))) {
+                QPoint spot = fw->position () + QPoint (x, y);
+                _sink->update_spot_location (spot.x (), spot.y ());
+            }
+        }
         _panel_client.prepare (impl->id);
         _panel_client.send ();
     }

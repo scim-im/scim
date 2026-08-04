@@ -64,6 +64,9 @@
 #endif
 #ifdef SCIM_HAS_CANDIDATES
 #include "scim_candidates_x11.h"
+#ifdef SCIM_HAS_KIMPANEL
+#include "scim_kimpanel_agent.h"
+#endif
 #endif
 
 #define SEND_EVENT_MASK 0x02
@@ -319,6 +322,16 @@ static guint                                            _panel_iochannel_hup_sou
 // candidate positioning work in-app; the panel keeps status/properties.
 #ifdef SCIM_HAS_CANDIDATES
 static CandidatesUIX11                                  _candidates_ui;
+
+// The candidate UI in use: the renderer above, or kimpanel when a Plasma panel
+// widget is there to draw for us.
+static CandidatesSink                                  *_sink                       = 0;
+
+#ifdef SCIM_HAS_KIMPANEL
+static KimpanelAgent                                    _kimpanel;
+static GIOChannel                                      *_kimpanel_iochannel         = 0;
+static guint                                            _kimpanel_iochannel_source  = 0;
+#endif
 static GIOChannel                                      *_candidates_iochannel        = 0;
 static guint                                            _candidates_iochannel_source  = 0;
 #endif
@@ -812,12 +825,16 @@ gtk_im_context_scim_focus_in (GtkIMContext *context)
 
         if (context_scim->impl->is_on) {
             _panel_client.turn_on (context_scim->id);
-#ifdef SCIM_HAS_CANDIDATES
-            // This context just became active. The in-process renderer is shared by
-            // every context in this process, so clear anything the previously focused
-            // one left on screen before we start drawing.
-            _candidates_ui.hide ();
-#endif
+            // This context just became active. The candidate UI is shared by
+            // every context in this process -- and with the whole desktop when
+            // Plasma is drawing -- so mark it active and clear anything the
+            // previously focused context left on screen.
+            if (_sink) {
+                _sink->enable (true);
+                _sink->show_preedit_string (false);
+                _sink->show_aux_string (false);
+                _sink->show_lookup_table (false);
+            }
             context_scim->impl->si->focus_in ();
         } else {
             _panel_client.turn_off (context_scim->id);
@@ -1470,6 +1487,12 @@ panel_iochannel_handler (GIOChannel *source, GIOCondition condition, gpointer us
     return TRUE;
 }
 
+static void     select_sink                             ();
+static void     sink_select_candidate                   (int index);
+static void     sink_page_up                            ();
+static void     sink_page_down                          ();
+static void     sink_move_preedit_caret                 (int pos);
+
 #ifdef SCIM_HAS_CANDIDATES
 static gboolean
 candidates_iochannel_handler (GIOChannel *, GIOCondition, gpointer)
@@ -1491,35 +1514,155 @@ candidates_initialize ()
     if (!_config.null ())
         _candidates_ui.ui ().set_theme (scim_candidates_theme_from_config (_config));
 
-    // Route clicks/paging back to the focused instance.
-    _candidates_ui.signal_connect_select_candidate ([] (int index) {
-        if (_focused_ic && _focused_ic->impl) {
-            _panel_client.prepare (_focused_ic->id);
-            _focused_ic->impl->si->select_candidate (index);
-            _panel_client.send ();
-        }
-    });
-    _candidates_ui.signal_connect_page_up ([] () {
-        if (_focused_ic && _focused_ic->impl) {
-            _panel_client.prepare (_focused_ic->id);
-            _focused_ic->impl->si->lookup_table_page_up ();
-            _panel_client.send ();
-        }
-    });
-    _candidates_ui.signal_connect_page_down ([] () {
-        if (_focused_ic && _focused_ic->impl) {
-            _panel_client.prepare (_focused_ic->id);
-            _focused_ic->impl->si->lookup_table_page_down ();
-            _panel_client.send ();
-        }
-    });
-
     int fd = _candidates_ui.connection_number ();
     if (fd >= 0) {
         _candidates_iochannel = g_io_channel_unix_new (fd);
         _candidates_iochannel_source =
             g_io_add_watch (_candidates_iochannel, G_IO_IN, candidates_iochannel_handler, 0);
     }
+}
+
+/* ------------------------------------------------------------------ */
+/* Candidate UI actions -> the focused engine                          */
+/*                                                                     */
+/* Shared by the renderer's own pointer events and by kimpanel, which   */
+/* reports the same things over D-Bus.                                 */
+/* ------------------------------------------------------------------ */
+
+static void
+sink_select_candidate (int index)
+{
+    if (!_focused_ic || !_focused_ic->impl || _focused_ic->impl->si.null ())
+        return;
+    _panel_client.prepare (_focused_ic->id);
+    _focused_ic->impl->si->select_candidate (index);
+    _panel_client.send ();
+}
+
+static void
+sink_page_up ()
+{
+    if (!_focused_ic || !_focused_ic->impl || _focused_ic->impl->si.null ())
+        return;
+    _panel_client.prepare (_focused_ic->id);
+    _focused_ic->impl->si->lookup_table_page_up ();
+    _panel_client.send ();
+}
+
+static void
+sink_page_down ()
+{
+    if (!_focused_ic || !_focused_ic->impl || _focused_ic->impl->si.null ())
+        return;
+    _panel_client.prepare (_focused_ic->id);
+    _focused_ic->impl->si->lookup_table_page_down ();
+    _panel_client.send ();
+}
+
+static void
+sink_move_preedit_caret (int pos)
+{
+    if (!_focused_ic || !_focused_ic->impl || _focused_ic->impl->si.null ())
+        return;
+    _panel_client.prepare (_focused_ic->id);
+    _focused_ic->impl->si->move_preedit_caret (pos);
+    _panel_client.send ();
+}
+
+#ifdef SCIM_HAS_KIMPANEL
+static gboolean
+kimpanel_iochannel_handler (GIOChannel *source, GIOCondition condition, gpointer user_data)
+{
+    (void) source; (void) user_data;
+
+    if (condition == G_IO_IN) {
+        _kimpanel.process_events ();
+        return TRUE;
+    }
+
+    // The bus connection died. Stop watching and go back to drawing candidates
+    // ourselves, rather than pushing them at something no longer listening.
+    _kimpanel.close ();
+    if (_kimpanel_iochannel) {
+        g_io_channel_unref (_kimpanel_iochannel);
+        _kimpanel_iochannel = 0;
+        _kimpanel_iochannel_source = 0;
+    }
+    select_sink ();
+    return FALSE;
+}
+
+// Connect the agent if this desktop wants kimpanel, and watch its fd. Watched
+// whether or not a panel widget is there yet: that connection is how one
+// appearing later is announced, and select_sink () acts on it.
+static void
+kimpanel_initialize ()
+{
+    bool want = _config.null ()
+                ? KimpanelAgent::desktop_prefers_kimpanel ()
+                : _config->read (String ("/Panel/UseKimpanel"),
+                                 KimpanelAgent::desktop_prefers_kimpanel ());
+    if (!want || !_kimpanel.connect ())
+        return;
+
+    _kimpanel.signal_connect_panel_presence_changed ([] (bool) { select_sink (); });
+
+    int fd = _kimpanel.event_fd ();
+    if (fd >= 0) {
+        _kimpanel_iochannel = g_io_channel_unix_new (fd);
+        _kimpanel_iochannel_source =
+            g_io_add_watch (_kimpanel_iochannel,
+                            (GIOCondition) (G_IO_IN | G_IO_ERR | G_IO_HUP),
+                            kimpanel_iochannel_handler, 0);
+    }
+}
+#endif
+
+// Choose between kimpanel and the X11 renderer from what is available now,
+// handing over if that changed. The renderer here is a CandidatesSink itself, so
+// there is no adapter in between.
+static void
+select_sink ()
+{
+    CandidatesSink *want = 0;
+
+#ifdef SCIM_HAS_KIMPANEL
+    if (_kimpanel.is_connected () && _kimpanel.panel_present ())
+        want = &_kimpanel;
+#endif
+#ifdef SCIM_HAS_CANDIDATES
+    if (!want && _candidates_ui.is_open ())
+        want = &_candidates_ui;
+#endif
+
+    if (want == _sink)
+        return;
+
+    // Empty the outgoing one, or it leaves a candidate window behind for good.
+    if (_sink) {
+        _sink->show_preedit_string (false);
+        _sink->show_aux_string (false);
+        _sink->show_lookup_table (false);
+        _sink->remove_engine_property ();
+        _sink->enable (false);
+    }
+
+    _sink = want;
+    if (!_sink)
+        return;
+
+    _sink->signal_connect_select_candidate (
+        [] (int idx) { sink_select_candidate (idx); });
+    _sink->signal_connect_page_up ([] () { sink_page_up (); });
+    _sink->signal_connect_page_down ([] () { sink_page_down (); });
+    _sink->signal_connect_move_preedit_caret (
+        [] (int pos) { sink_move_preedit_caret (pos); });
+
+    // Nothing in flight is replayed: no copy of the aux string or lookup table
+    // is kept, and this happens when a panel widget is added or removed rather
+    // than mid-composition. The next update fills the new one in.
+    if (_focused_ic && _focused_ic->impl && _focused_ic->impl->is_on)
+        _sink->enable (true);
 }
 
 static void
@@ -1546,12 +1689,16 @@ turn_on_ic (GtkIMContextSCIM *ic)
             panel_req_update_screen (ic);
             panel_req_update_factory_info (ic);
             _panel_client.turn_on (ic->id);
-#ifdef SCIM_HAS_CANDIDATES
-            // This context just became active. The in-process renderer is shared by
-            // every context in this process, so clear anything the previously focused
-            // one left on screen before we start drawing.
-            _candidates_ui.hide ();
-#endif
+            // This context just became active. The candidate UI is shared by
+            // every context in this process -- and with the whole desktop when
+            // Plasma is drawing -- so mark it active and clear anything the
+            // previously focused context left on screen.
+            if (_sink) {
+                _sink->enable (true);
+                _sink->show_preedit_string (false);
+                _sink->show_aux_string (false);
+                _sink->show_lookup_table (false);
+            }
             ic->impl->si->focus_in ();
         }
 
@@ -1942,11 +2089,21 @@ initialize (void)
         fprintf (stderr, "GTK IM Module SCIM: Cannot connect to Panel!\n");
     }
 
+#ifdef SCIM_HAS_KIMPANEL
+    kimpanel_initialize ();
+#endif
+
 #ifdef SCIM_HAS_CANDIDATES
     // Draw the lookup table in-process (own-Cairo, at the cursor) rather than
     // delegating it to the panel. Non-fatal if it can't open.
     candidates_initialize ();
 #endif
+
+    // After both, not between them: the renderer is this module's local sink and
+    // select_sink () will not choose one that is not open yet, so choosing before
+    // candidates_initialize () leaves no candidate UI at all whenever kimpanel is
+    // not there to be picked instead.
+    select_sink ();
 }
 
 static void
@@ -2163,10 +2320,10 @@ slot_show_preedit_string (IMEngineInstanceBase *si)
         else {
             // The client cannot draw preedit inline, so the in-process
             // renderer does it (matching the x11 frontend).
-            _candidates_ui.ui ().show_preedit_string ();
-            _candidates_ui.update ();
-            _candidates_ui.move (ic->impl->cursor_x, ic->impl->cursor_y);
-            _candidates_ui.show ();
+            if (_sink) {
+                _sink->update_spot_location (ic->impl->cursor_x, ic->impl->cursor_y);
+                _sink->show_preedit_string (true);
+            }
         }
 #endif
     }
@@ -2183,10 +2340,10 @@ slot_show_aux_string (IMEngineInstanceBase *si)
 #ifdef SCIM_HAS_CANDIDATES
         // There is no client-side path for the aux string; the renderer is the
         // only place it can appear.
-        _candidates_ui.ui ().show_aux_string ();
-        _candidates_ui.update ();
-        _candidates_ui.move (ic->impl->cursor_x, ic->impl->cursor_y);
-        _candidates_ui.show ();
+        if (_sink) {
+            _sink->update_spot_location (ic->impl->cursor_x, ic->impl->cursor_y);
+            _sink->show_aux_string (true);
+        }
 #endif
     }
 }
@@ -2200,8 +2357,13 @@ slot_show_lookup_table (IMEngineInstanceBase *si)
 
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
-        _candidates_ui.move (ic->impl->cursor_x, ic->impl->cursor_y);
-        _candidates_ui.show ();
+        // Mark the section visible before showing the window: without this the
+        // renderer has a lookup table it was never told to draw, so the window
+        // came up with the preedit alone and no candidates in it.
+        if (_sink) {
+            _sink->update_spot_location (ic->impl->cursor_x, ic->impl->cursor_y);
+            _sink->show_lookup_table (true);
+        }
 #endif
     }
 }
@@ -2230,8 +2392,7 @@ slot_hide_preedit_string (IMEngineInstanceBase *si)
         }
 #ifdef SCIM_HAS_CANDIDATES
         else {
-            _candidates_ui.ui ().hide_preedit_string ();
-            _candidates_ui.update ();
+            if (_sink) _sink->show_preedit_string (false);
         }
 #endif
     }
@@ -2246,8 +2407,7 @@ slot_hide_aux_string (IMEngineInstanceBase *si)
 
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
-        _candidates_ui.ui ().hide_aux_string ();
-        _candidates_ui.update ();
+        if (_sink) _sink->show_aux_string (false);
 #endif
     }
 }
@@ -2261,7 +2421,9 @@ slot_hide_lookup_table (IMEngineInstanceBase *si)
 
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
-        _candidates_ui.hide ();
+        // refresh () rather than hide (): the preedit is still being composed and
+        // has to stay on screen after the candidate list goes away.
+        if (_sink) _sink->show_lookup_table (false);
 #endif
     }
 }
@@ -2284,8 +2446,7 @@ slot_update_preedit_caret (IMEngineInstanceBase *si, int caret)
         }
 #ifdef SCIM_HAS_CANDIDATES
         else {
-            _candidates_ui.ui ().update_preedit_caret (caret);
-            _candidates_ui.update ();
+            if (_sink) _sink->update_preedit_caret (caret);
         }
 #endif
     }
@@ -2315,8 +2476,7 @@ slot_update_preedit_string (IMEngineInstanceBase *si,
         }
 #ifdef SCIM_HAS_CANDIDATES
         else {
-            _candidates_ui.ui ().update_preedit_string (str, attrs);
-            _candidates_ui.update ();
+            if (_sink) _sink->update_preedit_string (str, attrs);
         }
 #endif
     }
@@ -2333,8 +2493,7 @@ slot_update_aux_string (IMEngineInstanceBase *si,
 
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
-        _candidates_ui.ui ().update_aux_string (str, attrs);
-        _candidates_ui.update ();
+        if (_sink) _sink->update_aux_string (str, attrs);
 #endif
     }
 }
@@ -2385,8 +2544,7 @@ slot_update_lookup_table (IMEngineInstanceBase *si,
 
     if (ic && ic->impl && _focused_ic == ic) {
 #ifdef SCIM_HAS_CANDIDATES
-        _candidates_ui.ui ().update_lookup_table (table);
-        _candidates_ui.update ();
+        if (_sink) _sink->update_lookup_table (table);
 #endif
     }
 }
