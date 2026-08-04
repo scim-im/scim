@@ -39,6 +39,7 @@
 
 #include <functional>
 #include "scim_candidates.h"
+#include "scim_candidates_sink.h"
 
 struct wl_display;
 struct wl_compositor;
@@ -53,8 +54,14 @@ class CandidatesWaylandImpl;   // defined in scim_candidates_wayland.cpp
 
 /**
  * @brief input-popup-surface-v2 backend driving a CandidatesUI renderer.
+ *
+ * A CandidatesSink that draws: state goes into the renderer and the surface is
+ * updated behind it. Placement is not ours -- the compositor positions the popup
+ * against the text cursor -- so update_spot_location () has nothing to do, and
+ * set_active () stays off the interface because activation is a protocol state
+ * no other candidate UI has.
  */
-class CandidatesWayland
+class CandidatesWayland : public CandidatesSink
 {
     CandidatesWaylandImpl *m_impl;
 
@@ -123,10 +130,47 @@ public:
     /** @brief Blank the surface (attach a null buffer). */
     void hide ();
 
+    /**
+     * @brief Whether the compositor has activated the input method.
+     *
+     * Nothing is committed to the popup surface while inactive, and it starts
+     * inactive: an input popup is placed relative to the focused text input's
+     * surface, so with no text input focused there is nothing for the compositor
+     * to place it against. sway reads that surface's scene node while processing
+     * the commit and segfaults when none is current (input_popup_update () ->
+     * wlr_scene_node_coords ()), so this is not merely tidy.
+     *
+     * Call it from the frontend's focus transitions -- activate/deactivate for
+     * input-method-v2, and the v1 context's activate/deactivate.
+     */
+    void set_active (bool active);
+
     /** @name Pointer callbacks @{ */
-    void signal_connect_candidate_selected (CandidateSlot slot);
-    void signal_connect_page_up            (PageSlot slot);
-    void signal_connect_page_down          (PageSlot slot);
+    void signal_connect_select_candidate   (CandidateSlot slot) override;
+    void signal_connect_page_up            (PageSlot slot) override;
+    void signal_connect_page_down          (PageSlot slot) override;
+
+    /**
+     * @name CandidatesSink state
+     *
+     * Each pushes into ui() and then updates the surface. enable(false) clears
+     * and unmaps; enable(true) does nothing, because whether the popup may map
+     * is the compositor's call, made through set_active().
+     * @{
+     */
+    void enable                (bool enabled) override;
+    void update_preedit_string (const WideString &str,
+                                const AttributeList &attrs) override;
+    void update_preedit_caret  (int caret) override;
+    void show_preedit_string   (bool visible) override;
+    void update_aux_string     (const WideString &str,
+                                const AttributeList &attrs) override;
+    void show_aux_string       (bool visible) override;
+    void update_lookup_table   (const LookupTable &table) override;
+    void show_lookup_table     (bool visible) override;
+    /** @brief Nothing to do: the compositor places the popup. */
+    void update_spot_location  (int x, int y) override;
+    /** @} */
     /** @} */
 };
 

@@ -1492,7 +1492,7 @@ candidates_initialize ()
         _candidates_ui.ui ().set_theme (scim_candidates_theme_from_config (_config));
 
     // Route clicks/paging back to the focused instance.
-    _candidates_ui.signal_connect_candidate_selected ([] (int index) {
+    _candidates_ui.signal_connect_select_candidate ([] (int index) {
         if (_focused_ic && _focused_ic->impl) {
             _panel_client.prepare (_focused_ic->id);
             _focused_ic->impl->si->select_candidate (index);

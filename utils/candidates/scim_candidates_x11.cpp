@@ -27,10 +27,77 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>       // XVisualInfo / XGetVisualInfo
+#include <X11/Xresource.h>   // Xft.dpi out of the resource database
 #include <cairo.h>
 #include <cairo-xlib.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
 
 namespace scim {
+
+namespace {
+
+/**
+ * @brief The desktop's scale factor, from Xft.dpi in the resource database.
+ *
+ * X11 has no per-window scale the way Wayland does, so a HiDPI session is
+ * expressed as a raised dpi and every toolkit multiplies by it. Do the same, or
+ * the candidate panel is the one window on such a desktop still drawn at 96dpi
+ * -- sharp, but half the size of everything around it.
+ *
+ * Unlike the Wayland buffer scale this need not be an integer: the panel is
+ * drawn, not sampled, so 1.5 costs nothing and is what a 144dpi session asks
+ * for.
+ *
+ * Read once, when the connection is opened, which is also when GTK and Qt read
+ * it; changing the dpi mid-session already requires restarting applications.
+ * There is deliberately no fallback to the screen's physical size -- X11
+ * reports that wrongly often enough that the toolkits stopped believing it, and
+ * a wrong guess would misplace the panel on an ordinary display.
+ */
+double parse_xft_scale (const char *rms)
+{
+    if (!rms || !*rms)
+        return 1.0;
+
+    // Client-side parse; no server involved, which is what keeps this testable.
+    XrmDatabase db = XrmGetStringDatabase (rms);
+    if (!db)
+        return 1.0;
+
+    double scale = 1.0;
+    char *type = 0;
+    XrmValue value;
+
+    if (XrmGetResource (db, "Xft.dpi", "Xft.Dpi", &type, &value) &&
+        value.addr && value.size) {
+        // XrmValue is not promised to be terminated, so copy before reading.
+        char buf[32];
+        size_t n = value.size < sizeof buf ? value.size : sizeof buf - 1;
+        memcpy (buf, value.addr, n);
+        buf[n] = '\0';
+
+        double dpi = strtod (buf, 0);
+        if (dpi > 0.0)
+            scale = dpi / 96.0;
+    }
+
+    XrmDestroyDatabase (db);
+
+    // A nonsense resource should not produce a window that is invisible or
+    // bigger than the screen.
+    if (scale < 0.5) scale = 0.5;
+    if (scale > 8.0) scale = 8.0;
+    return scale;
+}
+
+double read_xft_scale (Display *display)
+{
+    return parse_xft_scale (XResourceManagerString (display));
+}
+
+} // anonymous namespace
 
 class CandidatesUIX11::CandidatesUIX11Impl
 {
@@ -44,9 +111,15 @@ public:
     Colormap         m_colormap;    // None unless we made one for an ARGB visual
     cairo_surface_t *m_surface;
 
+    // Window size in device pixels, i.e. the logical size the renderer measured
+    // multiplied by m_scale. The spot is in root coordinates, which are device
+    // pixels too, so place () needs no conversion.
     int              m_win_w, m_win_h;
     int              m_spot_x, m_spot_y;
     bool             m_mapped;
+
+    // See read_xft_scale (). 1.0 on an ordinary display.
+    double           m_scale;
 
     CandidateSlot    m_candidate_slot;
     PageSlot         m_page_up_slot;
@@ -55,7 +128,8 @@ public:
     CandidatesUIX11Impl ()
         : m_display (0), m_screen (0), m_root (0), m_window (0),
           m_colormap (None), m_surface (0),
-          m_win_w (1), m_win_h (1), m_spot_x (0), m_spot_y (0), m_mapped (false)
+          m_win_w (1), m_win_h (1), m_spot_x (0), m_spot_y (0), m_mapped (false),
+          m_scale (1.0)
     {
     }
 
@@ -112,6 +186,7 @@ public:
 
         m_screen = DefaultScreen (m_display);
         m_root   = RootWindow (m_display, m_screen);
+        m_scale  = read_xft_scale (m_display);
 
         int     depth  = DefaultDepth (m_display, m_screen);
         Visual *visual = DefaultVisual (m_display, m_screen);
@@ -235,6 +310,10 @@ public:
     {
         if (!m_surface) return;
         cairo_t *cr = cairo_create (m_surface);
+        // The renderer lays out in logical pixels; the window is that size
+        // times the scale, so everything it draws is magnified to match.
+        if (m_scale != 1.0)
+            cairo_scale (cr, m_scale, m_scale);
         m_ui.draw (cr);
         cairo_destroy (cr);
         if (m_display)
@@ -246,7 +325,9 @@ public:
         if (!m_display) return;
         int w = 0, h = 0;
         m_ui.measure (w, h);
-        resize (w, h);
+        // Round up, or the last pixel column and row of the panel are cut off
+        // at a fractional scale.
+        resize ((int) std::ceil (w * m_scale), (int) std::ceil (h * m_scale));
         place ();
         if (m_mapped)
             redraw ();
@@ -265,7 +346,11 @@ public:
         }
         if (ev.button == Button1) {
             int idx = -1;
-            CandidatesUI::HitType hit = m_ui.hit_test (ev.x, ev.y, idx);
+            // Pointer coordinates are device pixels; hit_test works in the
+            // logical ones the layout was measured in.
+            CandidatesUI::HitType hit = m_ui.hit_test ((int) (ev.x / m_scale),
+                                                       (int) (ev.y / m_scale),
+                                                       idx);
             if (hit == CandidatesUI::HIT_CANDIDATE && idx >= 0) {
                 if (m_candidate_slot) m_candidate_slot (idx);
             } else if (hit == CandidatesUI::HIT_PREV_PAGE) {
@@ -410,7 +495,7 @@ CandidatesUIX11::is_shown () const
 }
 
 void
-CandidatesUIX11::signal_connect_candidate_selected (CandidateSlot slot)
+CandidatesUIX11::signal_connect_select_candidate (CandidateSlot slot)
 {
     m_impl->m_candidate_slot = slot;
 }
@@ -425,6 +510,106 @@ void
 CandidatesUIX11::signal_connect_page_down (PageSlot slot)
 {
     m_impl->m_page_down_slot = slot;
+}
+
+/* ------------------------------------------------------------------ */
+/* CandidatesSink                                                      */
+/*                                                                     */
+/* Every state call ends in refresh (), which is what keeps the window  */
+/* honest: mapped while a section has content, unmapped once none does. */
+/* Doing it here rather than in each host is also the one place a       */
+/* deferred flush would go, if the repaint-per-sub-update ever matters. */
+/* ------------------------------------------------------------------ */
+
+void
+CandidatesUIX11::refresh ()
+{
+    if (!is_open ())
+        return;
+    if (m_impl->m_ui.is_visible ())
+        show ();                 // measures, positions, maps and redraws
+    else
+        hide ();
+}
+
+void
+CandidatesUIX11::enable (bool enabled)
+{
+    if (!is_open ())
+        return;
+    if (!enabled) {
+        m_impl->m_ui.hide_preedit_string ();
+        m_impl->m_ui.hide_aux_string ();
+        m_impl->m_ui.hide_lookup_table ();
+        hide ();
+    }
+}
+
+void
+CandidatesUIX11::update_preedit_string (const WideString &str,
+                                        const AttributeList &attrs)
+{
+    if (!is_open ()) return;
+    m_impl->m_ui.update_preedit_string (str, attrs);
+    refresh ();
+}
+
+void
+CandidatesUIX11::update_preedit_caret (int caret)
+{
+    if (!is_open ()) return;
+    m_impl->m_ui.update_preedit_caret (caret);
+    refresh ();
+}
+
+void
+CandidatesUIX11::show_preedit_string (bool visible)
+{
+    if (!is_open ()) return;
+    if (visible) m_impl->m_ui.show_preedit_string ();
+    else         m_impl->m_ui.hide_preedit_string ();
+    refresh ();
+}
+
+void
+CandidatesUIX11::update_aux_string (const WideString &str,
+                                    const AttributeList &attrs)
+{
+    if (!is_open ()) return;
+    m_impl->m_ui.update_aux_string (str, attrs);
+    refresh ();
+}
+
+void
+CandidatesUIX11::show_aux_string (bool visible)
+{
+    if (!is_open ()) return;
+    if (visible) m_impl->m_ui.show_aux_string ();
+    else         m_impl->m_ui.hide_aux_string ();
+    refresh ();
+}
+
+void
+CandidatesUIX11::update_lookup_table (const LookupTable &table)
+{
+    if (!is_open ()) return;
+    m_impl->m_ui.update_lookup_table (table);
+    refresh ();
+}
+
+void
+CandidatesUIX11::show_lookup_table (bool visible)
+{
+    if (!is_open ()) return;
+    if (visible) m_impl->m_ui.show_lookup_table ();
+    else         m_impl->m_ui.hide_lookup_table ();
+    refresh ();
+}
+
+void
+CandidatesUIX11::update_spot_location (int x, int y)
+{
+    move (x, y);
 }
 
 } // namespace scim

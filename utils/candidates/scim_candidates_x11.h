@@ -38,13 +38,18 @@
 #include <scim.h>
 #include <functional>
 #include "scim_candidates.h"
+#include "scim_candidates_sink.h"
 
 namespace scim {
 
 /**
  * @brief X11 override-redirect surface driving a CandidatesUI renderer.
+ *
+ * A CandidatesSink that draws: the state calls go into the renderer, and the
+ * window follows -- it is mapped while any section has content and unmapped when
+ * they are all empty, so a host never has to decide that for itself.
  */
-class CandidatesUIX11
+class CandidatesUIX11 : public CandidatesSink
 {
     class CandidatesUIX11Impl;
     CandidatesUIX11Impl *m_impl;
@@ -75,8 +80,10 @@ public:
 
     /** @brief Xlib connection fd, for the caller's poll/select loop (-1 if closed). */
     int  connection_number () const;
+    /** @brief Same, as the sink calls it. */
+    int  event_fd () const override { return connection_number (); }
     /** @brief Drain and handle pending X events for the panel window. */
-    void process_events ();
+    void process_events () override;
 
     /** @brief Set the anchor (absolute root coords of the text cursor). */
     void move   (int x, int y);
@@ -90,10 +97,39 @@ public:
     bool is_shown () const;
 
     /** @name Pointer callbacks @{ */
-    void signal_connect_candidate_selected (CandidateSlot slot);
-    void signal_connect_page_up            (PageSlot slot);
-    void signal_connect_page_down          (PageSlot slot);
+    void signal_connect_select_candidate   (CandidateSlot slot) override;
+    void signal_connect_page_up            (PageSlot slot) override;
+    void signal_connect_page_down          (PageSlot slot) override;
     /** @} */
+
+    /**
+     * @name CandidatesSink state
+     *
+     * Each pushes into ui() and then brings the window in line with what is left
+     * to show. update_spot_location() is move(); enable(false) takes the window
+     * down, since a hidden input method has nothing to display.
+     * @{
+     */
+    void enable                (bool enabled) override;
+    void update_preedit_string (const WideString &str,
+                                const AttributeList &attrs) override;
+    void update_preedit_caret  (int caret) override;
+    void show_preedit_string   (bool visible) override;
+    void update_aux_string     (const WideString &str,
+                                const AttributeList &attrs) override;
+    void show_aux_string       (bool visible) override;
+    void update_lookup_table   (const LookupTable &table) override;
+    void show_lookup_table     (bool visible) override;
+    void update_spot_location  (int x, int y) override;
+    /** @} */
+
+    /**
+     * @brief Map or unmap to match what the renderer has to show.
+     *
+     * Called for you after every state change; a host needs it only when it
+     * changes the renderer behind this class's back, as a theme change does.
+     */
+    void refresh ();
 };
 
 } // namespace scim

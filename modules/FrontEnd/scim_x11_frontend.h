@@ -31,6 +31,10 @@
 
 #include "scim_stl_map.h"
 
+// The candidate UI interface only: header-only, no cairo and no D-Bus, so it is
+// available whatever was built, and the state calls below need no #ifdef.
+#include "scim_candidates_sink.h"
+
 #ifdef SCIM_HAS_CANDIDATES
 #include "scim_candidates_x11.h"
 #endif
@@ -64,11 +68,16 @@ class X11FrontEnd : public FrontEndBase
 #endif
 
 #ifdef SCIM_HAS_KIMPANEL
-    // KDE delegated candidate UI (D-Bus). When active it takes the
+    // KDE delegated candidate UI (D-Bus). When it connects it takes the
     // preedit/aux/lookup updates instead of the Cairo renderer or the panel.
     KimpanelAgent           m_kimpanel;
-    bool                    m_use_kimpanel;
 #endif
+
+    // Whichever of the two above is in use, or null when neither is available
+    // and scim-panel-gtk draws the candidates instead. Everything pushes state at
+    // it without asking which; select_sink () is the only thing that changes it,
+    // and it can change while running, when a panel widget is added or removed.
+    CandidatesSink         *m_sink;
 
     X11IC                  *m_focus_ic;
 
@@ -232,28 +241,26 @@ private:
 
     void fallback_commit_string_cb (IMEngineInstanceBase * si, const WideString & str);
 
-#ifdef SCIM_HAS_KIMPANEL
-    bool use_kimpanel_ui () const { return m_use_kimpanel; }
-    void kimpanel_select_candidate (int cand_index);
-    void kimpanel_page_up ();
-    void kimpanel_page_down ();
-    void kimpanel_move_preedit_caret (int pos);
-#else
-    bool use_kimpanel_ui () const { return false; }
-#endif
+    // Choose between kimpanel and the Cairo renderer from what is available
+    // now, and hand over if that has changed. Called at startup and whenever a
+    // panel widget appears or goes away.
+    void select_sink ();
+
+    /** @name Sink -> frontend, whichever candidate UI is in use @{ */
+    void sink_select_candidate (int cand_index);
+    void sink_page_up ();
+    void sink_page_down ();
+    void sink_move_preedit_caret (int pos);
+    /** @} */
 
 #ifdef SCIM_HAS_CANDIDATES
     bool use_candidates_ui () const { return m_candidates_ui.is_open (); }
-    // Re-measure/redraw or hide the Cairo panel from the renderer's state.
-    void refresh_candidates_ui ();
-    // Apply the configured font/colors to the renderer.
+    // Apply the configured font/colors/shape to the renderer, then repaint. Not
+    // part of the sink: only a UI we draw ourselves has a theme to set.
     void configure_candidates_ui ();
-    // Pointer callbacks from the Cairo panel, routed to the focused IC.
-    void candidates_ui_select_candidate (int cand_index);
-    void candidates_ui_page_up ();
-    void candidates_ui_page_down ();
 #else
     bool use_candidates_ui () const { return false; }
+    void configure_candidates_ui () { }
 #endif
 
 private:

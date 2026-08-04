@@ -39,6 +39,7 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_srcdir)/intl \
 			  -I$(top_srcdir)/data \
 			  -I$(top_srcdir)/utils/x11utils \
+			  -I$(top_srcdir)/utils/candidates \
 			  -I$(top_srcdir)/extras/panel \
 			  -DSCIM_DATADIR=\"@SCIM_DATADIR@\" \
 			  -DSCIM_LOCALEDIR=\"@SCIM_LOCALEDIR@\" \
@@ -54,18 +55,19 @@ endif
 
 # Draw candidates in-process with the Cairo renderer when it was built.
 if SCIM_BUILD_CANDIDATES
-PANEL_UI_CFLAGS		= -DSCIM_HAS_CANDIDATES \
+CANDIDATES_CFLAGS	= -DSCIM_HAS_CANDIDATES \
 			  -I$(top_srcdir)/utils/candidates \
 			  @CAIRO_CFLAGS@ @CAIRO_XLIB_CFLAGS@
-PANEL_UI_LIBS		= $(top_builddir)/utils/candidates/libscim-candidates-x11@SCIM_EPOCH@.la \
+CANDIDATES_LIBS		= $(top_builddir)/utils/candidates/libscim-candidates-x11@SCIM_EPOCH@.la \
 			  @CAIRO_LIBS@ @CAIRO_XLIB_LIBS@
 endif
 
 # Delegate candidates to KDE kimpanel over D-Bus when it was built.
 if SCIM_BUILD_KIMPANEL
 KIMPANEL_CFLAGS		= -DSCIM_HAS_KIMPANEL \
-			  -I$(top_srcdir)/panel-ui @DBUS_CFLAGS@
-KIMPANEL_LIBS		= $(top_builddir)/panel-ui/libscimkimpanel.la @DBUS_LIBS@
+			  -I$(top_srcdir)/utils/candidates @DBUS_CFLAGS@
+KIMPANEL_LIBS		= $(top_builddir)/utils/candidates/libscim-candidates-kimpanel@SCIM_EPOCH@.la \
+			  @DBUS_LIBS@
 endif
 
 if SCIM_BUILD_FRONTEND_SOCKET
@@ -104,9 +106,9 @@ module_LTLIBRARIES	= $(CONFIG_FRONTEND_X11_MODULE) \
 x11_la_SOURCES 		= scim_x11_frontend.cpp \
 			  scim_x11_ic.cpp
 
-x11_la_CFLAGS		= @X_CFLAGS@ $(PANEL_UI_CFLAGS) $(KIMPANEL_CFLAGS)
+x11_la_CFLAGS		= @X_CFLAGS@ $(CANDIDATES_CFLAGS) $(KIMPANEL_CFLAGS)
 
-x11_la_CXXFLAGS		= @X_CFLAGS@ $(PANEL_UI_CFLAGS) $(KIMPANEL_CFLAGS)
+x11_la_CXXFLAGS		= @X_CFLAGS@ $(CANDIDATES_CFLAGS) $(KIMPANEL_CFLAGS)
 
 x11_la_LDFLAGS		= -avoid-version \
 		     	  -rpath $(moduledir) \
@@ -118,7 +120,7 @@ x11_la_LDFLAGS		= -avoid-version \
 x11_la_LIBADD		= IMdkit/libXimd.la \
 			  $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
 			  $(top_builddir)/utils/x11utils/libscim-x11utils@SCIM_EPOCH@.la \
-			  $(PANEL_UI_LIBS) \
+			  $(CANDIDATES_LIBS) \
 			  $(KIMPANEL_LIBS)
 
 socket_la_SOURCES 	= scim_socket_frontend.cpp

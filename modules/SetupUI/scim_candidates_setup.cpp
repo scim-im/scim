@@ -43,9 +43,11 @@ using namespace scim;
 #define scim_setup_module_save_config     candidates_setup_LTX_scim_setup_module_save_config
 #define scim_setup_module_query_changed   candidates_setup_LTX_scim_setup_module_query_changed
 
-// The renderer reads these through a layered lookup that also consults
-// /Panel/Gtk/ (see scim_candidates_theme_from_config); this page only ever
-// writes the /Candidates/Default/ level.
+// The renderer reads these through a layered lookup (see
+// scim_candidates_theme_from_config); this page writes the
+// /Candidates/Default/ level, which a per-renderer /Candidates/<renderer>/
+// value can still override.
+#define SCIM_CONFIG_CANDIDATES_COLOR_SCHEME        "/Candidates/Default/ColorScheme"
 #define SCIM_CONFIG_CANDIDATES_FONT                "/Candidates/Default/Font"
 #define SCIM_CONFIG_CANDIDATES_PREEDIT_FONT        "/Candidates/Default/PreeditFont"
 #define SCIM_CONFIG_CANDIDATES_COLOR_NORMAL_BG     "/Candidates/Default/Color/NormalBackground"
@@ -59,13 +61,6 @@ using namespace scim;
 #define SCIM_CONFIG_CANDIDATES_CORNER_RADIUS       "/Candidates/Default/CornerRadius"
 #define SCIM_CONFIG_CANDIDATES_PADDING             "/Candidates/Default/Padding"
 #define SCIM_CONFIG_CANDIDATES_SPACING             "/Candidates/Default/Spacing"
-
-// Read, never written here: what an unset color falls back to, so the pickers
-// can show the color actually in effect rather than a meaningless gray.
-#define SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_BG      "/Panel/Gtk/Color/NormalBackground"
-#define SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_TEXT    "/Panel/Gtk/Color/NormalText"
-#define SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_BG      "/Panel/Gtk/Color/ActiveBackground"
-#define SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_TEXT    "/Panel/Gtk/Color/ActiveText"
 
 static GtkWidget * create_setup_window ();
 static void        load_config (const ConfigPointer &config);
@@ -122,6 +117,11 @@ extern "C" {
 //
 // "default" (fonts) and "" (colors) mean the key stays unset, so the renderer
 // keeps its own fallback. Only what the user actually picks is pinned down here.
+
+// "", "light" or "dark". Empty is "auto", i.e. follow the desktop where the host
+// can tell us; see scim_candidates_set_dark_hint ().
+static String __config_color_scheme          = "";
+
 static String __config_font                  = "default";
 static String __config_preedit_font          = "default";
 
@@ -133,19 +133,25 @@ static String __config_color_active_text     = "";
 static String __config_color_label           = "";
 static String __config_color_border          = "";
 
-static int    __config_border_width          = 1;
+// Seeded from CandidatesTheme::light () in load_config (), never hardcoded here:
+// a copy that drifted from the renderer's default would show the wrong number and
+// let Apply write it back as though the user had chosen it.
+static int    __config_border_width          = 0;
 static int    __config_corner_radius         = 0;
-static int    __config_padding               = 6;
-static int    __config_spacing               = 6;
+static int    __config_padding               = 0;
+static int    __config_spacing               = 0;
 
-// The panel colors an unset candidate color inherits (read-only here).
-static String __panel_color_normal_bg        = "gray92";
-static String __panel_color_normal_text      = "black";
-static String __panel_color_active_bg        = "light blue";
-static String __panel_color_active_text      = "black";
+// What an unset color resolves to, so the pickers show the color actually in
+// effect. Set from the preset in load_config (); nothing is inherited from the
+// panel's own /Panel/Gtk/ keys any more.
+static String __unset_color_normal_bg;
+static String __unset_color_normal_text;
+static String __unset_color_active_bg;
+static String __unset_color_active_text;
 
 static bool   __have_changed                 = false;
 
+static GtkWidget * __widget_color_scheme      = 0;
 static GtkWidget * __widget_font              = 0;
 static GtkWidget * __widget_preedit_font      = 0;
 static GtkWidget * __widget_color_normal_bg   = 0;
@@ -159,6 +165,7 @@ static GtkWidget * __widget_border_width      = 0;
 static GtkWidget * __widget_corner_radius     = 0;
 static GtkWidget * __widget_padding           = 0;
 static GtkWidget * __widget_spacing           = 0;
+static GtkWidget * __widget_reset             = 0;
 
 // Declaration of internal functions.
 static void setup_widget_value ();
@@ -175,12 +182,90 @@ on_font_clicked                (GtkButton *button, gpointer user_data);
 static void
 set_color_button               (GtkWidget *button, const String &color);
 
+static void
+on_reset_clicked               (GtkButton *button, gpointer user_data);
+
+static CandidatesTheme
+__preset                       ();
+
+// The dropdown's rows, in order. Index 0 is "auto", stored as an unset key.
+static const char *__color_scheme_values[] = { "", "light", "dark" };
+
+static guint
+color_scheme_to_index (const String &value)
+{
+    for (guint i = 1; i < G_N_ELEMENTS (__color_scheme_values); ++i)
+        if (value == __color_scheme_values[i])
+            return i;
+    return 0;
+}
+
+static void
+on_color_scheme_changed (GObject *object, GParamSpec * /*pspec*/,
+                         gpointer /*user_data*/)
+{
+    guint i = gtk_drop_down_get_selected (GTK_DROP_DOWN (object));
+    if (i >= G_N_ELEMENTS (__color_scheme_values))
+        i = 0;
+    __config_color_scheme = String (__color_scheme_values[i]);
+    __have_changed = true;
+
+    // The pickers show what an unset color resolves to, and that just changed.
+    CandidatesTheme p = __preset ();
+    __unset_color_normal_bg   = scim_candidates_format_color (p.bg);
+    __unset_color_normal_text = scim_candidates_format_color (p.fg);
+    __unset_color_active_bg   = scim_candidates_format_color (p.highlight_bg);
+    __unset_color_active_text = scim_candidates_format_color (p.highlight_fg);
+    setup_widget_value ();
+}
+
 // The color a picker should show: what the user chose, or what the renderer
 // would fall back to if the key is left unset.
 static String
 effective_color (const String &chosen, const String &fallback)
 {
     return chosen.length () ? chosen : fallback;
+}
+
+// Everything this page owns, back to "unset". Fonts and colors spell that with
+// the empty string, which every reader already treats as "fall back"; the shape
+// values have no such spelling, so they take the renderer's own numbers rather
+// than a second copy kept here.
+static void
+adopt_builtin_defaults ()
+{
+    CandidatesTheme t = CandidatesTheme::light ();
+
+    __config_color_scheme       = String ();   // auto
+    __config_font               = String ();
+    __config_preedit_font       = String ();
+
+    __config_color_normal_bg    = String ();
+    __config_color_normal_text  = String ();
+    __config_color_preedit_text = String ();
+    __config_color_active_bg    = String ();
+    __config_color_active_text  = String ();
+    __config_color_label        = String ();
+    __config_color_border       = String ();
+
+    __unset_color_normal_bg     = scim_candidates_format_color (t.bg);
+    __unset_color_normal_text   = scim_candidates_format_color (t.fg);
+    __unset_color_active_bg     = scim_candidates_format_color (t.highlight_bg);
+    __unset_color_active_text   = scim_candidates_format_color (t.highlight_fg);
+
+    __config_border_width       = t.border_width;
+    __config_corner_radius      = t.corner_radius;
+    __config_padding            = t.padding;
+    __config_spacing            = t.spacing;
+}
+
+// The preset the page is currently showing. Which one it is depends on the
+// color-scheme choice, so "unset" means what the renderer will really draw.
+static CandidatesTheme
+__preset ()
+{
+    return __config_color_scheme == String ("dark") ? CandidatesTheme::dark ()
+                                                   : CandidatesTheme::light ();
 }
 
 static String
@@ -258,6 +343,28 @@ create_setup_window ()
         frame = create_frame (page, _("Colors"));
         grid  = create_grid (frame);
 
+        // Which preset the colors below fall back to when they are left unset.
+        // First, because it changes what every one of them means.
+        {
+            label = gtk_label_new_with_mnemonic (_("Color _scheme:"));
+            gtk_widget_set_halign (label, GTK_ALIGN_START);
+            gtk_grid_attach (GTK_GRID (grid), label, 0, 0, 1, 1);
+
+            const char *choices[] = { _("Follow the desktop"), _("Light"), _("Dark"), 0 };
+            __widget_color_scheme = gtk_drop_down_new_from_strings (choices);
+            gtk_grid_attach (GTK_GRID (grid), __widget_color_scheme, 1, 0, 1, 1);
+            gtk_label_set_mnemonic_widget (GTK_LABEL (label), __widget_color_scheme);
+
+            gtk_widget_set_tooltip_text (__widget_color_scheme,
+                _("Which built-in appearance the colors below fall back to. "
+                  "\"Follow the desktop\" works in GTK applications, which can "
+                  "report their theme; elsewhere it means light, so choose Dark "
+                  "explicitly for a dark candidate window."));
+
+            g_signal_connect ((gpointer) __widget_color_scheme, "notify::selected",
+                              G_CALLBACK (on_color_scheme_changed), 0);
+        }
+
         {
             struct { const char *label; GtkWidget **widget; String *cfg; } rows[] = {
                 { _("_Background:"),          &__widget_color_normal_bg,    &__config_color_normal_bg    },
@@ -270,16 +377,17 @@ create_setup_window ()
             };
             const int n = (int) (sizeof rows / sizeof rows[0]);
             for (int i = 0; i < n; ++i) {
+                // + 1: the color-scheme row above occupies row 0.
                 label = gtk_label_new_with_mnemonic (rows[i].label);
                 gtk_widget_set_halign (label, GTK_ALIGN_START);
-                gtk_grid_attach (GTK_GRID (grid), label, 0, i, 1, 1);
+                gtk_grid_attach (GTK_GRID (grid), label, 0, i + 1, 1, 1);
 
                 *rows[i].widget = gtk_color_button_new ();
                 // Alpha is how transparency is configured: the renderer honors
                 // it on the background and the border.
                 gtk_color_chooser_set_use_alpha (
                     GTK_COLOR_CHOOSER (*rows[i].widget), TRUE);
-                gtk_grid_attach (GTK_GRID (grid), *rows[i].widget, 1, i, 1, 1);
+                gtk_grid_attach (GTK_GRID (grid), *rows[i].widget, 1, i + 1, 1, 1);
                 gtk_label_set_mnemonic_widget (GTK_LABEL (label), *rows[i].widget);
 
                 g_signal_connect ((gpointer) *rows[i].widget, "color-set",
@@ -313,6 +421,34 @@ create_setup_window ()
                                   G_CALLBACK (on_default_spin_button_changed),
                                   rows[i].cfg);
             }
+        }
+
+        // --- Reset ---
+        //
+        // Without this there is no way back to the defaults for the shape values:
+        // a spin button always holds a number, so Apply always wrote one, and
+        // nothing the user could type meant "unset". Takes effect on Apply, like
+        // every other control on the page.
+        {
+            GtkWidget *box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+            gtk_widget_set_margin_start (box, 8);
+            gtk_widget_set_margin_end (box, 8);
+            gtk_widget_set_margin_top (box, 4);
+            gtk_widget_set_margin_bottom (box, 4);
+            gtk_box_append (GTK_BOX (page), box);
+
+            __widget_reset = gtk_button_new_with_mnemonic (_("_Reset to defaults"));
+            gtk_widget_set_halign (__widget_reset, GTK_ALIGN_END);
+            gtk_widget_set_hexpand (__widget_reset, TRUE);
+            gtk_box_append (GTK_BOX (box), __widget_reset);
+
+            gtk_widget_set_tooltip_text (__widget_reset,
+                _("Discard every setting on this page, so the candidate window "
+                  "follows the built-in appearance again -- including any later "
+                  "change to it. Applies when you press Apply."));
+
+            g_signal_connect ((gpointer) __widget_reset, "clicked",
+                              G_CALLBACK (on_reset_clicked), 0);
         }
 
         // Connect the font buttons; the payload says which setting to edit.
@@ -369,6 +505,9 @@ create_setup_window ()
 void
 setup_widget_value ()
 {
+    if (__widget_color_scheme)
+        gtk_drop_down_set_selected (GTK_DROP_DOWN (__widget_color_scheme),
+                                    color_scheme_to_index (__config_color_scheme));
     if (__widget_font)
         gtk_button_set_label (GTK_BUTTON (__widget_font), __config_font.c_str ());
     if (__widget_preedit_font)
@@ -376,11 +515,11 @@ setup_widget_value ()
                               __config_preedit_font.c_str ());
 
     const String normal_text =
-        effective_color (__config_color_normal_text, __panel_color_normal_text);
+        effective_color (__config_color_normal_text, __unset_color_normal_text);
 
     if (__widget_color_normal_bg)
         set_color_button (__widget_color_normal_bg,
-            effective_color (__config_color_normal_bg, __panel_color_normal_bg));
+            effective_color (__config_color_normal_bg, __unset_color_normal_bg));
     if (__widget_color_normal_text)
         set_color_button (__widget_color_normal_text, normal_text);
     // An unset preedit color follows the normal text color, not the panel's.
@@ -389,10 +528,10 @@ setup_widget_value ()
             effective_color (__config_color_preedit_text, normal_text));
     if (__widget_color_active_bg)
         set_color_button (__widget_color_active_bg,
-            effective_color (__config_color_active_bg, __panel_color_active_bg));
+            effective_color (__config_color_active_bg, __unset_color_active_bg));
     if (__widget_color_active_text)
         set_color_button (__widget_color_active_text,
-            effective_color (__config_color_active_text, __panel_color_active_text));
+            effective_color (__config_color_active_text, __unset_color_active_text));
     if (__widget_color_label)
         set_color_button (__widget_color_label,
             effective_color (__config_color_label, default_label_color ()));
@@ -418,6 +557,14 @@ void
 load_config (const ConfigPointer &config)
 {
     if (!config.null ()) {
+        // Every read below falls back to what is already in these variables, so
+        // seed them with the renderer's defaults first: that is what an unset key
+        // resolves to, and it keeps this page from inventing its own answer.
+        adopt_builtin_defaults ();
+
+        __config_color_scheme =
+            config->read (String (SCIM_CONFIG_CANDIDATES_COLOR_SCHEME),
+                          __config_color_scheme);
         __config_font =
             config->read (String (SCIM_CONFIG_CANDIDATES_FONT), __config_font);
         __config_preedit_font =
@@ -452,18 +599,15 @@ load_config (const ConfigPointer &config)
             config->read (String (SCIM_CONFIG_CANDIDATES_SPACING),
                           __config_spacing);
 
-        __panel_color_normal_bg =
-            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_BG),
-                          __panel_color_normal_bg);
-        __panel_color_normal_text =
-            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_NORMAL_TEXT),
-                          __panel_color_normal_text);
-        __panel_color_active_bg =
-            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_BG),
-                          __panel_color_active_bg);
-        __panel_color_active_text =
-            config->read (String (SCIM_CONFIG_PANEL_GTK_COLOR_ACTIVE_TEXT),
-                          __panel_color_active_text);
+        // Now that the scheme is known, show the colors that an unset key really
+        // resolves to: choosing Dark changes what "unset" looks like.
+        {
+            CandidatesTheme p = __preset ();
+            __unset_color_normal_bg   = scim_candidates_format_color (p.bg);
+            __unset_color_normal_text = scim_candidates_format_color (p.fg);
+            __unset_color_active_bg   = scim_candidates_format_color (p.highlight_bg);
+            __unset_color_active_text = scim_candidates_format_color (p.highlight_fg);
+        }
 
         setup_widget_value ();
 
@@ -474,39 +618,52 @@ load_config (const ConfigPointer &config)
 void
 save_config (const ConfigPointer &config)
 {
-    if (!config.null ()) {
-        config->write (String (SCIM_CONFIG_CANDIDATES_FONT), __config_font);
-        config->write (String (SCIM_CONFIG_CANDIDATES_PREEDIT_FONT),
-                       __config_preedit_font);
+    if (config.null ())
+        return;
 
-        // An untouched color is written back as the empty string, which reads as
-        // unset, so it keeps following its fallback instead of being frozen here.
-        config->write (String (SCIM_CONFIG_CANDIDATES_COLOR_NORMAL_BG),
-                       __config_color_normal_bg);
-        config->write (String (SCIM_CONFIG_CANDIDATES_COLOR_NORMAL_TEXT),
-                       __config_color_normal_text);
-        config->write (String (SCIM_CONFIG_CANDIDATES_COLOR_PREEDIT_TEXT),
-                       __config_color_preedit_text);
-        config->write (String (SCIM_CONFIG_CANDIDATES_COLOR_ACTIVE_BG),
-                       __config_color_active_bg);
-        config->write (String (SCIM_CONFIG_CANDIDATES_COLOR_ACTIVE_TEXT),
-                       __config_color_active_text);
-        config->write (String (SCIM_CONFIG_CANDIDATES_COLOR_LABEL),
-                       __config_color_label);
-        config->write (String (SCIM_CONFIG_CANDIDATES_COLOR_BORDER),
-                       __config_color_border);
+    CandidatesTheme t = CandidatesTheme::light ();
 
-        config->write (String (SCIM_CONFIG_CANDIDATES_BORDER_WIDTH),
-                       __config_border_width);
-        config->write (String (SCIM_CONFIG_CANDIDATES_CORNER_RADIUS),
-                       __config_corner_radius);
-        config->write (String (SCIM_CONFIG_CANDIDATES_PADDING),
-                       __config_padding);
-        config->write (String (SCIM_CONFIG_CANDIDATES_SPACING),
-                       __config_spacing);
-
-        __have_changed = false;
+    // An unset key is erased rather than written, so a setting the user never
+    // chose keeps following the renderer -- including when its default changes in
+    // a later version. Writing them all back unconditionally is what froze a
+    // page of appearance at whatever the defaults happened to be on the day
+    // someone first opened it.
+    struct { const char *key; const String *value; } strings[] = {
+        { SCIM_CONFIG_CANDIDATES_COLOR_SCHEME,       &__config_color_scheme       },
+        { SCIM_CONFIG_CANDIDATES_FONT,               &__config_font               },
+        { SCIM_CONFIG_CANDIDATES_PREEDIT_FONT,       &__config_preedit_font       },
+        { SCIM_CONFIG_CANDIDATES_COLOR_NORMAL_BG,    &__config_color_normal_bg    },
+        { SCIM_CONFIG_CANDIDATES_COLOR_NORMAL_TEXT,  &__config_color_normal_text  },
+        { SCIM_CONFIG_CANDIDATES_COLOR_PREEDIT_TEXT, &__config_color_preedit_text },
+        { SCIM_CONFIG_CANDIDATES_COLOR_ACTIVE_BG,    &__config_color_active_bg    },
+        { SCIM_CONFIG_CANDIDATES_COLOR_ACTIVE_TEXT,  &__config_color_active_text  },
+        { SCIM_CONFIG_CANDIDATES_COLOR_LABEL,        &__config_color_label        },
+        { SCIM_CONFIG_CANDIDATES_COLOR_BORDER,       &__config_color_border       },
+    };
+    for (size_t i = 0; i < sizeof strings / sizeof strings[0]; ++i) {
+        if (strings[i].value->length ())
+            config->write (String (strings[i].key), *strings[i].value);
+        else
+            config->erase (String (strings[i].key));
     }
+
+    // A shape value equal to the default is erased too. It looks identical today
+    // and keeps following the default tomorrow, which is what choosing the
+    // default means -- and for a number there is no other way to say "unset".
+    struct { const char *key; int value; int deflt; } ints[] = {
+        { SCIM_CONFIG_CANDIDATES_BORDER_WIDTH,  __config_border_width,  t.border_width  },
+        { SCIM_CONFIG_CANDIDATES_CORNER_RADIUS, __config_corner_radius, t.corner_radius },
+        { SCIM_CONFIG_CANDIDATES_PADDING,       __config_padding,       t.padding       },
+        { SCIM_CONFIG_CANDIDATES_SPACING,       __config_spacing,       t.spacing       },
+    };
+    for (size_t i = 0; i < sizeof ints / sizeof ints[0]; ++i) {
+        if (ints[i].value != ints[i].deflt)
+            config->write (String (ints[i].key), ints[i].value);
+        else
+            config->erase (String (ints[i].key));
+    }
+
+    __have_changed = false;
 }
 
 bool
@@ -541,6 +698,14 @@ set_color_button (GtkWidget *button, const String &color)
     rgba.alpha = c.a;
 
     gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (button), &rgba);
+}
+
+static void
+on_reset_clicked (GtkButton * /*button*/, gpointer /*user_data*/)
+{
+    adopt_builtin_defaults ();
+    setup_widget_value ();      // show what the defaults actually resolve to
+    __have_changed = true;      // save_config () erases the keys on Apply
 }
 
 static void

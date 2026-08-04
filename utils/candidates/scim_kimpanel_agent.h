@@ -43,12 +43,14 @@
 #include <scim.h>
 #include <functional>
 
+#include "scim_candidates_sink.h"
+
 namespace scim {
 
 /**
  * @brief D-Bus client speaking the kimpanel input-method protocol.
  */
-class KimpanelAgent
+class KimpanelAgent : public CandidatesSink
 {
     class KimpanelAgentImpl;
     KimpanelAgentImpl *m_impl;
@@ -57,13 +59,11 @@ class KimpanelAgent
     const KimpanelAgent & operator = (const KimpanelAgent &);
 
 public:
-    /** @brief Callback carrying an integer (candidate index / caret pos). */
-    typedef std::function<void (int)> IntSlot;
-    /** @brief Parameterless callback (page flip, exit). */
-    typedef std::function<void ()>    VoidSlot;
-
     KimpanelAgent ();
     ~KimpanelAgent ();
+
+    /** @brief Callback carrying whether a panel widget is now on the bus. */
+    typedef std::function<void (bool)> PresenceSlot;
 
     /**
      * @brief Whether the running desktop prefers kimpanel (i.e. is KDE/Plasma),
@@ -74,27 +74,61 @@ public:
     /**
      * @brief Connect to the session bus, own the IM name and subscribe to
      *        panel signals.
+     *
+     * Succeeds whether or not a panel widget is listening: the caller asks that
+     * separately with panel_present (), and a connection has to exist before the
+     * one appearing later can be noticed at all.
+     *
      * @return true on success.
      */
     bool connect ();
     void close ();
     bool is_connected () const;
 
+    /**
+     * @brief Whether a panel widget is on the bus right now.
+     *
+     * kimpanel draws nothing itself, so an agent with no panel behind it is
+     * useless: everything pushed at it is discarded, leaving a preedit and no
+     * candidates. A host that has its own candidate UI should use that instead
+     * while this is false.
+     */
+    bool panel_present () const;
+
+    /**
+     * @brief Called when a panel widget appears or goes away.
+     *
+     * The point at which a host switches between kimpanel and a UI of its own.
+     * Delivered from process_events (), so the connection has to be pumped even
+     * while kimpanel is not the one in use.
+     */
+    void signal_connect_panel_presence_changed (PresenceSlot slot);
+
     /** @brief D-Bus connection fd for the caller's select loop (-1 if closed). */
     int  connection_number () const;
+    /** @brief Same, as the sink calls it. */
+    int  event_fd () const override { return connection_number (); }
     /** @brief Non-blocking read + dispatch of pending D-Bus messages. */
-    void process_events ();
+    void process_events () override;
 
-    /** @name State push (frontend -> panel) @{ */
-    void enable               (bool enabled);
-    void update_preedit_string (const WideString &str);
-    void update_preedit_caret (int caret);
-    void show_preedit_string  (bool visible);
-    void update_aux_string    (const WideString &str);
-    void show_aux_string      (bool visible);
-    void update_lookup_table  (const LookupTable &table);
-    void show_lookup_table    (bool visible);
-    void update_spot_location (int x, int y);
+    /**
+     * @name State push (frontend -> panel)
+     *
+     * The attribute lists are dropped: the kimpanel protocol carries plain
+     * strings, and the panel styles them itself.
+     * @{
+     */
+    void enable               (bool enabled) override;
+    void update_preedit_string (const WideString &str,
+                                const AttributeList &attrs) override;
+    void update_preedit_caret (int caret) override;
+    void show_preedit_string  (bool visible) override;
+    void update_aux_string    (const WideString &str,
+                               const AttributeList &attrs) override;
+    void show_aux_string      (bool visible) override;
+    void update_lookup_table  (const LookupTable &table) override;
+    void show_lookup_table    (bool visible) override;
+    void update_spot_location (int x, int y) override;
 
     /**
      * @brief Advertise the engine indicator property to the panel.
@@ -106,17 +140,18 @@ public:
      * @param symbol a few characters identifying the engine, drawn by the panel.
      * @param name   the full engine name, used as the tooltip.
      */
-    void update_engine_property (const String &symbol, const String &name);
+    void update_engine_property (const String &symbol,
+                                 const String &name) override;
 
     /** @brief Withdraw the engine indicator property. */
-    void remove_engine_property ();
+    void remove_engine_property () override;
     /** @} */
 
     /** @name Panel -> frontend callbacks @{ */
-    void signal_connect_select_candidate   (IntSlot slot);
-    void signal_connect_page_up            (VoidSlot slot);
-    void signal_connect_page_down          (VoidSlot slot);
-    void signal_connect_move_preedit_caret (IntSlot slot);
+    void signal_connect_select_candidate   (IntSlot slot) override;
+    void signal_connect_page_up            (VoidSlot slot) override;
+    void signal_connect_page_down          (VoidSlot slot) override;
+    void signal_connect_move_preedit_caret (IntSlot slot) override;
     void signal_connect_exit               (VoidSlot slot);
     /** @brief The user clicked the engine indicator in the panel. */
     void signal_connect_trigger_engine     (VoidSlot slot);

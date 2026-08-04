@@ -86,6 +86,14 @@ public:
     // compositor placed us above the text rather than below it.
     bool     m_text_below;
 
+    // Whether the compositor has activated the input method, i.e. whether there
+    // is a focused text input for this popup to be positioned against. Nothing is
+    // committed to the surface until it is.
+    bool     m_active;
+    // Whether a buffer is currently attached, so an unmap is committed once
+    // rather than on every update that finds nothing to show.
+    bool     m_mapped;
+
     // Pointer state.
     bool     m_pointer_on_surface;
     double   m_ptr_x, m_ptr_y;
@@ -99,6 +107,7 @@ public:
         : m_display (0), m_compositor (0), m_shm (0), m_input_method (0),
           m_seat (0), m_surface (0), m_popup (0), m_panel_surface (0), m_pointer (0),
           m_text_below (false),
+          m_active (false), m_mapped (false),
           m_pointer_on_surface (false), m_ptr_x (0), m_ptr_y (0),
           m_enter_serial (0)
     {
@@ -160,16 +169,39 @@ public:
 
     void blank ()
     {
-        if (!m_surface) return;
+        if (!m_surface || !m_mapped) return;
         wl_surface_attach (m_surface, 0, 0, 0);
         wl_surface_commit (m_surface);
+        m_mapped = false;
         if (m_display) wl_display_flush (m_display);
+    }
+
+    // Called when the compositor activates or deactivates the input method.
+    void set_active (bool active)
+    {
+        if (m_active == active)
+            return;
+        m_active = active;
+        if (m_active) update ();   // there may already be something to show
+        else          blank ();
     }
 
     void update ()
     {
         if (!m_surface || !m_shm)
             return;
+
+        // Commit nothing until the input method is active. An input popup is
+        // positioned relative to the focused text input's surface, so without one
+        // there is nowhere for this to go -- and sway dereferences the focused
+        // surface's scene node when it processes the commit, which segfaults it
+        // when no such surface is current (input_popup_update () ->
+        // wlr_scene_node_coords ()). Staying unmapped until then is also simply
+        // the truth: there is nothing to draw candidates next to.
+        if (!m_active) {
+            blank ();
+            return;
+        }
 
         if (!m_ui.is_visible ()) {
             blank ();
@@ -201,6 +233,7 @@ public:
         wl_surface_attach (m_surface, b->buffer, 0, 0);
         wl_surface_damage_buffer (m_surface, 0, 0, b->width, b->height);
         wl_surface_commit (m_surface);
+        m_mapped = true;
         if (m_display) wl_display_flush (m_display);
     }
 
@@ -480,7 +513,13 @@ CandidatesWayland::hide ()
 }
 
 void
-CandidatesWayland::signal_connect_candidate_selected (CandidateSlot slot)
+CandidatesWayland::set_active (bool active)
+{
+    m_impl->set_active (active);
+}
+
+void
+CandidatesWayland::signal_connect_select_candidate (CandidateSlot slot)
 {
     m_impl->m_candidate_slot = slot;
 }
@@ -495,6 +534,89 @@ void
 CandidatesWayland::signal_connect_page_down (PageSlot slot)
 {
     m_impl->m_page_down_slot = slot;
+}
+
+/* ------------------------------------------------------------------ */
+/* CandidatesSink                                                      */
+/* ------------------------------------------------------------------ */
+
+void
+CandidatesWayland::enable (bool enabled)
+{
+    if (!is_ready () || enabled)
+        return;
+    m_impl->m_ui.hide_preedit_string ();
+    m_impl->m_ui.hide_aux_string ();
+    m_impl->m_ui.hide_lookup_table ();
+    hide ();
+}
+
+void
+CandidatesWayland::update_preedit_string (const WideString &str,
+                                          const AttributeList &attrs)
+{
+    if (!is_ready ()) return;
+    m_impl->m_ui.update_preedit_string (str, attrs);
+    update ();
+}
+
+void
+CandidatesWayland::update_preedit_caret (int caret)
+{
+    if (!is_ready ()) return;
+    m_impl->m_ui.update_preedit_caret (caret);
+    update ();
+}
+
+void
+CandidatesWayland::show_preedit_string (bool visible)
+{
+    if (!is_ready ()) return;
+    if (visible) m_impl->m_ui.show_preedit_string ();
+    else         m_impl->m_ui.hide_preedit_string ();
+    update ();
+}
+
+void
+CandidatesWayland::update_aux_string (const WideString &str,
+                                      const AttributeList &attrs)
+{
+    if (!is_ready ()) return;
+    m_impl->m_ui.update_aux_string (str, attrs);
+    update ();
+}
+
+void
+CandidatesWayland::show_aux_string (bool visible)
+{
+    if (!is_ready ()) return;
+    if (visible) m_impl->m_ui.show_aux_string ();
+    else         m_impl->m_ui.hide_aux_string ();
+    update ();
+}
+
+void
+CandidatesWayland::update_lookup_table (const LookupTable &table)
+{
+    if (!is_ready ()) return;
+    m_impl->m_ui.update_lookup_table (table);
+    update ();
+}
+
+void
+CandidatesWayland::show_lookup_table (bool visible)
+{
+    if (!is_ready ()) return;
+    if (visible) m_impl->m_ui.show_lookup_table ();
+    else         m_impl->m_ui.hide_lookup_table ();
+    update ();
+}
+
+void
+CandidatesWayland::update_spot_location (int x, int y)
+{
+    (void) x;
+    (void) y;
 }
 
 } // namespace scim

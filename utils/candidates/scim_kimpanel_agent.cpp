@@ -32,6 +32,7 @@
 #include <vector>
 #include <string>
 #include <cstdlib>
+#include <cstring>
 
 namespace scim {
 
@@ -61,7 +62,13 @@ public:
 
     bool      m_engine_registered;
 
-    KimpanelAgentImpl () : m_conn (0), m_engine_registered (false) { }
+    // Whether a panel widget is on the bus right now, kept current by
+    // NameOwnerChanged rather than sampled once.
+    bool      m_panel_present;
+    std::function<void (bool)> m_presence_changed;
+
+    KimpanelAgentImpl ()
+        : m_conn (0), m_engine_registered (false), m_panel_present (false) { }
 
     ~KimpanelAgentImpl () { close (); }
 
@@ -94,23 +101,15 @@ public:
 
         dbus_connection_set_exit_on_disconnect (m_conn, FALSE);
 
-        // Refuse to take this path when no panel widget is listening. kimpanel
-        // is display-only: we emit signals and something else draws them, so
-        // with no host every candidate update is silently discarded and the
-        // user sees a preedit with no candidate list at all. Failing here lets
-        // the caller fall back to its own candidate window instead.
+        // Whether a panel widget is listening decides whether this agent is
+        // usable at all: kimpanel is display-only, so with no host every update
+        // is silently discarded and the user gets a preedit and no candidates.
+        // The caller asks with panel_present () and draws its own instead.
         //
-        // Checked once, at startup: a panel widget added to the desktop later
-        // will not be picked up until the input method restarts.
-        if (!dbus_bus_name_has_owner (m_conn, KIMPANEL_PANEL_NAME, &err)) {
-            SCIM_DEBUG_FRONTEND(1) << "kimpanel -- no " KIMPANEL_PANEL_NAME
-                                      " on the bus; not using kimpanel.\n";
-            dbus_error_free (&err);
-            dbus_connection_close (m_conn);
-            dbus_connection_unref (m_conn);
-            m_conn = 0;
-            return false;
-        }
+        // Connecting anyway, rather than failing here, is what lets a widget
+        // added later be noticed: the subscription below needs a connection, and
+        // the caller cannot poll for something it has no fd for.
+        m_panel_present = dbus_bus_name_has_owner (m_conn, KIMPANEL_PANEL_NAME, &err);
         dbus_error_free (&err);
 
         // Own the input-method name so the panel knows an IM is present.
@@ -123,6 +122,17 @@ public:
         // Listen for panel -> IM signals.
         dbus_bus_add_match (m_conn,
                             "type='signal',interface='" KIMPANEL_PANEL_IFACE "'",
+                            &err);
+        dbus_error_free (&err);
+
+        // ... and for the panel widget coming or going, so adding it to the
+        // desktop takes effect without restarting the input method.
+        dbus_bus_add_match (m_conn,
+                            "type='signal',"
+                            "sender='org.freedesktop.DBus',"
+                            "interface='org.freedesktop.DBus',"
+                            "member='NameOwnerChanged',"
+                            "arg0='" KIMPANEL_PANEL_NAME "'",
                             &err);
         dbus_error_free (&err);
         dbus_connection_flush (m_conn);
@@ -290,6 +300,28 @@ public:
             dbus_error_free (&err);
             return DBUS_HANDLER_RESULT_HANDLED;
         }
+        if (dbus_message_is_signal (msg, "org.freedesktop.DBus",
+                                    "NameOwnerChanged")) {
+            const char *name = 0, *old_owner = 0, *new_owner = 0;
+            if (dbus_message_get_args (msg, 0,
+                                       DBUS_TYPE_STRING, &name,
+                                       DBUS_TYPE_STRING, &old_owner,
+                                       DBUS_TYPE_STRING, &new_owner,
+                                       DBUS_TYPE_INVALID) &&
+                name && !strcmp (name, KIMPANEL_PANEL_NAME)) {
+                bool present = new_owner && *new_owner;
+                if (present != m_panel_present) {
+                    m_panel_present = present;
+                    // A panel that went away forgets our property, so the next
+                    // one has to be told about it from scratch.
+                    if (!present)
+                        m_engine_registered = false;
+                    if (m_presence_changed)
+                        m_presence_changed (present);
+                }
+            }
+            return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+        }
         if (dbus_message_is_signal (msg, KIMPANEL_PANEL_IFACE, "Exit")) {
             if (m_exit) m_exit ();
             return DBUS_HANDLER_RESULT_HANDLED;
@@ -364,6 +396,18 @@ KimpanelAgent::is_connected () const
     return m_impl->m_conn != 0;
 }
 
+bool
+KimpanelAgent::panel_present () const
+{
+    return m_impl->m_conn != 0 && m_impl->m_panel_present;
+}
+
+void
+KimpanelAgent::signal_connect_panel_presence_changed (PresenceSlot slot)
+{
+    m_impl->m_presence_changed = slot;
+}
+
 int
 KimpanelAgent::connection_number () const
 {
@@ -389,8 +433,11 @@ KimpanelAgent::enable (bool enabled)
 }
 
 void
-KimpanelAgent::update_preedit_string (const WideString &str)
+KimpanelAgent::update_preedit_string (const WideString &str,
+                                      const AttributeList &attrs)
 {
+    (void) attrs;   // the protocol carries plain text; the panel styles it
+
     m_impl->emit_text_attr ("UpdatePreeditText", utf8_wcstombs (str));
     m_impl->flush ();
 }
@@ -410,8 +457,11 @@ KimpanelAgent::show_preedit_string (bool visible)
 }
 
 void
-KimpanelAgent::update_aux_string (const WideString &str)
+KimpanelAgent::update_aux_string (const WideString &str,
+                                  const AttributeList &attrs)
 {
+    (void) attrs;
+
     m_impl->emit_text_attr ("UpdateAux", utf8_wcstombs (str));
     m_impl->flush ();
 }

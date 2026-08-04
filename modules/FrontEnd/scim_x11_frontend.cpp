@@ -173,9 +173,7 @@ X11FrontEnd::X11FrontEnd (const BackEndPointer &backend,
     m_panel_client.signal_connect_request_factory_menu          (slot (this, &X11FrontEnd::panel_slot_request_factory_menu));
     m_panel_client.signal_connect_change_factory                (slot (this, &X11FrontEnd::panel_slot_change_factory));
 
-#ifdef SCIM_HAS_KIMPANEL
-    m_use_kimpanel = false;
-#endif
+    m_sink = 0;
 }
 
 X11FrontEnd::~X11FrontEnd ()
@@ -209,16 +207,8 @@ X11FrontEnd::show_preedit_string (int siid)
     if (is_inputing_ic (siid)) {
         if (ims_is_preedit_callback_mode (m_focus_ic))
             ims_preedit_callback_start (m_focus_ic);
-#ifdef SCIM_HAS_KIMPANEL
-        else if (use_kimpanel_ui ())
-            m_kimpanel.show_preedit_string (true);
-#endif
-#ifdef SCIM_HAS_CANDIDATES
-        else if (use_candidates_ui ()) {
-            m_candidates_ui.ui ().show_preedit_string ();
-            refresh_candidates_ui ();
-        }
-#endif
+        else if (m_sink)
+            m_sink->show_preedit_string (true);
     }
 }
 
@@ -228,16 +218,8 @@ X11FrontEnd::show_aux_string (int siid)
     SCIM_DEBUG_FRONTEND(2) << " Show aux string, siid=" << siid << "\n";
 
     if (is_inputing_ic (siid)) {
-#ifdef SCIM_HAS_KIMPANEL
-        if (use_kimpanel_ui ()) { m_kimpanel.show_aux_string (true); return; }
-#endif
-#ifdef SCIM_HAS_CANDIDATES
-        if (use_candidates_ui ()) {
-            m_candidates_ui.ui ().show_aux_string ();
-            refresh_candidates_ui ();
-            return;
-        }
-#endif
+        if (m_sink)
+            m_sink->show_aux_string (true);
     }
 }
 
@@ -247,16 +229,8 @@ X11FrontEnd::show_lookup_table (int siid)
     SCIM_DEBUG_FRONTEND(2) << " Show lookup table, siid=" << siid << "\n";
 
     if (is_inputing_ic (siid)) {
-#ifdef SCIM_HAS_KIMPANEL
-        if (use_kimpanel_ui ()) { m_kimpanel.show_lookup_table (true); return; }
-#endif
-#ifdef SCIM_HAS_CANDIDATES
-        if (use_candidates_ui ()) {
-            m_candidates_ui.ui ().show_lookup_table ();
-            refresh_candidates_ui ();
-            return;
-        }
-#endif
+        if (m_sink)
+            m_sink->show_lookup_table (true);
     }
 }
 
@@ -268,16 +242,8 @@ X11FrontEnd::hide_preedit_string (int siid)
     if (is_focused_ic (siid)) {
         if (ims_is_preedit_callback_mode (m_focus_ic))
             ims_preedit_callback_done (m_focus_ic);
-#ifdef SCIM_HAS_KIMPANEL
-        else if (use_kimpanel_ui ())
-            m_kimpanel.show_preedit_string (false);
-#endif
-#ifdef SCIM_HAS_CANDIDATES
-        else if (use_candidates_ui ()) {
-            m_candidates_ui.ui ().hide_preedit_string ();
-            refresh_candidates_ui ();
-        }
-#endif
+        else if (m_sink)
+            m_sink->show_preedit_string (false);
     }
 }
 
@@ -287,16 +253,8 @@ X11FrontEnd::hide_aux_string (int siid)
     SCIM_DEBUG_FRONTEND(2) << " Hide aux string, siid=" << siid << "\n";
 
     if (is_focused_ic (siid)) {
-#ifdef SCIM_HAS_KIMPANEL
-        if (use_kimpanel_ui ()) { m_kimpanel.show_aux_string (false); return; }
-#endif
-#ifdef SCIM_HAS_CANDIDATES
-        if (use_candidates_ui ()) {
-            m_candidates_ui.ui ().hide_aux_string ();
-            refresh_candidates_ui ();
-            return;
-        }
-#endif
+        if (m_sink)
+            m_sink->show_aux_string (false);
     }
 }
 
@@ -306,16 +264,8 @@ X11FrontEnd::hide_lookup_table (int siid)
     SCIM_DEBUG_FRONTEND(2) << " Hide lookup table, siid=" << siid << "\n";
 
     if (is_focused_ic (siid)) {
-#ifdef SCIM_HAS_KIMPANEL
-        if (use_kimpanel_ui ()) { m_kimpanel.show_lookup_table (false); return; }
-#endif
-#ifdef SCIM_HAS_CANDIDATES
-        if (use_candidates_ui ()) {
-            m_candidates_ui.ui ().hide_lookup_table ();
-            refresh_candidates_ui ();
-            return;
-        }
-#endif
+        if (m_sink)
+            m_sink->show_lookup_table (false);
     }
 }
 
@@ -327,16 +277,8 @@ X11FrontEnd::update_preedit_caret (int siid, int caret)
     if (is_inputing_ic (siid)) {
         if (ims_is_preedit_callback_mode (m_focus_ic))
             ims_preedit_callback_caret (m_focus_ic, caret);
-#ifdef SCIM_HAS_KIMPANEL
-        else if (use_kimpanel_ui ())
-            m_kimpanel.update_preedit_caret (caret);
-#endif
-#ifdef SCIM_HAS_CANDIDATES
-        else if (use_candidates_ui ()) {
-            m_candidates_ui.ui ().update_preedit_caret (caret);
-            refresh_candidates_ui ();
-        }
-#endif
+        else if (m_sink)
+            m_sink->update_preedit_caret (caret);
     }
 }
 
@@ -348,16 +290,8 @@ X11FrontEnd::update_preedit_string (int siid, const WideString & str, const Attr
     if (is_inputing_ic (siid)) {
         if (ims_is_preedit_callback_mode (m_focus_ic))
             ims_preedit_callback_draw (m_focus_ic, str, attrs);
-#ifdef SCIM_HAS_KIMPANEL
-        else if (use_kimpanel_ui ())
-            m_kimpanel.update_preedit_string (str);
-#endif
-#ifdef SCIM_HAS_CANDIDATES
-        else if (use_candidates_ui ()) {
-            m_candidates_ui.ui ().update_preedit_string (str, attrs);
-            refresh_candidates_ui ();
-        }
-#endif
+        else if (m_sink)
+            m_sink->update_preedit_string (str, attrs);
     }
 }
 
@@ -367,16 +301,8 @@ X11FrontEnd::update_aux_string (int siid, const WideString & str, const Attribut
     SCIM_DEBUG_FRONTEND(2) << " Update aux string, siid=" << siid << "\n";
 
     if (is_inputing_ic (siid)) {
-#ifdef SCIM_HAS_KIMPANEL
-        if (use_kimpanel_ui ()) { m_kimpanel.update_aux_string (str); return; }
-#endif
-#ifdef SCIM_HAS_CANDIDATES
-        if (use_candidates_ui ()) {
-            m_candidates_ui.ui ().update_aux_string (str, attrs);
-            refresh_candidates_ui ();
-            return;
-        }
-#endif
+        if (m_sink)
+            m_sink->update_aux_string (str, attrs);
     }
 }
 
@@ -386,16 +312,8 @@ X11FrontEnd::update_lookup_table (int siid, const LookupTable & table)
     SCIM_DEBUG_FRONTEND(2) << " Update lookup table, siid=" << siid << "\n";
 
     if (is_inputing_ic (siid)) {
-#ifdef SCIM_HAS_KIMPANEL
-        if (use_kimpanel_ui ()) { m_kimpanel.update_lookup_table (table); return; }
-#endif
-#ifdef SCIM_HAS_CANDIDATES
-        if (use_candidates_ui ()) {
-            m_candidates_ui.ui ().update_lookup_table (table);
-            refresh_candidates_ui ();
-            return;
-        }
-#endif
+        if (m_sink)
+            m_sink->update_lookup_table (table);
     }
 }
 
@@ -528,42 +446,30 @@ X11FrontEnd::init (int argc, char **argv)
 
     m_display_name = init_ims ();
 
+    // Bring up both candidate UIs that this build has, then let select_sink ()
+    // decide which one is in use. The Cairo renderer is opened even when
+    // kimpanel is taking the updates, because a panel widget removed later has
+    // to leave something to fall back to -- an unmapped window and one X
+    // connection is a cheap thing to keep in reserve.
 #ifdef SCIM_HAS_KIMPANEL
-    // Prefer KDE kimpanel when running on Plasma (config override or desktop
-    // detection). When it connects it takes the candidate/preedit/aux updates.
     bool want_kimpanel =
         m_config->read (String ("/Panel/UseKimpanel"),
                         KimpanelAgent::desktop_prefers_kimpanel ());
     if (want_kimpanel && m_kimpanel.connect ()) {
-        m_use_kimpanel = true;
-        m_kimpanel.signal_connect_select_candidate (
-            [this] (int idx) { kimpanel_select_candidate (idx); });
-        m_kimpanel.signal_connect_page_up (
-            [this] () { kimpanel_page_up (); });
-        m_kimpanel.signal_connect_page_down (
-            [this] () { kimpanel_page_down (); });
-        m_kimpanel.signal_connect_move_preedit_caret (
-            [this] (int pos) { kimpanel_move_preedit_caret (pos); });
+        m_kimpanel.signal_connect_panel_presence_changed (
+            [this] (bool) { select_sink (); });
     }
 #endif
 
 #ifdef SCIM_HAS_CANDIDATES
-    // Bring up the in-process Cairo candidate/preedit/aux renderer (unless
-    // kimpanel is handling candidates). If it cannot open we fall back to
-    // forwarding those updates to scim-panel-gtk.
-    if (!use_kimpanel_ui () && m_candidates_ui.open (m_display_name)) {
-        m_candidates_ui.signal_connect_candidate_selected (
-            [this] (int idx) { candidates_ui_select_candidate (idx); });
-        m_candidates_ui.signal_connect_page_up (
-            [this] () { candidates_ui_page_up (); });
-        m_candidates_ui.signal_connect_page_down (
-            [this] () { candidates_ui_page_down (); });
+    if (m_candidates_ui.open (m_display_name))
         configure_candidates_ui ();
-    } else {
+    else
         SCIM_DEBUG_FRONTEND (1) << "X11 -- Cairo panel renderer unavailable, "
                                    "using scim-panel-gtk for candidates.\n";
-    }
 #endif
+
+    select_sink ();
 
     SCIM_DEBUG_FRONTEND (1) << "X11 -- Connecting to panel daemon.\n";
 
@@ -590,17 +496,29 @@ X11FrontEnd::poll_fds (std::vector<int> &fds)
     if (panel_fd >= 0)
         fds.push_back (panel_fd);
 
-#ifdef SCIM_HAS_CANDIDATES
-    int candidates_ui_fd = m_candidates_ui.connection_number ();
-    if (candidates_ui_fd >= 0)
-        fds.push_back (candidates_ui_fd);
-#endif
+    if (m_sink) {
+        int sink_fd = m_sink->event_fd ();
+        if (sink_fd >= 0)
+            fds.push_back (sink_fd);
+    }
 
 #ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ()) {
-        int kfd = m_kimpanel.connection_number ();
+    // Watched even while kimpanel is not the sink in use: this is the connection
+    // a panel widget's arrival is announced on, and an unwatched fd would mean
+    // never hearing it.
+    if (m_kimpanel.is_connected () && m_sink != &m_kimpanel) {
+        int kfd = m_kimpanel.event_fd ();
         if (kfd >= 0)
             fds.push_back (kfd);
+    }
+#endif
+#ifdef SCIM_HAS_CANDIDATES
+    // Likewise the renderer's own X connection, which stays open in reserve
+    // while kimpanel has the updates: nothing else would drain it.
+    if (m_candidates_ui.is_open () && m_sink != &m_candidates_ui) {
+        int cfd = m_candidates_ui.event_fd ();
+        if (cfd >= 0)
+            fds.push_back (cfd);
     }
 #endif
 
@@ -620,13 +538,16 @@ X11FrontEnd::process_events ()
         XFilterEvent (&event, None);
     }
 
-#ifdef SCIM_HAS_CANDIDATES
-    m_candidates_ui.process_events ();
-#endif
+    if (m_sink)
+        m_sink->process_events ();
 
 #ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ())
+    if (m_kimpanel.is_connected () && m_sink != &m_kimpanel)
         m_kimpanel.process_events ();
+#endif
+#ifdef SCIM_HAS_CANDIDATES
+    if (m_candidates_ui.is_open () && m_sink != &m_candidates_ui)
+        m_candidates_ui.process_events ();
 #endif
 
     // Handle panel-daemon socket, reconnecting if the connection dropped.
@@ -1727,22 +1648,12 @@ X11FrontEnd::start_ic (X11IC *ic)
         panel_req_update_factory_info (ic);
 
         m_panel_client.turn_on (ic->icid);
-#ifdef SCIM_HAS_KIMPANEL
-        if (use_kimpanel_ui ()) {
-            m_kimpanel.enable (true);
-            m_kimpanel.show_preedit_string (false);
-            m_kimpanel.show_aux_string (false);
-            m_kimpanel.show_lookup_table (false);
+        if (m_sink) {
+            m_sink->enable (true);
+            m_sink->show_preedit_string (false);
+            m_sink->show_aux_string (false);
+            m_sink->show_lookup_table (false);
         }
-#endif
-#ifdef SCIM_HAS_CANDIDATES
-        if (use_candidates_ui ()) {
-            m_candidates_ui.ui ().hide_preedit_string ();
-            m_candidates_ui.ui ().hide_aux_string ();
-            m_candidates_ui.ui ().hide_lookup_table ();
-            refresh_candidates_ui ();
-        }
-#endif
 
         if (ic->shared_siid) reset (ic->siid);
 
@@ -1760,18 +1671,12 @@ X11FrontEnd::stop_ic (X11IC *ic)
         if (ims_is_preedit_callback_mode (ic))
             ims_preedit_callback_done (ic);
 
-#ifdef SCIM_HAS_KIMPANEL
-        if (use_kimpanel_ui ()) {
-            m_kimpanel.show_preedit_string (false);
-            m_kimpanel.show_aux_string (false);
-            m_kimpanel.show_lookup_table (false);
-            m_kimpanel.enable (false);
+        if (m_sink) {
+            m_sink->show_preedit_string (false);
+            m_sink->show_aux_string (false);
+            m_sink->show_lookup_table (false);
+            m_sink->enable (false);
         }
-#endif
-#ifdef SCIM_HAS_CANDIDATES
-        if (use_candidates_ui ())
-            m_candidates_ui.hide ();
-#endif
 
         panel_req_update_factory_info (ic);
         m_panel_client.turn_off (ic->icid);
@@ -2133,32 +2038,12 @@ X11FrontEnd::panel_req_update_spot_location (const X11IC *ic)
                 xwa.height,
                 &spot_x, &spot_y, &child);
         }
-#ifdef SCIM_HAS_KIMPANEL
-        if (use_kimpanel_ui ())
-            m_kimpanel.update_spot_location (spot_x, spot_y);
-#endif
-#ifdef SCIM_HAS_CANDIDATES
-        if (use_candidates_ui ())
-            m_candidates_ui.move (spot_x, spot_y);
-#endif
+        if (m_sink)
+            m_sink->update_spot_location (spot_x, spot_y);
     }
 }
 
 #ifdef SCIM_HAS_CANDIDATES
-void
-X11FrontEnd::refresh_candidates_ui ()
-{
-    // TODO(5a): coalesce redraws. Every sub-update (preedit/caret/aux/lookup)
-    // calls this, so a keystroke can repaint several times. Add a deferred
-    // flush once there is a batch/sync signal from the backend.
-    if (!use_candidates_ui ())
-        return;
-    if (m_candidates_ui.ui ().is_visible ())
-        m_candidates_ui.show ();     // measures, positions, maps and redraws
-    else
-        m_candidates_ui.hide ();
-}
-
 void
 X11FrontEnd::configure_candidates_ui ()
 {
@@ -2166,42 +2051,61 @@ X11FrontEnd::configure_candidates_ui ()
         return;
     // Apply the configured font AND colors, matching the legacy GTK panel.
     m_candidates_ui.ui ().set_theme (scim_candidates_theme_from_config (m_config));
-}
-
-void
-X11FrontEnd::candidates_ui_select_candidate (int cand_index)
-{
-    if (validate_ic (m_focus_ic)) {
-        m_panel_client.prepare (m_focus_ic->icid);
-        select_candidate (m_focus_ic->siid, cand_index);
-        m_panel_client.send ();
-    }
-}
-
-void
-X11FrontEnd::candidates_ui_page_up ()
-{
-    if (validate_ic (m_focus_ic)) {
-        m_panel_client.prepare (m_focus_ic->icid);
-        lookup_table_page_up (m_focus_ic->siid);
-        m_panel_client.send ();
-    }
-}
-
-void
-X11FrontEnd::candidates_ui_page_down ()
-{
-    if (validate_ic (m_focus_ic)) {
-        m_panel_client.prepare (m_focus_ic->icid);
-        lookup_table_page_down (m_focus_ic->siid);
-        m_panel_client.send ();
-    }
+    m_candidates_ui.refresh ();
 }
 #endif
 
-#ifdef SCIM_HAS_KIMPANEL
 void
-X11FrontEnd::kimpanel_select_candidate (int cand_index)
+X11FrontEnd::select_sink ()
+{
+    CandidatesSink *want = 0;
+
+#ifdef SCIM_HAS_KIMPANEL
+    // Only while a panel widget is actually listening; kimpanel draws nothing
+    // itself, so without one every update would go nowhere.
+    if (m_kimpanel.is_connected () && m_kimpanel.panel_present ())
+        want = &m_kimpanel;
+#endif
+#ifdef SCIM_HAS_CANDIDATES
+    if (!want && m_candidates_ui.is_open ())
+        want = &m_candidates_ui;
+#endif
+
+    if (want == m_sink)
+        return;
+
+    // Take down whatever the outgoing one is showing: it has no idea it is being
+    // replaced and would leave a candidate window on screen for good.
+    if (m_sink) {
+        m_sink->show_preedit_string (false);
+        m_sink->show_aux_string (false);
+        m_sink->show_lookup_table (false);
+        m_sink->remove_engine_property ();
+        m_sink->enable (false);
+    }
+
+    m_sink = want;
+    if (!m_sink)
+        return;
+
+    m_sink->signal_connect_select_candidate (
+        [this] (int idx) { sink_select_candidate (idx); });
+    m_sink->signal_connect_page_up (
+        [this] () { sink_page_up (); });
+    m_sink->signal_connect_page_down (
+        [this] () { sink_page_down (); });
+    m_sink->signal_connect_move_preedit_caret (
+        [this] (int pos) { sink_move_preedit_caret (pos); });
+
+    // Nothing in flight is replayed: the frontend keeps no copy of the aux
+    // string or lookup table, and this happens when a panel widget is added or
+    // removed rather than mid-composition. The next update fills the new one in.
+    if (validate_ic (m_focus_ic))
+        m_sink->enable (true);
+}
+
+void
+X11FrontEnd::sink_select_candidate (int cand_index)
 {
     if (validate_ic (m_focus_ic)) {
         m_panel_client.prepare (m_focus_ic->icid);
@@ -2211,7 +2115,7 @@ X11FrontEnd::kimpanel_select_candidate (int cand_index)
 }
 
 void
-X11FrontEnd::kimpanel_page_up ()
+X11FrontEnd::sink_page_up ()
 {
     if (validate_ic (m_focus_ic)) {
         m_panel_client.prepare (m_focus_ic->icid);
@@ -2221,7 +2125,7 @@ X11FrontEnd::kimpanel_page_up ()
 }
 
 void
-X11FrontEnd::kimpanel_page_down ()
+X11FrontEnd::sink_page_down ()
 {
     if (validate_ic (m_focus_ic)) {
         m_panel_client.prepare (m_focus_ic->icid);
@@ -2231,7 +2135,7 @@ X11FrontEnd::kimpanel_page_down ()
 }
 
 void
-X11FrontEnd::kimpanel_move_preedit_caret (int pos)
+X11FrontEnd::sink_move_preedit_caret (int pos)
 {
     if (validate_ic (m_focus_ic)) {
         m_panel_client.prepare (m_focus_ic->icid);
@@ -2239,7 +2143,6 @@ X11FrontEnd::kimpanel_move_preedit_caret (int pos)
         m_panel_client.send ();
     }
 }
-#endif
 
 void
 X11FrontEnd::reload_config_callback (const ConfigPointer &config)
@@ -2248,6 +2151,11 @@ X11FrontEnd::reload_config_callback (const ConfigPointer &config)
 
     m_frontend_hotkey_matcher.load_hotkeys (config);
     m_imengine_hotkey_matcher.load_hotkeys (config);
+
+    // The candidate appearance is configuration too. Applied once at startup and
+    // nowhere else, a font, color or shape changed in scim-setup did nothing here
+    // until the session was restarted, however faithfully the reload arrived.
+    configure_candidates_ui ();
 
     KeyEvent key;
 

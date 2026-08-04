@@ -67,6 +67,10 @@
 #include "input-method-unstable-v2-client-protocol.h"
 #include "virtual-keyboard-unstable-v1-client-protocol.h"
 
+// The candidate UI interface only: header-only, no cairo and no D-Bus, so it is
+// available whatever was built, and the state calls below need no #ifdef.
+#include "scim_candidates_sink.h"
+
 #ifdef SCIM_HAS_CANDIDATES_WAYLAND
 #include "scim_candidates_wayland.h"
 #endif
@@ -84,6 +88,10 @@ class WaylandFrontEnd : public FrontEndBase
     String          m_language;
     int             m_instance;       // the single IMEngine instance id (siid)
     bool            m_focused;        // a context is active
+
+    // Whether ensure_instance () has already complained. Every focus change
+    // retries, and one warning is a diagnosis while a stream of them is noise.
+    bool            m_instance_warned;
 
     // Whether the engine is converting. When off, keys pass straight to the
     // application, which is how the user types plain ASCII. There is no
@@ -171,8 +179,13 @@ class WaylandFrontEnd : public FrontEndBase
     // speaks v1 in practice is KWin, where kimpanel is the native look and
     // places candidates better than an overlay panel can.
     KimpanelAgent   m_kimpanel;
-    bool            m_use_kimpanel;
 #endif
+
+    // Whichever of the two above is in use, or null when neither is available
+    // and scim-panel-gtk draws the candidates instead. Everything pushes state at
+    // it without asking which; select_sink () is the only thing that changes it,
+    // and it can change while running, when a panel widget is added or removed.
+    CandidatesSink *m_sink;
 
     // Panel client for the status/property UI (tray item or toolbar). Serviced
     // from poll_fds () / process_events () along with the wayland fd.
@@ -296,18 +309,23 @@ private:
     KeyEvent wayland_key_to_scim (uint32_t key, uint32_t state) const;
     void forward_current_key ();
 
-#ifdef SCIM_HAS_KIMPANEL
-    bool use_kimpanel_ui () const { return m_use_kimpanel; }
-#else
-    bool use_kimpanel_ui () const { return false; }
-#endif
+    // Choose between kimpanel and our overlay panel from what is available now,
+    // and hand over if that has changed. Called at startup and whenever a panel
+    // widget appears or goes away.
+    void select_sink ();
+
+    /** @name Sink -> frontend, whichever candidate UI is in use @{ */
+    void sink_select_candidate (int cand_index);
+    void sink_page_up ();
+    void sink_page_down ();
+    void sink_move_preedit_caret (int pos);
+    /** @} */
 
 #ifdef SCIM_HAS_CANDIDATES_WAYLAND
-    void refresh_candidates_ui ();
+    // Not part of the sink: only a UI we draw ourselves has a theme to set.
     void configure_candidates_ui ();
-    void candidates_ui_select_candidate (int cand_index);
-    void candidates_ui_page_up ();
-    void candidates_ui_page_down ();
+#else
+    void configure_candidates_ui () { }
 #endif
 
 public:

@@ -1,17 +1,23 @@
 ## Makefile.am -- Process this file with automake to produce Makefile.in
 ##
-## libscim-candidates: the Cairo+Pango candidate renderer, split into a
-## surface-agnostic core plus per-surface backends:
+## libscim-candidates: the candidate UI, split into a surface-agnostic core plus
+## per-surface backends, and one delegated backend that draws nothing at all:
 ##
-##   libscim-candidates          core draw/model/theme (cairo+pango) -- INSTALLED
-##   libscim-candidates-x11      X11 cairo-xlib override-redirect     -- INSTALLED
-##   libscim-candidates-wayland  input-popup-surface-v2 backend       -- noinst
+##   libscim-candidates           core draw/model/theme (cairo+pango) -- INSTALLED
+##   libscim-candidates-x11       X11 cairo-xlib override-redirect     -- INSTALLED
+##   libscim-candidates-kimpanel  KDE kimpanel over D-Bus              -- INSTALLED
+##   libscim-candidates-wayland   input-popup-surface-v2 backend       -- noinst
 ##
-## The core and the X11 backend are installed shared libraries so the GTK/Qt IM
-## modules can link them (they draw candidates in-process). The Wayland backend
-## stays a convenience library pulled into wayland.so, because it must share the
-## single copy of the vendored protocol glue (the wl_interface globals) with it;
-## it is also daemon-only, so it never needs to be installed.
+## The core, X11 and kimpanel backends are installed shared libraries so the
+## GTK/Qt IM modules can link them: an IM module is its own frontend and picks a
+## candidate UI in-process. The Wayland backend stays a convenience library
+## pulled into wayland.so, because it must share the single copy of the vendored
+## protocol glue (the wl_interface globals) with it; it is also daemon-only, so
+## it never needs to be installed.
+##
+## kimpanel is the odd one out: it hands the state to Plasma and has no surface,
+## so it needs neither cairo nor the core, only libdbus. It is display-agnostic
+## (D-Bus is DE-level), which is why either frontend can select it.
 
 MAINTAINERCLEANFILES	= Makefile.in
 CLEANFILES		= *.bak
@@ -22,9 +28,12 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_srcdir)/src \
 			  @CAIRO_CFLAGS@
 
-# Public headers (core + X11 backend); the Wayland header stays internal.
+# Public headers (interface + core + X11 backend); the Wayland header stays
+# internal.
 candidatesincludedir	= $(includedir)/scim@SCIM_EPOCH@/candidates
-candidatesinclude_HEADERS = scim_candidates.h scim_candidates_x11.h
+candidatesinclude_HEADERS = scim_candidates_sink.h \
+			  scim_candidates.h \
+			  scim_candidates_x11.h
 noinst_HEADERS		= scim_candidates_wayland.h
 
 # --- core renderer (installed): surface-agnostic draw/model/theme ---
@@ -52,6 +61,27 @@ libscim_candidates_x11@SCIM_EPOCH@_la_LDFLAGS  = \
 			  @CAIRO_LIBS@ @CAIRO_XLIB_LIBS@ @X_LIBS@
 libscim_candidates_x11@SCIM_EPOCH@_la_LIBADD   = \
 			  libscim-candidates@SCIM_EPOCH@.la \
+			  $(top_builddir)/src/libscim@SCIM_EPOCH@.la
+endif
+
+# --- kimpanel delegated backend (installed): libdbus only, no surface ---
+#
+# Loop-agnostic on purpose: connection_number () plus process_events () suit the
+# frontends' select () loop and a toolkit main loop (g_unix_fd_add,
+# QSocketNotifier) alike, so a host integrates it without a D-Bus main loop.
+if SCIM_BUILD_KIMPANEL
+lib_LTLIBRARIES		+= libscim-candidates-kimpanel@SCIM_EPOCH@.la
+candidatesinclude_HEADERS += scim_kimpanel_agent.h
+
+libscim_candidates_kimpanel@SCIM_EPOCH@_la_SOURCES  = scim_kimpanel_agent.cpp
+libscim_candidates_kimpanel@SCIM_EPOCH@_la_CPPFLAGS = $(AM_CPPFLAGS) @DBUS_CFLAGS@
+libscim_candidates_kimpanel@SCIM_EPOCH@_la_LDFLAGS  = \
+			  -version-info $(SCIM_CURRENT):$(SCIM_REVISION):$(SCIM_AGE) \
+			  -export-dynamic \
+			  @LIBTOOL_EXPORT_OPTIONS@ \
+			  @LTLIBINTL@ \
+			  @DBUS_LIBS@
+libscim_candidates_kimpanel@SCIM_EPOCH@_la_LIBADD   = \
 			  $(top_builddir)/src/libscim@SCIM_EPOCH@.la
 endif
 

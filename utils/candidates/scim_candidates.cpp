@@ -44,7 +44,7 @@ CandidatesTheme::light ()
     CandidatesTheme t;
     t.font          = "Sans 12";
     t.preedit_font  = "";
-    t.bg            = { 0.98, 0.98, 0.98, 0.9 };
+    t.bg            = { 0.98, 0.98, 0.98, 0.8 };
     t.fg            = { 0.10, 0.10, 0.10, 1.0 };
     t.preedit_fg    = { 0.10, 0.10, 0.10, 1.0 };
     t.label         = { 0.45, 0.45, 0.45, 1.0 };
@@ -52,7 +52,7 @@ CandidatesTheme::light ()
     t.highlight_fg  = { 1.00, 1.00, 1.00, 1.0 };
     t.border        = { 0.60, 0.60, 0.60, 1.0 };
     t.border_width  = 1;
-    t.corner_radius = 2;
+    t.corner_radius = 4;
     t.padding       = 6;
     t.spacing       = 6;
     return t;
@@ -64,7 +64,7 @@ CandidatesTheme::dark ()
     CandidatesTheme t;
     t.font          = "Sans 12";
     t.preedit_font  = "";
-    t.bg            = { 0.16, 0.16, 0.16, 0.9 };
+    t.bg            = { 0.16, 0.16, 0.16, 0.8 };
     t.fg            = { 0.92, 0.92, 0.92, 1.0 };
     t.preedit_fg    = { 0.92, 0.92, 0.92, 1.0 };
     t.label         = { 0.60, 0.60, 0.60, 1.0 };
@@ -72,10 +72,28 @@ CandidatesTheme::dark ()
     t.highlight_fg  = { 1.00, 1.00, 1.00, 1.0 };
     t.border        = { 0.40, 0.40, 0.40, 1.0 };
     t.border_width  = 1;
-    t.corner_radius = 2;
+    t.corner_radius = 4;
     t.padding       = 6;
     t.spacing       = 6;
     return t;
+}
+
+/* ------------------------------------------------------------------ */
+/* Light / dark                                                        */
+/* ------------------------------------------------------------------ */
+
+static bool __dark_hint = false;
+
+void
+scim_candidates_set_dark_hint (bool dark)
+{
+    __dark_hint = dark;
+}
+
+bool
+scim_candidates_dark_hint (void)
+{
+    return __dark_hint;
 }
 
 // Parse "rgb(r,g,b)" / "rgba(r,g,b,a)" -- the form a GTK color chooser writes
@@ -237,42 +255,26 @@ rounded_rect (cairo_t *cr, double x, double y, double w, double h, double r)
 }
 
 // Which level of the layered lookup answered. Worth telling apart because the
-// legacy panel keys predate alpha in these values: a color inherited from there
-// says nothing about opacity, while one set under /Candidates/ is deliberate.
-enum KeyLevel {
-    KEY_UNSET,
-    KEY_CANDIDATES,     // /Candidates/<renderer>/ or /Candidates/Default/
-    KEY_LEGACY_PANEL    // /Panel/Gtk/
-};
-
 // Read an appearance key with a layered fallback:
-//   /Candidates/<renderer>/<key>  ->  /Candidates/Default/<key>  ->
-//   /Panel/Gtk/<key> (legacy, shared with the panel)  ->  "" (unset)
-// so a per-renderer override wins, otherwise the shared Candidates/Default
-// value, otherwise the historical panel value (backward compatible). When
-// skip_default is set, the sentinel "default" is treated as unset at each
-// level, so writing "default" in setup does not shadow a lower level.
+//   /Candidates/<renderer>/<key>  ->  /Candidates/Default/<key>  ->  "" (unset)
+// so a per-renderer override wins, otherwise the shared Candidates/Default value,
+// otherwise the preset supplies it. When skip_default is set, the sentinel
+// "default" is treated as unset at each level, so writing "default" in setup does
+// not shadow a lower level.
 static String
 read_layered_key (const ConfigPointer &config, const String &renderer,
-                  const String &key, bool skip_default = false,
-                  KeyLevel *level_out = 0)
+                  const String &key, bool skip_default = false)
 {
     const String levels[] = {
         String ("/Candidates/") + renderer + "/" + key,
         renderer == String ("Default") ? String () : String ("/Candidates/Default/") + key,
-        String ("/Panel/Gtk/") + key,
     };
-    if (level_out)
-        *level_out = KEY_UNSET;
     for (size_t i = 0; i < sizeof levels / sizeof levels[0]; ++i) {
         if (levels[i].empty ())
             continue;
         String v = config->read (levels[i], String ());
-        if (v.length () && (!skip_default || v != String ("default"))) {
-            if (level_out)
-                *level_out = (i == 2) ? KEY_LEGACY_PANEL : KEY_CANDIDATES;
+        if (v.length () && (!skip_default || v != String ("default")))
             return v;
-        }
     }
     return String ();
 }
@@ -288,7 +290,6 @@ read_layered_int (const ConfigPointer &config, const String &renderer,
     const String levels[] = {
         String ("/Candidates/") + renderer + "/" + key,
         renderer == String ("Default") ? String () : String ("/Candidates/Default/") + key,
-        String ("/Panel/Gtk/") + key,
     };
     for (const String &path : levels) {
         if (path.empty ())
@@ -305,7 +306,22 @@ read_layered_int (const ConfigPointer &config, const String &renderer,
 CandidatesTheme
 scim_candidates_theme_from_config (const ConfigPointer &config, const String &renderer)
 {
-    CandidatesTheme t = CandidatesTheme::light ();
+    // Which preset the unset keys fall back to. "auto" follows the desktop
+    // through whatever the host told us (see scim_candidates_set_dark_hint);
+    // "light" and "dark" pin it, which is what to use where nothing can find the
+    // preference out -- a bare compositor with no portal running, say.
+    //
+    // Only the base changes: every key below still overrides it, so a config that
+    // names its own colours is unaffected by this.
+    bool want_dark = scim_candidates_dark_hint ();
+    if (!config.null ()) {
+        String scheme = read_layered_key (config, renderer, String ("ColorScheme"), true);
+        if (scheme == "dark")       want_dark = true;
+        else if (scheme == "light") want_dark = false;
+    }
+
+    CandidatesTheme t = want_dark ? CandidatesTheme::dark ()
+                                  : CandidatesTheme::light ();
     if (config.null ())
         return t;
 
@@ -316,34 +332,27 @@ scim_candidates_theme_from_config (const ConfigPointer &config, const String &re
     // Empty keeps the preedit on the shared font, which is the default.
     t.preedit_font = read_layered_key (config, renderer, String ("PreeditFont"), true);
 
-    // parse_color () keeps the light() field when its string is empty/unparsable,
-    // so pass the historical default string when every level is unset.
-    auto color = [&] (const char *key, const char *deflt) -> String {
-        String v = read_layered_key (config, renderer, String (key));
-        return v.length () ? v : String (deflt);
+    // parse_color () keeps the preset's field when its string is empty or
+    // unparsable, so an unset key needs no default string here: the preset is the
+    // default. Nothing is inherited from /Panel/Gtk/ any more -- those keys style
+    // the panel's own lookup table and describe a single light palette, so letting
+    // them reach here overrode the presets (making a new default invisible) and
+    // could never be right for the dark one.
+    auto color = [&] (const char *key) -> String {
+        return read_layered_key (config, renderer, String (key));
     };
     // The panel is slightly translucent by default (see light ()). A background
-    // set under /Candidates/ is taken exactly as written, which is how to ask for
-    // a fully opaque panel -- "#rrggbbff", or any name/#rrggbb, since those parse
-    // as opaque. A value inherited from the legacy /Panel/Gtk/ keys carries no
-    // opinion about alpha, so the default opacity is kept rather than letting an
-    // old config silently turn the translucency off.
-    const double default_bg_alpha = t.bg.a;
-    KeyLevel bg_level = KEY_UNSET;
-    String bg_str = read_layered_key (config, renderer,
-                                      String ("Color/NormalBackground"), false,
-                                      &bg_level);
-    t.bg = parse_color (bg_str.length () ? bg_str : String ("gray92"), t.bg);
-    if (bg_level != KEY_CANDIDATES)
-        t.bg.a = default_bg_alpha;
-    t.fg           = parse_color (color ("Color/NormalText",       "black"),      t.fg);
-    t.highlight_bg = parse_color (color ("Color/ActiveBackground", "light blue"), t.highlight_bg);
-    t.highlight_fg = parse_color (color ("Color/ActiveText",       "black"),      t.highlight_fg);
-    t.label        = parse_color (color ("Color/Label",            ""),           t.label);
-    t.border       = parse_color (color ("Color/Border",           ""),           t.border);
+    // set here is taken exactly as written, which is how to ask for a fully opaque
+    // panel -- "#rrggbbff", or any name/#rrggbb, since those parse as opaque.
+    t.bg           = parse_color (color ("Color/NormalBackground"), t.bg);
+    t.fg           = parse_color (color ("Color/NormalText"),       t.fg);
+    t.highlight_bg = parse_color (color ("Color/ActiveBackground"), t.highlight_bg);
+    t.highlight_fg = parse_color (color ("Color/ActiveText"),       t.highlight_fg);
+    t.label        = parse_color (color ("Color/Label"),             t.label);
+    t.border       = parse_color (color ("Color/Border"),            t.border);
     // The preedit shares the normal text color unless it is given its own, so
     // that setting only NormalText still colors the whole panel consistently.
-    t.preedit_fg   = parse_color (color ("Color/PreeditText",      ""),           t.fg);
+    t.preedit_fg   = parse_color (color ("Color/PreeditText"),       t.fg);
 
     read_layered_int (config, renderer, String ("BorderWidth"),  t.border_width);
     read_layered_int (config, renderer, String ("CornerRadius"), t.corner_radius);
@@ -407,7 +416,8 @@ build_byte_offsets (const WideString &wstr, std::vector<int> &offsets)
 // its utf8 rendering. Returns null when there is nothing to apply.
 PangoAttrList *
 make_pango_attrs (const WideString &wstr, const AttributeList &attrs,
-                  const CandidatesColor &fg)
+                  const CandidatesColor &fg,
+                  const CandidatesColor &sel_bg, const CandidatesColor &sel_fg)
 {
     if (attrs.empty ())
         return 0;
@@ -438,15 +448,26 @@ make_pango_attrs (const WideString &wstr, const AttributeList &attrs,
                 break;
             case SCIM_ATTR_DECORATE_HIGHLIGHT:
             case SCIM_ATTR_DECORATE_REVERSE:
-                // Reverse/highlight: paint text in the theme bg over an fg
-                // background so it reads as a selection swatch.
+                // Both mean "this part is the active one", so both get the
+                // theme's selection colors -- the same ones the selected
+                // candidate uses, so the composing text reads in the same visual
+                // language as the row below it.
+                //
+                // Taking REVERSE literally is what made the preedit an inverted
+                // slab: swapping in the foreground color gave a near-black
+                // background under a pale window, with the glyphs hardcoded
+                // white. That could not follow a theme and was illegible against
+                // the dark preset. Engines use the two interchangeably in
+                // practice, so one consistent look beats the literal reading.
                 pa = pango_attr_background_new (
-                        (guint16)(fg.r * 65535), (guint16)(fg.g * 65535),
-                        (guint16)(fg.b * 65535));
+                        (guint16)(sel_bg.r * 65535), (guint16)(sel_bg.g * 65535),
+                        (guint16)(sel_bg.b * 65535));
                 pa->start_index = bstart;
                 pa->end_index   = bend;
                 pango_attr_list_insert (plist, pa);
-                pa = pango_attr_foreground_new (0xffff, 0xffff, 0xffff);
+                pa = pango_attr_foreground_new (
+                        (guint16)(sel_fg.r * 65535), (guint16)(sel_fg.g * 65535),
+                        (guint16)(sel_fg.b * 65535));
                 break;
             default:
                 break;
@@ -672,7 +693,8 @@ public:
         if (m_preedit_visible && m_preedit_str.length ()) {
             m_preedit_item.utf8  = utf8_wcstombs (m_preedit_str);
             m_preedit_item.attrs =
-                make_pango_attrs (m_preedit_str, m_preedit_attrs, m_theme.preedit_fg);
+                make_pango_attrs (m_preedit_str, m_preedit_attrs, m_theme.preedit_fg,
+                                  m_theme.highlight_bg, m_theme.highlight_fg);
             m_preedit_item.font = m_theme.preedit_font;
             m_preedit_item.x = origin;
             m_preedit_item.y = cur_y;
@@ -705,7 +727,8 @@ public:
         // Aux line.
         if (m_aux_visible && m_aux_str.length ()) {
             m_aux_item.utf8  = utf8_wcstombs (m_aux_str);
-            m_aux_item.attrs = make_pango_attrs (m_aux_str, m_aux_attrs, m_theme.fg);
+            m_aux_item.attrs = make_pango_attrs (m_aux_str, m_aux_attrs, m_theme.fg,
+                                     m_theme.highlight_bg, m_theme.highlight_fg);
             m_aux_item.x = origin;
             m_aux_item.y = cur_y;
             measure_item (cr, m_aux_item);

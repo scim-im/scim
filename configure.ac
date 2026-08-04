@@ -1137,7 +1137,6 @@ AC_SUBST(ac_aux_dir)
 AC_CONFIG_FILES([Makefile
 		 po/Makefile.in
 		 protocols/Makefile
-		 panel-ui/Makefile
 		 src/Makefile
 		 src/scim_types.h
 		 utils/Makefile

@@ -100,6 +100,34 @@ struct _GtkIMContextSCIMImpl
 /* Input Context handling functions. */
 static GtkIMContextSCIMImpl * new_ic_impl               (GtkIMContextSCIM       *parent);
 static void                   delete_ic_impl            (GtkIMContextSCIMImpl   *impl);
+
+// Follow the application's own light/dark setting, so the candidate panel matches
+// the window it is drawn over. Read straight off GtkSettings: sampling a widget's
+// colour is more accurate, but doing it the way the panel does -- realizing a
+// throwaway GtkWindow -- creates and destroys a surface every time, which is far
+// too much to pay inside an application's input path.
+static void
+candidates_sync_dark_hint (void)
+{
+    GtkSettings *settings = gtk_settings_get_default ();
+    if (!settings)
+        return;
+
+    gboolean prefer_dark = FALSE;
+    gchar   *theme       = 0;
+    g_object_get (settings,
+                  "gtk-application-prefer-dark-theme", &prefer_dark,
+                  "gtk-theme-name", &theme, NULL);
+
+    bool dark = prefer_dark ||
+                (theme && g_str_has_suffix (theme, "-dark")) ||
+                (theme && g_str_has_suffix (theme, "-Dark"));
+    g_free (theme);
+
+    scim_candidates_set_dark_hint (dark);
+}
+
+
 static void                   delete_all_ic_impl        ();
 
 static GtkIMContextSCIM     * find_ic                   (int                     siid);
@@ -1478,8 +1506,10 @@ candidates_ensure (GtkWidget *parent)
         g_signal_connect (click, "released", G_CALLBACK (candidates_click_cb), 0);
         gtk_widget_add_controller (_candidates_area, GTK_EVENT_CONTROLLER (click));
 
-        if (!_config.null ())
+        if (!_config.null ()) {
+            candidates_sync_dark_hint ();
             _candidates_ui.set_theme (scim_candidates_theme_from_config (_config));
+        }
     }
 
     GtkWidget *cur = gtk_widget_get_parent (_candidates_popover);
@@ -2532,6 +2562,7 @@ reload_config_callback (const ConfigPointer &config)
 
     // Re-apply the candidate appearance so a font/color change takes effect
     // without restarting.
+    candidates_sync_dark_hint ();
     _candidates_ui.set_theme (scim_candidates_theme_from_config (config));
 }
 

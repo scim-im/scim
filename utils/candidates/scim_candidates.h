@@ -73,7 +73,7 @@ struct CandidatesTheme {
      */
     String       preedit_font;
     CandidatesColor bg;            ///< Window background; its alpha is honored
-                                   ///< (0.9 by default, i.e. faintly see-through).
+                                   ///< (0.8 by default, i.e. slightly see-through).
     CandidatesColor fg;            ///< Normal text.
     CandidatesColor preedit_fg;    ///< Preedit text.
     CandidatesColor label;         ///< Candidate label ("1." "2." ...).
@@ -82,7 +82,7 @@ struct CandidatesTheme {
     CandidatesColor border;        ///< Window border.
     int          border_width;  ///< Border thickness in px; 0 draws none.
     /**
-     * @brief Corner radius in px; 0 draws a plain rectangle. Defaults to 2.
+     * @brief Corner radius in px; 0 draws a plain rectangle. Defaults to 4.
      *
      * Rounding cuts the corners out of the surface, so it only looks right
      * where the surface carries an alpha channel -- always on Wayland, on X11
@@ -100,28 +100,57 @@ struct CandidatesTheme {
 };
 
 /**
+ * @brief Tell the renderer whether the desktop is currently dark.
+ *
+ * Only consulted when /Candidates/<renderer>/ColorScheme is "auto", which is the
+ * default; an explicit "light" or "dark" wins. Process-wide, and light until
+ * something says otherwise -- this library deliberately has no way to find out
+ * for itself. Finding out needs either a toolkit (GtkSettings, QPalette) or the
+ * org.freedesktop.appearance portal over D-Bus, and this code is linked into
+ * frontends and into GTK and Qt input-method modules alike, so requiring either
+ * would put a dependency on every one of them for the sake of one colour choice.
+ * The host already knows; it just has to say.
+ *
+ * Safe to call repeatedly, including on a theme change: the value is only read
+ * when a theme is next built, so follow it with a fresh
+ * scim_candidates_theme_from_config () and set_theme () to repaint.
+ */
+void scim_candidates_set_dark_hint (bool dark);
+
+/** @brief What the last scim_candidates_set_dark_hint () said. */
+bool scim_candidates_dark_hint (void);
+
+/**
  * @brief Build a theme from the SCIM config for a candidate renderer.
  *
- * Reads the appearance keys -- Font, PreeditFont, BorderWidth, CornerRadius,
- * Padding, Spacing and Color/{NormalText,NormalBackground,PreeditText,
- * ActiveText,ActiveBackground,Label,Border} -- with a layered fallback:
- *   /Candidates/<renderer>/<key>  ->  /Candidates/Default/<key>  ->
- *   /Panel/Gtk/<key> (legacy, shared with the panel)  ->  CandidatesTheme::light().
- * So the candidate appearance is configured independently of the panel under
- * the "/Candidates/Default/" keys (a future GTK/Qt renderer can override via
- * "/Candidates/Gtk/" or "/Candidates/Qt/"), while existing setups that only set
- * the old "/Panel/Gtk/" keys keep working unchanged. @p renderer selects the top
- * level and defaults to "Default" (the toolkit-agnostic Cairo renderer).
+ * Reads the appearance keys -- ColorScheme, Font, PreeditFont, BorderWidth,
+ * CornerRadius, Padding, Spacing and Color/{NormalText,NormalBackground,
+ * PreeditText,ActiveText,ActiveBackground,Label,Border} -- with a layered
+ * fallback:
+ *   /Candidates/<renderer>/<key>  ->  /Candidates/Default/<key>  ->  the preset
+ *   base, CandidatesTheme::light () or ::dark () (see ColorScheme below).
+ * @p renderer selects the top level and defaults to "Default" (the
+ * toolkit-agnostic Cairo renderer); a GTK or Qt renderer can override through
+ * "/Candidates/Gtk/" or "/Candidates/Qt/".
+ *
+ * Nothing is inherited from the panel's own "/Panel/Gtk/" keys. Those style the
+ * panel's lookup table and describe a single light palette, so reaching here they
+ * overrode the presets -- a changed default was invisible to anyone whose config
+ * carried them -- and no light palette can serve the dark preset.
+ *
+ * ColorScheme is "auto" (the default), "light" or "dark". "auto" follows
+ * scim_candidates_set_dark_hint (), so it tracks the desktop only where the host
+ * can say -- a frontend with no toolkit and no portal to ask stays light, and
+ * wants an explicit "dark".
  *
  * Color values are CSS/X11 strings. Besides the names and "#rrggbb" that Pango
  * understands, "#rrggbbaa" and "rgb()"/"rgba()" are accepted, so a value can
  * carry an alpha -- that is how a translucent background is configured, and it
  * is the syntax a GTK color chooser with alpha enabled writes.
  *
- * The background is the one value whose alpha is not taken literally from every
- * level: set under "/Candidates/" it is, but a color inherited from the legacy
- * "/Panel/Gtk/" keys keeps CandidatesTheme::light()'s default opacity, since
- * those keys predate alpha and say nothing about it.
+ * A background is taken exactly as written, alpha included, so "#rrggbbff" or any
+ * name/"#rrggbb" asks for a fully opaque panel; leaving it unset keeps the
+ * preset's slight translucency.
  */
 CandidatesTheme scim_candidates_theme_from_config (const ConfigPointer &config,
                                                    const String &renderer = String ("Default"));
@@ -143,7 +172,7 @@ bool scim_candidates_parse_color (const String &str, CandidatesColor &out);
  *
  * "#rrggbb" for an opaque color, "#rrggbbaa" when it carries an alpha -- so a
  * fully opaque value stays readable by anything that only understands the plain
- * hex form, including the older /Panel/Gtk/ color keys.
+ * hex form.
  */
 String scim_candidates_format_color (const CandidatesColor &color);
 

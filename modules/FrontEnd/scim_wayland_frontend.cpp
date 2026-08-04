@@ -177,6 +177,7 @@ WaylandFrontEnd::WaylandFrontEnd (const BackEndPointer &backend,
       m_config (config),
       m_instance (-1),
       m_focused (false),
+      m_instance_warned (false),
       m_im_on (false),
       m_valid_key_mask (SCIM_KEY_AllMasks),
       m_display (0),
@@ -216,7 +217,7 @@ WaylandFrontEnd::WaylandFrontEnd (const BackEndPointer &backend,
         throw FrontEndError (String ("Wayland -- only one frontend can be created!"));
 
 #ifdef SCIM_HAS_KIMPANEL
-    m_use_kimpanel = false;
+    m_sink = 0;
 #endif
 }
 
@@ -242,6 +243,19 @@ WaylandFrontEnd::~WaylandFrontEnd ()
     if (m_vk_manager)       zwp_virtual_keyboard_manager_v1_destroy (m_vk_manager);
     if (m_seat)          wl_seat_destroy (m_seat);
     if (m_registry)      wl_registry_destroy (m_registry);
+
+#ifdef SCIM_HAS_CANDIDATES_WAYLAND
+    // Before the display goes. The candidates UI owns wl_ proxies of its own --
+    // its surface, the popup role object and a wl_pointer -- and being a member
+    // its destructor runs *after* this body, by which point
+    // wl_display_disconnect () has freed everything those proxies refer to.
+    // Destroying them there is a use-after-free on every exit that runs
+    // destructors at all, which is what turned a compositor going away into a
+    // segfault in wl_pointer_destroy () rather than an orderly shutdown.
+    // finish () is idempotent, so the member destructor is left with nothing.
+    m_candidates_ui.finish ();
+#endif
+
     if (m_display)       wl_display_disconnect (m_display);
 }
 
@@ -322,44 +336,33 @@ WaylandFrontEnd::init (int argc, char **argv)
         proto_start_grab ();
     }
 
+    // Bring up both candidate UIs that this build has, then let select_sink ()
+    // decide which is in use. The overlay panel is created even when kimpanel is
+    // taking the updates, so a panel widget removed later leaves something to
+    // fall back to.
 #ifdef SCIM_HAS_KIMPANEL
-    // The compositor that speaks v1 in practice is KWin, so kimpanel is both
-    // available and the better-placed candidate UI; prefer it when present.
     bool want_kimpanel =
         m_config->read (String ("/Panel/UseKimpanel"),
                         KimpanelAgent::desktop_prefers_kimpanel ());
     if (want_kimpanel && m_kimpanel.connect ()) {
-        m_use_kimpanel = true;
-        m_kimpanel.signal_connect_select_candidate (
-            [this] (int idx) { if (m_instance >= 0 && m_focused) select_candidate (m_instance, idx); });
-        m_kimpanel.signal_connect_page_up (
-            [this] () { if (m_instance >= 0 && m_focused) lookup_table_page_up (m_instance); });
-        m_kimpanel.signal_connect_page_down (
-            [this] () { if (m_instance >= 0 && m_focused) lookup_table_page_down (m_instance); });
-        m_kimpanel.signal_connect_move_preedit_caret (
-            [this] (int pos) { if (m_instance >= 0 && m_focused) move_preedit_caret (m_instance, pos); });
         // Clicking the indicator does what the trigger hotkey does. kimpanel
         // has no menu of ours to open, so a toggle is the useful action.
         m_kimpanel.signal_connect_trigger_engine (
             [this] () { if (m_im_on) turn_off_im (); else turn_on_im (); });
+        m_kimpanel.signal_connect_panel_presence_changed (
+            [this] (bool) { select_sink (); });
     }
 #endif
 
 #ifdef SCIM_HAS_CANDIDATES_WAYLAND
-    // Fallback candidate UI: our own overlay panel via zwp_input_panel_v1.
-    if (!use_kimpanel_ui () && proto_candidates_init ()) {
-        m_candidates_ui.signal_connect_candidate_selected (
-            [this] (int idx) { candidates_ui_select_candidate (idx); });
-        m_candidates_ui.signal_connect_page_up (
-            [this] () { candidates_ui_page_up (); });
-        m_candidates_ui.signal_connect_page_down (
-            [this] () { candidates_ui_page_down (); });
+    if (proto_candidates_init ())
         configure_candidates_ui ();
-    } else if (!use_kimpanel_ui ()) {
+    else
         SCIM_DEBUG_FRONTEND (1) << "Wayland -- no input panel surface; "
                                    "aux/candidates will not be shown.\n";
-    }
 #endif
+
+    select_sink ();
 
     ensure_instance ();
 
@@ -485,9 +488,16 @@ WaylandFrontEnd::poll_fds (std::vector<int> &fds)
         if (pfd >= 0)
             fds.push_back (pfd);
     }
+    if (m_sink) {
+        int sink_fd = m_sink->event_fd ();
+        if (sink_fd >= 0)
+            fds.push_back (sink_fd);
+    }
 #ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ()) {
-        int kfd = m_kimpanel.connection_number ();
+    // Watched even while kimpanel is not the sink in use: this is the connection
+    // a panel widget's arrival is announced on.
+    if (m_kimpanel.is_connected () && m_sink != &m_kimpanel) {
+        int kfd = m_kimpanel.event_fd ();
         if (kfd >= 0)
             fds.push_back (kfd);
     }
@@ -519,8 +529,11 @@ WaylandFrontEnd::process_events ()
         }
     }
 
+    if (m_sink)
+        m_sink->process_events ();
+
 #ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ())
+    if (m_kimpanel.is_connected () && m_sink != &m_kimpanel)
         m_kimpanel.process_events ();
 #endif
 
@@ -614,6 +627,14 @@ WaylandFrontEnd::reload_config_callback (const ConfigPointer &config)
     m_frontend_hotkey_matcher.load_hotkeys (config);
     m_imengine_hotkey_matcher.load_hotkeys (config);
 
+#ifdef SCIM_HAS_CANDIDATES_WAYLAND
+    // The candidate appearance is part of the configuration too, and this was the
+    // only part of it applied once at startup and never again: a font, color or
+    // shape changed in scim-setup did nothing until the session was restarted,
+    // however faithfully the reload itself arrived.
+    configure_candidates_ui ();
+#endif
+
     KeyEvent mask_key;
     scim_string_to_key (mask_key,
         config->read (String (SCIM_CONFIG_HOTKEYS_FRONTEND_VALID_KEY_MASK),
@@ -653,8 +674,22 @@ WaylandFrontEnd::ensure_instance ()
     String sfid = get_default_factory (language, encoding);
     m_instance = new_instance (sfid, encoding);
 
-    if (m_instance < 0)
-        SCIM_DEBUG_FRONTEND(1) << "Wayland -- failed to create an IMEngine instance.\n";
+    if (m_instance >= 0) {
+        m_instance_warned = false;
+        return;
+    }
+
+    // Reachable when the backend cannot name a factory yet -- an empty factory
+    // repository is the only way get_default_factory () returns nothing. That
+    // happens when we start before the session backend can serve its engine
+    // list, so it is transient and every caller retries. Say so once: silence
+    // here reads as "the input method is running" while nothing works.
+    if (!m_instance_warned) {
+        m_instance_warned = true;
+        std::cerr << "Wayland -- no IMEngine instance yet (the backend has no "
+                     "factories); retrying.\n";
+    }
+    SCIM_DEBUG_FRONTEND(1) << "Wayland -- failed to create an IMEngine instance.\n";
 }
 
 /* ------------------------------------------------------------------ */
@@ -724,10 +759,8 @@ WaylandFrontEnd::turn_on_im ()
         m_panel_client.turn_on (m_instance);
         m_panel_client.send ();
     }
-#ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ())
-        m_kimpanel.enable (true);
-#endif
+    if (m_sink)
+        m_sink->enable (true);
 }
 
 void
@@ -762,20 +795,11 @@ WaylandFrontEnd::turn_off_im ()
         m_panel_client.turn_off (m_instance);
         m_panel_client.send ();
     }
-#ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ()) {
-        m_kimpanel.show_aux_string (false);
-        m_kimpanel.show_lookup_table (false);
-        m_kimpanel.enable (false);
+    if (m_sink) {
+        m_sink->show_aux_string (false);
+        m_sink->show_lookup_table (false);
+        m_sink->enable (false);
     }
-#endif
-#ifdef SCIM_HAS_CANDIDATES_WAYLAND
-    if (m_candidates_ui.is_ready ()) {
-        m_candidates_ui.ui ().hide_aux_string ();
-        m_candidates_ui.ui ().hide_lookup_table ();
-        m_candidates_ui.hide ();
-    }
-#endif
 }
 
 void
@@ -871,10 +895,8 @@ WaylandFrontEnd::panel_req_update_factory_info ()
     // kimpanel draws the symbol as text in the panel's own colors, which is
     // the one indicator on this desktop that follows a light or dark theme.
     // Independent of the scim panel: either, both or neither may be running.
-#ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ())
-        m_kimpanel.update_engine_property (info.symbol, info.name);
-#endif
+    if (m_sink)
+        m_sink->update_engine_property (info.symbol, info.name);
 
     if (!m_panel_open)
         return;
@@ -1015,7 +1037,7 @@ WaylandFrontEnd::enter_focus ()
 {
     ensure_instance ();
     if (m_instance < 0)
-        return;
+        return;   // ensure_instance () has said why
 
     m_preedit_str = WideString ();
     m_preedit_caret = 0;
@@ -1035,9 +1057,14 @@ WaylandFrontEnd::enter_focus ()
         m_panel_client.send ();
         panel_req_update_factory_info ();
     }
-#ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ())
-        m_kimpanel.enable (true);
+    if (m_sink)
+        m_sink->enable (true);
+#ifdef SCIM_HAS_CANDIDATES_WAYLAND
+    // Only now is there a text input for the compositor to place the popup
+    // against; see CandidatesWayland::set_active (). Activation is a protocol
+    // state no other candidate UI has, so it stays off the sink interface.
+    if (m_candidates_ui.is_ready ())
+        m_candidates_ui.set_active (true);
 #endif
     focus_in (m_instance);
 }
@@ -1064,19 +1091,16 @@ WaylandFrontEnd::leave_focus ()
     if (!m_on_the_spot)
         preedit_to_panel (false);
 
-#ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ()) {
-        m_kimpanel.show_aux_string (false);
-        m_kimpanel.show_lookup_table (false);
-        m_kimpanel.enable (false);
+    if (m_sink) {
+        m_sink->show_aux_string (false);
+        m_sink->show_lookup_table (false);
+        m_sink->enable (false);
     }
-#endif
 #ifdef SCIM_HAS_CANDIDATES_WAYLAND
-    if (m_candidates_ui.is_ready ()) {
-        m_candidates_ui.ui ().hide_aux_string ();
-        m_candidates_ui.ui ().hide_lookup_table ();
-        m_candidates_ui.hide ();
-    }
+    // Staying unmapped until the compositor activates us again: the surface we
+    // would be positioned against is going away.
+    if (m_candidates_ui.is_ready ())
+        m_candidates_ui.set_active (false);
 #endif
 }
 
@@ -1517,25 +1541,11 @@ WaylandFrontEnd::clear_preedit_on_app ()
 void
 WaylandFrontEnd::preedit_to_panel (bool visible)
 {
-#ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ()) {
-        m_kimpanel.update_preedit_string (m_preedit_str);
-        m_kimpanel.update_preedit_caret (m_preedit_caret);
-        m_kimpanel.show_preedit_string (visible);
-        return;
+    if (m_sink) {
+        m_sink->update_preedit_string (m_preedit_str, m_preedit_attrs);
+        m_sink->update_preedit_caret (m_preedit_caret);
+        m_sink->show_preedit_string (visible);
     }
-#endif
-#ifdef SCIM_HAS_CANDIDATES_WAYLAND
-    if (m_candidates_ui.is_ready ()) {
-        m_candidates_ui.ui ().update_preedit_string (m_preedit_str, m_preedit_attrs);
-        m_candidates_ui.ui ().update_preedit_caret (m_preedit_caret);
-        if (visible) m_candidates_ui.ui ().show_preedit_string ();
-        else         m_candidates_ui.ui ().hide_preedit_string ();
-        refresh_candidates_ui ();
-    }
-#else
-    (void) visible;
-#endif
 }
 
 void
@@ -1611,13 +1621,6 @@ WaylandFrontEnd::forward_key_event (int id, const KeyEvent & /*key*/)
 #ifdef SCIM_HAS_CANDIDATES_WAYLAND
 
 void
-WaylandFrontEnd::refresh_candidates_ui ()
-{
-    if (m_candidates_ui.is_ready ())
-        m_candidates_ui.update ();
-}
-
-void
 WaylandFrontEnd::configure_candidates_ui ()
 {
     if (!m_candidates_ui.is_ready ())
@@ -1625,28 +1628,91 @@ WaylandFrontEnd::configure_candidates_ui ()
     m_candidates_ui.ui ().set_theme (scim_candidates_theme_from_config (m_config));
 }
 
+#endif // SCIM_HAS_CANDIDATES_WAYLAND
+
+// Not under either #ifdef: whichever candidate UI was built reports its actions
+// through these, so gating them on one of the two leaves the other calling a
+// symbol that does not exist -- and a frontend module only finds that out when
+// the launcher dlopen()s it.
+
 void
-WaylandFrontEnd::candidates_ui_select_candidate (int cand_index)
+WaylandFrontEnd::select_sink ()
+{
+    CandidatesSink *want = 0;
+
+#ifdef SCIM_HAS_KIMPANEL
+    // Only while a panel widget is actually listening; kimpanel draws nothing
+    // itself, so without one every update would go nowhere.
+    if (m_kimpanel.is_connected () && m_kimpanel.panel_present ())
+        want = &m_kimpanel;
+#endif
+#ifdef SCIM_HAS_CANDIDATES_WAYLAND
+    if (!want && m_candidates_ui.is_ready ())
+        want = &m_candidates_ui;
+#endif
+
+    if (want == m_sink)
+        return;
+
+    // Take down whatever the outgoing one is showing: it has no idea it is being
+    // replaced and would leave a candidate window on screen for good.
+    if (m_sink) {
+        m_sink->show_preedit_string (false);
+        m_sink->show_aux_string (false);
+        m_sink->show_lookup_table (false);
+        m_sink->remove_engine_property ();
+        m_sink->enable (false);
+    }
+
+    m_sink = want;
+    if (!m_sink)
+        return;
+
+    m_sink->signal_connect_select_candidate (
+        [this] (int idx) { sink_select_candidate (idx); });
+    m_sink->signal_connect_page_up (
+        [this] () { sink_page_up (); });
+    m_sink->signal_connect_page_down (
+        [this] () { sink_page_down (); });
+    m_sink->signal_connect_move_preedit_caret (
+        [this] (int pos) { sink_move_preedit_caret (pos); });
+
+    // Nothing in flight is replayed: the frontend keeps no copy of the aux string
+    // or lookup table, and this happens when a panel widget is added or removed
+    // rather than mid-composition. The engine indicator is re-sent, since that is
+    // the one piece of state a panel cannot rediscover on its own.
+    if (m_im_on && m_focused)
+        m_sink->enable (true);
+    panel_req_update_factory_info ();
+}
+
+void
+WaylandFrontEnd::sink_select_candidate (int cand_index)
 {
     if (m_instance >= 0 && m_focused)
         select_candidate (m_instance, cand_index);
 }
 
 void
-WaylandFrontEnd::candidates_ui_page_up ()
+WaylandFrontEnd::sink_page_up ()
 {
     if (m_instance >= 0 && m_focused)
         lookup_table_page_up (m_instance);
 }
 
 void
-WaylandFrontEnd::candidates_ui_page_down ()
+WaylandFrontEnd::sink_page_down ()
 {
     if (m_instance >= 0 && m_focused)
         lookup_table_page_down (m_instance);
 }
 
-#endif // SCIM_HAS_CANDIDATES_WAYLAND
+void
+WaylandFrontEnd::sink_move_preedit_caret (int pos)
+{
+    if (m_instance >= 0 && m_focused)
+        move_preedit_caret (m_instance, pos);
+}
 
 #if defined(SCIM_HAS_CANDIDATES_WAYLAND) || defined(SCIM_HAS_KIMPANEL)
 
@@ -1655,94 +1721,42 @@ WaylandFrontEnd::update_aux_string (int id, const WideString & str,
                                       const AttributeList & attrs)
 {
     if (id != m_instance) return;
-#ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ()) { m_kimpanel.update_aux_string (str); return; }
-#endif
-#ifdef SCIM_HAS_CANDIDATES_WAYLAND
-    if (m_candidates_ui.is_ready ()) {
-        m_candidates_ui.ui ().update_aux_string (str, attrs);
-        refresh_candidates_ui ();
-    }
-#else
-    (void) attrs;
-#endif
+    if (m_sink) m_sink->update_aux_string (str, attrs);
 }
 
 void
 WaylandFrontEnd::show_aux_string (int id)
 {
     if (id != m_instance) return;
-#ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ()) { m_kimpanel.show_aux_string (true); return; }
-#endif
-#ifdef SCIM_HAS_CANDIDATES_WAYLAND
-    if (m_candidates_ui.is_ready ()) {
-        m_candidates_ui.ui ().show_aux_string ();
-        refresh_candidates_ui ();
-    }
-#endif
+    if (m_sink) m_sink->show_aux_string (true);
 }
 
 void
 WaylandFrontEnd::hide_aux_string (int id)
 {
     if (id != m_instance) return;
-#ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ()) { m_kimpanel.show_aux_string (false); return; }
-#endif
-#ifdef SCIM_HAS_CANDIDATES_WAYLAND
-    if (m_candidates_ui.is_ready ()) {
-        m_candidates_ui.ui ().hide_aux_string ();
-        refresh_candidates_ui ();
-    }
-#endif
+    if (m_sink) m_sink->show_aux_string (false);
 }
 
 void
 WaylandFrontEnd::update_lookup_table (int id, const LookupTable & table)
 {
     if (id != m_instance) return;
-#ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ()) { m_kimpanel.update_lookup_table (table); return; }
-#endif
-#ifdef SCIM_HAS_CANDIDATES_WAYLAND
-    if (m_candidates_ui.is_ready ()) {
-        m_candidates_ui.ui ().update_lookup_table (table);
-        refresh_candidates_ui ();
-    }
-#else
-    (void) table;
-#endif
+    if (m_sink) m_sink->update_lookup_table (table);
 }
 
 void
 WaylandFrontEnd::show_lookup_table (int id)
 {
     if (id != m_instance) return;
-#ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ()) { m_kimpanel.show_lookup_table (true); return; }
-#endif
-#ifdef SCIM_HAS_CANDIDATES_WAYLAND
-    if (m_candidates_ui.is_ready ()) {
-        m_candidates_ui.ui ().show_lookup_table ();
-        refresh_candidates_ui ();
-    }
-#endif
+    if (m_sink) m_sink->show_lookup_table (true);
 }
 
 void
 WaylandFrontEnd::hide_lookup_table (int id)
 {
     if (id != m_instance) return;
-#ifdef SCIM_HAS_KIMPANEL
-    if (use_kimpanel_ui ()) { m_kimpanel.show_lookup_table (false); return; }
-#endif
-#ifdef SCIM_HAS_CANDIDATES_WAYLAND
-    if (m_candidates_ui.is_ready ()) {
-        m_candidates_ui.ui ().hide_lookup_table ();
-        refresh_candidates_ui ();
-    }
-#endif
+    if (m_sink) m_sink->show_lookup_table (false);
 }
 
 #endif // SCIM_HAS_CANDIDATES_WAYLAND || SCIM_HAS_KIMPANEL
