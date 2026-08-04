@@ -27,8 +27,7 @@
  * $Id: scim_socket.h,v 1.25 2005/01/25 15:13:15 suzhe Exp $
  */
 
-#ifndef __SCIM_SOCKET_H
-#define __SCIM_SOCKET_H
+#pragma once
 
 namespace scim {
 
@@ -637,11 +636,28 @@ String scim_socket_accept_connection (uint32       &key,
                                       const String &client_types,
                                       const Socket &socket,
                                       int           timeout = -1);
+
+/**
+ * @brief Check whether the SocketFrontEnd backend can serve its engines yet.
+ *
+ * Accepting a connection is not the same thing, and this is the distinction the
+ * socket clients care about: a frontend's first job is to create an IMEngine
+ * instance, which it can only do once the backend serves a factory list. A
+ * backend that is listening but not yet able to answer leaves the frontend with
+ * no engines, and a frontend that cannot make an instance does nothing at all.
+ * This asks the same question SocketIMEngine asks on connect, and counts an
+ * empty list as not ready.
+ *
+ * Only useful for waiting. Deciding whether to @em launch a backend needs a
+ * plain liveness check instead: a running-but-engineless backend still owns the
+ * socket, so launching a second one would just collide with it.
+ *
+ * @return true if a backend is listening and offers at least one factory.
+ */
+bool   scim_socket_frontend_ready ();
 /** @} */
 
 } // namespace scim
-
-#endif //__SCIM_SOCKET_H
 
 /*
 vi:ts=4:nowrap:ai:expandtab

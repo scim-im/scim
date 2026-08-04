@@ -70,6 +70,8 @@ static int run_supervised (bool supervise, const std::function<int ()> &launch)
     }
 }
 
+// Whether anything is listening on the backend socket. Answers "is a backend
+// already running", i.e. whether we need to launch one.
 bool check_socket_frontend ()
 {
     SocketAddress address;
@@ -359,11 +361,12 @@ int main (int argc, char *argv [])
             std::function<bool ()> ensure_backend = [&] () -> bool {
                 if (!have_socket)
                     return true;
-                if (check_socket_frontend ())
+                if (scim_socket_frontend_ready ())
                     return true;
-                scim_launch (true, def_config, "all", "socket", 0);
+                if (!check_socket_frontend ())
+                    scim_launch (true, def_config, "all", "socket", 0);
                 for (int i = 0; i < 100; ++i) {
-                    if (check_socket_frontend ())
+                    if (scim_socket_frontend_ready ())
                         return true;
                     scim_usleep (100000);
                 }
@@ -434,10 +437,12 @@ int main (int argc, char *argv [])
         }
 
         // If there is one Socket FrontEnd running and it's not manual mode,
-        // then just use this Socket Frontend.
+        // then just use this Socket Frontend. Wait for it to be able to serve
+        // its engine list, not merely to accept us: the frontend we are about to
+        // launch asks for that list immediately, and gets one chance at it.
         if (!manual) {
             for (int i = 0; i < 100; ++i) {
-                if (check_socket_frontend ()) {
+                if (scim_socket_frontend_ready ()) {
                     def_config = "socket";
                     load_engine_list.clear ();
                     load_engine_list.push_back ("socket");

@@ -36,6 +36,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <errno.h>
+#include <ctime>
 
 using namespace scim;
 
@@ -214,6 +215,48 @@ int main (int argc, char *argv [])
     }
 
     new_argv [new_argc] = 0;
+
+    // Both socket clients ask the backend one question at startup and neither
+    // retries: SocketConfig for the configuration, SocketIMEngine for the
+    // factory list. Starting before the backend can answer therefore leaves this
+    // process running with no engines and no config, silently, for as long as it
+    // lives -- and the failed connect is not even logged.
+    //
+    // The scim wrapper waits on our behalf, but nothing does when the launcher
+    // is exec'd directly, which is how the compositor's input method is started:
+    // scim-virtual-keyboard.desktop names the launcher so that KWin's
+    // pre-connected wayland fd survives (a second fork/exec would lose it), and
+    // KWin starts it during compositor startup, before the session's autostart
+    // entry has run "scim -d". That ordering is not a race we sometimes lose.
+    //
+    // Wait, never launch: "scim -d" is on its way, and an engineless backend
+    // already owns the socket, so launching a second one would only collide.
+    // Give up after a while and carry on degraded, which is today's behaviour --
+    // a session with no backend at all should not hang the compositor's input
+    // method forever.
+    bool needs_socket_backend = (config_name == "socket");
+    for (size_t n = 0; !needs_socket_backend && n < engine_list.size (); ++n)
+        if (engine_list [n] == "socket")
+            needs_socket_backend = true;
+
+    if (needs_socket_backend && !scim_socket_frontend_ready ()) {
+        std::cerr << "Waiting for the SCIM backend to serve its engines ...\n";
+
+        bool ready = false;
+        time_t deadline = time (0) + 10;
+
+        while (time (0) < deadline) {
+            scim_usleep (100000);
+            if (scim_socket_frontend_ready ()) {
+                ready = true;
+                break;
+            }
+        }
+
+        if (!ready)
+            std::cerr << "The SCIM backend is not serving engines; "
+                         "continuing without them.\n";
+    }
 
     try {
         // Try to load config module

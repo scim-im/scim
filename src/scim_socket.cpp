@@ -1465,6 +1465,54 @@ scim_socket_accept_connection (uint32       &key,
     return String ("");
 }
 
+bool
+scim_socket_frontend_ready ()
+{
+    SocketAddress address;
+    SocketClient client;
+
+    uint32 magic;
+
+    address.set_address (scim_get_default_socket_frontend_address ());
+
+    if (!client.connect (address))
+        return false;
+
+    // Registers as "SocketIMEngine" rather than as a ConnectionTester, because
+    // that is what SocketFrontEnd::socket_open_connection () will accept -- it
+    // takes only "SocketIMEngine,SocketConfig" and closes anything else. A
+    // liveness check gets away with calling itself a ConnectionTester only
+    // because it never sends a request afterwards, so it never notices the
+    // server hanging up on it.
+    if (!scim_socket_open_connection (magic,
+                                      String ("SocketIMEngine"),
+                                      String ("SocketFrontEnd"),
+                                      client,
+                                      1000))
+        return false;
+
+    Transaction trans;
+    trans.clear ();
+    trans.put_command (SCIM_TRANS_CMD_REQUEST);
+    trans.put_data (magic);
+    trans.put_command (SCIM_TRANS_CMD_GET_FACTORY_LIST);
+    trans.put_data (String (""));
+
+    if (!trans.write_to_socket (client))
+        return false;
+
+    int cmd;
+    std::vector<String> factories;
+
+    if (!trans.read_from_socket (client, 1000) ||
+        !trans.get_command (cmd) || cmd != SCIM_TRANS_CMD_REPLY ||
+        !trans.get_data (factories) ||
+        !trans.get_command (cmd) || cmd != SCIM_TRANS_CMD_OK)
+        return false;
+
+    return factories.size () > 0;
+}
+
 } // namespace scim
 
 /*
