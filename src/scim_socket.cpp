@@ -95,49 +95,39 @@ __gethostname (const char *host)
 
 class SocketAddress::SocketAddressImpl
 {
-    struct sockaddr *m_data;
-    SocketFamily     m_family;
-    String           m_address;
+    // Held by value in a sockaddr_storage, which the C library provides for
+    // exactly this: big enough and aligned for any family.
+    //
+    // It used to be a sockaddr * allocated as a sockaddr_un or a sockaddr_in and
+    // deleted through the base pointer. That is undefined behaviour, and with
+    // sized deallocation the compiler hands operator delete sizeof (sockaddr) --
+    // 16 bytes -- for a sockaddr_un of 110. glibc ignores the size and never
+    // complained; an allocator that checks does, so any application using
+    // Chromium's allocator died on the spot in every local address, which is all
+    // of SCIM's own sockets.
+    struct sockaddr_storage m_data;
+    bool                    m_has_data;
+    SocketFamily            m_family;
+    String                  m_address;
 
 public:
     SocketAddressImpl (const String &addr = String ())
-        : m_data (0), m_family (SCIM_SOCKET_UNKNOWN) {
+        : m_has_data (false), m_family (SCIM_SOCKET_UNKNOWN) {
+        memset (&m_data, 0, sizeof (m_data));
         if (addr.length ()) set_address (addr);
     }
 
-    SocketAddressImpl (const SocketAddressImpl &other)
-        : m_data (0), m_family (other.m_family), m_address (other.m_address) {
-        if (other.m_data) {
-            size_t len = 0;
-            switch (m_family) {
-                case SCIM_SOCKET_LOCAL:
-                    m_data = (struct sockaddr*) new struct sockaddr_un;
-                    len = sizeof (sockaddr_un);
-                    break;
-                case SCIM_SOCKET_INET:
-                    m_data = (struct sockaddr*) new struct sockaddr_in;
-                    len = sizeof (sockaddr_in);
-                    break;
-                case SCIM_SOCKET_UNKNOWN:
-                    break;
-            }
-
-            if (len && m_data) memcpy (m_data, other.m_data, len);
-        }
-    }
-
-    ~SocketAddressImpl () {
-        if (m_data) delete m_data;
-    }
+    // Copying is memberwise now; there is no longer a pointer to duplicate.
 
     void swap (SocketAddressImpl &other) {
         std::swap (m_data, other.m_data);
+        std::swap (m_has_data, other.m_has_data);
         std::swap (m_family, other.m_family);
         std::swap (m_address, other.m_address);
     }
 
     bool valid () const {
-        if (m_address.length () && m_data &&
+        if (m_address.length () && m_has_data &&
             (m_family == SCIM_SOCKET_LOCAL || m_family == SCIM_SOCKET_INET))
             return true;
         return false;
@@ -154,13 +144,13 @@ public:
     }
 
     const void * get_data () const {
-        return (void *)m_data;
+        return (const void *) &m_data;
     }
 
     int get_data_length () const {
-        if (m_data) {
+        if (m_has_data) {
             if (m_family == SCIM_SOCKET_LOCAL)
-                return SUN_LEN ((struct sockaddr_un*)(m_data));
+                return SUN_LEN ((const struct sockaddr_un*) &m_data);
             else if (m_family == SCIM_SOCKET_INET)
                 return sizeof (struct sockaddr_in);
         }
@@ -173,8 +163,12 @@ SocketAddress::SocketAddressImpl::set_address (const String &addr)
 {
     std::vector <String> varlist;
 
-    struct sockaddr *new_data   = 0;
-    SocketFamily     new_family = SCIM_SOCKET_UNKNOWN;
+    // Built aside and only committed once a family is settled, so a failed parse
+    // leaves the previous address intact.
+    struct sockaddr_storage new_data;
+    SocketFamily            new_family = SCIM_SOCKET_UNKNOWN;
+
+    memset (&new_data, 0, sizeof (new_data));
 
     scim_split_string_list (varlist, addr, ':');
 
@@ -186,7 +180,7 @@ SocketAddress::SocketAddressImpl::set_address (const String &addr)
                            String ("-") +
                            scim_get_user_name ();
 
-        struct sockaddr_un *un = new struct sockaddr_un;
+        struct sockaddr_un *un = (struct sockaddr_un *) &new_data;
 
         un->sun_family = AF_UNIX;
 
@@ -199,12 +193,11 @@ SocketAddress::SocketAddressImpl::set_address (const String &addr)
         SCIM_DEBUG_SOCKET(3) << "  local:" << un->sun_path << "\n";
 
         new_family = SCIM_SOCKET_LOCAL;
-        new_data = (struct sockaddr *) un;
 
     } else if ((varlist [0] == "tcp" || varlist [0] == "inet") &&
                 varlist.size () == 3) {
 
-        struct sockaddr_in *in = new struct sockaddr_in;
+        struct sockaddr_in *in = (struct sockaddr_in *) &new_data;
 
         in->sin_addr = __gethostname (varlist [1].c_str ());
 
@@ -217,16 +210,13 @@ SocketAddress::SocketAddressImpl::set_address (const String &addr)
                 << ntohs (in->sin_port) << "\n";
 
             new_family = SCIM_SOCKET_INET;
-            new_data = (struct sockaddr *) in;
-        } else {
-            delete in;
         }
     }
 
-    if (new_data) {
-        if (m_data) delete m_data;
+    if (new_family != SCIM_SOCKET_UNKNOWN) {
+        memcpy (&m_data, &new_data, sizeof (m_data));
 
-        m_data = new_data;
+        m_has_data = true;
         m_family = new_family;
         m_address = addr;
         return valid ();
