@@ -27,12 +27,16 @@ X11_UTILS=$(top_builddir)/utils/x11utils/libscim-x11utils@SCIM_EPOCH@.la
 endif
 
 # Draw the lookup table in-process with the Cairo candidate renderer, hosted in
-# a GtkPopover (works on both X11 and native Wayland). Links the core lib only.
+# a GtkPopover (works on both X11 and native Wayland). The X11 backend comes too,
+# as the fallback for a client the popover cannot be anchored to: Chromium
+# attaches no widget to its GdkWindow, so a standalone window is the only way to
+# put candidates on screen there.
 if SCIM_BUILD_CANDIDATES
 CANDIDATES_CFLAGS = -DSCIM_HAS_CANDIDATES \
 		    -I$(top_srcdir)/utils/candidates \
 		    @CAIRO_CFLAGS@
-CANDIDATES_LIBS   = $(top_builddir)/utils/candidates/libscim-candidates@SCIM_EPOCH@.la \
+CANDIDATES_LIBS   = $(top_builddir)/utils/candidates/libscim-candidates-x11@SCIM_EPOCH@.la \
+		    $(top_builddir)/utils/candidates/libscim-candidates@SCIM_EPOCH@.la \
 		    @CAIRO_LIBS@
 endif
 

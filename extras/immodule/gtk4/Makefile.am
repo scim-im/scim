@@ -32,13 +32,15 @@ LD_VERSION_SCRIPT_OPTION="-Wl,--version-script=$(srcdir)/im-scim.version-script"
 endif
 
 # Draw the lookup table in-process with the Cairo candidate renderer, hosted in
-# a GtkPopover (works on X11 and Wayland). Links the core lib only -- the popover
-# is the surface, so no X11 surface backend is needed.
+# a GtkPopover (works on X11 and Wayland). The X11 backend comes too, as the
+# fallback for a client that sets no widget on its IM context and so leaves the
+# popover nothing to be parented to.
 if SCIM_BUILD_CANDIDATES
 CANDIDATES_CFLAGS = -DSCIM_HAS_CANDIDATES \
 		    -I$(top_srcdir)/utils/candidates \
 		    @CAIRO_CFLAGS@
-CANDIDATES_LIBS   = $(top_builddir)/utils/candidates/libscim-candidates@SCIM_EPOCH@.la \
+CANDIDATES_LIBS   = $(top_builddir)/utils/candidates/libscim-candidates-x11@SCIM_EPOCH@.la \
+		    $(top_builddir)/utils/candidates/libscim-candidates@SCIM_EPOCH@.la \
 		    @CAIRO_LIBS@
 endif
 
