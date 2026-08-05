@@ -1,9 +1,12 @@
+data/scim-virtual-keyboard.desktop.in
+data/scim.desktop.in
 extras/immodule/gtk2/gtkimcontextscim.cpp
 extras/immodule/gtk3/gtkimcontextscim.cpp
 extras/immodule/gtk4/scimgtkimcontext.cpp
 extras/immodule/qt5/scimqtinputcontext.cpp
 extras/immodule/qt6/scimqtinputcontext.cpp
 extras/panel/scim_panel_gtk.cpp
+extras/setup/gtk3/scim_setup_gtk3_host.cpp
 extras/setup/scim-setup.desktop.in
 extras/setup/scim_setup_helper.cpp
 extras/setup/scim_setup_module.cpp
@@ -12,6 +15,7 @@ modules/Config/scim_simple_config.cpp
 modules/Config/scim_socket_config.cpp
 modules/Filter/scim_hanconv_filter.cpp
 modules/FrontEnd/scim_socket_frontend.cpp
+modules/FrontEnd/scim_wayland_frontend.cpp
 modules/FrontEnd/scim_x11_frontend.cpp
 modules/FrontEnd/scim_x11_ic.cpp
 modules/IMEngine/scim_rawcode_imengine.cpp

@@ -32,12 +32,27 @@ autostart_DATA		= scim.desktop
 desktopdir		= $(datadir)/applications
 desktop_DATA		= scim-virtual-keyboard.desktop
 
-# Substituted at make time, not by config.status: SCIM_LIBEXECDIR still holds an
-# unexpanded ${exec_prefix}, which make resolves but a .desktop parser would not.
-scim-virtual-keyboard.desktop: scim-virtual-keyboard.desktop.in Makefile
+# Both entries carry a user-visible Name/GenericName/Comment, so both are built
+# from a template through msgfmt --desktop, which merges the catalogues in po/
+# as Name[xx]= lines (the same treatment extras/setup gives scim-setup.desktop).
+# Listed in po/POTFILES.in, or there would be nothing to merge.
+scim.desktop: scim.desktop.in $(top_srcdir)/po/LINGUAS
+	$(AM_V_GEN) $(MSGFMT) --desktop \
+		--template=$(srcdir)/scim.desktop.in -d $(top_srcdir)/po -o $@
+
+# The Exec line is substituted at make time, not by config.status: SCIM_LIBEXECDIR
+# still holds an unexpanded ${exec_prefix}, which make resolves but a .desktop
+# parser would not. That has to happen before the translation merge, so it goes
+# through an intermediate template.
+scim-virtual-keyboard.desktop: scim-virtual-keyboard.desktop.in Makefile $(top_srcdir)/po/LINGUAS
 	$(AM_V_GEN) sed -e 's|@SCIM_LIBEXECDIR[@]|$(SCIM_LIBEXECDIR)|g' \
-		$(srcdir)/scim-virtual-keyboard.desktop.in > $@
+		$(srcdir)/scim-virtual-keyboard.desktop.in > $@.tmp
+	$(AM_V_at) $(MSGFMT) --desktop --template=$@.tmp \
+		-d $(top_srcdir)/po -o $@
+	$(AM_V_at) rm -f $@.tmp
 
-CLEANFILES		+= scim-virtual-keyboard.desktop
+CLEANFILES		+= scim.desktop \
+			  scim-virtual-keyboard.desktop \
+			  scim-virtual-keyboard.desktop.tmp
 
-EXTRA_DIST		= scim.desktop scim-virtual-keyboard.desktop.in
+EXTRA_DIST		= scim.desktop.in scim-virtual-keyboard.desktop.in

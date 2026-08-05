@@ -11,14 +11,14 @@ The input methods themselves come as separate packages:
   scim-novel-pinyin  Chinese        https://github.com/scim-im/scim-novel-pinyin
   scim-ccinput       Chinese        https://github.com/scim-im/scim-ccinput
   scim-chewing       Chinese        https://github.com/chewing/scim-chewing
-  scim-array         Chinese        https://github.com/tzhuan/scim-array
+  scim-array         Chinese        https://github.com/scim-im/scim-array
   scim-anthy         Japanese       https://github.com/scim-im/scim-anthy
   scim-wnn           Japanese       https://github.com/scim-im/scim-wnn
-  scim-skk           Japanese       https://github.com/tzhuan/scim-skk
-  scim-prime         Japanese       https://github.com/tzhuan/scim-prime
-  scim-canna         Japanese       https://github.com/tzhuan/scim-canna
-  scim-hangul        Korean         https://github.com/tzhuan/scim-hangul
-  scim-sinhala       Sinhala        https://github.com/tzhuan/scim-sinhala
+  scim-skk           Japanese       https://github.com/scim-im/scim-skk
+  scim-prime         Japanese       https://github.com/scim-im/scim-prime
+  scim-canna         Japanese       https://github.com/scim-im/scim-canna
+  scim-hangul        Korean         https://github.com/libhangul/scim-hangul
+  scim-sinhala       Sinhala        https://github.com/scim-im/scim-sinhala
   scim-unikey        Vietnamese     https://github.com/scim-im/scim-unikey
 
 SCIM alone ships only rawcode, which enters a character by its code (hex
@@ -118,8 +118,9 @@ extra.
 2.2  Everything else
 --------------------
 
-On Wayland it works as installed: no variables, no IM modules.  On KDE Plasma,
-first select SCIM under System Settings -> Keyboard -> Virtual Keyboard.
+On Wayland a native application on a current toolkit needs nothing: GTK3, GTK4
+and Qt6 ask the compositor for input, and the compositor starts SCIM.  On KDE
+Plasma, first select SCIM under System Settings -> Keyboard -> Virtual Keyboard.
 
 A compositor running on its own -- sway, river, labwc without a session manager
 -- reads no XDG autostart entries, so nothing starts SCIM and section 1's
@@ -128,7 +129,7 @@ instead; in sway that is:
 
   exec scim -d
 
-For X11 -- and for XWayland applications on a Wayland session -- set these
+For X11 -- and for anything under XWayland on a Wayland session -- set these
 somewhere your session reads before it starts: ~/.xprofile, which the X session
 startup scripts read on most distributions, or ~/.config/environment.d/*.conf,
 which systemd reads.  Then log out and back in:
@@ -137,15 +138,25 @@ which systemd reads.  Then log out and back in:
   QT_IM_MODULE=scim
   XMODIFIERS=@im=SCIM
 
-The first two use SCIM's GTK and Qt IM modules.  XMODIFIERS covers everything
-else through XIM, xterm and emacs included, but not GTK4: GTK4 dropped XIM, so a
-GTK4 application on X11 needs the GTK4 IM module.
+A Wayland session usually wants them too, because "native" excludes more than it
+sounds: GTK2 has no Wayland backend at all, so every GTK2 application is an
+XWayland client, as is every Qt5 one until the Qt5 Wayland platform plugin is
+installed.  Set them unless everything you run is native.
+
+The first two use SCIM's GTK and Qt IM modules.  XMODIFIERS covers what is left
+through XIM, xterm and emacs included, but neither GTK4 nor Qt: GTK4 dropped
+XIM, Qt dropped it in Qt5, and a Qt application therefore has no way to reach
+SCIM without QT_IM_MODULE.  GTK2 picks its input module from the locale and will
+not choose XIM in a latin one, so it needs the variable as well.
 
 On KDE Plasma, the "Input Method Panel" applet -- kimpanel -- lets Plasma draw
-the candidate window instead of SCIM, and SCIM uses it whenever it is there.  On
-Wayland it may place that window at the top-left corner of the screen; leave the
-applet off the panel, or set /Panel/UseKimpanel to false in
-~/.config/scim/config, and SCIM draws the candidates itself.
+the candidate window instead of SCIM, and SCIM uses it whenever it is there,
+adding or removing the applet taking effect as you do it.  Two things differ
+from SCIM's own window: the applet pages the list only with the engine's own
+keys, not the scroll wheel, and on Wayland it may place the window at the
+top-left corner of the screen.  Leave the applet off the panel, or set
+/Panel/UseKimpanel to false in ~/.config/scim/config, and SCIM draws the
+candidates itself.
 
 GNOME on X11 can be an IBus session, but it does not have to be: 2.1 is one
 option there, and setting these variables so SCIM is the input method itself is
@@ -192,3 +203,18 @@ works on any desktop with XDG autostart support.  Keep it, or start the daemon
 whichever way suits your platform -- a systemd user unit, your distribution's
 own session mechanism, anything else -- as long as it comes up with the session.
 That choice is yours.
+
+Refresh the caches after installing, and again after removing.  A toolkit reads
+its cache, not the directory, so until the cache is rebuilt a freshly installed
+module is invisible and a removed one is still listed -- either way the toolkit
+falls back to its default input method without saying why.  Which ones apply
+depends on what was built:
+
+  always           ldconfig
+  gtk2-immodule    gtk-query-immodules-2.0 --update-cache
+  gtk3-immodule    gtk-query-immodules-3.0 --update-cache
+  gtk4-immodule    gio-querymodules $(libdir)/gtk-4.0/4.0.0/immodules
+
+GTK4 keeps no immodule cache of its own -- it finds input methods through GIO,
+so gio-querymodules writes giomodule.cache beside the module instead.  Qt needs
+no cache.
