@@ -91,6 +91,15 @@ dnl dlopen-ed modules and shared libraries only; no static archives (.a).
 LT_INIT([disable-static dlopen])
 AC_SUBST(LIBTOOL_DEPS)
 
+# LT_INIT only sets the default, so --disable-shared can still override it, and
+# the result builds and installs without complaint: every frontend, engine,
+# filter, config backend and setup page comes out as a .a that dlopen cannot
+# load, leaving a SCIM that runs and can load nothing. Refuse it instead.
+if test "$enable_shared" != "yes"; then
+  AC_MSG_ERROR([SCIM loads its frontends, engines, filters and config backends
+with dlopen, so shared libraries cannot be disabled])
+fi
+
 # Modules are loaded with dlopen(3) directly (libltdl dropped).
 # Link libdl on platforms where dlopen lives outside libc.
 AC_SEARCH_LIBS([dlopen], [dl])
