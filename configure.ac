@@ -451,11 +451,11 @@ AC_ARG_ENABLE([documents],
 	[],
 	[enable_documents=no])
 
-AC_ARG_ENABLE([ordered-map],
-	[AS_HELP_STRING([--enable-ordered-map],
-		[Use std::map/std::set instead of the unordered hash containers internally])],
+AC_ARG_ENABLE([unordered-map],
+	[AS_HELP_STRING([--enable-unordered-map],
+		[Use the unordered hash containers instead of std::map/std::set internally])],
 	[],
-	[enable_ordered_map=no])
+	[enable_unordered_map=no])
 
 AC_ARG_ENABLE([ld-version-script],
 	[AS_HELP_STRING([--enable-ld-version-script],
@@ -682,8 +682,8 @@ else
   enable_debug=no
 fi
 
-if test "$enable_ordered_map" = "yes"; then
-  AC_DEFINE(SCIM_USE_ORDERED_MAP,1,[Use std::map/std::set instead of unordered hash containers in libscim])
+if test "$enable_unordered_map" = "yes"; then
+  AC_DEFINE(SCIM_USE_UNORDERED_MAP,1,[Use unordered hash containers instead of std::map/std::set in libscim])
 fi
 
 if test "$enable_tests" = "yes"; then
@@ -1182,7 +1182,7 @@ Build options:
   Debugging                $enable_debug
   ld version script        $enable_ld_version_script
   Build documents          $enable_documents
-  Ordered (std::map) mode  $enable_ordered_map
+  Unordered (hash) mode    $enable_unordered_map
 
 Module options -- each is a --enable/--disable switch:
   Simple Config module     $enable_config_simple

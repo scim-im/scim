@@ -43,28 +43,35 @@ public:
     }
 };
 
-// scim_map / scim_set select between the unordered (hash table) and the
-// ordered (red-black tree) standard containers at build time. Unordered is the
-// default; configure with --enable-ordered-map to fall back to std::map /
-// std::set, which have a smaller memory footprint and often competitive
-// performance for the small collections SCIM keeps. The Hash parameter is used
-// by the unordered containers and ignored by the ordered ones, which order by
+// scim_map / scim_set select between the ordered (red-black tree) and the
+// unordered (hash table) standard containers at build time.
+//
+// Ordered is the default. Nothing SCIM keeps in these is large -- a few hundred
+// entries at the very most -- so the lookup difference is not measurable, while
+// a defined iteration order is worth having: the simple Config module writes
+// ~/.scim/config by walking one of these, and a panel or setup list built by
+// walking another comes out in whatever sequence the hash chose. Hash order also
+// shifts whenever the table rehashes, so the same data reorders itself between
+// runs.
+//
+// Configure with --enable-unordered-map for the hash containers. The Hash
+// parameter is used by those and ignored by the ordered ones, which order by
 // operator< instead -- every key type used here provides both.
-#ifdef SCIM_USE_ORDERED_MAP
-
-template <typename Key, typename Value, typename Hash = std::hash <Key> >
-using scim_map = std::map <Key, Value>;
-
-template <typename Key, typename Hash = std::hash <Key> >
-using scim_set = std::set <Key>;
-
-#else
+#ifdef SCIM_USE_UNORDERED_MAP
 
 template <typename Key, typename Value, typename Hash = std::hash <Key> >
 using scim_map = std::unordered_map <Key, Value, Hash>;
 
 template <typename Key, typename Hash = std::hash <Key> >
 using scim_set = std::unordered_set <Key, Hash>;
+
+#else
+
+template <typename Key, typename Value, typename Hash = std::hash <Key> >
+using scim_map = std::map <Key, Value>;
+
+template <typename Key, typename Hash = std::hash <Key> >
+using scim_set = std::set <Key>;
 
 #endif
 
