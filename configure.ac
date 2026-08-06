@@ -269,7 +269,6 @@ PKG_CHECK_MODULES(GTK4, [gtk4 >= 4.0.0 pango >= 1.48.0 gdk-pixbuf-2.0 >= 2.42.0]
 			[SCIM_HAS_GTK4=yes],
 			[SCIM_HAS_GTK4=no])
 
-SCIM_HAS_GTK2_2=no
 if test "$SCIM_HAS_GTK2" = "yes"; then
   if $PKG_CONFIG --exists "gtk+-2.0 >= 2.2" ; then
     AC_DEFINE(GDK_MULTIHEAD_SAFE,1,[Force use of GDK's multihead-safe APIs.])
@@ -289,7 +288,9 @@ if test "$SCIM_HAS_GTK3" = "yes"; then
 fi
 
 if test "$SCIM_HAS_GTK4" = "yes"; then
-  GTK4_VERSION=4.0.0
+  # The installed release, only ever reported in the configure summary -- not a
+  # minimum, and not the ABI directory name (that is GTK4_BINARY_VERSION).
+  GTK4_VERSION=`$PKG_CONFIG --modversion gtk4`
   GTK4_BINARY_VERSION=`$PKG_CONFIG --variable=gtk_binary_version gtk4`
   GTK4_LIBDIR=`$PKG_CONFIG --variable=libdir gtk4`
   GTK4_IM_MODULEDIR=$GTK4_LIBDIR/gtk-4.0/$GTK4_BINARY_VERSION/immodules
@@ -419,47 +420,184 @@ PKG_CHECK_MODULES(GTK4_LAYER_SHELL, [gtk4-layer-shell-0],
 			[SCIM_HAS_GTK4_LAYER_SHELL=yes],
 			[SCIM_HAS_GTK4_LAYER_SHELL=no])
 
+###########################################################
+##            Definition of compile options.             ##
+###########################################################
+#
+# Grouped by what they affect.  Each help string is written in the direction
+# that is NOT the default, which is how ./configure --help reads: a switch shown
+# as --disable-foo is on by default, one shown as --enable-foo is off.  "auto"
+# means on whenever its dependencies are present; passing --enable-foo
+# explicitly then turns a missing dependency into a configure error instead of a
+# silent omission.
 
-# X11/XWayland support is controlled by --enable-frontend-x11 (default: auto --
-# built when X11 is detected). Disabling it drops the whole X11 build (the XIM
-# frontend, x11utils, the cairo-xlib panel shim and the gtk2/gtk3 IM modules)
-# for a Wayland-only system. Declared here, ahead of the other frontend
-# toggles, so the X11 decision is settled for everything below.
+## --- Build and diagnostics -------------------------------------------------
+
+AC_ARG_ENABLE([debug],
+	[AS_HELP_STRING([--enable-debug],
+		[Turn on debugging])],
+	[],
+	[enable_debug=no])
+
+AC_ARG_ENABLE([tests],
+	[AS_HELP_STRING([--enable-tests],
+		[Build tests/*])],
+	[],
+	[enable_tests=no])
+
+AC_ARG_ENABLE([documents],
+	[AS_HELP_STRING([--enable-documents],
+		[Build documents])],
+	[],
+	[enable_documents=no])
+
+AC_ARG_ENABLE([ordered-map],
+	[AS_HELP_STRING([--enable-ordered-map],
+		[Use std::map/std::set instead of the unordered hash containers internally])],
+	[],
+	[enable_ordered_map=no])
+
+AC_ARG_ENABLE([ld-version-script],
+	[AS_HELP_STRING([--enable-ld-version-script],
+		[Use ld version script to limit exported symbols])],
+	[],
+	[enable_ld_version_script=no])
+
+## --- Core modules ---------------------------------------------------------
+
+AC_ARG_ENABLE([config-simple],
+	[AS_HELP_STRING([--disable-config-simple],
+		[Do not build the Simple Config module])],
+	[],
+	[enable_config_simple=yes])
+
+AC_ARG_ENABLE([config-socket],
+	[AS_HELP_STRING([--disable-config-socket],
+		[Do not build the Socket Config module])],
+	[],
+	[enable_config_socket=yes])
+
+AC_ARG_ENABLE([im-rawcode],
+	[AS_HELP_STRING([--disable-im-rawcode],
+		[Do not build the RawCode IMEngine module])],
+	[],
+	[enable_im_rawcode=yes])
+
+AC_ARG_ENABLE([im-socket],
+	[AS_HELP_STRING([--disable-im-socket],
+		[Do not build the Socket IMEngine module])],
+	[],
+	[enable_im_socket=yes])
+
+AC_ARG_ENABLE([filter-hanconv],
+	[AS_HELP_STRING([--disable-filter-hanconv],
+		[Do not build the HanConv Filter module (Han script variant conversion)])],
+	[],
+	[enable_filter_hanconv=yes])
+
+## --- Display-server frontends ---------------------------------------------
+
+AC_ARG_ENABLE([frontend-socket],
+	[AS_HELP_STRING([--disable-frontend-socket],
+		[Do not build the Socket FrontEnd module])],
+	[],
+	[enable_frontend_socket=yes])
+
+# Disabling this drops the whole X11 build -- the XIM frontend, x11utils, the
+# cairo-xlib candidate window and the GTK2/GTK3 IM modules -- for a
+# Wayland-only system.  The detection it feeds runs just below this section,
+# before the first thing that reads the result.
 AC_ARG_ENABLE([frontend-x11],
 	[AS_HELP_STRING([--disable-frontend-x11],
-		[Do not build X11/XWayland support (for Wayland-only systems)])],
+		[Do not build X11/XWayland support (for Wayland-only systems; default: auto)])],
 	[],
 	[enable_frontend_x11=check])
 
-# Checks for X11 header files.
-AC_PATH_XTRA
+AC_ARG_ENABLE([frontend-wayland],
+	[AS_HELP_STRING([--disable-frontend-wayland],
+		[Do not build Wayland support (for X11-only systems; default: auto)])],
+	[],
+	[enable_frontend_wayland=check])
 
-# --disable-frontend-x11 behaves as if X11 were absent; an explicit
-# --enable-frontend-x11 with no X11 present is an error.
-if test "$enable_frontend_x11" = "no"; then
-  have_x=no
-elif test "$enable_frontend_x11" = "yes" -a "$have_x" != "yes"; then
-  AC_MSG_ERROR([--enable-frontend-x11 requires X11 headers/libraries (use --disable-frontend-x11 for a Wayland-only build)])
-fi
-if test "$have_x" = "yes"; then
-  enable_frontend_x11=yes
-  AC_DEFINE([SCIM_ENABLE_X11], [1], [Define to 1 if X11/XWayland support is enabled.])
-else
-  enable_frontend_x11=no
-fi
+AC_ARG_ENABLE([frontend-ibus],
+	[AS_HELP_STRING([--disable-frontend-ibus],
+		[Do not build the IBus FrontEnd module, which registers SCIM as an IBus engine for GNOME (default: auto)])],
+	[],
+	[enable_frontend_ibus=check])
 
-# Add -lX11 to X_LIBS
-if test "$have_x" = "yes"; then
-  X_LIBS="$X_LIBS -lX11"
-fi
+## --- Toolkit IM modules ---------------------------------------------------
+##
+## Each is built when its toolkit is found; the GTK2/GTK3 ones need X11 too.
 
-###########################################################
-##             Definiation of compile args.              ##
-###########################################################
-AC_ARG_WITH([gtk2-im-module-dir],
-	[AS_HELP_STRING([--with-gtk2-im-module-dir=dir],
-		[Select GTK2 immodule dir])],
-	[GTK2_IM_MODULEDIR=$with_gtk2_im_module_dir])
+AC_ARG_ENABLE([gtk2-immodule],
+	[AS_HELP_STRING([--disable-gtk2-immodule],
+		[Do not build the GTK2 IMModule (default: auto)])],
+	[],
+	[enable_gtk2_immodule=yes])
+
+AC_ARG_ENABLE([gtk3-immodule],
+	[AS_HELP_STRING([--disable-gtk3-immodule],
+		[Do not build the GTK3 IMModule (default: auto)])],
+	[],
+	[enable_gtk3_immodule=yes])
+
+AC_ARG_ENABLE([gtk4-immodule],
+	[AS_HELP_STRING([--disable-gtk4-immodule],
+		[Do not build the GTK4 IMModule (default: auto)])],
+	[],
+	[enable_gtk4_immodule=yes])
+
+AC_ARG_ENABLE([qt5-immodule],
+	[AS_HELP_STRING([--disable-qt5-immodule],
+		[Do not build the QT5 IMModule (default: auto)])],
+	[],
+	[enable_qt5_immodule=yes])
+
+AC_ARG_ENABLE([qt6-immodule],
+	[AS_HELP_STRING([--disable-qt6-immodule],
+		[Do not build the QT6 IMModule (default: auto)])],
+	[],
+	[enable_qt6_immodule=yes])
+
+## --- Candidate UI, panel and setup ----------------------------------------
+
+AC_ARG_ENABLE([kimpanel],
+	[AS_HELP_STRING([--disable-kimpanel],
+		[Do not build the kimpanel candidate UI, which lets KDE draw the candidates over D-Bus (default: auto)])],
+	[],
+	[enable_kimpanel=check])
+
+AC_ARG_ENABLE([panel-gtk],
+	[AS_HELP_STRING([--disable-panel-gtk],
+		[Do not build the GTK Panel (default: auto)])],
+	[],
+	[enable_panel_gtk=check])
+
+AC_ARG_ENABLE([sni],
+	[AS_HELP_STRING([--disable-sni],
+		[Do not build the panel's SNI tray, a StatusNotifierItem instead of a floating toolbar (default: auto)])],
+	[],
+	[enable_sni=check])
+
+AC_ARG_ENABLE([layer-shell],
+	[AS_HELP_STRING([--disable-layer-shell],
+		[Do not use the panel layer-shell anchor, which places the toolbar on Wayland via gtk4-layer-shell (default: auto)])],
+	[],
+	[enable_layer_shell=check])
+
+AC_ARG_ENABLE([setup-ui],
+	[AS_HELP_STRING([--disable-setup-ui],
+		[Do not build the Setup UI])],
+	[],
+	[enable_setup_ui=yes])
+
+AC_ARG_ENABLE([gtk3-legacy-setup],
+	[AS_HELP_STRING([--disable-gtk3-legacy-setup],
+		[Do not build the frozen GTK3 legacy setup helper (enabled when GTK3 is present and the setup host is GTK4)])],
+	[],
+	[enable_gtk3_legacy_setup=check])
+
+## --- Installation paths ---------------------------------------------------
 
 AC_ARG_WITH([gtk2-im-module-dir],
 	[AS_HELP_STRING([--with-gtk2-im-module-dir=dir],
@@ -467,13 +605,13 @@ AC_ARG_WITH([gtk2-im-module-dir],
 	[GTK2_IM_MODULEDIR=$with_gtk2_im_module_dir])
 
 AC_ARG_WITH([gtk3-im-module-dir],
-	[AS_HELP_STRING([--with-gtk3-im-module-dir=dir], 
-	    [Select GTK3 immodule dir])],
+	[AS_HELP_STRING([--with-gtk3-im-module-dir=dir],
+		[Select GTK3 immodule dir])],
 	[GTK3_IM_MODULEDIR=$with_gtk3_im_module_dir])
 
 AC_ARG_WITH([gtk4-im-module-dir],
-	[AS_HELP_STRING([--with-gtk4-im-module-dir=dir], 
-	    [Select GTK4 immodule dir])],
+	[AS_HELP_STRING([--with-gtk4-im-module-dir=dir],
+		[Select GTK4 immodule dir])],
 	[GTK4_IM_MODULEDIR=$with_gtk4_im_module_dir])
 
 AC_ARG_WITH([qt5-moc],
@@ -486,144 +624,47 @@ AC_ARG_WITH([qt5-im-module-dir],
 		[Select QT5 immodule dir])],
 	[QT5_IM_MODULEDIR=$with_qt5_im_module_dir])
 
-AC_ARG_WITH([gtk-version],
-	[AS_HELP_STRING([--with-gtk-version=2, 3 or 4],
-		[Select gtk version for the GUI if several are available (default is 4)])],
-	[WANT_GTK_VERSION=$withval],
-	[WANT_GTK_VERSION=4])
+AC_ARG_WITH([qt6-moc],
+	[AS_HELP_STRING([--with-qt6-moc=file],
+		[Select QT6 moc program (default to the libexecdir Qt6Core reports)])],
+	[QT6_MOC=$with_qt6_moc])
 
-AC_ARG_ENABLE([ld-version-script],
-	[AS_HELP_STRING([--enable-ld-version-script],
-		[Use ld version script to limit exported symbols])],
-	[],
-	[enable_ld_version_script=no])
+AC_ARG_WITH([qt6-im-module-dir],
+	[AS_HELP_STRING([--with-qt6-im-module-dir=dir],
+		[Select QT6 immodule dir])],
+	[QT6_IM_MODULEDIR=$with_qt6_im_module_dir])
 
-AC_ARG_ENABLE([debug],
-	[AS_HELP_STRING([--enable-debug],
-		[Turn on debugging])],
-	[], 
-	[enable_debug=no])
+# Defaults to ibus's own pkgdatadir, which is absolute and ignores --prefix --
+# it has to be, since ibus-daemon looks only there. Overridable so a build that
+# must stay inside its prefix (make distcheck, a staged package) can say so.
+AC_ARG_WITH([ibus-component-dir],
+	[AS_HELP_STRING([--with-ibus-component-dir=dir],
+		[Select IBus component dir])],
+	[IBUS_COMPONENT_DIR=$with_ibus_component_dir])
 
-AC_ARG_ENABLE([tests],
-	[AS_HELP_STRING([--enable-tests],
-		[Build tests/*])],
-	[], 
-	[enable_tests=no])
+# Checks for X11 header files.  Kept here, after the switches and before the
+# first use of have_x, so --disable-frontend-x11 can behave exactly as if X11
+# were absent while an explicit --enable-frontend-x11 without it is an error.
+#
+# AC_PATH_XTRA brings autoconf's own --with-x/--without-x along with it, which is
+# why there are two spellings for one decision: --without-x is equivalent to
+# --disable-frontend-x11 and both are honoured.  Wayland needs no counterpart --
+# it is found with pkg-config, so --disable-frontend-wayland is the only spelling
+# there and adding a --without-wayland would just duplicate it.
+AC_PATH_XTRA
 
-AC_ARG_ENABLE([documents],
-	[AS_HELP_STRING([--enable-documents],
-		[build documents])],
-	[],
-	[enable_documents=no])
-
-AC_ARG_ENABLE([ordered-map],
-	[AS_HELP_STRING([--enable-ordered-map],
-		[Use std::map/std::set instead of the unordered hash containers internally])],
-	[],
-	[enable_ordered_map=no])
-
-AC_ARG_ENABLE([config-simple],
-	[AS_HELP_STRING([--disable-config-simple],
-		[Do not build Simple Config module])],
-	[],
-	[enable_config_simple=yes])
-
-AC_ARG_ENABLE([config-socket],
-	[AS_HELP_STRING([--disable-config-socket],
-		[Do not build Socket Config module])],
-	[],
-	[enable_config_socket=yes])
-
-
-AC_ARG_ENABLE([frontend-socket],
-	[AS_HELP_STRING([--disable-frontend-socket],
-		[Do not build Socket FrontEnd module])],
-	[],
-	[enable_frontend_socket=yes])
-
-AC_ARG_ENABLE([frontend-wayland],
-	[AS_HELP_STRING([--disable-frontend-wayland],
-		[Do not build Wayland support (for X11-only systems; default: auto)])],
-	[],
-	[enable_frontend_wayland=check])
-
-AC_ARG_ENABLE([frontend-ibus],
-	[AS_HELP_STRING([--enable-frontend-ibus],
-		[Build the IBus engine FrontEnd module for GNOME (default: auto)])],
-	[],
-	[enable_frontend_ibus=check])
-
-AC_ARG_ENABLE([kimpanel],
-	[AS_HELP_STRING([--enable-kimpanel],
-		[Build the KDE kimpanel D-Bus candidate UI backend (default: auto)])],
-	[],
-	[enable_kimpanel=check])
-
-AC_ARG_ENABLE([im-rawcode],
-	[AS_HELP_STRING([--disable-im-rawcode],
-		[Do not build RawCode IMEngine module])],
-	[],
-	[enable_im_rawcode=yes])
-
-AC_ARG_ENABLE([im-socket],
-	[AS_HELP_STRING([--disable-im-socket],
-		[Do not build Socket IMEngine module])],
-	[],
-	[enable_im_socket=yes])
-
-AC_ARG_ENABLE([filter-hanconv],
-	[AS_HELP_STRING([--disable-filter-hanconv],
-		[Do not build the Han script variant conversion Filter module])],
-	[],
-	[enable_filter_hanconv=yes])
-
-AC_ARG_ENABLE([gtk2-immodule],
-	[AS_HELP_STRING([--enable-gtk2-immodule],
-		[Enable GTK2 IMModule])],
-	[],
-	[enable_gtk2_immodule=yes])
-
-AC_ARG_ENABLE([gtk3-immodule],
-	[AS_HELP_STRING([--enable-gtk3-immodule],
-		[Enable GTK3 IMModule])],
-	[],
-	[enable_gtk3_immodule=yes])
-
-AC_ARG_ENABLE([gtk4-immodule],
-	[AS_HELP_STRING([--enable-gtk4-immodule],
-		[Enable GTK4 IMModule])],
-	[],
-	[enable_gtk4_immodule=yes])
-
-AC_ARG_ENABLE([qt5-immodule],
-	[AS_HELP_STRING([--enable-qt5-immodule],
-		[Enable QT5 IMModule])],
-	[],
-	[enable_qt5_immodule=yes])
-
-AC_ARG_ENABLE([qt6-immodule],
-	[AS_HELP_STRING([--enable-qt6-immodule],
-		[Enable QT6 IMModule])],
-	[],
-	[enable_qt6_immodule=yes])
-
-AC_ARG_ENABLE([panel-gtk],
-	[AS_HELP_STRING([--disable-panel-gtk],
-		[Do not build GTK2 Panel])],
-	[], 
-	[enable_panel_gtk=check])
-
-AC_ARG_ENABLE([setup-ui],
-	[AS_HELP_STRING([--disable-setup-ui],
-		[Do not build Setup UI])],
-	[],
-	[enable_setup_ui=yes])
-
-AC_ARG_ENABLE([gtk3-legacy-setup],
-	[AS_HELP_STRING([--disable-gtk3-legacy-setup],
-		[Do not build the frozen GTK3 legacy setup helper (enabled when GTK3 is present and the setup host is GTK4)])],
-	[],
-	[enable_gtk3_legacy_setup=check])
+if test "$enable_frontend_x11" = "no"; then
+  have_x=no
+elif test "$enable_frontend_x11" = "yes" -a "$have_x" != "yes"; then
+  AC_MSG_ERROR([--enable-frontend-x11 requires X11 headers/libraries (use --disable-frontend-x11 for a Wayland-only build)])
+fi
+if test "$have_x" = "yes"; then
+  enable_frontend_x11=yes
+  AC_DEFINE([SCIM_ENABLE_X11], [1], [Define to 1 if X11/XWayland support is enabled.])
+  X_LIBS="$X_LIBS -lX11"
+else
+  enable_frontend_x11=no
+fi
 
 if test "$have_x" = "yes"; then
   SCIM_BUILD_X11_UTILS=1
@@ -718,9 +759,10 @@ else
   SCIM_BUILD_FRONTEND_IBUS=0
 fi
 
-# Cairo+Pango input-panel renderer (own-Cairo candidate UI).  The core needs
-# cairo/pango; the X11 surface shim additionally needs cairo-xlib and X11.
-# Built whenever those are present (shared by the x11/wayland frontends).
+# Cairo+Pango input-panel renderer (own-Cairo candidate UI), in two pieces.
+#
+# The X11 surface backend draws into an override-redirect window, so it needs
+# cairo-xlib and X11 on top of cairo/pango.
 if test "$SCIM_HAS_CAIRO" = "yes" -a "$SCIM_HAS_CAIRO_XLIB" = "yes" -a "$have_x" = "yes"; then
   SCIM_BUILD_CANDIDATES=1
   enable_candidates=yes
@@ -729,15 +771,23 @@ else
   enable_candidates=no
 fi
 
+# The core is surface-agnostic and needs only cairo/pango -- but it draws
+# nothing on its own, so build it only when something that owns a surface will
+# use it: the X11 backend above, or the Wayland frontend's input-popup surface.
+# Ungated it would build and install even for a configuration that turned every
+# candidate UI off.
+if test "$SCIM_HAS_CAIRO" = "yes" &&
+   test "$SCIM_BUILD_CANDIDATES" = "1" -o "$SCIM_BUILD_FRONTEND_WAYLAND" = "1"; then
+  SCIM_BUILD_CANDIDATES_CORE=1
+  enable_candidates_core=yes
+else
+  SCIM_BUILD_CANDIDATES_CORE=0
+  enable_candidates_core=no
+fi
+
 # StatusNotifierItem tray for the panel: needs dbusmenu-glib. On a desktop with
 # an SNI host (KDE, XFCE, ...) the panel presents its properties as a tray menu
 # instead of a floating toolbar, which wayland cannot position.
-AC_ARG_ENABLE([sni],
-	[AS_HELP_STRING([--disable-sni],
-		[Do not build the panel's StatusNotifierItem tray support])],
-	[],
-	[enable_sni=check])
-
 if test "$enable_sni" != "no"; then
   if test "$SCIM_HAS_DBUSMENU" = "yes"; then
     SCIM_BUILD_SNI=1
@@ -753,12 +803,6 @@ else
 fi
 
 # layer-shell anchoring for the panel toolbar: needs gtk4-layer-shell.
-AC_ARG_ENABLE([layer-shell],
-	[AS_HELP_STRING([--disable-layer-shell],
-		[Do not use gtk4-layer-shell to anchor the panel toolbar on wayland])],
-	[],
-	[enable_layer_shell=check])
-
 if test "$enable_layer_shell" != "no"; then
   if test "$SCIM_HAS_GTK4_LAYER_SHELL" = "yes"; then
     SCIM_BUILD_LAYER_SHELL=1
@@ -846,23 +890,13 @@ else
   enable_qt6_immodule=no
 fi
 
-if test "$SCIM_HAS_GTK4" = "yes" -a "$SCIM_HAS_GTK3" = "yes" -a "$SCIM_HAS_GTK2" = "yes"; then
-  if test "$WANT_GTK_VERSION" = "2"; then
-	USE_GTK_VERSION="2"
-  elif test "$WANT_GTK_VERSION" = "3"; then
-	USE_GTK_VERSION="3"
-  else
-	USE_GTK_VERSION="4"
-  fi
-elif test "$SCIM_HAS_GTK4" = "yes"; then
-  USE_GTK_VERSION="4"
-elif test "$SCIM_HAS_GTK3" = "yes"; then
-  USE_GTK_VERSION="3"
-elif test "$SCIM_HAS_GTK2" = "yes"; then
-  USE_GTK_VERSION="2"
-fi
-
-if test "$USE_GTK_VERSION" = "4"; then
+# The GTK parts of the tree -- the panel, the setup host, the SetupUI plugins and
+# libscim-gtkutils -- are GTK4 sources: gtk_init () with no arguments,
+# gtk_widget_add_controller (), gtk_window_set_child ().  Pointing them at GTK2 or
+# GTK3, which --with-gtk-version used to offer, could only produce a build
+# failure, so GTK4 is simply what they require.  The GTK2/GTK3/GTK4 IM modules
+# are separate and keep their own per-version flags.
+if test "$SCIM_HAS_GTK4" = "yes"; then
   SCIM_HAS_GTK=yes
   GTK_LIBDIR=$GTK4_LIBDIR
   GTK_VERSION=$GTK4_VERSION
@@ -870,50 +904,20 @@ if test "$USE_GTK_VERSION" = "4"; then
   GTK_BINARY_VERSION=$GTK4_BINARY_VERSION
   GTK_CFLAGS=$GTK4_CFLAGS
   GTK_LIBS=$GTK4_LIBS
-  AC_SUBST(GTK_LIBDIR)
-  AC_SUBST(GTK_VERSION)
-  AC_SUBST(GTK_MAJOR_VERSION)
-  AC_SUBST(GTK_BINARY_VERSION)
-  AC_SUBST(GTK_CFLAGS)
-  AC_SUBST(GTK_LIBS)
-elif test "$USE_GTK_VERSION" = "3"; then
-  SCIM_HAS_GTK=yes
-  GTK_LIBDIR=$GTK3_LIBDIR
-  GTK_VERSION=$GTK3_VERSION
-  GTK_MAJOR_VERSION=3
-  GTK_BINARY_VERSION=$GTK3_BINARY_VERSION
-  GTK_CFLAGS=$GTK3_CFLAGS
-  GTK_LIBS=$GTK3_LIBS
-  AC_SUBST(GTK_LIBDIR)
-  AC_SUBST(GTK_VERSION)
-  AC_SUBST(GTK_MAJOR_VERSION)
-  AC_SUBST(GTK_BINARY_VERSION)
-  AC_SUBST(GTK_CFLAGS)
-  AC_SUBST(GTK_LIBS)
-elif test "$USE_GTK_VERSION" = "2"; then
-  SCIM_HAS_GTK=yes
-  GTK_LIBDIR=$GTK2_LIBDIR
-  GTK_VERSION=$GTK2_VERSION
-  GTK_MAJOR_VERSION=2
-  GTK_BINARY_VERSION=$GTK2_BINARY_VERSION
-  GTK_CFLAGS=$GTK2_CFLAGS
-  GTK_LIBS=$GTK2_LIBS
-  AC_SUBST(GTK_LIBDIR)
-  AC_SUBST(GTK_VERSION)
-  AC_SUBST(GTK_MAJOR_VERSION)
-  AC_SUBST(GTK_BINARY_VERSION)
-  AC_SUBST(GTK_CFLAGS)
-  AC_SUBST(GTK_LIBS)
 else
   SCIM_HAS_GTK=no
 fi
 
-# pkg-config module name for the selected GTK (gtk4 dropped the "gtk+-" prefix).
-if test "$GTK_MAJOR_VERSION" = "4"; then
-  GTK_PC_NAME=gtk4
-else
-  GTK_PC_NAME="gtk+-${GTK_MAJOR_VERSION}.0"
-fi
+# gtk4 dropped the "gtk+-" prefix; named unconditionally so scim-gtkutils.pc is
+# well formed even in a build that leaves the GTK parts out.
+GTK_PC_NAME=gtk4
+
+AC_SUBST(GTK_LIBDIR)
+AC_SUBST(GTK_VERSION)
+AC_SUBST(GTK_MAJOR_VERSION)
+AC_SUBST(GTK_BINARY_VERSION)
+AC_SUBST(GTK_CFLAGS)
+AC_SUBST(GTK_LIBS)
 AC_SUBST(GTK_PC_NAME)
 
 if test "$enable_setup_ui" = "yes" -a "$SCIM_HAS_GTK" = "yes"; then
@@ -952,7 +956,7 @@ AC_SUBST(ELF_LIBS)
 # only makes sense when the host itself is GTK4 and GTK3 is available.
 SCIM_BUILD_GTK3_LEGACY_SETUP=0
 if test "$enable_gtk3_legacy_setup" != "no"; then
-  if test "$enable_setup_ui" = "yes" -a "$USE_GTK_VERSION" = "4" -a "$SCIM_HAS_GTK3" = "yes"; then
+  if test "$enable_setup_ui" = "yes" -a "$SCIM_HAS_GTK" = "yes" -a "$SCIM_HAS_GTK3" = "yes"; then
     SCIM_BUILD_GTK3_LEGACY_SETUP=1
     enable_gtk3_legacy_setup=yes
     AC_DEFINE(SCIM_ENABLE_GTK3_LEGACY_SETUP,1,[Build the frozen GTK3 legacy setup helper.])
@@ -969,12 +973,6 @@ if test "$SCIM_HAS_GTK" = "yes"; then
 else
   enable_gtk_utils=no
   SCIM_BUILD_GTK_UTILS=0
-fi
-
-enable_tray_icon=no
-if test \( "$SCIM_HAS_GTK4"="yes" -o "$SCIM_HAS_GTK3"="yes" -o "$SCIM_HAS_GTK2_2" = "yes" \) -a "$no_x" != "yes"; then
-  enable_tray_icon=yes
-  AC_DEFINE(ENABLE_TRAY_ICON,1,[Enable the TrayIcon code.])
 fi
 
 SCIM_BUILD_PANEL_GTK=0
@@ -1031,6 +1029,9 @@ AM_CONDITIONAL(SCIM_BUILD_IBUS_SYNC,
 AM_CONDITIONAL(SCIM_BUILD_CANDIDATES,
 		[test "$enable_candidates" = "yes"])
 
+AM_CONDITIONAL(SCIM_BUILD_CANDIDATES_CORE,
+		[test "$enable_candidates_core" = "yes"])
+
 AM_CONDITIONAL(SCIM_BUILD_SNI,
 		[test "$enable_sni" = "yes"])
 
@@ -1076,9 +1077,6 @@ AM_CONDITIONAL(SCIM_BUILD_GTK_UTILS,
 AM_CONDITIONAL(SCIM_BUILD_X11_UTILS,
 	        [test "$enable_x11_utils" = "yes"])
 
-AM_CONDITIONAL(SCIM_BUILD_TRAY_ICON,
-	        [test "$enable_tray_icon" = "yes"])
-
 AM_CONDITIONAL(SCIM_BUILD_PANEL_GTK,
 	        [test "$enable_panel_gtk" = "yes"])
 
@@ -1091,6 +1089,7 @@ AC_SUBST(SCIM_BUILD_FRONTEND_SOCKET)
 AC_SUBST(SCIM_BUILD_FRONTEND_WAYLAND)
 AC_SUBST(SCIM_BUILD_FRONTEND_IBUS)
 AC_SUBST(SCIM_BUILD_CANDIDATES)
+AC_SUBST(SCIM_BUILD_CANDIDATES_CORE)
 AC_SUBST(SCIM_BUILD_SNI)
 AC_SUBST(SCIM_BUILD_LAYER_SHELL)
 AC_SUBST(SCIM_BUILD_KIMPANEL)
@@ -1180,22 +1179,21 @@ Build options:
   Build shared libs        $enable_shared
   Build static libs        $enable_static
   Build tests/*            $enable_tests
-  Enable debug             $enable_debug
-  Enable ld version script $enable_ld_version_script
+  Debugging                $enable_debug
+  ld version script        $enable_ld_version_script
   Build documents          $enable_documents
   Ordered (std::map) mode  $enable_ordered_map
 
-Module options:
-  Simple config module     $enable_config_simple
-  Socket config module     $enable_config_socket
+Module options -- each is a --enable/--disable switch:
+  Simple Config module     $enable_config_simple
+  Socket Config module     $enable_config_socket
 
   X11/XWayland support     $enable_frontend_x11
   Wayland support          $enable_frontend_wayland
   Socket FrontEnd module   $enable_frontend_socket
   IBus FrontEnd module     $enable_frontend_ibus
 
-  Cairo candidate renderer $enable_candidates
-  kimpanel D-Bus UI        $enable_kimpanel
+  kimpanel candidate UI    $enable_kimpanel
   Panel SNI tray           $enable_sni
   Panel layer-shell anchor $enable_layer_shell
 
@@ -1204,28 +1202,30 @@ Module options:
 
   HanConv Filter module    $enable_filter_hanconv
 
-  GTK Utility Library      $enable_gtk_utils
-  X11 Utility Library      $enable_x11_utils
-
-  GTK Version              $USE_GTK_VERSION
-
-  GUI Setup Utility        $enable_setup_ui
+  Setup UI                 $enable_setup_ui
   GTK3 legacy setup helper $enable_gtk3_legacy_setup
-
-  GTK Panel GUI            $enable_panel_gtk
-
-  Enable TrayIcon          $enable_tray_icon
-
-  GTK2 IMModule dir        $GTK2_IM_MODULEDIR
-  GTK3 IMModule dir        $GTK3_IM_MODULEDIR
-  GTK4 IMModule dir        $GTK4_IM_MODULEDIR
-  QT5 IMModule dir         $QT5_IM_MODULEDIR
-
-  QT5 moc program          $QT5_MOC
+  GTK Panel                $enable_panel_gtk
 
   GTK2 IMModule            $enable_gtk2_immodule
   GTK3 IMModule            $enable_gtk3_immodule
   GTK4 IMModule            $enable_gtk4_immodule
   QT5 IMModule             $enable_qt5_immodule
   QT6 IMModule             $enable_qt6_immodule
+
+Follows from those and from what was found -- no switch of its own:
+  Cairo candidate renderer $enable_candidates_core
+  X11 candidate window     $enable_candidates
+  GTK Utility Library      $enable_gtk_utils
+  X11 Utility Library      $enable_x11_utils
+  GTK version used         $GTK_VERSION
+
+Install paths:
+  GTK2 IMModule dir        $GTK2_IM_MODULEDIR
+  GTK3 IMModule dir        $GTK3_IM_MODULEDIR
+  GTK4 IMModule dir        $GTK4_IM_MODULEDIR
+  QT5 IMModule dir         $QT5_IM_MODULEDIR
+  QT6 IMModule dir         $QT6_IM_MODULEDIR
+  IBus component dir       $IBUS_COMPONENT_DIR
+  QT5 moc program          $QT5_MOC
+  QT6 moc program          $QT6_MOC
 ])

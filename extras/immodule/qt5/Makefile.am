@@ -23,7 +23,10 @@ endif
 # Draw the lookup table in-process with the Cairo candidate renderer, blitted
 # into a QtGui QRasterWindow. Links the core lib only (the window is the
 # surface); QtGui is already pulled in by @QT5_LIBS@.
-if SCIM_BUILD_CANDIDATES
+#
+# Follows the core rather than the X11 backend: Qt owns the surface either way,
+# so this works on a Wayland-only build where there is no X11 backend at all.
+if SCIM_BUILD_CANDIDATES_CORE
 CANDIDATES_CFLAGS = -DSCIM_HAS_CANDIDATES \
 		    -I$(top_srcdir)/utils/candidates \
 		    @CAIRO_CFLAGS@
@@ -63,6 +66,4 @@ MOC = @QT5_MOC@
 moc_scimqtinputcontext.cpp: scimqtinputcontext.h scim.json
 	$(AM_V_GEN) $(MOC) -DQT_VERSION=0x050000 $(srcdir)/scimqtinputcontext.h -o $@
 
-# dlopen-ed plugin, never linked: drop the installed libtool archive (shared dir).
-install-data-hook:
-	rm -f "$(DESTDIR)$(moduledir)/libscimqtinputcontextplugin.la"
+include $(top_srcdir)/dlopen-module.am

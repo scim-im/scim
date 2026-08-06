@@ -1,0 +1,30 @@
+# Install rules shared by every directory that ships dlopen-ed modules.
+#
+# Include this after setting module_LTLIBRARIES and moduledir:
+#
+#   include $(top_srcdir)/dlopen-module.am
+#
+# A libtool archive (.la) describes how to *link* against a library. These
+# modules are opened by name at runtime and never linked against, so theirs
+# describe nothing anyone can use. Automake installs one beside each module
+# regardless and offers no way to ask it not to, so the install is undone here
+# instead. (Static archives need no such treatment: LT_INIT disables them
+# outright, since nothing in the tree links statically.)
+#
+# Removing the .la costs the uninstall rule, which is libtool's and reads that
+# same file -- without it, "make uninstall" quietly removes nothing. So the .so
+# has to be named explicitly there.
+#
+# Both rules walk what this build installs rather than globbing the directory.
+# Several of these directories are shared with other input methods, and a
+# wildcard would carry their files off.
+
+install-data-hook:
+	for la in $(module_LTLIBRARIES); do \
+	  rm -f "$(DESTDIR)$(moduledir)/$$la"; \
+	done
+
+uninstall-hook:
+	for so in $(module_LTLIBRARIES:.la=.so); do \
+	  rm -f "$(DESTDIR)$(moduledir)/$$so"; \
+	done

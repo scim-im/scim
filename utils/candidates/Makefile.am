@@ -28,16 +28,42 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_srcdir)/src \
 			  @CAIRO_CFLAGS@
 
-# Public headers (interface + core + X11 backend); the Wayland header stays
-# internal.
+# Public headers, each shipped with the library that needs it; the Wayland
+# header stays internal.  The sink interface is the contract between a host and
+# any backend, so it goes out with whichever backend is installed -- including
+# kimpanel, which pulls in nothing else from here.
+#
+# The directory has to be named unconditionally -- automake rejects a _HEADERS
+# whose dir is undefined in any condition -- so a build with no candidate UI
+# creates it empty.  Harmless, and nothing is installed into it.
 candidatesincludedir	= $(includedir)/scim@SCIM_EPOCH@/candidates
-candidatesinclude_HEADERS = scim_candidates_sink.h \
-			  scim_candidates.h \
-			  scim_candidates_x11.h
 noinst_HEADERS		= scim_candidates_wayland.h
 
+if SCIM_BUILD_CANDIDATES_CORE
+CANDIDATES_SINK_HEADER	= scim_candidates_sink.h
+else
+if SCIM_BUILD_KIMPANEL
+CANDIDATES_SINK_HEADER	= scim_candidates_sink.h
+endif
+endif
+
+lib_LTLIBRARIES		= $(CANDIDATES_CORE_LIB) \
+			  $(CANDIDATES_X11_LIB) \
+			  $(CANDIDATES_KIMPANEL_LIB)
+
+candidatesinclude_HEADERS = $(CANDIDATES_SINK_HEADER) \
+			  $(CANDIDATES_CORE_HEADER) \
+			  $(CANDIDATES_X11_HEADER) \
+			  $(CANDIDATES_KIMPANEL_HEADER)
+
 # --- core renderer (installed): surface-agnostic draw/model/theme ---
-lib_LTLIBRARIES		= libscim-candidates@SCIM_EPOCH@.la
+#
+# Drawn into by the backends below, so it is built only when one of them is:
+# on its own it renders to nobody.
+if SCIM_BUILD_CANDIDATES_CORE
+CANDIDATES_CORE_LIB	= libscim-candidates@SCIM_EPOCH@.la
+CANDIDATES_CORE_HEADER	= scim_candidates.h
+endif
 
 libscim_candidates@SCIM_EPOCH@_la_SOURCES = scim_candidates.cpp
 libscim_candidates@SCIM_EPOCH@_la_LDFLAGS = \
@@ -50,7 +76,9 @@ libscim_candidates@SCIM_EPOCH@_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPO
 
 # --- X11 surface backend (installed): core + cairo-xlib + X ---
 if SCIM_BUILD_CANDIDATES
-lib_LTLIBRARIES		+= libscim-candidates-x11@SCIM_EPOCH@.la
+CANDIDATES_X11_LIB	= libscim-candidates-x11@SCIM_EPOCH@.la
+CANDIDATES_X11_HEADER	= scim_candidates_x11.h
+endif
 libscim_candidates_x11@SCIM_EPOCH@_la_SOURCES  = scim_candidates_x11.cpp
 libscim_candidates_x11@SCIM_EPOCH@_la_CPPFLAGS = $(AM_CPPFLAGS) @CAIRO_XLIB_CFLAGS@ @X_CFLAGS@
 libscim_candidates_x11@SCIM_EPOCH@_la_LDFLAGS  = \
@@ -62,7 +90,6 @@ libscim_candidates_x11@SCIM_EPOCH@_la_LDFLAGS  = \
 libscim_candidates_x11@SCIM_EPOCH@_la_LIBADD   = \
 			  libscim-candidates@SCIM_EPOCH@.la \
 			  $(top_builddir)/src/libscim@SCIM_EPOCH@.la
-endif
 
 # --- kimpanel delegated backend (installed): libdbus only, no surface ---
 #
@@ -70,9 +97,9 @@ endif
 # frontends' select () loop and a toolkit main loop (g_unix_fd_add,
 # QSocketNotifier) alike, so a host integrates it without a D-Bus main loop.
 if SCIM_BUILD_KIMPANEL
-lib_LTLIBRARIES		+= libscim-candidates-kimpanel@SCIM_EPOCH@.la
-candidatesinclude_HEADERS += scim_kimpanel_agent.h
-
+CANDIDATES_KIMPANEL_LIB	   = libscim-candidates-kimpanel@SCIM_EPOCH@.la
+CANDIDATES_KIMPANEL_HEADER = scim_kimpanel_agent.h
+endif
 libscim_candidates_kimpanel@SCIM_EPOCH@_la_SOURCES  = scim_kimpanel_agent.cpp
 libscim_candidates_kimpanel@SCIM_EPOCH@_la_CPPFLAGS = $(AM_CPPFLAGS) @DBUS_CFLAGS@
 libscim_candidates_kimpanel@SCIM_EPOCH@_la_LDFLAGS  = \
@@ -83,7 +110,6 @@ libscim_candidates_kimpanel@SCIM_EPOCH@_la_LDFLAGS  = \
 			  @DBUS_LIBS@
 libscim_candidates_kimpanel@SCIM_EPOCH@_la_LIBADD   = \
 			  $(top_builddir)/src/libscim@SCIM_EPOCH@.la
-endif
 
 # --- Wayland surface backend (convenience, pulled into wayland.so) ---
 if SCIM_BUILD_FRONTEND_WAYLAND

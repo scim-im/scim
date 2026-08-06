@@ -8,6 +8,7 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_srcdir)/intl \
 			  -I$(top_srcdir)/data \
 			  -I$(top_srcdir)/utils/x11utils \
+			  -I$(top_srcdir)/utils/candidates \
 			  -I$(top_srcdir)/extras/panel \
 			  -DSCIM_DATADIR=\"@SCIM_DATADIR@\" \
 			  -DSCIM_LOCALEDIR=\"@SCIM_LOCALEDIR@\" \
@@ -27,24 +28,29 @@ X11_UTILS=$(top_builddir)/utils/x11utils/libscim-x11utils@SCIM_EPOCH@.la
 endif
 
 # Draw the lookup table in-process with the Cairo candidate renderer, hosted in
-# a GtkPopover (works on both X11 and native Wayland). The X11 backend comes too,
-# as the fallback for a client the popover cannot be anchored to: Chromium
-# attaches no widget to its GdkWindow, so a standalone window is the only way to
-# put candidates on screen there.
-if SCIM_BUILD_CANDIDATES
+# a GtkPopover. The popover needs no global coordinates, so this follows the
+# renderer core and works on a Wayland-only build too.
+if SCIM_BUILD_CANDIDATES_CORE
 CANDIDATES_CFLAGS = -DSCIM_HAS_CANDIDATES \
-		    -I$(top_srcdir)/utils/candidates \
 		    @CAIRO_CFLAGS@
-CANDIDATES_LIBS   = $(top_builddir)/utils/candidates/libscim-candidates-x11@SCIM_EPOCH@.la \
-		    $(top_builddir)/utils/candidates/libscim-candidates@SCIM_EPOCH@.la \
+CANDIDATES_LIBS   = $(top_builddir)/utils/candidates/libscim-candidates@SCIM_EPOCH@.la \
 		    @CAIRO_LIBS@
+endif
+
+# The standalone X11 window, the fallback for a client the popover cannot be
+# anchored to: Chromium attaches no widget to its GdkWindow, so a window of our
+# own is the only way to put candidates on screen there. Separate from the above
+# because GTK can carry X11 support in a build of ours that has no X11 candidate
+# library to draw with.
+if SCIM_BUILD_CANDIDATES
+CANDIDATES_X11_CFLAGS = -DSCIM_HAS_CANDIDATES_X11_LIB
+CANDIDATES_X11_LIBS   = $(top_builddir)/utils/candidates/libscim-candidates-x11@SCIM_EPOCH@.la
 endif
 
 # Let Plasma draw the candidates instead, when a kimpanel widget is there. The
 # agent needs no cairo and no display connection of its own, only libdbus.
 if SCIM_BUILD_KIMPANEL
 KIMPANEL_CFLAGS   = -DSCIM_HAS_KIMPANEL \
-		    -I$(top_srcdir)/utils/candidates \
 		    @DBUS_CFLAGS@
 KIMPANEL_LIBS     = $(top_builddir)/utils/candidates/libscim-candidates-kimpanel@SCIM_EPOCH@.la \
 		    @DBUS_LIBS@
@@ -62,8 +68,8 @@ module_LTLIBRARIES = $(CONFIG_GTK3_IMMODULE)
 
 im_scim_la_SOURCES = gtkimcontextscim.cpp imscim.cpp
 
-im_scim_la_CXXFLAGS=@GTK3_CFLAGS@ $(CANDIDATES_CFLAGS) $(KIMPANEL_CFLAGS)
-im_scim_la_CFLAGS  =@GTK3_CFLAGS@ $(CANDIDATES_CFLAGS) $(KIMPANEL_CFLAGS)
+im_scim_la_CXXFLAGS=@GTK3_CFLAGS@ $(CANDIDATES_CFLAGS) $(CANDIDATES_X11_CFLAGS) $(KIMPANEL_CFLAGS)
+im_scim_la_CFLAGS  =@GTK3_CFLAGS@ $(CANDIDATES_CFLAGS) $(CANDIDATES_X11_CFLAGS) $(KIMPANEL_CFLAGS)
 
 im_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     -avoid-version \
@@ -71,9 +77,6 @@ im_scim_la_LDFLAGS = -rpath $(moduledir) \
 		     $(LD_VERSION_SCRIPT_OPTION) \
 		     @GTK3_LIBS@
 
-im_scim_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(X11_UTILS) $(CANDIDATES_LIBS) $(KIMPANEL_LIBS)
+im_scim_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(X11_UTILS) $(CANDIDATES_X11_LIBS) $(CANDIDATES_LIBS) $(KIMPANEL_LIBS)
 
-# Immodules are dlopen-ed, never linked: drop the installed libtool archive.
-# The dir is shared with other IMEs, so remove only our own file.
-install-data-hook:
-	rm -f "$(DESTDIR)$(moduledir)/im-scim.la"
+include $(top_srcdir)/dlopen-module.am

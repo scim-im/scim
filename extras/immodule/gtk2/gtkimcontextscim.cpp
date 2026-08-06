@@ -64,9 +64,18 @@
 #endif
 #ifdef SCIM_HAS_CANDIDATES
 #include "scim_candidates_x11.h"
+#endif
+#include "scim_candidates_sink.h"
 #ifdef SCIM_HAS_KIMPANEL
 #include "scim_kimpanel_agent.h"
 #endif
+
+// kimpanel draws nothing itself and needs no cairo, so it is a candidate UI in
+// builds that have no renderer at all. The sink plumbing -- the _sink pointer,
+// select_sink () and the callbacks it wires up -- therefore belongs to either
+// backend, not to the renderer.
+#if defined (SCIM_HAS_CANDIDATES) || defined (SCIM_HAS_KIMPANEL)
+#define SCIM_HAS_CANDIDATES_SINK 1
 #endif
 
 #define SEND_EVENT_MASK 0x02
@@ -320,18 +329,21 @@ static guint                                            _panel_iochannel_hup_sou
 // In-process candidate window: the lookup table is drawn here (own-Cairo, at
 // the cursor) instead of being delegated to scim-panel-gtk. This is what lets
 // candidate positioning work in-app; the panel keeps status/properties.
-#ifdef SCIM_HAS_CANDIDATES
-static CandidatesUIX11                                  _candidates_ui;
-
-// The candidate UI in use: the renderer above, or kimpanel when a Plasma panel
-// widget is there to draw for us.
+#ifdef SCIM_HAS_CANDIDATES_SINK
+// The candidate UI in use: the renderer below, or kimpanel when a Plasma panel
+// widget is there to draw for us. Null while neither is available.
 static CandidatesSink                                  *_sink                       = 0;
+#endif
 
 #ifdef SCIM_HAS_KIMPANEL
 static KimpanelAgent                                    _kimpanel;
 static GIOChannel                                      *_kimpanel_iochannel         = 0;
 static guint                                            _kimpanel_iochannel_source  = 0;
 #endif
+
+#ifdef SCIM_HAS_CANDIDATES
+static CandidatesUIX11                                  _candidates_ui;
+
 static GIOChannel                                      *_candidates_iochannel        = 0;
 static guint                                            _candidates_iochannel_source  = 0;
 #endif
@@ -829,12 +841,14 @@ gtk_im_context_scim_focus_in (GtkIMContext *context)
             // every context in this process -- and with the whole desktop when
             // Plasma is drawing -- so mark it active and clear anything the
             // previously focused context left on screen.
+#ifdef SCIM_HAS_CANDIDATES_SINK
             if (_sink) {
                 _sink->enable (true);
                 _sink->show_preedit_string (false);
                 _sink->show_aux_string (false);
                 _sink->show_lookup_table (false);
             }
+#endif
             context_scim->impl->si->focus_in ();
         } else {
             _panel_client.turn_off (context_scim->id);
@@ -1487,11 +1501,13 @@ panel_iochannel_handler (GIOChannel *source, GIOCondition condition, gpointer us
     return TRUE;
 }
 
+#ifdef SCIM_HAS_CANDIDATES_SINK
 static void     select_sink                             ();
 static void     sink_select_candidate                   (int index);
 static void     sink_page_up                            ();
 static void     sink_page_down                          ();
 static void     sink_move_preedit_caret                 (int pos);
+#endif
 
 #ifdef SCIM_HAS_CANDIDATES
 static gboolean
@@ -1521,12 +1537,15 @@ candidates_initialize ()
             g_io_add_watch (_candidates_iochannel, G_IO_IN, candidates_iochannel_handler, 0);
     }
 }
+#endif // SCIM_HAS_CANDIDATES
 
+#ifdef SCIM_HAS_CANDIDATES_SINK
 /* ------------------------------------------------------------------ */
 /* Candidate UI actions -> the focused engine                          */
 /*                                                                     */
 /* Shared by the renderer's own pointer events and by kimpanel, which   */
-/* reports the same things over D-Bus.                                 */
+/* reports the same things over D-Bus. Nothing here touches a renderer, */
+/* so it belongs to whichever sink was built.                           */
 /* ------------------------------------------------------------------ */
 
 static void
@@ -1664,7 +1683,9 @@ select_sink ()
     if (_focused_ic && _focused_ic->impl && _focused_ic->impl->is_on)
         _sink->enable (true);
 }
+#endif // SCIM_HAS_CANDIDATES_SINK
 
+#ifdef SCIM_HAS_CANDIDATES
 static void
 candidates_finalize ()
 {
@@ -1693,12 +1714,14 @@ turn_on_ic (GtkIMContextSCIM *ic)
             // every context in this process -- and with the whole desktop when
             // Plasma is drawing -- so mark it active and clear anything the
             // previously focused context left on screen.
+#ifdef SCIM_HAS_CANDIDATES_SINK
             if (_sink) {
                 _sink->enable (true);
                 _sink->show_preedit_string (false);
                 _sink->show_aux_string (false);
                 _sink->show_lookup_table (false);
             }
+#endif
             ic->impl->si->focus_in ();
         }
 
@@ -2103,7 +2126,9 @@ initialize (void)
     // select_sink () will not choose one that is not open yet, so choosing before
     // candidates_initialize () leaves no candidate UI at all whenever kimpanel is
     // not there to be picked instead.
+#ifdef SCIM_HAS_CANDIDATES_SINK
     select_sink ();
+#endif
 }
 
 static void
@@ -2701,9 +2726,11 @@ reload_config_callback (const ConfigPointer &config)
 
     _keyboard_layout = scim_get_default_keyboard_layout ();
 
+#ifdef SCIM_HAS_CANDIDATES
     // Re-apply the candidate appearance so a font/color change takes effect
     // without restarting.
     _candidates_ui.ui ().set_theme (scim_candidates_theme_from_config (config));
+#endif
 }
 
 static void

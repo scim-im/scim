@@ -8,6 +8,7 @@ AM_CPPFLAGS	= -I$(top_builddir) \
 			  -I$(top_srcdir)/intl \
 			  -I$(top_srcdir)/data \
 			  -I$(top_srcdir)/utils/x11utils \
+			  -I$(top_srcdir)/utils/candidates \
 			  -I$(top_srcdir)/extras/panel \
 			  -DSCIM_DATADIR=\"@SCIM_DATADIR@\" \
 			  -DSCIM_LOCALEDIR=\"@SCIM_LOCALEDIR@\" \
@@ -26,10 +27,11 @@ if SCIM_BUILD_X11_UTILS
 X11_UTILS=$(top_builddir)/utils/x11utils/libscim-x11utils@SCIM_EPOCH@.la
 endif
 
-# Draw the lookup table in-process with the Cairo candidate renderer.
+# Draw the lookup table in-process with the Cairo candidate renderer. GTK2 has
+# no popover, so the X11 window is the renderer here and this follows the X11
+# backend rather than the core.
 if SCIM_BUILD_CANDIDATES
 CANDIDATES_CFLAGS = -DSCIM_HAS_CANDIDATES \
-		    -I$(top_srcdir)/utils/candidates \
 		    @CAIRO_CFLAGS@ @CAIRO_XLIB_CFLAGS@
 CANDIDATES_LIBS   = $(top_builddir)/utils/candidates/libscim-candidates-x11@SCIM_EPOCH@.la \
 		    @CAIRO_LIBS@ @CAIRO_XLIB_LIBS@
@@ -38,7 +40,6 @@ endif
 # Let Plasma draw the candidates instead, when a kimpanel widget is there.
 if SCIM_BUILD_KIMPANEL
 KIMPANEL_CFLAGS   = -DSCIM_HAS_KIMPANEL \
-		    -I$(top_srcdir)/utils/candidates \
 		    @DBUS_CFLAGS@
 KIMPANEL_LIBS     = $(top_builddir)/utils/candidates/libscim-candidates-kimpanel@SCIM_EPOCH@.la \
 		    @DBUS_LIBS@
@@ -67,7 +68,4 @@ im_scim_la_LDFLAGS = -rpath $(moduledir) \
 
 im_scim_la_LIBADD  = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(X11_UTILS) $(CANDIDATES_LIBS) $(KIMPANEL_LIBS)
 
-# Immodules are dlopen-ed, never linked: drop the installed libtool archive.
-# The dir is shared with other IMEs, so remove only our own file.
-install-data-hook:
-	rm -f "$(DESTDIR)$(moduledir)/im-scim.la"
+include $(top_srcdir)/dlopen-module.am

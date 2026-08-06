@@ -20,16 +20,28 @@ AUX_DIST                = $(ac_aux_dir)/config.guess \
 			$(ac_aux_dir)/compile \
 			$(ac_aux_dir)/depcomp \
 			$(ac_aux_dir)/install-sh \
-			$(ac_aux_dir)/ltconfig \
 			$(ac_aux_dir)/ltmain.sh \
 			$(ac_aux_dir)/missing
 
 EXTRA_DIST		= config.rpath THANKS \
-			  mkinstalldirs \
 			  bootstrap
 
 AUTOMAKE_OPTIONS 	= gnu
 SUBDIRS 		= src protocols utils modules configs po extras data docs tests
+
+# distcheck installs into a throwaway prefix, but everything we plug into
+# another package -- the IBus component manifest, the GTK and Qt immodules --
+# installs where that package looks for it: an absolute path from its
+# pkg-config, outside the prefix and needing root. Point them back inside for
+# the check only; a real install still lands where each toolkit searches.
+# AM_ rather than plain DISTCHECK_CONFIGURE_FLAGS, which is the user's to set.
+AM_DISTCHECK_CONFIGURE_FLAGS = \
+	--with-ibus-component-dir='$${datadir}/ibus/component' \
+	--with-gtk2-im-module-dir='$${libdir}/gtk-2.0/immodules' \
+	--with-gtk3-im-module-dir='$${libdir}/gtk-3.0/immodules' \
+	--with-gtk4-im-module-dir='$${libdir}/gtk-4.0/immodules' \
+	--with-qt5-im-module-dir='$${libdir}/qt5/plugins/platforminputcontexts' \
+	--with-qt6-im-module-dir='$${libdir}/qt6/plugins/platforminputcontexts'
 
 MAINTAINERCLEANFILES 	= Makefile.in \
 			  aclocal.m4 \

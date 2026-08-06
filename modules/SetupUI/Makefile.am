@@ -44,16 +44,20 @@ endif
 
 CONFIG_FRONTEND_SETUP_MODULE= aaa-frontend-setup.la
 CONFIG_IMENGINE_SETUP_MODULE= aaa-imengine-setup.la
-# Always built: the candidate renderer it configures is part of libscim, not of
-# any one frontend or panel.
+
+# The candidate renderer it configures belongs to no one frontend or panel, so
+# this follows the renderer itself rather than any of them -- and there is
+# nothing to configure, nor anything to link against, when it was not built.
+if SCIM_BUILD_CANDIDATES_CORE
 CONFIG_CANDIDATES_SETUP_MODULE= candidates-setup.la
+endif
 
 endif
 
 # Rules for setup module
-setupmoduledir           = $(libdir)/scim@SCIM_EPOCH@/$(SCIM_BINARY_VERSION)/SetupUI
+moduledir           = $(libdir)/scim@SCIM_EPOCH@/$(SCIM_BINARY_VERSION)/SetupUI
 
-setupmodule_LTLIBRARIES  = $(CONFIG_FRONTEND_SETUP_MODULE) \
+module_LTLIBRARIES  = $(CONFIG_FRONTEND_SETUP_MODULE) \
 			   $(CONFIG_IMENGINE_SETUP_MODULE) \
 			   $(CONFIG_CANDIDATES_SETUP_MODULE) \
 			   $(CONFIG_PANEL_GTK_SETUP_MODULE)
@@ -62,7 +66,7 @@ aaa_frontend_setup_la_SOURCES = scim_frontend_setup.cpp
 aaa_frontend_setup_la_CFLAGS  = @GTK_CFLAGS@
 aaa_frontend_setup_la_CXXFLAGS= @GTK_CFLAGS@
 aaa_frontend_setup_la_LDFLAGS = -avoid-version \
-		    	     	  -rpath $(setupmoduledir) \
+		    	     	  -rpath $(moduledir) \
 		    		  -module \
     				  @LIBTOOL_EXPORT_OPTIONS@ \
 		    		  @GTK_LIBS@ \
@@ -75,7 +79,7 @@ aaa_imengine_setup_la_SOURCES = scim_imengine_setup.cpp
 aaa_imengine_setup_la_CFLAGS  = @GTK_CFLAGS@
 aaa_imengine_setup_la_CXXFLAGS= @GTK_CFLAGS@
 aaa_imengine_setup_la_LDFLAGS = -avoid-version \
-				-rpath $(setupmoduledir) \
+				-rpath $(moduledir) \
 				-module \
 				@LIBTOOL_EXPORT_OPTIONS@ \
 				@GTK_LIBS@ \
@@ -88,7 +92,7 @@ candidates_setup_la_SOURCES   = scim_candidates_setup.cpp
 candidates_setup_la_CFLAGS    = @GTK_CFLAGS@
 candidates_setup_la_CXXFLAGS  = @GTK_CFLAGS@
 candidates_setup_la_LDFLAGS   = -avoid-version \
-				-rpath $(setupmoduledir) \
+				-rpath $(moduledir) \
 				-module \
 				@LIBTOOL_EXPORT_OPTIONS@ \
 				@GTK_LIBS@ \
@@ -102,14 +106,11 @@ panel_gtk_setup_la_SOURCES     = scim_panel_gtk_setup.cpp
 panel_gtk_setup_la_CFLAGS      = @GTK_CFLAGS@
 panel_gtk_setup_la_CXXFLAGS    = @GTK_CFLAGS@
 panel_gtk_setup_la_LDFLAGS     = -avoid-version \
-			     	 -rpath $(setupmoduledir) \
+			     	 -rpath $(moduledir) \
 				 -module \
 				 @LIBTOOL_EXPORT_OPTIONS@ \
 				 @GTK_LIBS@ \
 				 @LTLIBINTL@
 panel_gtk_setup_la_LIBADD      = $(top_builddir)/src/libscim@SCIM_EPOCH@.la
 
-
-# dlopen-ed setup modules, never linked: drop the installed libtool archives.
-install-data-hook:
-	rm -f $(DESTDIR)$(setupmoduledir)/*.la
+include $(top_srcdir)/dlopen-module.am

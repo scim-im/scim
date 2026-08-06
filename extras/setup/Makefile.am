@@ -85,5 +85,9 @@ scim-setup.desktop: scim-setup.desktop.in
 		--template=$(srcdir)/scim-setup.desktop.in -d $(top_srcdir)/po -o $@
 endif
 
-EXTRA_DIST = $(desktop_in_files) scim-setup.in
+# Named literally, not through $(desktop_in_files): that variable exists only
+# when the setup UI is enabled, so the tarball would otherwise lose the .desktop
+# source whenever the tree was configured with --disable-setup-ui.
+EXTRA_DIST = scim-setup.desktop.in scim-setup.in
 
+include $(top_srcdir)/dlopen-module.am

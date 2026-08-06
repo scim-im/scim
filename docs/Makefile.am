@@ -22,7 +22,18 @@ CLEANFILES		= *.bak
 EXTRA_DIST		= scim.cfg developers design.zh_CN
 
 # Hand-written manual pages: install to $(mandir)/man1 and ship in the tarball.
-dist_man_MANS		= scim.1 scim-setup.1 scim-config-agent.1
+# scim and scim-config-agent are always built, so their pages always install.
+dist_man_MANS		= scim.1 scim-config-agent.1
+
+# scim-setup.1 documents a program that --disable-setup-ui leaves out, so it
+# follows that program rather than installing a page for a missing command. It
+# is distributed either way: what ends up in the tarball must not depend on how
+# the tree happened to be configured.
+if SCIM_BUILD_SCIM_SETUP
+dist_man_MANS	       += scim-setup.1
+else
+EXTRA_DIST	       += scim-setup.1
+endif
 
 SUBDIRS			= manual
 

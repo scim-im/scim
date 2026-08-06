@@ -191,8 +191,4 @@ wayland_la_LIBADD	= $(top_builddir)/src/libscim@SCIM_EPOCH@.la \
 			  $(top_builddir)/utils/candidates/libscim-candidates-wayland.la \
 			  $(KIMPANEL_LIBS)
 
-
-
-# dlopen-ed modules, never linked: drop the installed libtool archives.
-install-data-hook:
-	rm -f $(DESTDIR)$(moduledir)/*.la
+include $(top_srcdir)/dlopen-module.am
