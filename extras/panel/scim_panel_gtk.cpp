@@ -2395,46 +2395,13 @@ sni_menu_item_activated (DbusmenuMenuitem *item, guint /*timestamp*/, gpointer /
 // Mirror scim's property tree into dbusmenu items. scim ships a flat, key-sorted
 // list whose nesting is implied by the keys (Property::is_a_leaf_of ()), the same
 // walk the toolbar and the ibus frontend use.
-// Attach an icon that lives at a path. ICON_NAME is a freedesktop icon-theme
-// *name*, so a path like /usr/local/share/scim/icons/Array30.png never resolves
-// and the entry ends up bare. ICON_DATA carries the image itself: raw PNG bytes,
-// which is what libdbusmenu-gtk's property_set_image () produces -- we cannot
-// call that directly because it lives in the gtk flavour of the library, and the
-// panel links the toolkit-agnostic glib one.
-static void
-sni_menuitem_set_icon (DbusmenuMenuitem *item, const String &iconfile,
-                       const char *fallback = 0)
-{
-    String path = iconfile;
-    if (path.length () && path [0] != SCIM_PATH_DELIM)
-        path = String (SCIM_ICONDIR) + String (SCIM_PATH_DELIM_STRING) + path;
-
-    // Loading through gdk-pixbuf rather than reading the file verbatim also
-    // scales the icon down and accepts whatever format the engine shipped.
-    GdkPixbuf *pb = 0;
-    if (path.length ())
-        pb = gdk_pixbuf_new_from_file_at_size (path.c_str (),
-                                               MENU_ICON_SIZE, MENU_ICON_SIZE, 0);
-    if (!pb && path.length ())
-        SCIM_DEBUG_MAIN (1) << "Panel: no usable icon at \"" << path << "\".\n";
-    // Engines fall back to the SCIM logo so the list stays aligned when one of
-    // them reports an icon that cannot be loaded. Properties pass no fallback:
-    // many legitimately have only a label, and a logo on each would be noise.
-    if (!pb && fallback)
-        pb = gdk_pixbuf_new_from_file_at_size (fallback, MENU_ICON_SIZE, MENU_ICON_SIZE, 0);
-    if (!pb)
-        return;
-
-    gchar *png = 0;
-    gsize  len = 0;
-    if (gdk_pixbuf_save_to_buffer (pb, &png, &len, "png", 0, NULL)) {
-        dbusmenu_menuitem_property_set_byte_array (item, DBUSMENU_MENUITEM_PROP_ICON_DATA,
-                                                  (const guchar *) png, len);
-        g_free (png);
-    }
-    g_object_unref (pb);
-}
-
+//
+// The entries carry no icons. The ones scim has are fixed bitmaps at a fixed
+// size, so they neither recolour for the desktop's theme nor scale for its
+// display, and several only repeat what the label already says -- the hanconv
+// filter's icons against labels that read "SC->TC". A themed name (ICON_NAME) is
+// the only kind of icon that belongs in a tray menu, and it is what the
+// English/Keyboard entry below uses.
 static void
 sni_add_properties (DbusmenuMenuitem *parent,
                     PropertyRepository::const_iterator begin,
@@ -2454,7 +2421,6 @@ sni_add_properties (DbusmenuMenuitem *parent,
                                              it->property.visible ());
         dbusmenu_menuitem_property_set_bool (item, DBUSMENU_MENUITEM_PROP_ENABLED,
                                              it->property.active ());
-        sni_menuitem_set_icon (item, it->property.get_icon ());
 
         g_object_set_data_full (G_OBJECT (item), "scim-property-key",
                                 g_strdup (it->property.get_key ().c_str ()), g_free);
@@ -2548,8 +2514,6 @@ sni_rebuild_menu (void)
         DbusmenuMenuitem *item = dbusmenu_menuitem_new ();
         dbusmenu_menuitem_property_set (item, DBUSMENU_MENUITEM_PROP_LABEL,
                                         _sni_factories[i].name.c_str ());
-        sni_menuitem_set_icon (item, _sni_factories[i].icon,
-                               SCIM_TRADEMARK_ICON_FILE);
         g_object_set_data_full (G_OBJECT (item), "scim-factory-uuid",
                                 g_strdup (_sni_factories[i].uuid.c_str ()), g_free);
         g_signal_connect (item, DBUSMENU_MENUITEM_SIGNAL_ITEM_ACTIVATED,
