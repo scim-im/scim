@@ -311,8 +311,12 @@ static void panel_slot_forward_key_event (int context, const KeyEvent &key)
 {
     ScimQtInputContext *ic = find_ic (context);
     if (ic && ic->impl) {
-        // Let the fallback engine turn the key into a commit where it can.
-        // TODO: inject a real QKeyEvent for true forwarding.
+        // The fallback engine commits the key as text where it can, which
+        // covers the printable ones. Qt could go further -- a QKeyEvent sent to
+        // the focus object would deliver the rest -- but forward_key_event ()
+        // is deprecated and unimplementable on GTK4, so matching it here would
+        // only make an engine work in Qt applications and nowhere else. See the
+        // note on IMEngineInstanceBase::forward_key_event ().
         _fallback_instance->process_key_event (key);
     }
 }
@@ -1260,8 +1264,10 @@ static void slot_forward_key_event (IMEngineInstanceBase *si, const KeyEvent &ke
 {
     ScimQtInputContext *ic = static_cast<ScimQtInputContext *> (si->get_frontend_data ());
     if (ic && _focused_ic == ic) {
-        // Let the fallback engine commit the key as text where it can.
-        // TODO: inject a real QKeyEvent to the focus object for full forwarding.
+        // The fallback engine commits the key as text where it can. Not
+        // extended to a synthesized QKeyEvent on purpose: forward_key_event ()
+        // is deprecated because GTK4 cannot implement it, and an engine that
+        // worked only under Qt would be worse than one told to decline the key.
         _fallback_instance->process_key_event (key);
     }
 }

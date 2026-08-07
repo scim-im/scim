@@ -729,10 +729,41 @@ protected:
     void commit_string (const WideString &str);
 
     /**
-     * @brief Forward a key event to the client application.
+     * @brief Forward a key event to the client application. Deprecated.
+     *
+     * @deprecated Decline the key instead: return false from
+     * process_key_event (). That is the only mechanism that works on every
+     * toolkit and every display protocol, because a key that was never
+     * consumed is never taken away from the application in the first place --
+     * nothing has to be put back.
+     *
+     * This call asks a FrontEnd to hand the application a key it has already
+     * taken, which means synthesizing an input event, and that is no longer
+     * possible everywhere:
+     *
+     *  - GTK4 has no way to do it at all. GdkEvent is opaque with no public
+     *    constructor, gdk_key_event_new () is not even exported from the
+     *    library, gdk_event_put () is gone, and widgets no longer have a
+     *    key-press-event signal to emit. The GTK4 module therefore commits
+     *    printable keys as text and drops the rest.
+     *  - The Wayland and IBus FrontEnds re-send the key currently being
+     *    processed and ignore @p key entirely, since a compositor's virtual
+     *    keyboard replays a physical key rather than naming an arbitrary one.
+     *  - Only the GTK2, GTK3 and XIM FrontEnds honor @p key as written.
+     *
+     * So the same call already means four different things depending on how
+     * the application happens to reach SCIM, which no engine can reasonably
+     * program against.
+     *
+     * Substituting a different key -- consume Space, deliver Return -- has no
+     * replacement and cannot be made to work on GTK4 or Wayland. Express the
+     * intent as committed text instead.
      *
      * @param key - the key event to be forwarded.
      */
+    SCIM_DEPRECATED ("return false from process_key_event () to let the "
+                     "application handle the key; forwarding cannot be "
+                     "implemented on GTK4 or Wayland")
     void forward_key_event (const KeyEvent &key);
 
     /**

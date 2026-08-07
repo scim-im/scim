@@ -27,10 +27,44 @@
  */
 
 
-#ifndef __SCIM_TYPES_H
-#define __SCIM_TYPES_H
+#pragma once
 
 @INCLUDE_STDINT@
+
+/**
+ * @brief Mark an interface as deprecated, with a message saying what to use.
+ *
+ * Spelled through a macro rather than [[deprecated]] directly because this is
+ * an installed header: SCIM itself builds as C++17, but nothing forces the
+ * standard on an out-of-tree engine, and the attribute is only standard from
+ * C++14. Falls back to the GNU attribute, then to nothing.
+ */
+#ifndef SCIM_DEPRECATED
+# if defined (__cplusplus) && __cplusplus >= 201402L
+#  define SCIM_DEPRECATED(msg) [[deprecated (msg)]]
+# elif defined (__GNUC__) || defined (__clang__)
+#  define SCIM_DEPRECATED(msg) __attribute__ ((deprecated (msg)))
+# else
+#  define SCIM_DEPRECATED(msg)
+# endif
+#endif
+
+/**
+ * @brief Silence the deprecation warning around a relay of a deprecated call.
+ *
+ * For the few places inside SCIM that pass such a call along on someone else's
+ * behalf -- a filter chain, the socket proxy -- where the warning would name
+ * this code rather than the engine that still makes the call.
+ */
+#if defined (__GNUC__) || defined (__clang__)
+# define SCIM_DIAG_PUSH_NO_DEPRECATED \
+    _Pragma ("GCC diagnostic push") \
+    _Pragma ("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+# define SCIM_DIAG_POP _Pragma ("GCC diagnostic pop")
+#else
+# define SCIM_DIAG_PUSH_NO_DEPRECATED
+# define SCIM_DIAG_POP
+#endif
 
 #ifdef __FreeBSD__
 # include <osreldate.h>
@@ -55,8 +89,6 @@ typedef std::basic_string<char> String;
 typedef std::basic_string<ucs4_t> WideString;
 
 } // namespace scim
-
-#endif //__SCIM_TYPES_H
 
 /*
 vi:ts=4:nowrap:ai:expandtab

@@ -1417,10 +1417,10 @@ panel_slot_process_key_event (int context, const KeyEvent &key)
             if (!_focused_ic || !_focused_ic->impl->is_on ||
                 !_focused_ic->impl->si->process_key_event (key)) {
                 if (!_fallback_instance->process_key_event (key)) {
-                    // GTK4 events are immutable and gdk_event_put() is gone, so
-                    // an unhandled key coming back from the panel cannot be
-                    // re-injected into the application; it is dropped here.
-                    // TODO(gtk4): forward via the toolkit's input machinery.
+                    // Dropped, and it cannot be otherwise. Handing a key back
+                    // to the application means synthesizing an input event,
+                    // which GTK4 has no way to do -- see
+                    // panel_slot_forward_key_event () below for the detail.
                 }
             }
         }
@@ -1444,8 +1444,19 @@ panel_slot_forward_key_event (int context, const KeyEvent &key)
     GtkIMContextSCIM *ic = find_ic (context);
     SCIM_DEBUG_FRONTEND(1) << "panel_slot_forward_key_event context=" << context << " key=" << key.get_key_string () << " ic=" << ic << "\n";
     if (ic && ic->impl) {
-        // GTK4 cannot inject a synthesized key event into the application.
-        // TODO(gtk4): forward the key via the toolkit's input machinery.
+        // Nothing to do, and nothing that could be done. Re-delivering a key
+        // means building a GdkEvent, and GTK4 offers no way to: GdkKeyEvent is
+        // opaque with no public constructor, gdk_key_event_new () is not
+        // exported from the library at all, gdk_event_put () is gone,
+        // gdk_display_put_event () is deprecated and still wants the event we
+        // cannot build, and widgets no longer carry a key-press-event signal to
+        // emit -- key handling moved to GtkEventControllerKey, which has no
+        // injection entry point. This is not a gap to close later; the toolkit
+        // deliberately closed it, and it applies to every GTK4 input method.
+        //
+        // Engines should decline a key (return false from process_key_event)
+        // rather than consume it and ask for it back. See the deprecation note
+        // on IMEngineInstanceBase::forward_key_event ().
         (void) key;
     }
 }
@@ -2890,10 +2901,10 @@ slot_forward_key_event (IMEngineInstanceBase *si,
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
     if (ic && _focused_ic == ic) {
-        // Let the fallback engine turn the key into a commit where it can.
-        // GTK4 cannot re-inject a raw key event into the application, so an
-        // otherwise-unhandled key is dropped.
-        // TODO(gtk4): forward unhandled keys via the toolkit's input machinery.
+        // The fallback engine commits the key as text where it can, which
+        // covers the printable ones. The rest are dropped: GTK4 cannot
+        // synthesize an input event (see panel_slot_forward_key_event ()), and
+        // forward_key_event () is deprecated for exactly that reason.
         _fallback_instance->process_key_event (key);
     }
 }

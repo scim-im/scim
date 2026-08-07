@@ -491,7 +491,12 @@ FilterInstanceBase::filter_commit_string (const WideString &str)
 void
 FilterInstanceBase::filter_forward_key_event (const KeyEvent &key)
 {
+    // Relaying what the filtered engine asked for, not a use of the deprecated
+    // call in its own right: a filter must stay transparent, and warning here
+    // would point at this file instead of the engine that still calls it.
+SCIM_DIAG_PUSH_NO_DEPRECATED
     forward_key_event (key);
+SCIM_DIAG_POP
 }
 
 void

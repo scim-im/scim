@@ -947,7 +947,11 @@ SocketInstance::do_transaction (Transaction &trans, bool &ret)
                     KeyEvent key;
                     if (trans.get_data (key)) {
                         SCIM_DEBUG_IMENGINE(3) << "  forward_key_event ()\n";
+                        // Relaying the remote engine's request; the warning
+                        // belongs at that engine, not at this proxy.
+SCIM_DIAG_PUSH_NO_DEPRECATED
                         forward_key_event (key);
+SCIM_DIAG_POP
                     }
                     break;
                 }
