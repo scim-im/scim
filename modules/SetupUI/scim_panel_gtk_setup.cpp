@@ -64,8 +64,6 @@ using namespace scim;
 #define SCIM_CONFIG_PANEL_GTK_TOOLBAR_SHOW_MENU_ICON    "/Panel/Gtk/ToolBar/ShowMenuIcon"
 #define SCIM_CONFIG_PANEL_GTK_TOOLBAR_SHOW_HELP_ICON    "/Panel/Gtk/ToolBar/ShowHelpIcon"
 #define SCIM_CONFIG_PANEL_GTK_TOOLBAR_SHOW_PROPERTY_LABEL "/Panel/Gtk/ToolBar/ShowPropertyLabel"
-#define SCIM_CONFIG_PANEL_GTK_LOOKUP_TABLE_EMBEDDED     "/Panel/Gtk/LookupTableEmbedded"
-#define SCIM_CONFIG_PANEL_GTK_LOOKUP_TABLE_VERTICAL     "/Panel/Gtk/LookupTableVertical"
 #define SCIM_CONFIG_PANEL_GTK_DEFAULT_STICKED           "/Panel/Gtk/DefaultSticked"
 #define SCIM_CONFIG_PANEL_GTK_SHOW_TRAY_ICON            "/Panel/Gtk/ShowTrayIcon"
 
@@ -131,8 +129,6 @@ static bool   __config_toolbar_show_stick_icon   = false;
 static bool   __config_toolbar_show_menu_icon    = true;
 static bool   __config_toolbar_show_help_icon    = false;
 static bool   __config_toolbar_show_property_label = true;
-static bool   __config_lookup_table_embedded     = true;
-static bool   __config_lookup_table_vertical     = false;
 static bool   __config_default_sticked           = false;
 static bool   __config_show_tray_icon            = true;
 
@@ -156,8 +152,6 @@ static GtkWidget * __widget_toolbar_show_stick_icon   = 0;
 static GtkWidget * __widget_toolbar_show_menu_icon   = 0;
 static GtkWidget * __widget_toolbar_show_help_icon    = 0;
 static GtkWidget * __widget_toolbar_show_property_label = 0;
-static GtkWidget * __widget_lookup_table_embedded     = 0;
-static GtkWidget * __widget_lookup_table_vertical     = 0;
 static GtkWidget * __widget_default_sticked           = 0;
 static GtkWidget * __widget_show_tray_icon            = 0;
 static GtkWidget * __widget_font                      = 0;
@@ -306,23 +300,11 @@ create_setup_window ()
         hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
         gtk_box_append (GTK_BOX (vbox), hbox);
 
-        // Create the Input Window setup block
-        frame = gtk_frame_new (_("Input window"));
-        gtk_widget_set_margin_start (frame, 4);
-        gtk_widget_set_margin_end (frame, 4);
-        gtk_widget_set_margin_top (frame, 4);
-        gtk_widget_set_margin_bottom (frame, 4);
-        gtk_widget_set_hexpand (frame, TRUE);
-        gtk_box_append (GTK_BOX (hbox), frame);
-
-        vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 4);
-        gtk_frame_set_child (GTK_FRAME (frame), vbox);
-
-        __widget_lookup_table_embedded = gtk_check_button_new_with_mnemonic (_("E_mbedded lookup table"));
-        gtk_box_append (GTK_BOX (vbox), __widget_lookup_table_embedded);
-
-        __widget_lookup_table_vertical = gtk_check_button_new_with_mnemonic (_("_Vertical lookup table"));
-        gtk_box_append (GTK_BOX (vbox), __widget_lookup_table_vertical);
+        // No "Input window" block here any more. The panel stopped drawing the
+        // preedit and the lookup table -- every transport renders its own now --
+        // so its two checkboxes ("embedded" and "vertical" lookup table) had
+        // nothing left to act on and only wrote keys nobody reads. Orientation
+        // moved to the candidates page, where the renderer that honours it lives.
 
         frame = gtk_frame_new (_("Misc"));
         gtk_widget_set_margin_start (frame, 4);
@@ -430,14 +412,6 @@ create_setup_window ()
                           G_CALLBACK (on_default_check_button_toggled),
                           &__config_toolbar_show_property_label);
 
-        g_signal_connect ((gpointer) __widget_lookup_table_embedded, "toggled",
-                          G_CALLBACK (on_default_check_button_toggled),
-                          &__config_lookup_table_embedded);
-
-        g_signal_connect ((gpointer) __widget_lookup_table_vertical, "toggled",
-                          G_CALLBACK (on_default_check_button_toggled),
-                          &__config_lookup_table_vertical);
-
         g_signal_connect ((gpointer) __widget_default_sticked, "toggled",
                           G_CALLBACK (on_default_check_button_toggled),
                           &__config_default_sticked);
@@ -494,16 +468,6 @@ create_setup_window ()
         gtk_widget_set_tooltip_text (__widget_toolbar_show_property_label,
                               _("If this option is checked, "
                                 "the text label of input method properties will be showed on the toolbar."));
-
-        gtk_widget_set_tooltip_text (__widget_lookup_table_embedded,
-                              _("If this option is checked, "
-                                "the lookup table will be embedded into "
-                                "the input window."));
-
-        gtk_widget_set_tooltip_text (__widget_lookup_table_vertical,
-                              _("If this option is checked, "
-                                "the lookup table will be displayed "
-                                "vertically."));
 
         gtk_widget_set_tooltip_text (__widget_show_tray_icon,
                               _("If this option is checked, "
@@ -596,18 +560,6 @@ setup_widget_value ()
             __config_toolbar_show_property_label);
     }
 
-    if (__widget_lookup_table_embedded) {
-        gtk_check_button_set_active (
-            GTK_CHECK_BUTTON (__widget_lookup_table_embedded),
-            __config_lookup_table_embedded);
-    }
-
-    if (__widget_lookup_table_vertical) {
-        gtk_check_button_set_active (
-            GTK_CHECK_BUTTON (__widget_lookup_table_vertical),
-            __config_lookup_table_vertical);
-    }
-
     if (__widget_default_sticked) {
         gtk_check_button_set_active (
             GTK_CHECK_BUTTON (__widget_default_sticked),
@@ -666,12 +618,6 @@ load_config (const ConfigPointer &config)
         __config_toolbar_show_property_label =
             config->read (String (SCIM_CONFIG_PANEL_GTK_TOOLBAR_SHOW_PROPERTY_LABEL),
                           __config_toolbar_show_property_label);
-        __config_lookup_table_embedded =
-            config->read (String (SCIM_CONFIG_PANEL_GTK_LOOKUP_TABLE_EMBEDDED),
-                          __config_lookup_table_embedded);
-        __config_lookup_table_vertical =
-            config->read (String (SCIM_CONFIG_PANEL_GTK_LOOKUP_TABLE_VERTICAL),
-                          __config_lookup_table_vertical);
         __config_default_sticked =
             config->read (String (SCIM_CONFIG_PANEL_GTK_DEFAULT_STICKED),
                           __config_default_sticked);
@@ -720,10 +666,6 @@ save_config (const ConfigPointer &config)
                        __config_toolbar_show_help_icon);
         config->write (String (SCIM_CONFIG_PANEL_GTK_TOOLBAR_SHOW_PROPERTY_LABEL),
                        __config_toolbar_show_property_label);
-        config->write (String (SCIM_CONFIG_PANEL_GTK_LOOKUP_TABLE_EMBEDDED),
-                        __config_lookup_table_embedded);
-        config->write (String (SCIM_CONFIG_PANEL_GTK_LOOKUP_TABLE_VERTICAL),
-                       __config_lookup_table_vertical);
         config->write (String (SCIM_CONFIG_PANEL_GTK_SHOW_TRAY_ICON),
                        __config_show_tray_icon);
         config->write (String (SCIM_CONFIG_PANEL_GTK_DEFAULT_STICKED),

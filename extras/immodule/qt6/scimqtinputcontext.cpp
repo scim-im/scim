@@ -64,6 +64,7 @@
 #include <QtGui/QRasterWindow>
 #include <QtGui/QSurfaceFormat>
 #include <QtGui/QPainter>
+#include <QtGui/QWheelEvent>
 #include <QtGui/QImage>
 #include <QtGui/QMouseEvent>
 #include <cairo.h>
@@ -705,7 +706,14 @@ class ScimCandidatesWindow : public QRasterWindow
 {
 public:
     CandidatesUI ui;
-    ScimCandidatesWindow () {
+
+    // Sub-notch scroll carried between events. Per window rather than function
+    // static: a remainder left by one candidate list must not page the next.
+    int scroll_accum;
+
+    void reset_scroll () { scroll_accum = 0; }
+
+    ScimCandidatesWindow () : scroll_accum (0) {
         setFlags (Qt::ToolTip | Qt::FramelessWindowHint);
         // Ask for an alpha channel, so a translucent background or a rounded
         // corner has something to be transparent against. Without it the raster
@@ -726,13 +734,25 @@ protected:
     void paintEvent (QPaintEvent *) override {
         int w = (int) width (), h = (int) height ();
         if (w <= 0 || h <= 0) return;
-        cairo_surface_t *surf = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, w, h);
+        // width()/height() are logical pixels. Rendering the panel at that size
+        // and handing it to a QPainter that scales by the device pixel ratio had
+        // Qt blow a 1x image up on a HiDPI screen, so draw at device resolution
+        // and let the renderer keep working in logical units.
+        const qreal dpr = devicePixelRatioF ();
+        const int bw = qMax (1, qRound (w * dpr));
+        const int bh = qMax (1, qRound (h * dpr));
+        cairo_surface_t *surf = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, bw, bh);
         cairo_t *cr = cairo_create (surf);
+        if (dpr != 1.0)
+            cairo_scale (cr, dpr, dpr);
         ui.draw (cr);
         cairo_surface_flush (surf);
-        QImage img (cairo_image_surface_get_data (surf), w, h,
+        QImage img (cairo_image_surface_get_data (surf), bw, bh,
                     cairo_image_surface_get_stride (surf),
                     QImage::Format_ARGB32_Premultiplied);
+        // Says the image is already at device resolution, so drawImage () maps
+        // it 1:1 instead of scaling it again.
+        img.setDevicePixelRatio (dpr);
         QPainter p (this);
         // Source, not the default SourceOver: the cleared corners must replace
         // the backing store rather than blend into the previous frame, or the
@@ -748,6 +768,73 @@ protected:
         CandidatesUI::HitType hit = ui.hit_test ((int) ev->position ().x (),
                                                  (int) ev->position ().y (), idx);
         candidates_route_click (hit, idx);
+    }
+
+    // The wheel pages the list, as it does in the standalone X11 and Wayland
+    // candidate windows. Without it an application using this module has no way
+    // to page with the mouse at all, only the engine's own keys.
+    void wheelEvent (QWheelEvent *ev) override {
+        // angleDelta is in eighths of a degree and a wheel notch is 120, but a
+        // touchpad or a high-resolution wheel sends far smaller amounts, and
+        // paging on each would run a swipe through a dozen pages. Accumulate to
+        // a notch instead, keeping the remainder so a slow drag still pages once
+        // it has added up.
+        int &accum = scroll_accum;
+        // Positive y is a scroll away from the user, matching Button4 on X11.
+        const int dy = ev->angleDelta ().y ();
+
+        // The gesture is over: what did not add up to a notch never will. Only
+        // a touchpad says so; a wheel reports NoScrollPhase.
+        //
+        // Under the xcb plugin nothing says so at all -- XI2 smooth scrolling
+        // carries no notion of a gesture, so every event is NoScrollPhase and
+        // the remainder lives until the direction reverses or the window
+        // hides. The gtk3 module has no such gap: gdk synthesises a stop event
+        // on X11 too, so gdk_event_is_scroll_stop_event () covers both.
+        if (ev->phase () == Qt::ScrollEnd) {
+            accum = 0;
+            ev->ignore ();
+            return;
+        }
+
+        // A phase event and the horizontal part of a diagonal swipe both carry
+        // no vertical delta. Ignoring one must not discard what is accumulated,
+        // or a touchpad never reaches a notch.
+        if (dy == 0) {
+            ev->ignore ();
+            return;
+        }
+
+        // Reversing direction abandons what was accumulated the other way, or
+        // the first notch back would come early.
+        if ((dy < 0) != (accum < 0))
+            accum = 0;
+        accum += dy;
+
+        // Whole notches now, sub-notch remainder carried. Bounded like the gtk4
+        // module and the wayland window: a fling can add up to a great many,
+        // and each page is a round trip to the engine. Past the cap the rest is
+        // dropped rather than kept, or the overshoot would dribble out over the
+        // events that follow.
+        const int max_steps = 5;
+        int steps = accum / 120;
+        accum -= steps * 120;
+
+        if (steps >  max_steps) { steps =  max_steps; accum = 0; }
+        if (steps < -max_steps) { steps = -max_steps; accum = 0; }
+
+        // Positive is a scroll away from the user, which pages back.
+        for (int i = 0; i < steps; ++ i)
+            candidates_route_click (CandidatesUI::HIT_PREV_PAGE, -1);
+        for (int i = steps; i < 0; ++ i)
+            candidates_route_click (CandidatesUI::HIT_NEXT_PAGE, -1);
+
+        const bool paged = (steps != 0);
+
+        if (paged)
+            ev->accept ();
+        else
+            ev->ignore ();
     }
 };
 
@@ -798,7 +885,11 @@ static void candidates_show (ScimQtInputContext *ic)
 
 static void candidates_hide ()
 {
-    if (_candidates_window) _candidates_window->hide ();
+    if (_candidates_window) {
+        // Drop a partial notch with the list it belonged to.
+        _candidates_window->reset_scroll ();
+        _candidates_window->hide ();
+    }
 }
 
 static void candidates_update (const LookupTable &table)

@@ -55,6 +55,7 @@ CandidatesTheme::light ()
     t.corner_radius = 4;
     t.padding       = 6;
     t.spacing       = 6;
+    t.vertical      = false;
     return t;
 }
 
@@ -75,6 +76,7 @@ CandidatesTheme::dark ()
     t.corner_radius = 4;
     t.padding       = 6;
     t.spacing       = 6;
+    t.vertical      = false;
     return t;
 }
 
@@ -354,6 +356,11 @@ scim_candidates_theme_from_config (const ConfigPointer &config, const String &re
     // that setting only NormalText still colors the whole panel consistently.
     t.preedit_fg   = parse_color (color ("Color/PreeditText"),       t.fg);
 
+    // "vertical" or "horizontal"; anything else leaves the preset alone.
+    String orientation = read_layered_key (config, renderer, String ("Orientation"), true);
+    if (orientation == "vertical")        t.vertical = true;
+    else if (orientation == "horizontal") t.vertical = false;
+
     read_layered_int (config, renderer, String ("BorderWidth"),  t.border_width);
     read_layered_int (config, renderer, String ("CornerRadius"), t.corner_radius);
     read_layered_int (config, renderer, String ("Padding"),      t.padding);
@@ -521,7 +528,6 @@ public:
     AttributeList m_aux_attrs;
 
     bool          m_lookup_visible;
-    bool          m_lookup_vertical;
     bool          m_sections_reversed;
     std::vector<WideString> m_cand_text;
     std::vector<WideString> m_cand_label;
@@ -541,6 +547,23 @@ public:
     bool          m_has_aux_item;
     std::vector<CandidateCell> m_cells;
 
+    /**
+     * @brief A page-flip chevron: where it is and whether it leads anywhere.
+     *
+     * Laid out in the same logical pixels as everything else, so hit_test ()
+     * compares against these directly. Both are placed whenever the list runs to
+     * more than one page, the unreachable direction merely drawn dimmed -- hiding
+     * one would change the panel's width as the user reaches the last page,
+     * which is a jump right under the caret.
+     */
+    struct PageArrow {
+        int  x, y, w, h;
+        bool enabled;
+    };
+    bool      m_has_arrows;
+    PageArrow m_prev_arrow;
+    PageArrow m_next_arrow;
+
     // A scratch cairo context for measuring without a live surface.
     cairo_surface_t *m_scratch_surface;
     cairo_t         *m_scratch_cr;
@@ -549,13 +572,14 @@ public:
         : m_theme (CandidatesTheme::light ()),
           m_preedit_visible (false), m_preedit_caret (0),
           m_aux_visible (false),
-          m_lookup_visible (false), m_lookup_vertical (false),
+          m_lookup_visible (false),
           m_sections_reversed (false),
           m_cursor_in_page (-1), m_has_prev_page (false), m_has_next_page (false),
           m_dirty (true), m_width (0), m_height (0),
           m_has_preedit_item (false),
           m_caret_x (0), m_caret_y (0), m_caret_h (0), m_has_caret (false),
           m_has_aux_item (false),
+          m_has_arrows (false),
           m_scratch_surface (0), m_scratch_cr (0)
     {
     }
@@ -585,6 +609,69 @@ public:
         }
     }
 
+    // Chevrons are sized from the candidate row so they track the font rather
+    // than a fixed pixel count. Narrower than they are tall, which is the shape
+    // of the glyph; the floor keeps a tiny font from leaving nothing to click.
+    static int arrow_width (int row_height)
+    {
+        int w = row_height / 2;
+        return w < 8 ? 8 : w;
+    }
+
+    /**
+     * @brief Stroke one page-flip chevron.
+     *
+     * A path rather than an icon: it costs no assets, it is sharp at whatever
+     * scale the host renders at, and being drawn in the theme's own text color
+     * it follows a light or dark panel without a second set of images. A glyph
+     * would do as well, but not every CJK font carries the arrow characters.
+     *
+     * Points along the list: left/right beside a horizontal row, up/down beside
+     * a vertical one.
+     */
+    void draw_chevron (cairo_t *cr, const PageArrow &a, bool prev)
+    {
+        const double cx = a.x + a.w / 2.0;
+        const double cy = a.y + a.h / 2.0;
+        const double d  = (a.w < a.h ? a.w : a.h) * 0.25;
+
+        cairo_save (cr);
+        // The direction that cannot be taken is dimmed rather than dropped, so
+        // the panel keeps its size while the user pages through the list.
+        cairo_set_source_rgba (cr, m_theme.fg.r, m_theme.fg.g, m_theme.fg.b,
+                               m_theme.fg.a * (a.enabled ? 1.0 : 0.3));
+        double lw = a.h * 0.08;
+        if (lw < 1.5) lw = 1.5;
+        cairo_set_line_width (cr, lw);
+        cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
+        cairo_set_line_join (cr, CAIRO_LINE_JOIN_ROUND);
+
+        if (m_theme.vertical) {
+            if (prev) {                       // up
+                cairo_move_to (cr, cx - d, cy + d * 0.6);
+                cairo_line_to (cr, cx,     cy - d * 0.6);
+                cairo_line_to (cr, cx + d, cy + d * 0.6);
+            } else {                          // down
+                cairo_move_to (cr, cx - d, cy - d * 0.6);
+                cairo_line_to (cr, cx,     cy + d * 0.6);
+                cairo_line_to (cr, cx + d, cy - d * 0.6);
+            }
+        } else {
+            if (prev) {                       // left
+                cairo_move_to (cr, cx + d * 0.6, cy - d);
+                cairo_line_to (cr, cx - d * 0.6, cy);
+                cairo_line_to (cr, cx + d * 0.6, cy + d);
+            } else {                          // right
+                cairo_move_to (cr, cx - d * 0.6, cy - d);
+                cairo_line_to (cr, cx + d * 0.6, cy);
+                cairo_line_to (cr, cx - d * 0.6, cy + d);
+            }
+        }
+
+        cairo_stroke (cr);
+        cairo_restore (cr);
+    }
+
     void clear_layout ()
     {
         free_item_attrs (m_preedit_item);
@@ -592,6 +679,7 @@ public:
         for (size_t i = 0; i < m_cells.size (); ++i)
             free_item_attrs (m_cells[i].item);
         m_cells.clear ();
+        m_has_arrows = false;
         m_has_preedit_item = false;
         m_has_aux_item = false;
         m_has_caret = false;
@@ -647,6 +735,16 @@ public:
                 if (it.y < top)          top = it.y;
                 if (it.y + it.h > bot)   bot = it.y + it.h;
             }
+            // The chevrons belong to this block and move with it. In a vertical
+            // list they sit on their own row below the candidates, so leaving
+            // them out would stretch the block past them and strand them.
+            if (m_has_arrows) {
+                if (m_prev_arrow.y < top) top = m_prev_arrow.y;
+                if (m_prev_arrow.y + m_prev_arrow.h > bot)
+                    bot = m_prev_arrow.y + m_prev_arrow.h;
+                if (m_next_arrow.y + m_next_arrow.h > bot)
+                    bot = m_next_arrow.y + m_next_arrow.h;
+            }
             blocks.push_back (Block { 2, top, bot - top });
         }
 
@@ -667,6 +765,10 @@ public:
             default:
                 for (size_t c = 0; c < m_cells.size (); ++c)
                     m_cells[c].item.y += dy;
+                if (m_has_arrows) {
+                    m_prev_arrow.y += dy;
+                    m_next_arrow.y += dy;
+                }
                 break;
             }
             y += blocks[i].h + spacing;
@@ -743,7 +845,8 @@ public:
         if (m_lookup_visible && !m_cand_text.empty ()) {
             const int n = static_cast<int> (m_cand_text.size ());
 
-            if (m_lookup_vertical) {
+            if (m_theme.vertical) {
+                int cellh = 0;
                 for (int i = 0; i < n; ++i) {
                     CandidateCell cell;
                     cell.index = i;
@@ -754,9 +857,23 @@ public:
                     cell.item.y = cur_y;
                     measure_item (cr, cell.item);
                     cur_y += cell.item.h + spacing;
+                    if (cell.item.h > cellh) cellh = cell.item.h;
                     if (cell.item.x + cell.item.w > max_x)
                         max_x = cell.item.x + cell.item.w;
                     m_cells.push_back (cell);
+                }
+
+                // Side by side on a row of their own beneath the list, since
+                // stacking them would make an already tall panel taller.
+                if (m_has_prev_page || m_has_next_page) {
+                    const int aw = arrow_width (cellh);
+                    m_prev_arrow = PageArrow { origin, cur_y, aw, cellh, m_has_prev_page };
+                    m_next_arrow = PageArrow { origin + aw + spacing * 2, cur_y,
+                                               aw, cellh, m_has_next_page };
+                    cur_y += cellh + spacing;
+                    if (m_next_arrow.x + aw > max_x)
+                        max_x = m_next_arrow.x + aw;
+                    m_has_arrows = true;
                 }
             } else {
                 int x = origin;
@@ -774,8 +891,22 @@ public:
                     if (cell.item.h > rowh) rowh = cell.item.h;
                     m_cells.push_back (cell);
                 }
-                if (x - spacing * 2 > max_x)
-                    max_x = x - spacing * 2;
+                int right = x - spacing * 2;
+
+                // Chevrons at the end of the row, where the eye lands after the
+                // last candidate and where the panel is already widest.
+                if (m_has_prev_page || m_has_next_page) {
+                    const int aw = arrow_width (rowh);
+                    int ax = right + spacing * 2;
+                    m_prev_arrow = PageArrow { ax, cur_y, aw, rowh, m_has_prev_page };
+                    ax += aw + spacing;
+                    m_next_arrow = PageArrow { ax, cur_y, aw, rowh, m_has_next_page };
+                    right = ax + aw;
+                    m_has_arrows = true;
+                }
+
+                if (right > max_x)
+                    max_x = right;
                 cur_y += rowh + spacing;
             }
         }
@@ -951,9 +1082,9 @@ CandidatesUI::update_lookup_table (const LookupTable &table)
         d->m_cand_label.push_back (table.get_candidate_label (i));
     }
 
-    // TODO(5a): vertical orientation. LookupTable exposes no orientation getter
-    // at this layer; wire from config/engine hint. Horizontal for now.
-    d->m_lookup_vertical = false;
+    // Orientation is deliberately not touched here: it comes from the theme
+    // (/Candidates/<renderer>/Orientation), and this runs on every keystroke,
+    // so setting it from the table would undo the configured value each time.
     d->m_cursor_in_page =
         table.is_cursor_visible () ? table.get_cursor_pos_in_current_page () : -1;
 
@@ -1065,9 +1196,10 @@ CandidatesUI::draw (cairo_t *cr)
     for (size_t i = 0; i < d->m_cells.size (); ++i)
         d->paint_item (cr, d->m_cells[i].item, t.fg);
 
-    // TODO(5a): draw prev/next-page arrows when has_prev_page/has_next_page and
-    // report them from hit_test() as HIT_PREV_PAGE/HIT_NEXT_PAGE (wheel paging
-    // already works; this adds click targets). Also HiDPI: scale by output scale.
+    if (d->m_has_arrows) {
+        d->draw_chevron (cr, d->m_prev_arrow, true);
+        d->draw_chevron (cr, d->m_next_arrow, false);
+    }
 
     // Border. Stroked on a path inset by half the line width so the whole line
     // lands inside the panel, with the radius pulled in by the same amount to
@@ -1101,6 +1233,21 @@ CandidatesUI::hit_test (int x, int y, int &candidate_index) const
             return HIT_CANDIDATE;
         }
     }
+
+    // Only the direction that leads somewhere answers; a click on the dimmed
+    // one falls through to HIT_NONE rather than asking for a page that is not
+    // there.
+    if (d->m_has_arrows) {
+        const CandidatesUIImpl::PageArrow &p = d->m_prev_arrow;
+        const CandidatesUIImpl::PageArrow &n = d->m_next_arrow;
+        if (p.enabled &&
+            x >= p.x && x <= p.x + p.w && y >= p.y && y <= p.y + p.h)
+            return HIT_PREV_PAGE;
+        if (n.enabled &&
+            x >= n.x && x <= n.x + n.w && y >= n.y && y <= n.y + n.h)
+            return HIT_NEXT_PAGE;
+    }
+
     return HIT_NONE;
 }
 

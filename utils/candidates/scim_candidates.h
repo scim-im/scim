@@ -92,6 +92,17 @@ struct CandidatesTheme {
     int          corner_radius;
     int          padding;       ///< Inner padding in px.
     int          spacing;       ///< Gap between rows / candidates in px.
+    /**
+     * @brief Stack the candidates one per line instead of side by side.
+     *
+     * Orientation is a user preference, not something the engine asks for:
+     * LookupTable carries no orientation, and the panel that used to draw the
+     * table took it from the configuration too. It rides along with the theme so
+     * that a host picks it up wherever it already re-reads the theme -- which is
+     * every one of them, on every config reload -- rather than each having to
+     * read and apply a key of its own.
+     */
+    bool         vertical;
 
     /** @brief A sane light-theme default. */
     static CandidatesTheme light ();
@@ -123,8 +134,9 @@ bool scim_candidates_dark_hint (void);
 /**
  * @brief Build a theme from the SCIM config for a candidate renderer.
  *
- * Reads the appearance keys -- ColorScheme, Font, PreeditFont, BorderWidth,
- * CornerRadius, Padding, Spacing and Color/{NormalText,NormalBackground,
+ * Reads the appearance keys -- ColorScheme, Font, PreeditFont, Orientation,
+ * BorderWidth, CornerRadius, Padding, Spacing and
+ * Color/{NormalText,NormalBackground,
  * PreeditText,ActiveText,ActiveBackground,Label,Border} -- with a layered
  * fallback:
  *   /Candidates/<renderer>/<key>  ->  /Candidates/Default/<key>  ->  the preset
@@ -137,6 +149,9 @@ bool scim_candidates_dark_hint (void);
  * panel's lookup table and describe a single light palette, so reaching here they
  * overrode the presets -- a changed default was invisible to anyone whose config
  * carried them -- and no light palette can serve the dark preset.
+ *
+ * Orientation is "horizontal" (the default) or "vertical", and decides whether
+ * the candidates sit side by side or one per line.
  *
  * ColorScheme is "auto" (the default), "light" or "dark". "auto" follows
  * scim_candidates_set_dark_hint (), so it tracks the desktop only where the host

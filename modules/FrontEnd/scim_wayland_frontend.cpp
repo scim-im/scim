@@ -950,7 +950,28 @@ WaylandFrontEnd::registry_global (uint32_t name, const char *interface, uint32_t
         m_v1_input_panel = static_cast<zwp_input_panel_v1 *> (
             wl_registry_bind (m_registry, name, &zwp_input_panel_v1_interface, 1));
     } else if (!strcmp (interface, wl_compositor_interface.name)) {
-        uint32_t v = version < 4 ? version : 4;
+        // Up to 6, which is where wl_surface gains preferred_buffer_scale --
+        // how the candidate surface learns it is on a HiDPI output.
+        //
+        // The ceiling has to be a compile-time one. The surface listener in
+        // utils/candidates is as long as the headers this was built against
+        // made it, and libwayland dispatches an event by indexing that array
+        // with the opcode, unchecked. Asking for 6 where the headers stopped at
+        // 4 would have the compositor send an event past the end of it.
+        //
+        // wl_compositor_interface.version cannot serve: that struct lives in
+        // libwayland-client, so it reports the runtime library rather than the
+        // headers. Keep it as a second ceiling anyway, for the reverse case of
+        // a library older than the headers.
+        //
+        // No #ifdef on the 6: configure requires wayland-client 1.22, the
+        // release that added both this event and the wl_pointer one the
+        // candidate window's listener is initialised with, so headers without
+        // it cannot build this tree at all.
+        uint32_t want = 6;
+        if (want > (uint32_t) wl_compositor_interface.version)
+            want = (uint32_t) wl_compositor_interface.version;
+        uint32_t v = version < want ? version : want;
         m_compositor = static_cast<wl_compositor *> (
             wl_registry_bind (m_registry, name, &wl_compositor_interface, v));
     } else if (!strcmp (interface, wl_shm_interface.name)) {

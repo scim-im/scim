@@ -19,8 +19,6 @@
 /Panel/Gtk/Color/NormalText = black
 /Panel/Gtk/Font = default
 /Panel/Gtk/DefaultSticked = false
-/Panel/Gtk/LookupTableEmbedded = true
-/Panel/Gtk/LookupTableVertical = false
 /Panel/Gtk/ShowStatusBox = false
 /Panel/Gtk/ShowTrayIcon = true
 /Panel/Gtk/ToolBar/AlwaysShow = false

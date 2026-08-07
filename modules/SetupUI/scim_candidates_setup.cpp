@@ -48,6 +48,7 @@ using namespace scim;
 // /Candidates/Default/ level, which a per-renderer /Candidates/<renderer>/
 // value can still override.
 #define SCIM_CONFIG_CANDIDATES_COLOR_SCHEME        "/Candidates/Default/ColorScheme"
+#define SCIM_CONFIG_CANDIDATES_ORIENTATION         "/Candidates/Default/Orientation"
 #define SCIM_CONFIG_CANDIDATES_FONT                "/Candidates/Default/Font"
 #define SCIM_CONFIG_CANDIDATES_PREEDIT_FONT        "/Candidates/Default/PreeditFont"
 #define SCIM_CONFIG_CANDIDATES_COLOR_NORMAL_BG     "/Candidates/Default/Color/NormalBackground"
@@ -122,6 +123,9 @@ extern "C" {
 // can tell us; see scim_candidates_set_dark_hint ().
 static String __config_color_scheme          = "";
 
+// "", "horizontal" or "vertical". Empty leaves the renderer's own default.
+static String __config_orientation           = "";
+
 static String __config_font                  = "default";
 static String __config_preedit_font          = "default";
 
@@ -152,6 +156,7 @@ static String __unset_color_active_text;
 static bool   __have_changed                 = false;
 
 static GtkWidget * __widget_color_scheme      = 0;
+static GtkWidget * __widget_orientation       = 0;
 static GtkWidget * __widget_font              = 0;
 static GtkWidget * __widget_preedit_font      = 0;
 static GtkWidget * __widget_color_normal_bg   = 0;
@@ -219,6 +224,30 @@ on_color_scheme_changed (GObject *object, GParamSpec * /*pspec*/,
     setup_widget_value ();
 }
 
+// The dropdown's rows, in order. Index 0 is the renderer's own default, stored
+// as an unset key, so a changed default still reaches anyone who never picked.
+static const char *__orientation_values[] = { "", "horizontal", "vertical" };
+
+static guint
+orientation_to_index (const String &value)
+{
+    for (guint i = 1; i < G_N_ELEMENTS (__orientation_values); ++i)
+        if (value == __orientation_values[i])
+            return i;
+    return 0;
+}
+
+static void
+on_orientation_changed (GObject *object, GParamSpec * /*pspec*/,
+                        gpointer /*user_data*/)
+{
+    guint i = gtk_drop_down_get_selected (GTK_DROP_DOWN (object));
+    if (i >= G_N_ELEMENTS (__orientation_values))
+        i = 0;
+    __config_orientation = String (__orientation_values[i]);
+    __have_changed = true;
+}
+
 // The color a picker should show: what the user chose, or what the renderer
 // would fall back to if the key is left unset.
 static String
@@ -237,6 +266,7 @@ adopt_builtin_defaults ()
     CandidatesTheme t = CandidatesTheme::light ();
 
     __config_color_scheme       = String ();   // auto
+    __config_orientation        = String ();   // the renderer's own default
     __config_font               = String ();
     __config_preedit_font       = String ();
 
@@ -399,6 +429,26 @@ create_setup_window ()
         frame = create_frame (page, _("Shape"));
         grid  = create_grid (frame);
 
+        // Whether the candidates run across or down. First in the frame: it
+        // changes the shape of the window, not merely its measurements.
+        {
+            label = gtk_label_new_with_mnemonic (_("_Orientation:"));
+            gtk_widget_set_halign (label, GTK_ALIGN_START);
+            gtk_grid_attach (GTK_GRID (grid), label, 0, 0, 1, 1);
+
+            const char *choices[] = { _("Default"), _("Horizontal"), _("Vertical"), 0 };
+            __widget_orientation = gtk_drop_down_new_from_strings (choices);
+            gtk_grid_attach (GTK_GRID (grid), __widget_orientation, 1, 0, 1, 1);
+            gtk_label_set_mnemonic_widget (GTK_LABEL (label), __widget_orientation);
+
+            gtk_widget_set_tooltip_text (__widget_orientation,
+                _("Whether the candidates are listed side by side or one per "
+                  "line."));
+
+            g_signal_connect ((gpointer) __widget_orientation, "notify::selected",
+                              G_CALLBACK (on_orientation_changed), 0);
+        }
+
         {
             struct { const char *label; GtkWidget **widget; int *cfg; int max; } rows[] = {
                 { _("Border _width:"),   &__widget_border_width,  &__config_border_width,  16 },
@@ -408,13 +458,15 @@ create_setup_window ()
             };
             const int n = (int) (sizeof rows / sizeof rows[0]);
             for (int i = 0; i < n; ++i) {
+                // Row 0 is the orientation dropdown above.
+                const int row = i + 1;
                 label = gtk_label_new_with_mnemonic (rows[i].label);
                 gtk_widget_set_halign (label, GTK_ALIGN_START);
-                gtk_grid_attach (GTK_GRID (grid), label, 0, i, 1, 1);
+                gtk_grid_attach (GTK_GRID (grid), label, 0, row, 1, 1);
 
                 *rows[i].widget =
                     gtk_spin_button_new_with_range (0.0, (double) rows[i].max, 1.0);
-                gtk_grid_attach (GTK_GRID (grid), *rows[i].widget, 1, i, 1, 1);
+                gtk_grid_attach (GTK_GRID (grid), *rows[i].widget, 1, row, 1, 1);
                 gtk_label_set_mnemonic_widget (GTK_LABEL (label), *rows[i].widget);
 
                 g_signal_connect ((gpointer) *rows[i].widget, "value_changed",
@@ -508,6 +560,9 @@ setup_widget_value ()
     if (__widget_color_scheme)
         gtk_drop_down_set_selected (GTK_DROP_DOWN (__widget_color_scheme),
                                     color_scheme_to_index (__config_color_scheme));
+    if (__widget_orientation)
+        gtk_drop_down_set_selected (GTK_DROP_DOWN (__widget_orientation),
+                                    orientation_to_index (__config_orientation));
     if (__widget_font)
         gtk_button_set_label (GTK_BUTTON (__widget_font), __config_font.c_str ());
     if (__widget_preedit_font)
@@ -565,6 +620,9 @@ load_config (const ConfigPointer &config)
         __config_color_scheme =
             config->read (String (SCIM_CONFIG_CANDIDATES_COLOR_SCHEME),
                           __config_color_scheme);
+        __config_orientation =
+            config->read (String (SCIM_CONFIG_CANDIDATES_ORIENTATION),
+                          __config_orientation);
         __config_font =
             config->read (String (SCIM_CONFIG_CANDIDATES_FONT), __config_font);
         __config_preedit_font =
@@ -630,6 +688,7 @@ save_config (const ConfigPointer &config)
     // someone first opened it.
     struct { const char *key; const String *value; } strings[] = {
         { SCIM_CONFIG_CANDIDATES_COLOR_SCHEME,       &__config_color_scheme       },
+        { SCIM_CONFIG_CANDIDATES_ORIENTATION,        &__config_orientation        },
         { SCIM_CONFIG_CANDIDATES_FONT,               &__config_font               },
         { SCIM_CONFIG_CANDIDATES_PREEDIT_FONT,       &__config_preedit_font       },
         { SCIM_CONFIG_CANDIDATES_COLOR_NORMAL_BG,    &__config_color_normal_bg    },

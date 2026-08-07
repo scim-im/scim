@@ -397,6 +397,10 @@ static GtkWidget                                       *_candidates_area        
 // Defined further down; needed by the popover code above it.
 static void candidates_hide ();
 
+// Sub-step scroll carried between events. Cleared with the candidate list, so a
+// remainder left by one composition cannot page the next.
+static gdouble _candidates_scroll_accum = 0.0;
+
 #ifdef SCIM_HAS_CANDIDATES_X11
 // The fallback for a client whose GdkWindow has no widget behind it: a Chromium
 // browser creates the window itself, so a GtkPopover has nothing to anchor to
@@ -1740,6 +1744,72 @@ candidates_button_cb (GtkWidget *, GdkEventButton *ev, gpointer)
     return TRUE;
 }
 
+// The wheel pages the list, as it does in the standalone X11 and Wayland
+// candidate windows. Without it an application using this module has no way to
+// page with the mouse at all, only the engine's own keys.
+static gboolean
+candidates_scroll_cb (GtkWidget *, GdkEventScroll *ev, gpointer)
+{
+    switch (ev->direction) {
+    case GDK_SCROLL_UP:
+        sink_page_up ();
+        return TRUE;
+    case GDK_SCROLL_DOWN:
+        sink_page_down ();
+        return TRUE;
+    case GDK_SCROLL_SMOOTH: {
+        // A touchpad reports fractions of a step, so paging on any delta at all
+        // would send one swipe through a dozen pages. Accumulate instead and
+        // page per whole step, which is what GTK4's DISCRETE scroll controller
+        // does for the module there. The remainder is kept, so a slow drag still
+        // pages once it has added up to a step.
+        gdouble dx = 0.0, dy = 0.0;
+
+        // The gesture is over: what did not add up to a step never will.
+        if (gdk_event_is_scroll_stop_event ((GdkEvent *) ev)) {
+            _candidates_scroll_accum = 0.0;
+            return FALSE;
+        }
+
+        if (!gdk_event_get_scroll_deltas ((GdkEvent *) ev, &dx, &dy))
+            return FALSE;
+
+        // No vertical movement -- the horizontal part of a diagonal swipe.
+        // Ignore it without discarding what is accumulated, or a touchpad that
+        // never delivers a whole step in one straight run would stop paging.
+        if (dy == 0.0)
+            return FALSE;
+
+        gdouble &accum = _candidates_scroll_accum;
+
+        // Reversing direction abandons what was accumulated the other way, or
+        // the first step back would come early.
+        if ((dy < 0.0) != (accum < 0.0))
+            accum = 0.0;
+        accum += dy;
+
+        // Whole steps now, sub-step remainder carried. Bounded like the gtk4
+        // module and the wayland window: a fling can add up to a great many,
+        // and each page is a round trip to the engine. Past the cap the rest is
+        // dropped rather than kept, or the overshoot would dribble out over the
+        // events that follow.
+        const int max_steps = 5;
+        int steps = (int) accum;
+        accum -= steps;
+
+        if (steps >  max_steps) { steps =  max_steps; accum = 0.0; }
+        if (steps < -max_steps) { steps = -max_steps; accum = 0.0; }
+
+        for (int i = steps; i < 0; ++ i) sink_page_up ();
+        for (int i = 0; i < steps; ++ i) sink_page_down ();
+
+        return steps ? TRUE : FALSE;
+    }
+    default:
+        return FALSE;
+    }
+}
+
 static bool
 candidates_ensure (GtkWidget *relative_to)
 {
@@ -1750,11 +1820,15 @@ candidates_ensure (GtkWidget *relative_to)
         g_object_ref_sink (_candidates_popover);
         gtk_popover_set_modal (GTK_POPOVER (_candidates_popover), FALSE);
         _candidates_area = gtk_drawing_area_new ();
-        gtk_widget_add_events (_candidates_area, GDK_BUTTON_PRESS_MASK);
+        gtk_widget_add_events (_candidates_area,
+                               GDK_BUTTON_PRESS_MASK | GDK_SCROLL_MASK |
+                               GDK_SMOOTH_SCROLL_MASK);
         g_signal_connect (_candidates_area, "draw",
                           G_CALLBACK (candidates_draw_cb), 0);
         g_signal_connect (_candidates_area, "button-press-event",
                           G_CALLBACK (candidates_button_cb), 0);
+        g_signal_connect (_candidates_area, "scroll-event",
+                          G_CALLBACK (candidates_scroll_cb), 0);
         gtk_container_add (GTK_CONTAINER (_candidates_popover), _candidates_area);
         gtk_widget_show (_candidates_area);
         if (!_config.null ()) {
@@ -1831,6 +1905,9 @@ candidates_show (GtkIMContextSCIM *ic)
 static void
 candidates_hide ()
 {
+    // Drop a partial step with the list it belonged to.
+    _candidates_scroll_accum = 0.0;
+
     if (_candidates_popover)
         gtk_popover_popdown (GTK_POPOVER (_candidates_popover));
 }

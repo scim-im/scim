@@ -313,7 +313,9 @@ fi
 # APIs (QGuiApplication, QInputMethod, qe->nativeVirtualKey()), so it needs
 # just Qt5Gui -- no X11/xcb/Qt5X11Extras (those were a stale coupling and are
 # dropped so the plugin works the same on X11 and Wayland).
-PKG_CHECK_MODULES(QT5, [Qt5Gui >= 5.0],
+# 5.6 is what the module actually uses: devicePixelRatioF () and
+# QImage::setDevicePixelRatio () for the HiDPI candidate window.
+PKG_CHECK_MODULES(QT5, [Qt5Gui >= 5.6],
             [SCIM_HAS_QT5=yes],
             [SCIM_HAS_QT5=no])
 
@@ -374,7 +376,7 @@ if test "$SCIM_HAS_QT6" = "yes"; then
 fi
 
 # Wayland input-method-v2 FrontEnd + Cairo/Pango candidate renderer dependencies.
-PKG_CHECK_MODULES(WAYLAND, [wayland-client >= 1.20 xkbcommon],
+PKG_CHECK_MODULES(WAYLAND, [wayland-client >= 1.22 xkbcommon],
 			[SCIM_HAS_WAYLAND=yes],
 			[SCIM_HAS_WAYLAND=no])
 AC_PATH_PROG(WAYLAND_SCANNER, wayland-scanner)

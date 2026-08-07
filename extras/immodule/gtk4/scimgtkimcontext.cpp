@@ -391,6 +391,11 @@ static CandidatesUI                                     _candidates_ui;
 static GtkWidget                                       *_candidates_popover         = 0;
 static GtkWidget                                       *_candidates_area            = 0;
 
+// Sub-step scroll carried between events. Cleared with the candidate list, so a
+// remainder left by one composition cannot page the next -- as in the gtk3 and
+// qt modules.
+static gdouble                                          _candidates_scroll_accum    = 0.0;
+
 // Defined further down; needed by the popover code above it.
 static void candidates_hide ();
 
@@ -1625,6 +1630,61 @@ candidates_click_cb (GtkGestureClick *, gint, gdouble x, gdouble y, gpointer)
         sink_page_down ();
 }
 
+// The wheel pages the list, as it does in the standalone X11 and Wayland
+// candidate windows. Without it an application using this module has no way to
+// page with the mouse at all, only the engine's own keys.
+static gboolean
+candidates_scroll_cb (GtkEventControllerScroll *, gdouble, gdouble dy, gpointer)
+{
+    if (!_focused_ic || !_focused_ic->impl)
+        return FALSE;
+
+    // Accumulated here rather than by asking the controller for DISCRETE steps:
+    // that accumulator is GTK's, with no way to reach it -- the scroll
+    // controller does not implement the reset vfunc -- so a remainder left when
+    // one candidate list closed would page the next, which is exactly what the
+    // gtk3 and qt modules keep an accumulator of their own to avoid. A wheel
+    // notch is one unit here as it is there, so the arithmetic is the same.
+    gdouble &accum = _candidates_scroll_accum;
+
+    // No vertical movement -- the horizontal part of a diagonal swipe. Ignore it
+    // without discarding what is accumulated, or a touchpad that never delivers
+    // a whole step in one straight run would stop paging.
+    if (dy == 0.0)
+        return FALSE;
+
+    // Reversing direction abandons what was accumulated the other way, or the
+    // first step back would come early.
+    if ((dy < 0.0) != (accum < 0.0))
+        accum = 0.0;
+    accum += dy;
+
+    // Whole steps now, sub-step remainder carried. Bounded: a fling can add up
+    // to a great many, and each page is a synchronous round trip to the engine.
+    // Past the cap the rest is dropped rather than kept, or the overshoot would
+    // dribble out over the events that follow.
+    const int max_steps = 5;
+    int steps = (int) accum;
+    accum -= steps;
+
+    if (steps >  max_steps) { steps =  max_steps; accum = 0.0; }
+    if (steps < -max_steps) { steps = -max_steps; accum = 0.0; }
+
+    for (int i = steps; i < 0; ++ i) sink_page_up ();
+    for (int i = 0; i < steps; ++ i) sink_page_down ();
+
+    return steps ? TRUE : FALSE;
+}
+
+// The gesture is over: what did not add up to a step never will. This is what
+// gdk_event_is_scroll_stop_event () tells the gtk3 module; a wheel emits no such
+// signal and needs none, its steps being whole.
+static void
+candidates_scroll_end_cb (GtkEventControllerScroll *, gpointer)
+{
+    _candidates_scroll_accum = 0.0;
+}
+
 #ifdef SCIM_HAS_CANDIDATES_X11
 static gboolean
 candidates_x11_iochannel_handler (GIOChannel *, GIOCondition, gpointer)
@@ -1701,6 +1761,15 @@ candidates_ensure (GtkWidget *parent)
         g_signal_connect (click, "released", G_CALLBACK (candidates_click_cb), 0);
         gtk_widget_add_controller (_candidates_area, GTK_EVENT_CONTROLLER (click));
 
+        // Deltas as they come; candidates_scroll_cb () adds them up to a step.
+        GtkEventController *scroll =
+            gtk_event_controller_scroll_new (GTK_EVENT_CONTROLLER_SCROLL_VERTICAL);
+        g_signal_connect (scroll, "scroll",
+                          G_CALLBACK (candidates_scroll_cb), 0);
+        g_signal_connect (scroll, "scroll-end",
+                          G_CALLBACK (candidates_scroll_end_cb), 0);
+        gtk_widget_add_controller (_candidates_area, scroll);
+
         if (!_config.null ()) {
             candidates_sync_dark_hint ();
             _candidates_ui.set_theme (scim_candidates_theme_from_config (_config));
@@ -1776,6 +1845,9 @@ candidates_show (GtkIMContextSCIM *ic)
 static void
 candidates_hide ()
 {
+    // Drop a partial step with the list it belonged to.
+    _candidates_scroll_accum = 0.0;
+
     if (_candidates_popover)
         gtk_popover_popdown (GTK_POPOVER (_candidates_popover));
 }
