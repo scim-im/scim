@@ -103,7 +103,6 @@ using namespace scim;
   #define SCIM_KEYBOARD_ICON_FILE            (SCIM_ICONDIR "/keyboard.png")
 #endif
 
-#define SCIM_CONFIG_FRONTEND_GTK_IMMODULE_USE_KEY_SNOOPER  "/FrontEnd/GtkIMModule/UseKeySnooper"
 
 /* Typedef */
 struct _GtkIMContextSCIMImpl
@@ -189,9 +188,7 @@ static void     gtk_im_context_scim_get_preedit_string  (GtkIMContext           
                                                          PangoAttrList         **attrs,
                                                          gint                   *cursor_pos);
 
-static gboolean gtk_scim_key_snooper                    (GtkWidget              *grab_widget,
-                                                         GdkEventKey            *event,
-                                                         gpointer                data);
+static gboolean process_key_event                       (GdkEventKey            *event);
 
 static void     gtk_im_slave_commit_cb                  (GtkIMContext           *context,
                                                          const char             *str,
@@ -349,7 +346,6 @@ static ConfigPointer                                    _config;
 static BackEndPointer                                   _backend;
 
 static GtkIMContextSCIM                                *_focused_ic                 = 0;
-static GtkWidget                                       *_focused_widget             = 0;
 
 static bool                                             _scim_initialized           = false;
 
@@ -358,8 +354,6 @@ static GdkColor                                         _normal_text;
 static GdkColor                                         _active_bg;
 static GdkColor                                         _active_text;
 
-static gint                                             _snooper_id                 = 0;
-static bool                                             _snooper_installed          = false;
 
 static int                                              _instance_count             = 0;
 static int                                              _context_count              = 0;
@@ -417,7 +411,6 @@ static bool                                             _on_the_spot            
 
 static bool     preedit_in_client (const GtkIMContextSCIM *ic);
 static bool                                             _shared_input_method        = false;
-static bool                                             _use_key_snooper            = false;
 
 // A hack to shutdown the immodule cleanly even if im_module_exit () is not called when exiting.
 class FinalizeHandler
@@ -793,8 +786,7 @@ gtk_im_context_scim_filter_keypress (GtkIMContext *context,
     gboolean ret = FALSE;
 
     if (context_scim) {
-        if (!_snooper_installed)
-            ret = gtk_scim_key_snooper (0, event, 0);
+        ret = process_key_event (event);
 
         if (context_scim->slave) {
             if (!ret ) {
@@ -838,13 +830,6 @@ gtk_im_context_scim_focus_in (GtkIMContext *context)
         }
         SCIM_DEBUG_FRONTEND(1) << "Focus out previous IC first: " << _focused_ic->id << "\n";
         gtk_im_context_scim_focus_out (GTK_IM_CONTEXT (_focused_ic));
-    }
-
-    // Only use key snooper when use_key_snooper option is enabled and a gtk main loop is running.
-    if (_use_key_snooper && !_snooper_installed && gtk_main_level () > 0) {
-        SCIM_DEBUG_FRONTEND(2) << "Install key snooper.\n";
-        _snooper_id = gtk_key_snooper_install ((GtkKeySnoopFunc)gtk_scim_key_snooper, NULL);
-        _snooper_installed = true;
     }
 
     bool need_cap = false;
@@ -942,12 +927,6 @@ gtk_im_context_scim_focus_out (GtkIMContext *context)
     SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_focus_out(" << context_scim->id << ")...\n";
 
     if (context_scim && context_scim->impl && context_scim == _focused_ic) {
-
-        if (_snooper_installed) {
-            SCIM_DEBUG_FRONTEND(2) << "Remove key snooper.\n";
-            gtk_key_snooper_remove (_snooper_id);
-            _snooper_installed = false;
-        }
 
         _panel_client.prepare (context_scim->id);
         context_scim->impl->si->focus_out ();
@@ -1157,17 +1136,18 @@ gtk_im_context_scim_get_preedit_string (GtkIMContext   *context,
     }
 }
 
+// The key path that filter_keypress uses. Once a GtkKeySnoopFunc, hence the
+// old name and the two arguments it no longer needs: the snooper was off
+// unless a config key nobody sets turned it on, it could only install under
+// gtk_main (), and filter_keypress called this directly regardless.
 static gboolean
-gtk_scim_key_snooper (GtkWidget    *grab_widget,
-                      GdkEventKey  *event,
-                      gpointer      /* data */)
+process_key_event (GdkEventKey *event)
 {
-    SCIM_DEBUG_FRONTEND(3) << "gtk_scim_key_snooper...\n";
+    SCIM_DEBUG_FRONTEND(3) << "process_key_event...\n";
 
     gboolean ret = FALSE;
 
     if (_focused_ic && _focused_ic->impl && (event->type == GDK_KEY_PRESS || event->type == GDK_KEY_RELEASE) && !(event->send_event & SEND_EVENT_MASK)) {
-        _focused_widget = grab_widget;
 
         KeyEvent key = keyevent_gdk_to_scim (_focused_ic, *event);
 
@@ -1192,9 +1172,8 @@ gtk_scim_key_snooper (GtkWidget    *grab_widget,
 
         _panel_client.send ();
 
-        _focused_widget = 0;
     } else {
-        SCIM_DEBUG_FRONTEND(3) << "Failed snooper: "
+        SCIM_DEBUG_FRONTEND(3) << "Key not handled: "
                                << ((!_focused_ic || !_focused_ic->impl) ? "Invalid focused ic" :
                                    ((event->send_event & SEND_EVENT_MASK) ? "send event is set" : "unknown"))
                                << "\n";
@@ -1340,7 +1319,7 @@ panel_slot_process_key_event (int context, const KeyEvent &key)
             if (!_focused_ic || !_focused_ic->impl->is_on ||
                 !_focused_ic->impl->si->process_key_event (key)) {
                 if (!_fallback_instance->process_key_event (key)) {
-                    // Just send it to key_snooper and bypass to client directly (because send_event is set to TRUE).
+                    // Bypass to the client directly, send_event being set.
                     GdkEventKey gdkevent = keyevent_scim_to_gdk (ic, key);
                     gdk_event_put ((GdkEvent *)&gdkevent);
                 }
@@ -1366,7 +1345,7 @@ panel_slot_forward_key_event (int context, const KeyEvent &key)
     GtkIMContextSCIM *ic = find_ic (context);
     SCIM_DEBUG_FRONTEND(1) << "panel_slot_forward_key_event context=" << context << " key=" << key.get_key_string () << " ic=" << ic << "\n";
     if (ic && ic->impl) {
-        // Just send it to key_snooper and bypass to client directly (because send_event is set to TRUE).
+        // Bypass to the client directly, send_event being set.
         GdkEventKey gdkevent = keyevent_scim_to_gdk (ic, key);
         gdk_event_put ((GdkEvent *)&gdkevent);
     }
@@ -2538,12 +2517,6 @@ finalize (void)
 {
     SCIM_DEBUG_FRONTEND(1) << "Finalizing GTK SCIM IMModule...\n";
 
-    if (_snooper_installed) {
-        gtk_key_snooper_remove(_snooper_id);
-        _snooper_installed=false;
-        _snooper_id = 0;
-    }
-
     // Reset this first so that the shared instance could be released correctly afterwards.
     _default_instance.reset ();
 
@@ -2574,7 +2547,6 @@ finalize (void)
     }
 
     _focused_ic = 0;
-    _focused_widget = 0;
 
     _scim_initialized = false;
 
@@ -2938,13 +2910,9 @@ slot_forward_key_event (IMEngineInstanceBase *si,
         if (!_fallback_instance->process_key_event (key) &&
             !gtk_im_context_filter_keypress (GTK_IM_CONTEXT (ic->slave), &gdkevent)) {
 
-            // To avoid timing issue, we need emit the signal directly, rather than put the event into the queue.
-            if (_focused_widget) {
-                gboolean result;
-                g_signal_emit_by_name(_focused_widget, key.is_key_press () ? "key-press-event" : "key-release-event", &gdkevent, &result);
-            } else {
-                gdk_event_put ((GdkEvent *) &gdkevent);
-            }
+            // Queued rather than emitted straight at the focused widget: only
+            // the key snooper ever knew which widget that was, and it is gone.
+            gdk_event_put ((GdkEvent *) &gdkevent);
         }
     }
 }
@@ -3110,7 +3078,6 @@ reload_config_callback (const ConfigPointer &config)
 
     _on_the_spot = config->read (String (SCIM_CONFIG_FRONTEND_ON_THE_SPOT), _on_the_spot);
     _shared_input_method = config->read (String (SCIM_CONFIG_FRONTEND_SHARED_INPUT_METHOD), _shared_input_method);
-    _use_key_snooper = config->read (String (SCIM_CONFIG_FRONTEND_GTK_IMMODULE_USE_KEY_SNOOPER), _use_key_snooper);
 
     // Get keyboard layout setting
     // Flush the global config first, in order to load the new configs from disk.

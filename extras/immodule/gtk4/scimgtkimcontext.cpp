@@ -98,7 +98,6 @@ using namespace scim;
   #define SCIM_KEYBOARD_ICON_FILE            (SCIM_ICONDIR "/keyboard.png")
 #endif
 
-#define SCIM_CONFIG_FRONTEND_GTK_IMMODULE_USE_KEY_SNOOPER  "/FrontEnd/GtkIMModule/UseKeySnooper"
 
 /* Typedef */
 struct _GtkIMContextSCIMImpl
