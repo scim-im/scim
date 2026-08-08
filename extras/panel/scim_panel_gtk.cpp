@@ -306,6 +306,8 @@ static void       ui_property_menu_deactivate_cb       (GtkWidget      *item,
 static gboolean   ui_help_close_request_cb             (GtkWindow      *window,
                                                         gpointer        user_data);
 
+static void       ui_help_hide_cb                      (GtkWidget      *dialog);
+
 
 static bool       ui_any_menu_activated                (void);
 
@@ -852,7 +854,7 @@ ui_initialize (void)
         _client_properties_area = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
         gtk_widget_set_hexpand (_client_properties_area, TRUE);
         gtk_box_append (GTK_BOX (hbox), _client_properties_area);
-        gtk_widget_show (_client_properties_area);
+        gtk_widget_set_visible (_client_properties_area, TRUE);
 
         //New menu button
         if (_toolbar_show_menu_icon) {
@@ -907,7 +909,7 @@ ui_initialize (void)
         gtk_widget_set_halign (ok, GTK_ALIGN_END);
         gtk_box_append (GTK_BOX (vbox), ok);
         g_signal_connect_swapped (ok, "clicked",
-                                  G_CALLBACK (gtk_widget_hide), _help_dialog);
+                                  G_CALLBACK (ui_help_hide_cb), _help_dialog);
 
         g_signal_connect (_help_dialog, "close-request",
                           G_CALLBACK (ui_help_close_request_cb), NULL);
@@ -1379,7 +1381,7 @@ ui_help_button_click_cb (GtkButton */* button */,
     SCIM_DEBUG_MAIN (3) << "  ui_help_button_click_cb...\n";
 
     if (gtk_widget_get_visible (_help_dialog)) {
-        gtk_widget_hide (_help_dialog);
+        gtk_widget_set_visible (_help_dialog, FALSE);
     } else {
         action_request_help ();
     }
@@ -1582,19 +1584,19 @@ ui_toolbar_enter_cb (GtkEventControllerMotion */* controller */,
 
     if (_toolbar_hidden) {
         if (_window_stick_button)
-            gtk_widget_show (_window_stick_button);
+            gtk_widget_set_visible (_window_stick_button, TRUE);
 
         if (_factory_button)
-            gtk_widget_show (_factory_button);
+            gtk_widget_set_visible (_factory_button, TRUE);
 
         if (_client_properties_area)
-            gtk_widget_show (_client_properties_area);
+            gtk_widget_set_visible (_client_properties_area, TRUE);
 
         if (_menu_button)
-            gtk_widget_show (_menu_button);
+            gtk_widget_set_visible (_menu_button, TRUE);
 
         if (_help_button)
-            gtk_widget_show (_help_button);
+            gtk_widget_set_visible (_help_button, TRUE);
 
         _toolbar_hidden = false;
         ui_settle_toolbar_window ();
@@ -1632,19 +1634,19 @@ ui_hide_window_timeout_cb (gpointer /* data */)
         _toolbar_hide_timeout_count = 0;
 
         if (_help_button)
-            gtk_widget_hide (_help_button);
+            gtk_widget_set_visible (_help_button, FALSE);
 
         if (_menu_button)
-            gtk_widget_hide (_menu_button);
+            gtk_widget_set_visible (_menu_button, FALSE);
 
         if (_client_properties_area)
-            gtk_widget_hide (_client_properties_area);
+            gtk_widget_set_visible (_client_properties_area, FALSE);
 
         if (_factory_button)
-            gtk_widget_hide (_factory_button);
+            gtk_widget_set_visible (_factory_button, FALSE);
 
         if (_window_stick_button)
-            gtk_widget_hide (_window_stick_button);
+            gtk_widget_set_visible (_window_stick_button, FALSE);
 
         _toolbar_hidden = true;
         ui_settle_toolbar_window ();
@@ -1663,8 +1665,17 @@ ui_any_menu_activated (void)
 static gboolean
 ui_help_close_request_cb (GtkWindow *window, gpointer /* user_data */)
 {
-    gtk_widget_hide (GTK_WIDGET (window));
+    gtk_widget_set_visible (GTK_WIDGET (window), FALSE);
     return TRUE; // do not destroy
+}
+
+// A named handler rather than G_CALLBACK (gtk_widget_hide): that one is
+// deprecated, and set_visible cannot stand in for it as a bare function
+// pointer, taking a second argument.
+static void
+ui_help_hide_cb (GtkWidget *dialog)
+{
+    gtk_widget_set_visible (dialog, FALSE);
 }
 
 static void
@@ -1733,10 +1744,10 @@ ui_command_menu_hide_toolbar_toggled_cb (GtkWidget */* item */,
     _toolbar_always_hidden = ! _toolbar_always_hidden;
 
     if (_toolbar_always_hidden && !_toolbar_hidden) {
-        gtk_widget_hide (_toolbar_window);
+        gtk_widget_set_visible (_toolbar_window, FALSE);
         _toolbar_hidden = true;
     } else if (!_toolbar_always_hidden && _panel_is_on) {
-        gtk_widget_show (_toolbar_window);
+        gtk_widget_set_visible (_toolbar_window, TRUE);
         _toolbar_hidden = false;
     }
 }
@@ -1749,7 +1760,7 @@ ui_command_menu_help_activate_cb (GtkWidget */* item */,
         gtk_popover_popdown (GTK_POPOVER (_command_menu));
 
     if (gtk_widget_get_visible (_help_dialog)) {
-        gtk_widget_hide (_help_dialog);
+        gtk_widget_set_visible (_help_dialog, FALSE);
     } else {
         action_request_help ();
     }
@@ -3006,25 +3017,25 @@ do_slot_turn_on (void)
         return;
 
     if (_frontend_properties_area)
-        gtk_widget_hide (_frontend_properties_area);
+        gtk_widget_set_visible (_frontend_properties_area, FALSE);
 
     if (_window_stick_button)
-        gtk_widget_show (_window_stick_button);
+        gtk_widget_set_visible (_window_stick_button, TRUE);
 
     if (_factory_button)
-        gtk_widget_show (_factory_button);
+        gtk_widget_set_visible (_factory_button, TRUE);
 
     if (_client_properties_area)
-        gtk_widget_show (_client_properties_area);
+        gtk_widget_set_visible (_client_properties_area, TRUE);
 
     if (_menu_button)
-        gtk_widget_show (_menu_button);
+        gtk_widget_set_visible (_menu_button, TRUE);
 
     if (_help_button)
-        gtk_widget_show (_help_button);
+        gtk_widget_set_visible (_help_button, TRUE);
 
     if (!_toolbar_always_hidden)
-        gtk_widget_show (_toolbar_window);
+        gtk_widget_set_visible (_toolbar_window, TRUE);
 
     ui_settle_toolbar_window (true);
 }
@@ -3037,30 +3048,30 @@ do_slot_turn_off (void)
     _panel_is_on = false;
 
     if (_frontend_properties_area)
-        gtk_widget_hide (_frontend_properties_area);
+        gtk_widget_set_visible (_frontend_properties_area, FALSE);
 
     if (_toolbar_always_show) {
         if (!_toolbar_hidden) {
             if (_window_stick_button)
-                gtk_widget_show (_window_stick_button);
+                gtk_widget_set_visible (_window_stick_button, TRUE);
 
             if (_factory_button)
-                gtk_widget_show (_factory_button);
+                gtk_widget_set_visible (_factory_button, TRUE);
 
             if (_client_properties_area)
-                gtk_widget_show (_client_properties_area);
+                gtk_widget_set_visible (_client_properties_area, TRUE);
 
             if (_menu_button)
-                gtk_widget_show (_menu_button);
+                gtk_widget_set_visible (_menu_button, TRUE);
 
             if (_help_button)
-                gtk_widget_show (_help_button);
+                gtk_widget_set_visible (_help_button, TRUE);
         }
-        gtk_widget_show (_toolbar_window);
+        gtk_widget_set_visible (_toolbar_window, TRUE);
         ui_settle_toolbar_window (true);
         _toolbar_should_hide = true;
     } else {
-        gtk_widget_hide (_toolbar_window);
+        gtk_widget_set_visible (_toolbar_window, FALSE);
         _toolbar_hidden = true;
     }
 }
@@ -3103,7 +3114,7 @@ do_slot_update_factory_info (const PanelFactoryInfo &info)
         }
 
         if (!gtk_widget_get_visible (_factory_button) && !_toolbar_hidden)
-            gtk_widget_show (_factory_button);
+            gtk_widget_set_visible (_factory_button, TRUE);
 
         gtk_widget_set_tooltip_text (_factory_button, info.name.c_str ());
 
@@ -3330,9 +3341,9 @@ create_properties_node (PropertyRepository           &repository,
     }
 
     if (begin->visible ())
-        gtk_widget_show (node);
+        gtk_widget_set_visible (node, TRUE);
     else
-        gtk_widget_hide (node);
+        gtk_widget_set_visible (node, FALSE);
 
     gtk_widget_set_sensitive (node, begin->active ());
 
@@ -3450,7 +3461,7 @@ register_frontend_properties (const PropertyList &properties)
         for (pit = properties.begin (); pit != properties.end (); ++pit)
             update_frontend_property (*pit);
 
-        gtk_widget_show (_frontend_properties_area);
+        gtk_widget_set_visible (_frontend_properties_area, TRUE);
     } else { // Construct all properties.
         if (_frontend_properties_area)
             panel_widget_destroy (_frontend_properties_area);
@@ -3468,7 +3479,7 @@ register_frontend_properties (const PropertyList &properties)
                                -1,
                                0);
 
-            gtk_widget_show (_frontend_properties_area);
+            gtk_widget_set_visible (_frontend_properties_area, TRUE);
 
             gtk_widget_set_hexpand (_frontend_properties_area, TRUE);
             gtk_box_append (GTK_BOX (_client_properties_area), _frontend_properties_area);
@@ -3523,7 +3534,7 @@ register_helper_properties (int client, const PropertyList &properties)
                            client,
                            0);
 
-        gtk_widget_show (it->second.holder);
+        gtk_widget_set_visible (it->second.holder, TRUE);
         gtk_widget_set_hexpand (it->second.holder, TRUE);
         gtk_box_append (GTK_BOX (_client_properties_area), it->second.holder);
     }
@@ -3561,9 +3572,9 @@ update_property (PropertyRepository &repository,
             }
 
             if (property.visible ())
-                gtk_widget_show (it->widget);
+                gtk_widget_set_visible (it->widget, TRUE);
             else
-                gtk_widget_hide (it->widget);
+                gtk_widget_set_visible (it->widget, FALSE);
 
             gtk_widget_set_sensitive (it->widget, property.active ());
 

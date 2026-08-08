@@ -160,14 +160,14 @@ static void slot_process_imengine_event (const HelperAgent *, int ic, const Stri
                     {
                         cur_ic = ic;
                         cur_uuid = uuid;
-                        gtk_widget_show (main_window);
+                        gtk_widget_set_visible (main_window, TRUE);
                         break;
                     }
                     case SCIM_TRANS_CMD_FOCUS_OUT:
                     {
                         cur_ic = -1;
                         cur_uuid = String ("");
-                        gtk_widget_hide (main_window);
+                        gtk_widget_set_visible (main_window, FALSE);
                         break;
                     }
                     case SCIM_TRANS_CMD_GET_SURROUNDING_TEXT:
@@ -231,23 +231,23 @@ static void run (const String &display)
 #else
     gtk_window_set_policy (GTK_WINDOW (main_window), FALSE, FALSE, TRUE);
 #endif
-    gtk_widget_hide (main_window);
+    gtk_widget_set_visible (main_window, FALSE);
 
     vbox = gtk_vbox_new (FALSE, 0);
     gtk_container_add(GTK_CONTAINER(main_window), vbox);
-    gtk_widget_show (vbox);
+    gtk_widget_set_visible (vbox, TRUE);
 
     keystring = gtk_label_new (0);
     gtk_box_pack_start (GTK_BOX (vbox), keystring, FALSE, FALSE, 0);
-    gtk_widget_show (keystring);
+    gtk_widget_set_visible (keystring, TRUE);
 
     surrounding = gtk_label_new (0);
     gtk_box_pack_start (GTK_BOX (vbox), surrounding, FALSE, FALSE, 0);
-    gtk_widget_show (surrounding);
+    gtk_widget_set_visible (surrounding, TRUE);
 
     button = gtk_button_new_with_label ("Delete Surrounding");
     gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
-    gtk_widget_show (button);
+    gtk_widget_set_visible (button, TRUE);
 
     g_signal_connect (G_OBJECT(button), "clicked",
                       G_CALLBACK (delete_button_clicked_callback),

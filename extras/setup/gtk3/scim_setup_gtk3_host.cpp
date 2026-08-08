@@ -189,7 +189,7 @@ main (int argc, char *argv [])
 
         gtk_notebook_append_page (GTK_NOTEBOOK (notebook), ui,
                                   gtk_label_new (name.c_str ()));
-        gtk_widget_show (ui);
+        gtk_widget_set_visible (ui, TRUE);
         _modules.push_back (module);
     }
 

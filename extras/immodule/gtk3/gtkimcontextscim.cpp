@@ -349,10 +349,22 @@ static GtkIMContextSCIM                                *_focused_ic             
 
 static bool                                             _scim_initialized           = false;
 
-static GdkColor                                         _normal_bg;
-static GdkColor                                         _normal_text;
-static GdkColor                                         _active_bg;
-static GdkColor                                         _active_text;
+static GdkRGBA                                          _normal_bg;
+static GdkRGBA                                          _normal_text;
+static GdkRGBA                                          _active_bg;
+static GdkRGBA                                          _active_text;
+
+// GdkRGBA carries each channel as a double in [0,1], while Pango's color
+// attributes take 16-bit components. Handing a GdkRGBA channel straight to
+// pango_attr_foreground_new () truncates every color to 0, which paints the
+// preedit black on black -- a solid rectangle where the text should be.
+static inline guint16
+rgba_to_pango (double channel)
+{
+    if (channel <= 0.0) return 0;
+    if (channel >= 1.0) return 65535;
+    return (guint16) (channel * 65535.0 + 0.5);
+}
 
 
 static int                                              _instance_count             = 0;
@@ -1064,22 +1076,30 @@ gtk_im_context_scim_get_preedit_string (GtkIMContext   *context,
                                 attr->end_index = end_index;
                                 pango_attr_list_insert (*attrs, attr);
                             } else if (i->get_value () == SCIM_ATTR_DECORATE_REVERSE) {
-                                attr = pango_attr_foreground_new (_normal_bg.red, _normal_bg.green, _normal_bg.blue);
+                                attr = pango_attr_foreground_new (rgba_to_pango (_normal_bg.red),
+                                                 rgba_to_pango (_normal_bg.green),
+                                                 rgba_to_pango (_normal_bg.blue));
                                 attr->start_index = start_index;
                                 attr->end_index = end_index;
                                 pango_attr_list_insert (*attrs, attr);
    
-                                attr = pango_attr_background_new (_normal_text.red, _normal_text.green, _normal_text.blue);
+                                attr = pango_attr_background_new (rgba_to_pango (_normal_text.red),
+                                                 rgba_to_pango (_normal_text.green),
+                                                 rgba_to_pango (_normal_text.blue));
                                 attr->start_index = start_index;
                                 attr->end_index = end_index;
                                 pango_attr_list_insert (*attrs, attr);
                             } else if (i->get_value () == SCIM_ATTR_DECORATE_HIGHLIGHT) {
-                                attr = pango_attr_foreground_new (_active_text.red, _active_text.green, _active_text.blue);
+                                attr = pango_attr_foreground_new (rgba_to_pango (_active_text.red),
+                                                 rgba_to_pango (_active_text.green),
+                                                 rgba_to_pango (_active_text.blue));
                                 attr->start_index = start_index;
                                 attr->end_index = end_index;
                                 pango_attr_list_insert (*attrs, attr);
    
-                                attr = pango_attr_background_new (_active_bg.red, _active_bg.green, _active_bg.blue);
+                                attr = pango_attr_background_new (rgba_to_pango (_active_bg.red),
+                                                 rgba_to_pango (_active_bg.green),
+                                                 rgba_to_pango (_active_bg.blue));
                                 attr->start_index = start_index;
                                 attr->end_index = end_index;
                                 pango_attr_list_insert (*attrs, attr);
@@ -1809,7 +1829,7 @@ candidates_ensure (GtkWidget *relative_to)
         g_signal_connect (_candidates_area, "scroll-event",
                           G_CALLBACK (candidates_scroll_cb), 0);
         gtk_container_add (GTK_CONTAINER (_candidates_popover), _candidates_area);
-        gtk_widget_show (_candidates_area);
+        gtk_widget_set_visible (_candidates_area, TRUE);
         if (!_config.null ()) {
             candidates_sync_dark_hint ();
             _candidates_ui.set_theme (scim_candidates_theme_from_config (_config));
@@ -2462,10 +2482,10 @@ initialize (void)
     }
 
     // Init colors.
-    gdk_color_parse ("gray92",     &_normal_bg);
-    gdk_color_parse ("black",      &_normal_text);
-    gdk_color_parse ("light blue", &_active_bg);
-    gdk_color_parse ("black",      &_active_text);
+    gdk_rgba_parse (&_normal_bg, "gray92");
+    gdk_rgba_parse (&_normal_text, "black");
+    gdk_rgba_parse (&_active_bg, "light blue");
+    gdk_rgba_parse (&_active_text, "black");
 
     reload_config_callback (_config); 
     _config->signal_connect_reload (slot (reload_config_callback));
@@ -2964,7 +2984,7 @@ slot_beep (IMEngineInstanceBase *si)
     GtkIMContextSCIM *ic = static_cast<GtkIMContextSCIM *> (si->get_frontend_data ());
 
     if (ic && ic->impl && _focused_ic == ic)
-        gdk_beep ();
+        gdk_display_beep (gdk_display_get_default ());
 }
 
 static void
