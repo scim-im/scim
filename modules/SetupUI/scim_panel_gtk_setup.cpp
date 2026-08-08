@@ -182,7 +182,8 @@ on_default_spin_button_changed       (GtkSpinButton   *spinbutton,
                                       gpointer         user_data);
 
 static void
-on_toolbar_show_behavior_changed      (GtkComboBox     *combobox,
+on_toolbar_show_behavior_changed      (GObject         *object,
+                                      GParamSpec      *pspec,
                                       gpointer         user_data);
 
 static void
@@ -190,7 +191,8 @@ on_font_selection_clicked            (GtkButton       *button,
                                       gpointer         user_data);
 
 static void
-on_panel_color_set                   (GtkColorButton  *button,
+on_panel_color_set                   (GObject         *object,
+                                      GParamSpec      *pspec,
                                       gpointer         user_data);
 
 static void
@@ -241,13 +243,13 @@ create_setup_window ()
         gtk_widget_set_margin_end (label, 4);
         gtk_box_append (GTK_BOX (hbox), label);
 
-        __widget_toolbar_show_behavior = gtk_combo_box_text_new ();
-        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_toolbar_show_behavior),
-                                   _(__toolbar_show_behavior_text[SCIM_TOOLBAR_SHOW_ALWAYS]));
-        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_toolbar_show_behavior),
-                                   _(__toolbar_show_behavior_text[SCIM_TOOLBAR_SHOW_ON_DEMAND]));
-        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_toolbar_show_behavior),
-                                   _(__toolbar_show_behavior_text[SCIM_TOOLBAR_SHOW_NEVER]));
+        const char *show_choices[] = {
+            _(__toolbar_show_behavior_text[SCIM_TOOLBAR_SHOW_ALWAYS]),
+            _(__toolbar_show_behavior_text[SCIM_TOOLBAR_SHOW_ON_DEMAND]),
+            _(__toolbar_show_behavior_text[SCIM_TOOLBAR_SHOW_NEVER]),
+            0
+        };
+        __widget_toolbar_show_behavior = gtk_drop_down_new_from_strings (show_choices);
         gtk_box_append (GTK_BOX (hbox), __widget_toolbar_show_behavior);
         gtk_label_set_mnemonic_widget (GTK_LABEL (label), __widget_toolbar_show_behavior);
 
@@ -365,18 +367,18 @@ create_setup_window ()
                 gtk_widget_set_halign (label, GTK_ALIGN_START);
                 gtk_grid_attach (GTK_GRID (table), label, 0, i, 1, 1);
 
-                *rows[i].widget = gtk_color_button_new ();
+                *rows[i].widget = gtk_color_dialog_button_new (gtk_color_dialog_new ());
                 gtk_grid_attach (GTK_GRID (table), *rows[i].widget, 1, i, 1, 1);
                 gtk_label_set_mnemonic_widget (GTK_LABEL (label), *rows[i].widget);
 
-                g_signal_connect ((gpointer) *rows[i].widget, "color-set",
+                g_signal_connect ((gpointer) *rows[i].widget, "notify::rgba",
                                   G_CALLBACK (on_panel_color_set),
                                   rows[i].cfg);
             }
         }
 
         // Connect all signals.
-        g_signal_connect ((gpointer) __widget_toolbar_show_behavior, "changed",
+        g_signal_connect ((gpointer) __widget_toolbar_show_behavior, "notify::selected",
                           G_CALLBACK (on_toolbar_show_behavior_changed),
                           NULL);
 
@@ -494,16 +496,16 @@ setup_widget_value ()
 {
     if (__widget_toolbar_show_behavior) {
         if (__config_toolbar_always_hidden) {
-            gtk_combo_box_set_active (
-                GTK_COMBO_BOX (__widget_toolbar_show_behavior),
+            gtk_drop_down_set_selected (
+                GTK_DROP_DOWN (__widget_toolbar_show_behavior),
                 SCIM_TOOLBAR_SHOW_NEVER);
         } else if (__config_toolbar_always_show) {
-            gtk_combo_box_set_active (
-                GTK_COMBO_BOX (__widget_toolbar_show_behavior),
+            gtk_drop_down_set_selected (
+                GTK_DROP_DOWN (__widget_toolbar_show_behavior),
                 SCIM_TOOLBAR_SHOW_ALWAYS);
         } else {
-            gtk_combo_box_set_active (
-                GTK_COMBO_BOX (__widget_toolbar_show_behavior),
+            gtk_drop_down_set_selected (
+                GTK_DROP_DOWN (__widget_toolbar_show_behavior),
                 SCIM_TOOLBAR_SHOW_ON_DEMAND);
         }
     }
@@ -712,11 +714,11 @@ on_default_check_button_toggled (GtkCheckButton *checkbutton,
 }
 
 static void
-on_toolbar_show_behavior_changed (GtkComboBox *combobox,
+on_toolbar_show_behavior_changed (GObject     *object,
+                                 GParamSpec  */* pspec */,
                                  gpointer     /* user_data */)
 {
-    gint active;
-    active  = gtk_combo_box_get_active (combobox);
+    guint active = gtk_drop_down_get_selected (GTK_DROP_DOWN (object));
 
     switch (active) {
         case SCIM_TOOLBAR_SHOW_ALWAYS:
@@ -790,12 +792,15 @@ on_toolbar_show_behavior_changed (GtkComboBox *combobox,
 }
 
 static void
-font_dialog_response_cb (GtkDialog *dialog,
-                         gint       response,
-                         gpointer   /* user_data */)
+font_chosen_cb (GObject *source, GAsyncResult *result, gpointer /* user_data */)
 {
-    if (response == GTK_RESPONSE_OK) {
-        gchar *fontname = gtk_font_chooser_get_font (GTK_FONT_CHOOSER (dialog));
+    // Null when the user dismissed the dialog, which is not an error worth
+    // reporting -- the configured font simply stays as it was.
+    PangoFontDescription *desc = gtk_font_dialog_choose_font_finish (
+        GTK_FONT_DIALOG (source), result, NULL);
+
+    if (desc) {
+        gchar *fontname = pango_font_description_to_string (desc);
 
         if (fontname) {
             __config_font = String (fontname);
@@ -807,31 +812,33 @@ font_dialog_response_cb (GtkDialog *dialog,
 
             __have_changed = true;
         }
+        pango_font_description_free (desc);
     }
 
-    gtk_window_destroy (GTK_WINDOW (dialog));
+    g_object_unref (source);
 }
 
 static void
 on_font_selection_clicked (GtkButton *button,
                            gpointer   /* user_data */)
 {
-    GtkWidget *font_selection = gtk_font_chooser_dialog_new (_("Select Interface Font"), NULL);
-    GtkRoot   *root = gtk_widget_get_root (GTK_WIDGET (button));
+    GtkFontDialog *dialog = gtk_font_dialog_new ();
+    GtkRoot       *root = gtk_widget_get_root (GTK_WIDGET (button));
 
-    if (__config_font != "default") {
-        gtk_font_chooser_set_font (
-            GTK_FONT_CHOOSER (font_selection),
-            __config_font.c_str ());
-    }
+    gtk_font_dialog_set_title (dialog, _("Select Interface Font"));
 
-    if (root && GTK_IS_WINDOW (root))
-        gtk_window_set_transient_for (GTK_WINDOW (font_selection), GTK_WINDOW (root));
-    gtk_window_set_modal (GTK_WINDOW (font_selection), TRUE);
+    PangoFontDescription *initial = 0;
+    if (__config_font != "default")
+        initial = pango_font_description_from_string (__config_font.c_str ());
 
-    g_signal_connect (font_selection, "response", G_CALLBACK (font_dialog_response_cb), NULL);
+    // The dialog runs itself and reports back; font_chosen_cb owns it from here.
+    gtk_font_dialog_choose_font (
+        dialog,
+        (root && GTK_IS_WINDOW (root)) ? GTK_WINDOW (root) : 0,
+        initial, 0, font_chosen_cb, 0);
 
-    gtk_window_present (GTK_WINDOW (font_selection));
+    if (initial)
+        pango_font_description_free (initial);
 }
 
 // Parse a color string (X11/CSS name or #rrggbb) the same way the candidate
@@ -849,35 +856,38 @@ set_color_button (GtkWidget *button, const String &color)
         rgba.alpha = 1.0;
     }
 
-    gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (button), &rgba);
+    gtk_color_dialog_button_set_rgba (GTK_COLOR_DIALOG_BUTTON (button), &rgba);
 }
 
 // Read a color button as #rrggbb, which the panel and the candidate renderer's
 // pango_color_parse both read back.
 static String
-color_button_hex (GtkColorButton *button)
+color_button_hex (GtkWidget *button)
 {
-    GdkRGBA rgba;
-    gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (button), &rgba);
+    const GdkRGBA *rgba =
+        gtk_color_dialog_button_get_rgba (GTK_COLOR_DIALOG_BUTTON (button));
+    if (!rgba)
+        return String ("#000000");
 
     gchar *hex = g_strdup_printf ("#%02x%02x%02x",
-        (int) (CLAMP (rgba.red,   0.0, 1.0) * 255.0 + 0.5),
-        (int) (CLAMP (rgba.green, 0.0, 1.0) * 255.0 + 0.5),
-        (int) (CLAMP (rgba.blue,  0.0, 1.0) * 255.0 + 0.5));
+        (int) (CLAMP (rgba->red,   0.0, 1.0) * 255.0 + 0.5),
+        (int) (CLAMP (rgba->green, 0.0, 1.0) * 255.0 + 0.5),
+        (int) (CLAMP (rgba->blue,  0.0, 1.0) * 255.0 + 0.5));
     String s (hex);
     g_free (hex);
     return s;
 }
 
 static void
-on_panel_color_set (GtkColorButton *button,
-                    gpointer        user_data)
+on_panel_color_set (GObject    *object,
+                    GParamSpec */* pspec */,
+                    gpointer    user_data)
 {
     String *cfg = static_cast<String *> (user_data);
     if (!cfg)
         return;
 
-    *cfg = color_button_hex (button);
+    *cfg = color_button_hex (GTK_WIDGET (object));
     __have_changed = true;
 }
 

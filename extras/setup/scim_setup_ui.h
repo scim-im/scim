@@ -38,9 +38,11 @@ class SetupUI
     GtkWidget        *m_restore_button;
     GtkWidget        *m_status_label;
 
-    GtkWidget        *m_module_list_view;
-    GtkTreeSelection *m_module_list_selection;
-    GtkTreeStore     *m_module_list_model;
+    GtkWidget          *m_module_list_view;
+    GtkSingleSelection *m_module_list_selection;
+    // Categories; each carries its own store of modules. The GtkTreeListModel
+    // that flattens the two levels for the view is held by the selection.
+    GListStore         *m_module_list_model;
 
     GtkWidget        *m_current_widget;
     SetupModule      *m_current_module;
@@ -89,10 +91,11 @@ private:
     GtkWidget * create_splash_view ();
     GtkWidget * create_setup_cover (const char *category);
 
-    gboolean find_category (const char *category, GtkTreeIter *parent_out);
-    void     append_module_row (GtkTreeIter *parent, const char *label,
+    // The category row, or NULL when there is none yet. Borrowed.
+    struct _ScimSetupRow *find_category (const char *category);
+    void     append_module_row (struct _ScimSetupRow *parent, const char *label,
                                 SetupModule *module, GtkWidget *widget);
-    GtkTreeIter create_category (const char *category, const char *label);
+    struct _ScimSetupRow * create_category (const char *category, const char *label);
 
     void request_quit ();
 
@@ -101,7 +104,11 @@ private:
     // void show_restart_hint_then_quit ();
     // static void restart_hint_response_cb (GObject *source, GAsyncResult *res, gpointer user_data);
 
-    static void module_list_selection_changed_callback (GtkTreeSelection *selection, gpointer user_data);
+    static void module_list_selection_changed_callback (GObject *object, GParamSpec *pspec, gpointer user_data);
+
+    static void module_list_setup_item (GtkSignalListItemFactory *factory, GtkListItem *item, gpointer data);
+    static void module_list_bind_item  (GtkSignalListItemFactory *factory, GtkListItem *item, gpointer data);
+    static GListModel * module_list_child_model (gpointer item, gpointer data);
 
     static void apply_button_clicked_callback (GtkButton *button, gpointer user_data);
     static void restore_button_clicked_callback (GtkButton *button, gpointer user_data);
@@ -114,11 +121,9 @@ private:
     static gboolean query_changed_timeout_cb (gpointer data);
 
 
-    static gboolean module_list_hide_widget_iter_func (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data);
+    void module_list_hide_widget_walk ();
 
-    static gboolean module_list_save_config_iter_func (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data);
-
-    static gboolean module_list_load_config_iter_func (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data);
+    void module_list_save_config_walk ();
 };
 
 /*

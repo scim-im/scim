@@ -270,11 +270,11 @@ PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.24.0 pango >= 1.1.0 gdk-pixbuf-2.0 >= 2.4
 			[SCIM_HAS_GTK2=yes],
 			[SCIM_HAS_GTK2=no])
 
-PKG_CHECK_MODULES(GTK3, [gtk+-3.0 >= 3.0.0 pango >= 1.1.0 gdk-pixbuf-2.0 >= 2.4.0],
+PKG_CHECK_MODULES(GTK3, [gtk+-3.0 >= 3.24.0 pango >= 1.1.0 gdk-pixbuf-2.0 >= 2.4.0],
 			[SCIM_HAS_GTK3=yes],
 			[SCIM_HAS_GTK3=no])
 
-PKG_CHECK_MODULES(GTK4, [gtk4 >= 4.0.0 pango >= 1.48.0 gdk-pixbuf-2.0 >= 2.42.0],
+PKG_CHECK_MODULES(GTK4, [gtk4 >= 4.10.0 pango >= 1.48.0 gdk-pixbuf-2.0 >= 2.42.0],
 			[SCIM_HAS_GTK4=yes],
 			[SCIM_HAS_GTK4=no])
 

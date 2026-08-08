@@ -268,7 +268,8 @@ on_default_key_selection_clicked     (GtkButton       *button,
                                       gpointer         user_data);
 
 static void
-on_keyboard_layout_changed           (GtkComboBox     *combobox,
+on_keyboard_layout_changed           (GObject         *object,
+                                      GParamSpec      *pspec,
                                       gpointer         user_data);
 
 static void
@@ -316,16 +317,16 @@ create_setup_window ()
         label = gtk_label_new_with_mnemonic (_("_Keyboard Layout:"));
         gtk_box_append (GTK_BOX (hbox), label);
 
-        __widget_keyboard_layout = gtk_combo_box_text_new ();
+        GtkStringList *layouts = gtk_string_list_new (NULL);
+        for (size_t i = 0; i < SCIM_KEYBOARD_NUM_LAYOUTS; ++i) {
+            gtk_string_list_append (layouts,
+                scim_keyboard_layout_get_display_name (static_cast<KeyboardLayout> (i)).c_str ());
+        }
+        __widget_keyboard_layout = gtk_drop_down_new (G_LIST_MODEL (layouts), NULL);
 
         gtk_label_set_mnemonic_widget (GTK_LABEL (label), __widget_keyboard_layout);
 
-        for (size_t i = 0; i < SCIM_KEYBOARD_NUM_LAYOUTS; ++i) {
-            gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (__widget_keyboard_layout),
-                scim_keyboard_layout_get_display_name (static_cast<KeyboardLayout> (i)).c_str ());
-        }
-
-        g_signal_connect (G_OBJECT (__widget_keyboard_layout), "changed",
+        g_signal_connect (G_OBJECT (__widget_keyboard_layout), "notify::selected",
                           G_CALLBACK (on_keyboard_layout_changed),
                           NULL);
 
@@ -438,7 +439,8 @@ setup_widget_value ()
             __config_shared_input_method);
     }
 
-    gtk_combo_box_set_active (GTK_COMBO_BOX (__widget_keyboard_layout), (gint) __config_keyboard_layout);
+    gtk_drop_down_set_selected (GTK_DROP_DOWN (__widget_keyboard_layout),
+                                (guint) __config_keyboard_layout);
 }
 
 static void
@@ -476,9 +478,9 @@ save_config (const ConfigPointer &config)
                           __config_keyboards [i].data);
         }
 
-        gint act = gtk_combo_box_get_active (GTK_COMBO_BOX (__widget_keyboard_layout));
+        guint act = gtk_drop_down_get_selected (GTK_DROP_DOWN (__widget_keyboard_layout));
 
-        if (act >= 0 && act < SCIM_KEYBOARD_NUM_LAYOUTS)
+        if (act != GTK_INVALID_LIST_POSITION && act < SCIM_KEYBOARD_NUM_LAYOUTS)
             __config_keyboard_layout = static_cast<KeyboardLayout> (act);
         else
             __config_keyboard_layout = SCIM_KEYBOARD_Unknown;
@@ -515,13 +517,13 @@ on_default_editable_changed (GtkEditable *editable,
 }
 
 static void
-key_selection_response_cb (GtkDialog *dialog,
-                           gint       response,
-                           gpointer   user_data)
+key_selection_response_cb (ScimKeySelectionDialog *dialog,
+                           gint                    response,
+                           gpointer                user_data)
 {
     KeyboardConfigData *data = static_cast <KeyboardConfigData *> (user_data);
 
-    if (response == GTK_RESPONSE_OK && data) {
+    if (response == SCIM_KEY_SELECTION_RESPONSE_OK && data) {
         const gchar *keys = scim_key_selection_dialog_get_keys (
                         SCIM_KEY_SELECTION_DIALOG (dialog));
 
@@ -571,7 +573,8 @@ on_default_check_button_toggled (GtkCheckButton *checkbutton,
 }
 
 static void
-on_keyboard_layout_changed (GtkComboBox */* combobox */,
+on_keyboard_layout_changed (GObject     */* object */,
+                            GParamSpec  */* pspec */,
                             gpointer     /* user_data */)
 {
     __have_changed = true;

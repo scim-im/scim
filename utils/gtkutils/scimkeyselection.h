@@ -40,9 +40,10 @@ struct _ScimKeySelection
     GtkWidget *toggle_release;
     GtkWidget *key_code;
 
-    GtkWidget        *list_view;
-    GtkTreeSelection *list_selection;
-    GtkListStore     *list_model;
+    GtkWidget          *list_view;
+    // Owned by list_view, which holds the selection, which holds the model.
+    GtkSingleSelection *list_selection;
+    GtkStringList      *list_model;
 
     gchar            *keys;
 };
@@ -54,9 +55,18 @@ struct _ScimKeySelectionClass
     void (*changed) (ScimKeySelection *keyselection);
 };
 
+// What the dialog reports through its "response" signal. Its own values, not
+// GtkResponseType: that enum lives in gtk/deprecated/gtkdialog.h, which is
+// exactly what this widget stopped deriving from.
+enum
+{
+    SCIM_KEY_SELECTION_RESPONSE_CANCEL = 0,
+    SCIM_KEY_SELECTION_RESPONSE_OK     = 1
+};
+
 struct _ScimKeySelectionDialog
 {
-    GtkDialog parent_instance;
+    GtkWindow parent_instance;
 
     GtkWidget *keysel;
 
@@ -68,7 +78,9 @@ struct _ScimKeySelectionDialog
 
 struct _ScimKeySelectionDialogClass
 {
-    GtkDialogClass parent_class;
+    GtkWindowClass parent_class;
+
+    void (*response) (ScimKeySelectionDialog *dialog, gint response_id);
 
     /* Padding for future expansion */
     void (*_gtk_reserved1) (void);

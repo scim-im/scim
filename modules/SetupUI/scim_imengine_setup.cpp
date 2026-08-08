@@ -38,6 +38,7 @@
 #include <functional>
 
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 
 #include "scim_private.h"
 #include "scim.h"
@@ -1348,11 +1349,12 @@ struct HotkeyDialogData {
 };
 
 static void
-hotkey_dialog_response_cb (GtkDialog *dialog, gint response, gpointer user_data)
+hotkey_dialog_response_cb (ScimKeySelectionDialog *dialog, gint response,
+                           gpointer user_data)
 {
     HotkeyDialogData *d = static_cast<HotkeyDialogData *> (user_data);
 
-    if (response == GTK_RESPONSE_OK) {
+    if (response == SCIM_KEY_SELECTION_RESPONSE_OK) {
         const gchar *newkeys = scim_key_selection_dialog_get_keys (SCIM_KEY_SELECTION_DIALOG (dialog));
         const gchar *hotkeys = d->old_hotkeys;
 
@@ -1574,12 +1576,14 @@ struct FilterDialogData {
     std::vector<String> enabled_filters;
 };
 
+// GtkDialog's response protocol went with the widget; the two buttons say
+// which they are through this flag instead.
 static void
-filter_dialog_response_cb (GtkDialog *dialog, gint response, gpointer user_data)
+filter_dialog_finish (GtkWidget *dialog, gboolean accepted, gpointer user_data)
 {
     FilterDialogData *d = static_cast<FilterDialogData *> (user_data);
 
-    if (response == GTK_RESPONSE_OK) {
+    if (accepted) {
         std::vector <String> filter_names;
 
         get_filter_list_view_result (d->view, d->enabled_filters, filter_names);
@@ -1595,8 +1599,29 @@ filter_dialog_response_cb (GtkDialog *dialog, gint response, gpointer user_data)
         }
     }
 
-    delete d;
+    // The dialog owns d; destroying it frees it, on this path and on the one
+    // where the window is closed without touching either button.
     gtk_window_destroy (GTK_WINDOW (dialog));
+}
+
+static void
+filter_dialog_data_free (gpointer data)
+{
+    delete static_cast<FilterDialogData *> (data);
+}
+
+static void
+filter_dialog_ok_cb (GtkButton *button, gpointer user_data)
+{
+    filter_dialog_finish (GTK_WIDGET (gtk_widget_get_root (GTK_WIDGET (button))),
+                          TRUE, user_data);
+}
+
+static void
+filter_dialog_cancel_cb (GtkButton *button, gpointer user_data)
+{
+    filter_dialog_finish (GTK_WIDGET (gtk_widget_get_root (GTK_WIDGET (button))),
+                          FALSE, user_data);
 }
 
 static void
@@ -1624,18 +1649,20 @@ on_filter_button_clicked (GtkButton */* button */, gpointer /* user_data */)
         char buf [256];
         snprintf (buf, 256, _("Select Filters for %s"), name);
 
-        dialog = gtk_dialog_new_with_buttons (buf,
-                                              NULL,
-                                              GTK_DIALOG_MODAL,
-                                              _("_OK"), GTK_RESPONSE_OK,
-                                              _("_Cancel"), GTK_RESPONSE_CANCEL,
-                                              NULL);
+        dialog = gtk_window_new ();
+        gtk_window_set_title (GTK_WINDOW (dialog), buf);
+        gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
+
+        // GtkWindow takes a single child, so the content and the buttons go in
+        // a box of our own -- the shape GtkDialog used to supply.
+        GtkWidget *content_area = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+        gtk_window_set_child (GTK_WINDOW (dialog), content_area);
 
         scrolledwindow = gtk_scrolled_window_new ();
         gtk_widget_set_vexpand (scrolledwindow, TRUE);
         gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow),
                                         GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-        gtk_box_append (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), scrolledwindow);
+        gtk_box_append (GTK_BOX (content_area), scrolledwindow);
 
         view = create_filter_list_view ();
         set_filter_list_view_content (view, __filter_infos, enabled_filters);
@@ -1643,10 +1670,10 @@ on_filter_button_clicked (GtkButton */* button */, gpointer /* user_data */)
         gtk_scrolled_window_set_child (GTK_SCROLLED_WINDOW (scrolledwindow), view);
 
         separator = gtk_separator_new (GTK_ORIENTATION_HORIZONTAL);
-        gtk_box_append (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), separator);
+        gtk_box_append (GTK_BOX (content_area), separator);
 
         hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 4);
-        gtk_box_append (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), hbox);
+        gtk_box_append (GTK_BOX (content_area), hbox);
 
         button = gtk_button_new_with_mnemonic (_("Move _Up"));
         gtk_widget_set_hexpand (button, TRUE);
@@ -1673,7 +1700,38 @@ on_filter_button_clicked (GtkButton */* button */, gpointer /* user_data */)
         d->filter_uuids_old = String (filter_uuids ? filter_uuids : "");
         d->enabled_filters  = enabled_filters;
 
-        g_signal_connect (dialog, "response", G_CALLBACK (filter_dialog_response_cb), d);
+        // Hang it on the dialog rather than on the buttons: the window can also
+        // be closed without pressing either, and this way that frees it too.
+        g_object_set_data_full (G_OBJECT (dialog), "scim-filter-dialog-data",
+                                d, filter_dialog_data_free);
+
+        // Escape dismisses it, as it did while this was a GtkDialog.
+        GtkEventController *shortcuts = gtk_shortcut_controller_new ();
+        gtk_shortcut_controller_add_shortcut (
+            GTK_SHORTCUT_CONTROLLER (shortcuts),
+            gtk_shortcut_new (gtk_keyval_trigger_new (GDK_KEY_Escape,
+                                                      (GdkModifierType) 0),
+                              gtk_named_action_new ("window.close")));
+        gtk_widget_add_controller (dialog, shortcuts);
+
+        // The action area GtkDialog used to add.
+        GtkWidget *action_area = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+        gtk_widget_set_halign (action_area, GTK_ALIGN_END);
+        gtk_widget_set_margin_start (action_area, 4);
+        gtk_widget_set_margin_end (action_area, 4);
+        gtk_widget_set_margin_top (action_area, 4);
+        gtk_widget_set_margin_bottom (action_area, 4);
+        gtk_box_append (GTK_BOX (content_area), action_area);
+
+        GtkWidget *cancel = gtk_button_new_with_mnemonic (_("_Cancel"));
+        gtk_box_append (GTK_BOX (action_area), cancel);
+        g_signal_connect (cancel, "clicked", G_CALLBACK (filter_dialog_cancel_cb), d);
+
+        GtkWidget *ok = gtk_button_new_with_mnemonic (_("_OK"));
+        gtk_box_append (GTK_BOX (action_area), ok);
+        g_signal_connect (ok, "clicked", G_CALLBACK (filter_dialog_ok_cb), d);
+
+        gtk_window_set_default_widget (GTK_WINDOW (dialog), ok);
 
         gtk_window_present (GTK_WINDOW (dialog));
     }

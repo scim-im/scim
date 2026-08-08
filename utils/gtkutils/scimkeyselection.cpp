@@ -3,6 +3,7 @@
 
 #include <glib.h>
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 
 #define Uses_SCIM_EVENT
 
@@ -40,8 +41,17 @@ static void scim_key_selection_add_key_button_callback (GtkButton             *b
 static void scim_key_selection_del_key_button_callback (GtkButton             *button,
                                                         ScimKeySelection      *keyselection);
 
-static void scim_key_selection_list_changed_callback   (GtkTreeSelection      *selection,
+static void scim_key_selection_list_changed_callback   (GtkSingleSelection    *selection,
+                                                        GParamSpec            *pspec,
                                                         ScimKeySelection      *keyselection);
+
+static void scim_key_selection_list_setup_callback     (GtkSignalListItemFactory *factory,
+                                                        GtkListItem           *item,
+                                                        gpointer               data);
+
+static void scim_key_selection_list_bind_callback      (GtkSignalListItemFactory *factory,
+                                                        GtkListItem           *item,
+                                                        gpointer               data);
 
 static void scim_key_grab_button_callback              (GtkButton             *button,
                                                         ScimKeySelection      *keyselection);
@@ -135,9 +145,6 @@ scim_key_selection_init (GTypeInstance *instance,
     GtkWidget *scrolledwindow;
     GtkWidget *button;
 
-    GtkCellRenderer *list_cell;
-    GtkTreeViewColumn *list_column;
-
     frame = gtk_frame_new (NULL);
     gtk_widget_set_vexpand (frame, TRUE);
     gtk_box_append (GTK_BOX (keyselection), frame);
@@ -153,31 +160,29 @@ scim_key_selection_init (GTypeInstance *instance,
                                     GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_set_has_frame (GTK_SCROLLED_WINDOW (scrolledwindow), TRUE);
 
-    keyselection->list_view = gtk_tree_view_new ();
+    // A flat list of key strings: GtkStringList is the model for exactly that,
+    // and GtkSingleSelection gives the always-one-selected behaviour that
+    // GTK_SELECTION_BROWSE used to. Each takes a reference to the one below,
+    // so only the view has to be kept.
+    keyselection->list_model = gtk_string_list_new (NULL);
+    keyselection->list_selection =
+        gtk_single_selection_new (G_LIST_MODEL (keyselection->list_model));
+
+    GtkListItemFactory *factory = gtk_signal_list_item_factory_new ();
+    g_signal_connect (factory, "setup",
+                      G_CALLBACK (scim_key_selection_list_setup_callback), NULL);
+    g_signal_connect (factory, "bind",
+                      G_CALLBACK (scim_key_selection_list_bind_callback), NULL);
+
+    keyselection->list_view =
+        gtk_list_view_new (GTK_SELECTION_MODEL (keyselection->list_selection), factory);
     gtk_scrolled_window_set_child (GTK_SCROLLED_WINDOW (scrolledwindow), keyselection->list_view);
-    gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (keyselection->list_view), FALSE);
 
     gtk_label_set_mnemonic_widget (GTK_LABEL (label), keyselection->list_view);
 
-    keyselection->list_selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (keyselection->list_view));
-    gtk_tree_selection_set_mode (keyselection->list_selection, GTK_SELECTION_BROWSE);
-
-    g_signal_connect (G_OBJECT (keyselection->list_selection), "changed",
+    g_signal_connect (G_OBJECT (keyselection->list_selection), "notify::selected",
                       G_CALLBACK (scim_key_selection_list_changed_callback),
                       keyselection);
-
-    // Create key list column.
-    list_cell = gtk_cell_renderer_text_new ();
-    list_column = gtk_tree_view_column_new_with_attributes (
-                            NULL, list_cell, "text", 0, NULL);
-
-    gtk_tree_view_append_column (GTK_TREE_VIEW (keyselection->list_view), list_column);
-
-    // Create key list model
-    keyselection->list_model = gtk_list_store_new (1, G_TYPE_STRING);
-
-    gtk_tree_view_set_model (GTK_TREE_VIEW (keyselection->list_view),
-                             GTK_TREE_MODEL (keyselection->list_model));
 
     grid = gtk_grid_new ();
     gtk_grid_set_row_spacing (GTK_GRID (grid), 4);
@@ -280,7 +285,6 @@ static void
 scim_key_selection_add_key_button_callback (GtkButton        */* button */,
                                             ScimKeySelection *keyselection)
 {
-    GtkTreeIter iter;
     String key;
     String key_code;
 
@@ -312,22 +316,14 @@ scim_key_selection_add_key_button_callback (GtkButton        */* button */,
     if (gtk_check_button_get_active (GTK_CHECK_BUTTON (keyselection->toggle_release)))
         key += String ("+KeyRelease");
 
-    if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (keyselection->list_model), &iter)) {
-        gchar * keystr;
-
-        do {
-            gtk_tree_model_get (GTK_TREE_MODEL (keyselection->list_model), &iter,
-                                0, &keystr, -1);
-
-            if (keystr && String (keystr) == key)
-                return;
-
-        } while (gtk_tree_model_iter_next (GTK_TREE_MODEL (keyselection->list_model), &iter));
+    const guint n = g_list_model_get_n_items (G_LIST_MODEL (keyselection->list_model));
+    for (guint i = 0; i < n; ++ i) {
+        const char *keystr = gtk_string_list_get_string (keyselection->list_model, i);
+        if (keystr && String (keystr) == key)
+            return;
     }
 
-    gtk_list_store_append (keyselection->list_model, &iter);
-    gtk_list_store_set (keyselection->list_model, &iter,
-                        0, key.c_str (), -1);
+    gtk_string_list_append (keyselection->list_model, key.c_str ());
 
     g_signal_emit_by_name (keyselection, "key-selection-changed");
 }
@@ -336,11 +332,10 @@ static void
 scim_key_selection_del_key_button_callback (GtkButton       */* button */,
                                            ScimKeySelection *keyselection)
 {
-    GtkTreeIter iter;
-    GtkTreeModel *model;
+    const guint pos = gtk_single_selection_get_selected (keyselection->list_selection);
 
-    if (gtk_tree_selection_get_selected (keyselection->list_selection, &model, &iter)) {
-        gtk_list_store_remove (keyselection->list_model, &iter);
+    if (pos != GTK_INVALID_LIST_POSITION) {
+        gtk_string_list_remove (keyselection->list_model, pos);
         g_signal_emit_by_name (keyselection, "key-selection-changed");
     }
 }
@@ -467,16 +462,11 @@ scim_key_selection_append_keys (ScimKeySelection *keyselection,
     if (!scim_string_to_key_list (keylist, keys))
         return;
 
-    GtkTreeIter iter;
-
     String str;
 
     for (size_t i = 0; i < keylist.size (); ++ i) {
-        if (scim_key_to_string (str, keylist [i])) {
-            gtk_list_store_append (keyselection->list_model, &iter);
-            gtk_list_store_set (keyselection->list_model, &iter,
-                                0, str.c_str (), -1);
-        }
+        if (scim_key_to_string (str, keylist [i]))
+            gtk_string_list_append (keyselection->list_model, str.c_str ());
     }
 }
 
@@ -486,7 +476,9 @@ scim_key_selection_set_keys (ScimKeySelection *keyselection,
 {
     g_return_if_fail (SCIM_IS_KEY_SELECTION (keyselection));
 
-    gtk_list_store_clear (keyselection->list_model);
+    gtk_string_list_splice (keyselection->list_model, 0,
+                            g_list_model_get_n_items (G_LIST_MODEL (keyselection->list_model)),
+                            NULL);
     scim_key_selection_append_keys (keyselection, keys);
 }
 
@@ -500,42 +492,59 @@ scim_key_selection_get_keys (ScimKeySelection *keyselection)
 
     keyselection->keys = NULL;
 
-    GtkTreeIter iter;
+    const guint n = g_list_model_get_n_items (G_LIST_MODEL (keyselection->list_model));
+    std::vector <String> keylist;
 
-    if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (keyselection->list_model), &iter)) {
-        std::vector <String> keylist;
-        gchar * keystr;
-
-        do {
-            gtk_tree_model_get (GTK_TREE_MODEL (keyselection->list_model), &iter,
-                                0, &keystr, -1);
-
-            if (keystr) keylist.push_back (keystr);
-        } while (gtk_tree_model_iter_next (GTK_TREE_MODEL (keyselection->list_model), &iter));
-
-        if (keylist.size ())
-            keyselection->keys = g_strdup (scim_combine_string_list (keylist).c_str ());
+    for (guint i = 0; i < n; ++ i) {
+        const char *keystr = gtk_string_list_get_string (keyselection->list_model, i);
+        if (keystr) keylist.push_back (String (keystr));
     }
+
+    if (keylist.size ())
+        keyselection->keys = g_strdup (scim_combine_string_list (keylist).c_str ());
 
     return keyselection->keys;
 }
 
 static void
-scim_key_selection_list_changed_callback (GtkTreeSelection *selection,
-                                          ScimKeySelection *keyselection)
+scim_key_selection_list_changed_callback (GtkSingleSelection *selection,
+                                          GParamSpec         */* pspec */,
+                                          ScimKeySelection   *keyselection)
 {
-    GtkTreeModel *model;
-    GtkTreeIter   iter;
-    gchar        *keystr;
+    const guint pos = gtk_single_selection_get_selected (selection);
 
-    KeyEvent      keyevent;
+    if (pos == GTK_INVALID_LIST_POSITION)
+        return;
 
-    if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
-        gtk_tree_model_get (model, &iter, 0, &keystr, -1);
+    GtkStringList *model = GTK_STRING_LIST (gtk_single_selection_get_model (selection));
+    const char *keystr = gtk_string_list_get_string (model, pos);
+    KeyEvent keyevent;
 
-        if (scim_string_to_key (keyevent, String (keystr)))
-            scim_key_selection_set_key_event (keyselection, keyevent);
-    }
+    if (keystr && scim_string_to_key (keyevent, String (keystr)))
+        scim_key_selection_set_key_event (keyselection, keyevent);
+}
+
+// One label per row; the factory builds it once and refills it as rows scroll.
+static void
+scim_key_selection_list_setup_callback (GtkSignalListItemFactory */* factory */,
+                                        GtkListItem              *item,
+                                        gpointer                  /* data */)
+{
+    GtkWidget *label = gtk_label_new (NULL);
+    gtk_widget_set_halign (label, GTK_ALIGN_START);
+    gtk_list_item_set_child (item, label);
+}
+
+static void
+scim_key_selection_list_bind_callback (GtkSignalListItemFactory */* factory */,
+                                       GtkListItem              *item,
+                                       gpointer                  /* data */)
+{
+    GtkWidget *label = gtk_list_item_get_child (item);
+    GtkStringObject *obj = GTK_STRING_OBJECT (gtk_list_item_get_item (item));
+
+    if (label && obj)
+        gtk_label_set_text (GTK_LABEL (label), gtk_string_object_get_string (obj));
 }
 
 static void
@@ -583,10 +592,14 @@ scim_key_selection_set_key_event (ScimKeySelection *keyselection,
  *****************************************************************************/
 static GtkWidgetClass *dialog_parent_class = NULL;
 
+enum { DIALOG_RESPONSE, DIALOG_LAST_SIGNAL };
+static guint dialog_signals [DIALOG_LAST_SIGNAL] = { 0 };
+
 static GType key_selection_dialog_type = 0;
 
 static void scim_key_selection_dialog_class_init (gpointer klass_ptr, gpointer klass_data);
 static void scim_key_selection_dialog_init (GTypeInstance *instance, gpointer klass);
+static gboolean scim_key_selection_dialog_close_request (GtkWindow *window);
 
 void
 scim_key_selection_dialog_register_type (GTypeModule *type_module)
@@ -609,13 +622,13 @@ scim_key_selection_dialog_register_type (GTypeModule *type_module)
         if (type_module)
             key_selection_dialog_type = g_type_module_register_type (
                                     type_module,
-                                    GTK_TYPE_DIALOG,
+                                    GTK_TYPE_WINDOW,
                                     "SCIM_ScimKeySelectionDialog",
                                     &key_selection_dialog_info,
                                     (GTypeFlags) 0);
         else
             key_selection_dialog_type = g_type_register_static (
-                                    GTK_TYPE_DIALOG,
+                                    GTK_TYPE_WINDOW,
                                     "SCIM_ScimKeySelectionDialog",
                                     &key_selection_dialog_info,
                                     (GTypeFlags) 0);
@@ -637,6 +650,48 @@ scim_key_selection_dialog_class_init (gpointer klass_ptr,
 {
     ScimKeySelectionDialogClass *klass = (ScimKeySelectionDialogClass *) klass_ptr;
     dialog_parent_class = (GtkWidgetClass*) g_type_class_peek_parent (klass);
+
+    // GtkDialog used to provide this; the widget carries its own now.
+    dialog_signals [DIALOG_RESPONSE] =
+        g_signal_new ("response",
+                      G_TYPE_FROM_CLASS (klass),
+                      G_SIGNAL_RUN_LAST,
+                      G_STRUCT_OFFSET (ScimKeySelectionDialogClass, response),
+                      NULL, NULL,
+                      g_cclosure_marshal_VOID__INT,
+                      G_TYPE_NONE, 1, G_TYPE_INT);
+
+    // The other two things GtkDialog gave a dialog: Escape dismisses it, and
+    // closing it any other way is reported like a button, so a caller hears
+    // exactly once however the dialog ends.
+    GTK_WINDOW_CLASS (klass)->close_request = scim_key_selection_dialog_close_request;
+
+    gtk_widget_class_add_binding_action (GTK_WIDGET_CLASS (klass),
+                                         GDK_KEY_Escape, (GdkModifierType) 0,
+                                         "window.close", NULL);
+}
+
+// Closing from the window manager, or with Escape, is a cancel. The window is
+// left to the response handler to destroy, as it is on either button, so a
+// caller has one place to clean up whatever it attached to the dialog.
+static gboolean
+scim_key_selection_dialog_close_request (GtkWindow *window)
+{
+    g_signal_emit (window, dialog_signals [DIALOG_RESPONSE], 0,
+                   SCIM_KEY_SELECTION_RESPONSE_CANCEL);
+
+    return GTK_WINDOW_CLASS (dialog_parent_class)->close_request (window);
+}
+
+static void
+scim_key_selection_dialog_button_cb (GtkButton *button, gpointer user_data)
+{
+    ScimKeySelectionDialog *dialog = (ScimKeySelectionDialog *) user_data;
+    const gint id = (button == GTK_BUTTON (dialog->ok_button))
+                    ? SCIM_KEY_SELECTION_RESPONSE_OK
+                    : SCIM_KEY_SELECTION_RESPONSE_CANCEL;
+
+    g_signal_emit (dialog, dialog_signals [DIALOG_RESPONSE], 0, id);
 }
 
 static void
@@ -644,11 +699,16 @@ scim_key_selection_dialog_init (GTypeInstance *instance,
                                 gpointer /* klass */)
 {
     ScimKeySelectionDialog *keyseldialog = (ScimKeySelectionDialog *) instance;
-    GtkDialog *dialog = GTK_DIALOG (keyseldialog);
-
     gtk_window_set_resizable (GTK_WINDOW (keyseldialog), TRUE);
 
-    keyseldialog->content_area = gtk_dialog_get_content_area (dialog);
+    // GtkDialog laid out a content area with an action area under it; build the
+    // same shape by hand, since GtkWindow has only the one child.
+    GtkWidget *root_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+    gtk_window_set_child (GTK_WINDOW (keyseldialog), root_box);
+
+    keyseldialog->content_area = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_vexpand (keyseldialog->content_area, TRUE);
+    gtk_box_append (GTK_BOX (root_box), keyseldialog->content_area);
 
     keyseldialog->keysel = scim_key_selection_new ();
     gtk_widget_set_margin_start (keyseldialog->keysel, 4);
@@ -658,14 +718,25 @@ scim_key_selection_dialog_init (GTypeInstance *instance,
     gtk_widget_set_vexpand (keyseldialog->keysel, TRUE);
     gtk_box_append (GTK_BOX (keyseldialog->content_area), keyseldialog->keysel);
 
-    keyseldialog->cancel_button = gtk_dialog_add_button (dialog,
-                                                        _("_Cancel"),
-                                                        GTK_RESPONSE_CANCEL);
+    GtkWidget *action_area = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+    gtk_widget_set_halign (action_area, GTK_ALIGN_END);
+    gtk_widget_set_margin_start (action_area, 4);
+    gtk_widget_set_margin_end (action_area, 4);
+    gtk_widget_set_margin_top (action_area, 4);
+    gtk_widget_set_margin_bottom (action_area, 4);
+    gtk_box_append (GTK_BOX (root_box), action_area);
 
-    keyseldialog->ok_button = gtk_dialog_add_button (dialog,
-                                                    _("_OK"),
-                                                    GTK_RESPONSE_OK);
-    gtk_window_set_default_widget (GTK_WINDOW (dialog), keyseldialog->ok_button);
+    keyseldialog->cancel_button = gtk_button_new_with_mnemonic (_("_Cancel"));
+    gtk_box_append (GTK_BOX (action_area), keyseldialog->cancel_button);
+    g_signal_connect (keyseldialog->cancel_button, "clicked",
+                      G_CALLBACK (scim_key_selection_dialog_button_cb), keyseldialog);
+
+    keyseldialog->ok_button = gtk_button_new_with_mnemonic (_("_OK"));
+    gtk_box_append (GTK_BOX (action_area), keyseldialog->ok_button);
+    g_signal_connect (keyseldialog->ok_button, "clicked",
+                      G_CALLBACK (scim_key_selection_dialog_button_cb), keyseldialog);
+
+    gtk_window_set_default_widget (GTK_WINDOW (keyseldialog), keyseldialog->ok_button);
 
     gtk_window_set_title (GTK_WINDOW (keyseldialog),
                           _("Key Selection"));

@@ -47,14 +47,63 @@ const gchar * scim_setup_module_categories [] =
     NULL
 };
 
-enum
+// One row of the module list. A GtkTreeStore carried these as four columns;
+// a list model carries objects instead, so they become fields. A category row
+// owns the store holding its modules, and a module row leaves it null -- that
+// is also how the tree model tells the two apart when it asks for children.
+struct _ScimSetupRow
 {
-    MODULE_LIST_LABEL = 0,
-    MODULE_LIST_CATEGORY,
-    MODULE_LIST_MODULE,
-    MODULE_LIST_WIDGET,
-    MODULE_LIST_NUM_COLUMNS
+    GObject      parent_instance;
+
+    char        *label;
+    char        *category;    // null on a module row
+    SetupModule *module;      // null on a category row, not owned
+    GtkWidget   *widget;      // the page this row shows, not owned
+    GListStore  *children;    // null on a module row
 };
+
+#define SCIM_TYPE_SETUP_ROW (scim_setup_row_get_type ())
+G_DECLARE_FINAL_TYPE (ScimSetupRow, scim_setup_row, SCIM, SETUP_ROW, GObject)
+G_DEFINE_TYPE (ScimSetupRow, scim_setup_row, G_TYPE_OBJECT)
+
+static void
+scim_setup_row_finalize (GObject *object)
+{
+    ScimSetupRow *row = (ScimSetupRow *) object;
+
+    g_free (row->label);
+    g_free (row->category);
+    g_clear_object (&row->children);
+
+    G_OBJECT_CLASS (scim_setup_row_parent_class)->finalize (object);
+}
+
+static void
+scim_setup_row_class_init (ScimSetupRowClass *klass)
+{
+    G_OBJECT_CLASS (klass)->finalize = scim_setup_row_finalize;
+}
+
+static void
+scim_setup_row_init (ScimSetupRow */* row */)
+{
+}
+
+static ScimSetupRow *
+scim_setup_row_new (const char *label, const char *category,
+                    SetupModule *module, GtkWidget *widget,
+                    gboolean with_children)
+{
+    ScimSetupRow *row = (ScimSetupRow *) g_object_new (SCIM_TYPE_SETUP_ROW, NULL);
+
+    row->label    = g_strdup (label);
+    row->category = category ? g_strdup (category) : 0;
+    row->module   = module;
+    row->widget   = widget;
+    row->children = with_children ? g_list_store_new (SCIM_TYPE_SETUP_ROW) : 0;
+
+    return row;
+}
 
 SetupUI::SetupUI (const ConfigPointer &config, const String &display, const HelperInfo &helper_info)
     : m_main_window (0),
@@ -98,66 +147,52 @@ SetupUI::~SetupUI ()
     m_helper_agent.close_connection ();
 }
 
-gboolean
-SetupUI::find_category (const char *category, GtkTreeIter *parent_out)
+_ScimSetupRow *
+SetupUI::find_category (const char *category)
 {
-    GtkTreeIter parent;
+    const guint n = g_list_model_get_n_items (G_LIST_MODEL (m_module_list_model));
 
-    if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (m_module_list_model), &parent)) {
-        do {
-            gchar *cat = 0;
-            gtk_tree_model_get (GTK_TREE_MODEL (m_module_list_model), &parent,
-                                MODULE_LIST_CATEGORY, &cat, -1);
-            if (cat && !strcmp (cat, category)) {
-                g_free (cat);
-                *parent_out = parent;
-                return TRUE;
-            }
-            g_free (cat);
-        } while (gtk_tree_model_iter_next (GTK_TREE_MODEL (m_module_list_model), &parent));
+    for (guint i = 0; i < n; ++ i) {
+        ScimSetupRow *row =
+            (ScimSetupRow *) g_list_model_get_item (G_LIST_MODEL (m_module_list_model), i);
+        const gboolean match = row->category && !strcmp (row->category, category);
+
+        g_object_unref (row);      // the store keeps its own reference
+        if (match)
+            return row;
     }
 
-    return FALSE;
+    return 0;
 }
 
-GtkTreeIter
+_ScimSetupRow *
 SetupUI::create_category (const char *category, const char *label)
 {
-    GtkWidget  *cover = create_setup_cover (label ? label : category);
-    GtkTreeIter parent;
+    GtkWidget *cover = create_setup_cover (label ? label : category);
 
     gtk_box_append (GTK_BOX (m_work_area), cover);
     gtk_widget_set_hexpand (cover, TRUE);
     gtk_widget_set_vexpand (cover, TRUE);
 
-    gtk_tree_store_append (m_module_list_model, &parent, NULL);
-    gtk_tree_store_set (
-        m_module_list_model, &parent,
-        MODULE_LIST_LABEL,    _(category),
-        MODULE_LIST_CATEGORY, category,
-        MODULE_LIST_MODULE,   NULL,
-        MODULE_LIST_WIDGET,   cover,
-        -1);
+    ScimSetupRow *row = scim_setup_row_new (_(category), category, 0, cover, TRUE);
+    g_list_store_append (m_module_list_model, row);
+    g_object_unref (row);          // the store owns it now
 
-    return parent;
+    return row;
 }
 
 void
-SetupUI::append_module_row (GtkTreeIter *parent, const char *label,
+SetupUI::append_module_row (_ScimSetupRow *parent, const char *label,
                             SetupModule *module, GtkWidget *widget)
 {
-    GtkTreeIter iter;
+    if (!parent || !parent->children)
+        return;
 
-    gtk_tree_store_append (m_module_list_model, &iter, parent);
-    gtk_tree_store_set (
-        m_module_list_model, &iter,
-        MODULE_LIST_LABEL,    label,
-        MODULE_LIST_CATEGORY, NULL,
-        MODULE_LIST_MODULE,   module,
-        MODULE_LIST_WIDGET,   widget,
-        -1);
+    ScimSetupRow *row = scim_setup_row_new (label, 0, module, widget, FALSE);
+    g_list_store_append (parent->children, row);
+    g_object_unref (row);
 
-    gtk_tree_view_expand_all (GTK_TREE_VIEW (m_module_list_view));
+    // No expand-all to call: the tree model is created autoexpanding.
 }
 
 bool
@@ -180,11 +215,11 @@ SetupUI::add_module (SetupModule *module)
     gtk_widget_set_vexpand (module_widget, TRUE);
     gtk_widget_set_visible (module_widget, FALSE);
 
-    GtkTreeIter parent;
-    if (!find_category (module_category.c_str (), &parent))
+    ScimSetupRow *parent = find_category (module_category.c_str ());
+    if (!parent)
         parent = create_category (module_category.c_str (), module_category.c_str ());
 
-    append_module_row (&parent, module_label.c_str (), module, module_widget);
+    append_module_row (parent, module_label.c_str (), module, module_widget);
 
     return true;
 }
@@ -238,11 +273,11 @@ SetupUI::add_legacy_gtk3_entry (const std::vector<String> &names,
     gtk_box_append (GTK_BOX (m_work_area), page);
     gtk_widget_set_visible (page, FALSE);
 
-    GtkTreeIter parent;
-    if (!find_category ("__legacy__", &parent))
+    ScimSetupRow *parent = find_category ("__legacy__");
+    if (!parent)
         parent = create_category ("__legacy__", _("Legacy"));
 
-    append_module_row (&parent, _("Legacy settings (GTK3)"), NULL, page);
+    append_module_row (parent, _("Legacy settings (GTK3)"), NULL, page);
 }
 
 void
@@ -282,11 +317,11 @@ SetupUI::add_unsupported_notice (const std::vector<String> &names)
     gtk_box_append (GTK_BOX (m_work_area), page);
     gtk_widget_set_visible (page, FALSE);
 
-    GtkTreeIter parent;
-    if (!find_category ("__unsupported__", &parent))
+    ScimSetupRow *parent = find_category ("__unsupported__");
+    if (!parent)
         parent = create_category ("__unsupported__", _("Unsupported"));
 
-    append_module_row (&parent, _("Unsupported modules"), NULL, page);
+    append_module_row (parent, _("Unsupported modules"), NULL, page);
 }
 
 void
@@ -346,21 +381,27 @@ SetupUI::create_main_ui ()
     gtk_paned_set_resize_start_child (GTK_PANED (hpaned1), FALSE);
     gtk_paned_set_shrink_start_child (GTK_PANED (hpaned1), FALSE);
 
-    // Create module list view.
-    m_module_list_view = gtk_tree_view_new ();
+    // Create module list view. The store of categories is built in
+    // create_splash_view ()'s caller below; wrap it as a two-level tree, always
+    // expanded, which is what gtk_tree_view_expand_all () used to give.
+    m_module_list_model = g_list_store_new (SCIM_TYPE_SETUP_ROW);
+
+    GtkTreeListModel *tree = gtk_tree_list_model_new (
+                                G_LIST_MODEL (m_module_list_model),
+                                FALSE,                  // passthrough
+                                TRUE,                   // autoexpand
+                                module_list_child_model,
+                                0, 0);
+
+    m_module_list_selection = gtk_single_selection_new (G_LIST_MODEL (tree));
+
+    GtkListItemFactory *factory = gtk_signal_list_item_factory_new ();
+    g_signal_connect (factory, "setup", G_CALLBACK (module_list_setup_item), 0);
+    g_signal_connect (factory, "bind",  G_CALLBACK (module_list_bind_item), 0);
+
+    m_module_list_view = gtk_list_view_new (
+                            GTK_SELECTION_MODEL (m_module_list_selection), factory);
     gtk_scrolled_window_set_child (GTK_SCROLLED_WINDOW (scrolledwindow1), m_module_list_view);
-    gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (m_module_list_view), FALSE);
-    gtk_tree_view_set_enable_search (GTK_TREE_VIEW (m_module_list_view), FALSE);
-
-    // Get module list selection.
-    m_module_list_selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (m_module_list_view));
-    gtk_tree_selection_set_mode (m_module_list_selection, GTK_SELECTION_BROWSE);
-
-    // Create module list column.
-    GtkCellRenderer *module_list_cell = gtk_cell_renderer_text_new ();
-    GtkTreeViewColumn *module_list_column = gtk_tree_view_column_new_with_attributes (
-                            NULL, module_list_cell, "text", MODULE_LIST_LABEL, NULL);
-    gtk_tree_view_append_column (GTK_TREE_VIEW (m_module_list_view), module_list_column);
 
     // Create vbox for work area and button area.
     GtkWidget *vbox2 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
@@ -413,7 +454,7 @@ SetupUI::create_main_ui ()
                       G_CALLBACK (SetupUI::restore_button_clicked_callback), this);
     g_signal_connect (m_main_window, "close-request",
                       G_CALLBACK (SetupUI::main_window_close_request_callback), this);
-    g_signal_connect (m_module_list_selection, "changed",
+    g_signal_connect (m_module_list_selection, "notify::selected",
                       G_CALLBACK (SetupUI::module_list_selection_changed_callback), this);
 
     gtk_window_set_default_widget (GTK_WINDOW (m_main_window), ok_button);
@@ -462,72 +503,119 @@ SetupUI::create_setup_cover (const char *category)
 void
 SetupUI::create_module_list_model ()
 {
-    GtkTreeIter iter;
-
     GtkWidget *widget = create_splash_view ();
     gtk_box_append (GTK_BOX (m_work_area), widget);
     gtk_widget_set_hexpand (widget, TRUE);
     gtk_widget_set_vexpand (widget, TRUE);
 
-    m_module_list_model = gtk_tree_store_new (
-                            MODULE_LIST_NUM_COLUMNS,
-                            G_TYPE_STRING,
-                            G_TYPE_STRING,
-                            G_TYPE_POINTER,
-                            GTK_TYPE_WIDGET);
-
-    gtk_tree_store_append (m_module_list_model, &iter, NULL);
-    gtk_tree_store_set (m_module_list_model, &iter,
-                        MODULE_LIST_LABEL,    _(scim_setup_module_categories [0]),
-                        MODULE_LIST_CATEGORY, scim_setup_module_categories [0],
-                        MODULE_LIST_MODULE,   NULL,
-                        MODULE_LIST_WIDGET,   widget,
-                        -1);
-
-    gtk_tree_view_set_model (GTK_TREE_VIEW (m_module_list_view),
-                             GTK_TREE_MODEL (m_module_list_model));
+    ScimSetupRow *row = scim_setup_row_new (_(scim_setup_module_categories [0]),
+                                            scim_setup_module_categories [0],
+                                            0, widget, TRUE);
+    g_list_store_append (m_module_list_model, row);
+    g_object_unref (row);
 }
 
-gboolean
-SetupUI::module_list_hide_widget_iter_func (GtkTreeModel *model,
-                                            GtkTreePath */* path */,
-                                            GtkTreeIter *iter,
-                                            gpointer /* data */)
+// The three walks below replace gtk_tree_model_foreach (), which visited every
+// row of both levels. Categories live in m_module_list_model and their modules
+// in each category's own store, so visiting both is explicit now.
+template <typename F>
+static void
+scim_setup_rows_foreach (GListStore *categories, F fn)
 {
-    GtkWidget *widget = 0;
-    gtk_tree_model_get (model, iter, MODULE_LIST_WIDGET, &widget, -1);
+    const guint n = g_list_model_get_n_items (G_LIST_MODEL (categories));
 
-    if (widget) {
-        gtk_widget_set_visible (widget, FALSE);
-        g_object_unref (widget);
+    for (guint i = 0; i < n; ++ i) {
+        ScimSetupRow *cat =
+            (ScimSetupRow *) g_list_model_get_item (G_LIST_MODEL (categories), i);
+        fn (cat);
+
+        if (cat->children) {
+            const guint m = g_list_model_get_n_items (G_LIST_MODEL (cat->children));
+            for (guint j = 0; j < m; ++ j) {
+                ScimSetupRow *row =
+                    (ScimSetupRow *) g_list_model_get_item (G_LIST_MODEL (cat->children), j);
+                fn (row);
+                g_object_unref (row);
+            }
+        }
+        g_object_unref (cat);
     }
-
-    return FALSE;
 }
 
 void
-SetupUI::module_list_selection_changed_callback (GtkTreeSelection *selection, gpointer user_data)
+SetupUI::module_list_hide_widget_walk ()
 {
-    GtkTreeModel *model;
-    GtkTreeIter   iter;
-    GtkWidget    *widget = 0;
-    SetupModule  *module = 0;
-    gchar        *label = 0;
-    gchar        *category = 0;
+    scim_setup_rows_foreach (m_module_list_model, [] (ScimSetupRow *row) {
+        if (row->widget)
+            gtk_widget_set_visible (row->widget, FALSE);
+    });
+}
 
+GListModel *
+SetupUI::module_list_child_model (gpointer item, gpointer /* data */)
+{
+    ScimSetupRow *row = (ScimSetupRow *) item;
+
+    // A null return marks the row as a leaf; a category hands back its modules.
+    return row->children ? G_LIST_MODEL (g_object_ref (row->children)) : 0;
+}
+
+void
+SetupUI::module_list_setup_item (GtkSignalListItemFactory */* factory */,
+                                 GtkListItem *item, gpointer /* data */)
+{
+    GtkWidget *expander = gtk_tree_expander_new ();
+    GtkWidget *label    = gtk_label_new (0);
+
+    gtk_widget_set_halign (label, GTK_ALIGN_START);
+    gtk_tree_expander_set_child (GTK_TREE_EXPANDER (expander), label);
+    gtk_list_item_set_child (item, expander);
+}
+
+void
+SetupUI::module_list_bind_item (GtkSignalListItemFactory */* factory */,
+                                GtkListItem *item, gpointer /* data */)
+{
+    GtkTreeExpander *expander = GTK_TREE_EXPANDER (gtk_list_item_get_child (item));
+    GtkTreeListRow  *tree_row = GTK_TREE_LIST_ROW (gtk_list_item_get_item (item));
+
+    if (!expander || !tree_row)
+        return;
+
+    gtk_tree_expander_set_list_row (expander, tree_row);
+
+    ScimSetupRow *row = (ScimSetupRow *) gtk_tree_list_row_get_item (tree_row);
+    if (row) {
+        gtk_label_set_text (GTK_LABEL (gtk_tree_expander_get_child (expander)),
+                            row->label ? row->label : "");
+        g_object_unref (row);
+    }
+}
+
+void
+SetupUI::module_list_selection_changed_callback (GObject *object,
+                                                 GParamSpec */* pspec */,
+                                                 gpointer user_data)
+{
+    GtkSingleSelection *selection = GTK_SINGLE_SELECTION (object);
     SetupUI *ui = (SetupUI *) user_data;
 
-    if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
-        gtk_tree_model_get (model, &iter,
-                            MODULE_LIST_LABEL,    &label,
-                            MODULE_LIST_CATEGORY, &category,
-                            MODULE_LIST_MODULE,   &module,
-                            MODULE_LIST_WIDGET,   &widget,
-                            -1);
+    GtkTreeListRow *tree_row =
+        (GtkTreeListRow *) gtk_single_selection_get_selected_item (selection);
+
+    if (tree_row) {
+        ScimSetupRow *row = (ScimSetupRow *) gtk_tree_list_row_get_item (tree_row);
+        if (!row)
+            return;
+
+        // Borrowed from the row, which the store keeps alive.
+        GtkWidget   *widget   = row->widget;
+        SetupModule *module   = row->module;
+        g_object_unref (row);
 
         if (widget != ui->m_current_widget) {
             // Hide all other widgets.
-            gtk_tree_model_foreach (model, module_list_hide_widget_iter_func, NULL);
+            ui->module_list_hide_widget_walk ();
             gtk_widget_set_visible (widget, TRUE);
             ui->m_current_widget = widget;
         }
@@ -550,10 +638,6 @@ SetupUI::module_list_selection_changed_callback (GtkTreeSelection *selection, gp
 
             ui->m_current_module = module;
         }
-
-        g_free (label);
-        if (category) g_free (category);
-        if (widget) g_object_unref (widget);
     }
 }
 
@@ -599,42 +683,15 @@ SetupUI::apply_button_clicked_callback (GtkButton */* button */, gpointer user_d
     }
 }
 
-gboolean
-SetupUI::module_list_save_config_iter_func (GtkTreeModel *model,
-                                            GtkTreePath */* path */,
-                                            GtkTreeIter *iter,
-                                            gpointer data)
+void
+SetupUI::module_list_save_config_walk ()
 {
-    SetupModule *module = 0;
-
-    SetupUI *ui = (SetupUI *) data;
-
-    gtk_tree_model_get (model, iter, MODULE_LIST_MODULE, &module, -1);
-
-    if (module && module->query_changed () && ui && !ui->m_config.null ()) {
-        module->save_config (ui->m_config);
-        ui->m_changes_applied = true;
-    }
-
-    return FALSE;
-}
-
-gboolean
-SetupUI::module_list_load_config_iter_func (GtkTreeModel *model,
-                                            GtkTreePath */* path */,
-                                            GtkTreeIter *iter,
-                                            gpointer data)
-{
-    SetupModule *module = 0;
-
-    SetupUI *ui = (SetupUI *) data;
-
-    gtk_tree_model_get (model, iter, MODULE_LIST_MODULE, &module, -1);
-
-    if (module && ui && !ui->m_config.null ())
-        module->load_config (ui->m_config);
-
-    return FALSE;
+    scim_setup_rows_foreach (m_module_list_model, [this] (ScimSetupRow *row) {
+        if (row->module && row->module->query_changed () && !m_config.null ()) {
+            row->module->save_config (m_config);
+            m_changes_applied = true;
+        }
+    });
 }
 
 void
@@ -643,9 +700,7 @@ SetupUI::ok_button_clicked_callback (GtkButton */* button */, gpointer user_data
     SetupUI *ui = (SetupUI *) user_data;
 
     if (!ui->m_config.null ()) {
-        gtk_tree_model_foreach (GTK_TREE_MODEL (ui->m_module_list_model),
-                                module_list_save_config_iter_func,
-                                user_data);
+        ui->module_list_save_config_walk ();
         ui->m_config->flush ();
 
         // OK saves every page, so it changes the configuration just as much as

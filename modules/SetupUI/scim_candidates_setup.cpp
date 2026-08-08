@@ -155,6 +155,15 @@ static String __unset_color_active_text;
 
 static bool   __have_changed                 = false;
 
+// Set while setup_widget_value () fills the widgets, so that the handlers can
+// tell that apart from an edit. A GtkColorDialogButton reports a colour set on
+// it through notify::rgba exactly as it reports one the user picked -- unlike
+// the GtkColorButton "color-set" that preceded it -- and the handler writes
+// what it sees into the config. Ungated, merely showing the page would spell
+// out every colour the user had left unset, and it would stop following the
+// scheme from then on.
+static bool   __updating_widgets             = false;
+
 static GtkWidget * __widget_color_scheme      = 0;
 static GtkWidget * __widget_orientation       = 0;
 static GtkWidget * __widget_font              = 0;
@@ -179,7 +188,8 @@ static void
 on_default_spin_button_changed (GtkSpinButton *spinbutton, gpointer user_data);
 
 static void
-on_color_set                   (GtkColorButton *button, gpointer user_data);
+on_color_set                   (GObject *object, GParamSpec *pspec,
+                                gpointer user_data);
 
 static void
 on_font_clicked                (GtkButton *button, gpointer user_data);
@@ -209,6 +219,9 @@ static void
 on_color_scheme_changed (GObject *object, GParamSpec * /*pspec*/,
                          gpointer /*user_data*/)
 {
+    if (__updating_widgets)
+        return;
+
     guint i = gtk_drop_down_get_selected (GTK_DROP_DOWN (object));
     if (i >= G_N_ELEMENTS (__color_scheme_values))
         i = 0;
@@ -241,6 +254,9 @@ static void
 on_orientation_changed (GObject *object, GParamSpec * /*pspec*/,
                         gpointer /*user_data*/)
 {
+    if (__updating_widgets)
+        return;
+
     guint i = gtk_drop_down_get_selected (GTK_DROP_DOWN (object));
     if (i >= G_N_ELEMENTS (__orientation_values))
         i = 0;
@@ -412,15 +428,17 @@ create_setup_window ()
                 gtk_widget_set_halign (label, GTK_ALIGN_START);
                 gtk_grid_attach (GTK_GRID (grid), label, 0, i + 1, 1, 1);
 
-                *rows[i].widget = gtk_color_button_new ();
-                // Alpha is how transparency is configured: the renderer honors
-                // it on the background and the border.
-                gtk_color_chooser_set_use_alpha (
-                    GTK_COLOR_CHOOSER (*rows[i].widget), TRUE);
+                {
+                    // Alpha is how transparency is configured: the renderer
+                    // honors it on the background and the border.
+                    GtkColorDialog *dialog = gtk_color_dialog_new ();
+                    gtk_color_dialog_set_with_alpha (dialog, TRUE);
+                    *rows[i].widget = gtk_color_dialog_button_new (dialog);
+                }
                 gtk_grid_attach (GTK_GRID (grid), *rows[i].widget, 1, i + 1, 1, 1);
                 gtk_label_set_mnemonic_widget (GTK_LABEL (label), *rows[i].widget);
 
-                g_signal_connect ((gpointer) *rows[i].widget, "color-set",
+                g_signal_connect ((gpointer) *rows[i].widget, "notify::rgba",
                                   G_CALLBACK (on_color_set), rows[i].cfg);
             }
         }
@@ -557,6 +575,9 @@ create_setup_window ()
 void
 setup_widget_value ()
 {
+    const bool was_updating = __updating_widgets;
+    __updating_widgets = true;
+
     if (__widget_color_scheme)
         gtk_drop_down_set_selected (GTK_DROP_DOWN (__widget_color_scheme),
                                     color_scheme_to_index (__config_color_scheme));
@@ -606,6 +627,8 @@ setup_widget_value ()
     if (__widget_spacing)
         gtk_spin_button_set_value (GTK_SPIN_BUTTON (__widget_spacing),
                                    __config_spacing);
+
+    __updating_widgets = was_updating;
 }
 
 void
@@ -737,7 +760,7 @@ on_default_spin_button_changed (GtkSpinButton *spinbutton,
 {
     int *value = static_cast<int *> (user_data);
 
-    if (value) {
+    if (value && !__updating_widgets) {
         *value = gtk_spin_button_get_value_as_int (spinbutton);
         __have_changed = true;
     }
@@ -756,7 +779,7 @@ set_color_button (GtkWidget *button, const String &color)
     rgba.blue  = c.b;
     rgba.alpha = c.a;
 
-    gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (button), &rgba);
+    gtk_color_dialog_button_set_rgba (GTK_COLOR_DIALOG_BUTTON (button), &rgba);
 }
 
 static void
@@ -768,36 +791,41 @@ on_reset_clicked (GtkButton * /*button*/, gpointer /*user_data*/)
 }
 
 static void
-on_color_set (GtkColorButton *button, gpointer user_data)
+on_color_set (GObject *object, GParamSpec */* pspec */, gpointer user_data)
 {
     String *cfg = static_cast<String *> (user_data);
-    if (!cfg)
+    if (!cfg || __updating_widgets)
         return;
 
-    GdkRGBA rgba;
-    gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (button), &rgba);
+    const GdkRGBA *rgba =
+        gtk_color_dialog_button_get_rgba (GTK_COLOR_DIALOG_BUTTON (object));
+    if (!rgba)
+        return;
 
-    CandidatesColor c = { rgba.red, rgba.green, rgba.blue, rgba.alpha };
+    CandidatesColor c = { rgba->red, rgba->green, rgba->blue, rgba->alpha };
     *cfg = scim_candidates_format_color (c);
     __have_changed = true;
 
     // The preedit color follows the normal text color while it is unset, so it
-    // has to track a change to that one (set_rgba does not re-emit "color-set").
+    // has to track a change to that one.
     if (cfg == &__config_color_normal_text)
         setup_widget_value ();
 }
 
 static void
-font_dialog_response_cb (GtkDialog *dialog,
-                         gint       response,
-                         gpointer   user_data)
+font_chosen_cb (GObject *source, GAsyncResult *result, gpointer user_data)
 {
     String    *cfg    = static_cast<String *> (user_data);
     GtkWidget *button = (cfg == &__config_preedit_font)
                         ? __widget_preedit_font : __widget_font;
 
-    if (response == GTK_RESPONSE_OK && cfg) {
-        gchar *fontname = gtk_font_chooser_get_font (GTK_FONT_CHOOSER (dialog));
+    // Null when the user dismissed the dialog, which is not an error worth
+    // reporting -- the configured font simply stays as it was.
+    PangoFontDescription *desc = gtk_font_dialog_choose_font_finish (
+        GTK_FONT_DIALOG (source), result, NULL);
+
+    if (desc && cfg) {
+        gchar *fontname = pango_font_description_to_string (desc);
 
         if (fontname) {
             *cfg = String (fontname);
@@ -810,7 +838,9 @@ font_dialog_response_cb (GtkDialog *dialog,
         }
     }
 
-    gtk_window_destroy (GTK_WINDOW (dialog));
+    if (desc)
+        pango_font_description_free (desc);
+    g_object_unref (source);
 }
 
 static void
@@ -821,21 +851,24 @@ on_font_clicked (GtkButton *button, gpointer user_data)
         return;
 
     const bool preedit = (cfg == &__config_preedit_font);
-    GtkWidget *dialog = gtk_font_chooser_dialog_new (
-        preedit ? _("Select Preedit Font") : _("Select Candidate Font"), NULL);
+    GtkFontDialog *dialog = gtk_font_dialog_new ();
     GtkRoot *root = gtk_widget_get_root (GTK_WIDGET (button));
 
+    gtk_font_dialog_set_title (dialog,
+        preedit ? _("Select Preedit Font") : _("Select Candidate Font"));
+
+    PangoFontDescription *initial = 0;
     if (*cfg != String ("default"))
-        gtk_font_chooser_set_font (GTK_FONT_CHOOSER (dialog), cfg->c_str ());
+        initial = pango_font_description_from_string (cfg->c_str ());
 
-    if (root && GTK_IS_WINDOW (root))
-        gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (root));
-    gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
+    // The dialog runs itself and reports back; font_chosen_cb owns it from here.
+    gtk_font_dialog_choose_font (
+        dialog,
+        (root && GTK_IS_WINDOW (root)) ? GTK_WINDOW (root) : 0,
+        initial, 0, font_chosen_cb, cfg);
 
-    g_signal_connect (dialog, "response",
-                      G_CALLBACK (font_dialog_response_cb), cfg);
-
-    gtk_window_present (GTK_WINDOW (dialog));
+    if (initial)
+        pango_font_description_free (initial);
 }
 
 /*
