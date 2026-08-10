@@ -67,7 +67,7 @@ DebugOutput::DebugOutput (uint32 mask, uint32 verbose)
     current_verbose = verbose;
 }
 #else
-DebugOutput::DebugOutput (uint32 mask, uint32 verbose)
+DebugOutput::DebugOutput (uint32 /* mask */, uint32 /* verbose */)
 {
 }
 #endif

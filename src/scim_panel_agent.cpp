@@ -1180,7 +1180,7 @@ private:
 
     const ClientInfo & socket_get_client_info   (int client)
     {
-        static ClientInfo null_client = { 0, UNKNOWN_CLIENT };
+        static ClientInfo null_client = { 0, UNKNOWN_CLIENT, 0 };
 
         ClientRepository::iterator it = m_client_repository.find (client);
 
@@ -1637,7 +1637,7 @@ private:
         }
     }
 
-    void socket_helper_key_event_op (int client, int cmd)
+    void socket_helper_key_event_op (int /* client */, int cmd)
     {
         uint32 target_ic;
         String target_uuid;
@@ -1881,7 +1881,7 @@ private:
         unlock ();
     }
 
-    const String & get_focused_context (int &client, uint32 &context, bool force_last_context = false) const
+    const String & get_focused_context (int &client, uint32 &context, bool /* force_last_context */ = false) const
     {
         if (m_current_socket_client >= 0) {
             client = m_current_socket_client;

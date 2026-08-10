@@ -70,9 +70,9 @@ extern "C" {
 namespace scim {
 
 SocketConfig::SocketConfig ()
-    : m_valid (false),
-      m_socket_address (scim_get_default_socket_config_address ()),
+    : m_socket_address (scim_get_default_socket_config_address ()),
       m_socket_timeout (scim_get_default_socket_timeout ()),
+      m_valid (false),
       m_connected (false)
 {
     SCIM_DEBUG_CONFIG (2) << " Construct SocketConfig object.\n";

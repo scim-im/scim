@@ -45,8 +45,8 @@ enum {
   LAST_SIGNAL
 };
 
-static void   scim_string_view_class_init    (ScimStringViewClass *klass);
-static void   scim_string_view_init          (ScimStringView      *string_view);
+static void   scim_string_view_class_init    (gpointer klass_ptr, gpointer klass_data);
+static void   scim_string_view_init          (GTypeInstance *instance, gpointer klass);
 static void   scim_string_view_finalize      (GObject             *object);
 static void   scim_string_view_set_property  (GObject *object, guint prop_id,
                                               const GValue *value, GParamSpec *pspec);
@@ -87,12 +87,12 @@ scim_string_view_register_type (GTypeModule *type_module)
     sizeof (ScimStringViewClass),
     NULL,
     NULL,
-    (GClassInitFunc) scim_string_view_class_init,
+    scim_string_view_class_init,
     NULL,
     NULL,
     sizeof (ScimStringView),
     0,
-    (GInstanceInitFunc) scim_string_view_init,
+    scim_string_view_init,
     0
   };
 
@@ -118,8 +118,10 @@ scim_string_view_get_type (void)
 }
 
 static void
-scim_string_view_class_init (ScimStringViewClass *klass)
+scim_string_view_class_init (gpointer klass_ptr,
+                             gpointer /* klass_data */)
 {
+  ScimStringViewClass *klass = (ScimStringViewClass *) klass_ptr;
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
@@ -190,8 +192,10 @@ scim_string_view_class_init (ScimStringViewClass *klass)
 }
 
 static void
-scim_string_view_init (ScimStringView *string_view)
+scim_string_view_init (GTypeInstance *instance,
+                       gpointer /* klass */)
 {
+  ScimStringView *string_view = (ScimStringView *) instance;
   GtkGesture *click;
 
   string_view->text_size = MIN_SIZE;
@@ -582,7 +586,7 @@ scim_string_view_check_cursor_blink (ScimStringView *string_view)
 
 static void
 scim_string_view_measure (GtkWidget *widget, GtkOrientation orientation,
-                          int for_size, int *minimum, int *natural,
+                          int /* for_size */, int *minimum, int *natural,
                           int *minimum_baseline, int *natural_baseline)
 {
   ScimStringView *string_view = SCIM_STRING_VIEW (widget);
@@ -771,8 +775,8 @@ scim_string_view_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
 }
 
 static void
-scim_string_view_pressed_cb (GtkGestureClick *gesture, int n_press,
-                             double x, double y, gpointer data)
+scim_string_view_pressed_cb (GtkGestureClick *gesture, int /* n_press */,
+                             double x, double /* y */, gpointer data)
 {
   ScimStringView *string_view = SCIM_STRING_VIEW (data);
   gint pos = scim_string_view_find_position (string_view, (gint) x);

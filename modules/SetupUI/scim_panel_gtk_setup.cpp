@@ -713,7 +713,7 @@ on_default_check_button_toggled (GtkCheckButton *checkbutton,
 
 static void
 on_toolbar_show_behavior_changed (GtkComboBox *combobox,
-                                 gpointer     user_data)
+                                 gpointer     /* user_data */)
 {
     gint active;
     active  = gtk_combo_box_get_active (combobox);
@@ -792,7 +792,7 @@ on_toolbar_show_behavior_changed (GtkComboBox *combobox,
 static void
 font_dialog_response_cb (GtkDialog *dialog,
                          gint       response,
-                         gpointer   user_data)
+                         gpointer   /* user_data */)
 {
     if (response == GTK_RESPONSE_OK) {
         gchar *fontname = gtk_font_chooser_get_font (GTK_FONT_CHOOSER (dialog));
@@ -814,7 +814,7 @@ font_dialog_response_cb (GtkDialog *dialog,
 
 static void
 on_font_selection_clicked (GtkButton *button,
-                           gpointer   user_data)
+                           gpointer   /* user_data */)
 {
     GtkWidget *font_selection = gtk_font_chooser_dialog_new (_("Select Interface Font"), NULL);
     GtkRoot   *root = gtk_widget_get_root (GTK_WIDGET (button));

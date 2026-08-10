@@ -419,7 +419,7 @@ SocketFrontEnd::check_client_connection (const Socket &client) const
 }
 
 void
-SocketFrontEnd::socket_accept_callback (SocketServer *server, const Socket &client)
+SocketFrontEnd::socket_accept_callback (SocketServer */* server */, const Socket &client)
 {
     SCIM_DEBUG_FRONTEND (1) << "socket_accept_callback (" << client.get_id () << ").\n";
 }

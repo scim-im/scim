@@ -331,7 +331,7 @@ bool initialize_socket_server ()
     return true;
 }
 
-void signalhandler(int sig)
+void signalhandler(int /* sig */)
 {
     SCIM_DEBUG_MAIN (1) << "signalhandler ()\n";
 

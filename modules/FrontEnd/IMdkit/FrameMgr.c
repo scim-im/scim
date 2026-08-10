@@ -1299,7 +1299,7 @@ static FrameIter _FrameIterCounterIncr (FrameIter fitr, int i)
     return (NULL);
 }
 
-static void _IterStartWatch (Iter it, void *client_data)
+static void _IterStartWatch (Iter /* it */, void *client_data)
 {
     FrameIter p = (FrameIter) client_data;
     p->counting = True;

@@ -396,7 +396,7 @@ X11FrontEnd::send_helper_event (int siid, const String &helper_uuid, const Trans
 }
 
 bool
-X11FrontEnd::get_surrounding_text (int siid, WideString &text, int &cursor, int maxlen_before, int maxlen_after)
+X11FrontEnd::get_surrounding_text (int siid, WideString &text, int &cursor, int /* maxlen_before */, int /* maxlen_after */)
 {
     SCIM_DEBUG_FRONTEND(2) << " Get surrounding text, siid=" << siid << "\n";
 
@@ -425,7 +425,7 @@ X11FrontEnd::delete_surrounding_text (int siid, int offset, int len)
 }
 
 void
-X11FrontEnd::init (int argc, char **argv)
+X11FrontEnd::init (int /* argc */, char **/* argv */)
 {
     String str;
 
@@ -853,7 +853,7 @@ X11FrontEnd::filter_hotkeys (X11IC *ic, const KeyEvent &scimkey)
 }
 
 int
-X11FrontEnd::ims_open_handler (XIMS ims, IMOpenStruct *call_data)
+X11FrontEnd::ims_open_handler (XIMS /* ims */, IMOpenStruct *call_data)
 {
     SCIM_DEBUG_FRONTEND(2) << " IMS Open handler: LANG=" << call_data->lang.name
                  << " Connect ID=" << call_data->connect_id << "\n";
@@ -863,7 +863,7 @@ X11FrontEnd::ims_open_handler (XIMS ims, IMOpenStruct *call_data)
 }
 
 int
-X11FrontEnd::ims_close_handler (XIMS ims, IMCloseStruct *call_data)
+X11FrontEnd::ims_close_handler (XIMS /* ims */, IMCloseStruct *call_data)
 {
     SCIM_DEBUG_FRONTEND(2) << " IMS Close handler: Connect ID="
             << call_data->connect_id << "\n";
@@ -873,7 +873,7 @@ X11FrontEnd::ims_close_handler (XIMS ims, IMCloseStruct *call_data)
 }
 
 int
-X11FrontEnd::ims_create_ic_handler (XIMS ims, IMChangeICStruct *call_data)
+X11FrontEnd::ims_create_ic_handler (XIMS /* ims */, IMChangeICStruct *call_data)
 {
     String locale = m_ic_manager.get_connection_locale (call_data->connect_id);
     String language = scim_get_locale_language (locale);
@@ -924,7 +924,7 @@ X11FrontEnd::ims_create_ic_handler (XIMS ims, IMChangeICStruct *call_data)
 }
 
 int
-X11FrontEnd::ims_set_ic_values_handler (XIMS ims, IMChangeICStruct *call_data)
+X11FrontEnd::ims_set_ic_values_handler (XIMS /* ims */, IMChangeICStruct *call_data)
 {
     uint32 changes;
 
@@ -965,7 +965,7 @@ X11FrontEnd::ims_set_ic_values_handler (XIMS ims, IMChangeICStruct *call_data)
 }
 
 int
-X11FrontEnd::ims_get_ic_values_handler (XIMS ims, IMChangeICStruct *call_data)
+X11FrontEnd::ims_get_ic_values_handler (XIMS /* ims */, IMChangeICStruct *call_data)
 {
     SCIM_DEBUG_FRONTEND(2) << " IMS Get IC values handler, ICID="
                     << call_data->icid << " Connect ID="
@@ -976,7 +976,7 @@ X11FrontEnd::ims_get_ic_values_handler (XIMS ims, IMChangeICStruct *call_data)
 }
 
 int
-X11FrontEnd::ims_destroy_ic_handler (XIMS ims, IMDestroyICStruct *call_data)
+X11FrontEnd::ims_destroy_ic_handler (XIMS /* ims */, IMDestroyICStruct *call_data)
 {
     X11IC *ic = m_ic_manager.find_ic (call_data->icid);
 
@@ -1016,7 +1016,7 @@ X11FrontEnd::ims_destroy_ic_handler (XIMS ims, IMDestroyICStruct *call_data)
 }
 
 int
-X11FrontEnd::ims_set_ic_focus_handler (XIMS ims, IMChangeFocusStruct *call_data)
+X11FrontEnd::ims_set_ic_focus_handler (XIMS /* ims */, IMChangeFocusStruct *call_data)
 {
     SCIM_DEBUG_FRONTEND(2) << " IMS Set IC focus handler, ID="
                     << call_data->icid << " Connect ID="
@@ -1094,7 +1094,7 @@ X11FrontEnd::ims_set_ic_focus_handler (XIMS ims, IMChangeFocusStruct *call_data)
 }
 
 int
-X11FrontEnd::ims_unset_ic_focus_handler (XIMS ims, IMChangeFocusStruct *call_data)
+X11FrontEnd::ims_unset_ic_focus_handler (XIMS /* ims */, IMChangeFocusStruct *call_data)
 {
     SCIM_DEBUG_FRONTEND(2) << " IMS Unset IC focus handler, ID="
                     << call_data->icid << " Connect ID="
@@ -1119,7 +1119,7 @@ X11FrontEnd::ims_unset_ic_focus_handler (XIMS ims, IMChangeFocusStruct *call_dat
 }
 
 int
-X11FrontEnd::ims_reset_ic_handler (XIMS ims, IMResetICStruct *call_data)
+X11FrontEnd::ims_reset_ic_handler (XIMS /* ims */, IMResetICStruct *call_data)
 {
     SCIM_DEBUG_FRONTEND(2) << " IMS Reset IC handler, ID="
                     << call_data->icid << " Connect ID="
@@ -1140,7 +1140,7 @@ X11FrontEnd::ims_reset_ic_handler (XIMS ims, IMResetICStruct *call_data)
 }
 
 int
-X11FrontEnd::ims_trigger_notify_handler (XIMS ims, IMTriggerNotifyStruct *call_data)
+X11FrontEnd::ims_trigger_notify_handler (XIMS /* ims */, IMTriggerNotifyStruct *call_data)
 {
     SCIM_DEBUG_FRONTEND(2) << " IMS Trigger notify handler, Flag="
                     << call_data->flag << " KeyIndex="
@@ -1226,21 +1226,21 @@ X11FrontEnd::ims_forward_event_handler (XIMS ims, IMForwardEventStruct *call_dat
 }
 
 int
-X11FrontEnd::ims_sync_reply_handler (XIMS ims, IMSyncXlibStruct *call_data)
+X11FrontEnd::ims_sync_reply_handler (XIMS /* ims */, IMSyncXlibStruct */* call_data */)
 {
     SCIM_DEBUG_FRONTEND(2) << " IMS Sync reply handler.\n";
     return 1;
 }
 
 int
-X11FrontEnd::ims_preedit_start_reply_handler (XIMS ims, IMPreeditCBStruct *call_data)
+X11FrontEnd::ims_preedit_start_reply_handler (XIMS /* ims */, IMPreeditCBStruct */* call_data */)
 {
     SCIM_DEBUG_FRONTEND(2) << " IMS Preedit start reply handler.\n";
     return 1;
 }
 
 int
-X11FrontEnd::ims_preedit_caret_reply_handler (XIMS ims, IMPreeditCBStruct *call_data)
+X11FrontEnd::ims_preedit_caret_reply_handler (XIMS /* ims */, IMPreeditCBStruct */* call_data */)
 {
     SCIM_DEBUG_FRONTEND(2) << " IMS Preedit caret reply handler.\n";
     return 1;
@@ -1271,8 +1271,6 @@ X11FrontEnd::ims_forward_key_event (const X11IC *ic, const KeyEvent &key)
 {
     IMForwardEventStruct fe;
     XEvent xkp;
-
-    XKeyEvent *event = (XKeyEvent*) (&xkp);
 
     //create event
     xkp.xkey = scim_x11_keyevent_scim_to_x11 (m_display, key);
@@ -1492,7 +1490,7 @@ X11FrontEnd::ims_preedit_callback_caret (X11IC *ic, int caret)
 }
 
 bool
-X11FrontEnd::ims_string_conversion_callback_retrieval (X11IC *ic, WideString &text, int &cursor, int maxlen_before, int maxlen_after)
+X11FrontEnd::ims_string_conversion_callback_retrieval (X11IC */* ic */, WideString &/* text */, int &/* cursor */, int /* maxlen_before */, int /* maxlen_after */)
 {
 #if 0
     if (!validate_ic (ic) || (maxlen_before == 0 && maxlen_after == 0))
@@ -1538,7 +1536,7 @@ X11FrontEnd::ims_string_conversion_callback_retrieval (X11IC *ic, WideString &te
 }
 
 bool
-X11FrontEnd::ims_string_conversion_callback_substitution (X11IC *ic, int offset, int len)
+X11FrontEnd::ims_string_conversion_callback_substitution (X11IC */* ic */, int /* offset */, int /* len */)
 {
 #if 0
     if (!validate_ic (ic) || len <= 0)
@@ -1772,13 +1770,13 @@ X11FrontEnd::x_error_handler (Display *display, XErrorEvent *error)
 
 //===================== Panel Slot callbacks =======================
 void
-X11FrontEnd::panel_slot_reload_config (int context)
+X11FrontEnd::panel_slot_reload_config (int /* context */)
 {
     m_config->reload ();
 }
 
 void
-X11FrontEnd::panel_slot_exit (int context)
+X11FrontEnd::panel_slot_exit (int /* context */)
 {
     m_should_exit = true;
 }
@@ -2184,7 +2182,7 @@ X11FrontEnd::reload_config_callback (const ConfigPointer &config)
 }
 
 void
-X11FrontEnd::fallback_commit_string_cb (IMEngineInstanceBase * si, const WideString & str)
+X11FrontEnd::fallback_commit_string_cb (IMEngineInstanceBase * /* si */, const WideString & str)
 {
     if (validate_ic (m_focus_ic))
         ims_commit_string (m_focus_ic, str);

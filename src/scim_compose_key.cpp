@@ -163,13 +163,13 @@ ComposeKeyFactory::get_icon_file () const
 }
 
 bool
-ComposeKeyFactory::validate_encoding (const String& encoding) const
+ComposeKeyFactory::validate_encoding (const String& /* encoding */) const
 {
     return true;
 }
 
 bool
-ComposeKeyFactory::validate_locale (const String& locale) const
+ComposeKeyFactory::validate_locale (const String& /* locale */) const
 {
     return true;
 }

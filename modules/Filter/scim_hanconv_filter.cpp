@@ -572,7 +572,7 @@ HanConvFilterInstance::filter_update_lookup_table (const LookupTable &table)
     } else {
         CommonLookupTable ntable;
         std::vector<WideString> labels;
-        size_t i;
+        int i;
 
         // Can be paged up.
         if (table.get_current_page_start ())
@@ -586,7 +586,8 @@ HanConvFilterInstance::filter_update_lookup_table (const LookupTable &table)
             labels.push_back (__convert (table.get_candidate_label (i), dir));
         }
 
-        if (table.get_current_page_start () + table.get_current_page_size () < table.number_of_candidates ())
+        if ((uint32) (table.get_current_page_start () +
+                      table.get_current_page_size ()) < table.number_of_candidates ())
             ntable.append_candidate (0x3400);
 
         if (table.get_current_page_start ()) {

@@ -249,83 +249,83 @@ public:
     }
 
 private:
-    void slot_show_preedit_string   (IMEngineInstanceBase * si) {
+    void slot_show_preedit_string   (IMEngineInstanceBase * /* si */) {
         m_parent->filter_show_preedit_string ();
     }
 
-    void slot_show_aux_string       (IMEngineInstanceBase * si) {
+    void slot_show_aux_string       (IMEngineInstanceBase * /* si */) {
         m_parent->filter_show_aux_string ();
     }
 
-    void slot_show_lookup_table     (IMEngineInstanceBase * si) {
+    void slot_show_lookup_table     (IMEngineInstanceBase * /* si */) {
         m_parent->filter_show_lookup_table ();
     }
 
-    void slot_hide_preedit_string   (IMEngineInstanceBase * si) {
+    void slot_hide_preedit_string   (IMEngineInstanceBase * /* si */) {
         m_parent->filter_hide_preedit_string ();
     }
 
-    void slot_hide_aux_string       (IMEngineInstanceBase * si) {
+    void slot_hide_aux_string       (IMEngineInstanceBase * /* si */) {
         m_parent->filter_hide_aux_string ();
     }
 
-    void slot_hide_lookup_table     (IMEngineInstanceBase * si) {
+    void slot_hide_lookup_table     (IMEngineInstanceBase * /* si */) {
         m_parent->filter_hide_lookup_table ();
     }
 
-    void slot_update_preedit_caret  (IMEngineInstanceBase * si, int caret) {
+    void slot_update_preedit_caret  (IMEngineInstanceBase * /* si */, int caret) {
         m_parent->filter_update_preedit_caret (caret);
     }
 
-    void slot_update_preedit_string (IMEngineInstanceBase * si, const WideString & str, const AttributeList & attrs) {
+    void slot_update_preedit_string (IMEngineInstanceBase * /* si */, const WideString & str, const AttributeList & attrs) {
         m_parent->filter_update_preedit_string (str, attrs);
     }
 
-    void slot_update_aux_string     (IMEngineInstanceBase * si, const WideString & str, const AttributeList & attrs) {
+    void slot_update_aux_string     (IMEngineInstanceBase * /* si */, const WideString & str, const AttributeList & attrs) {
         m_parent->filter_update_aux_string (str, attrs);
     }
 
-    void slot_update_lookup_table   (IMEngineInstanceBase * si, const LookupTable & table) {
+    void slot_update_lookup_table   (IMEngineInstanceBase * /* si */, const LookupTable & table) {
         m_parent->filter_update_lookup_table (table);
     }
 
-    void slot_commit_string         (IMEngineInstanceBase * si, const WideString & str) {
+    void slot_commit_string         (IMEngineInstanceBase * /* si */, const WideString & str) {
         m_parent->filter_commit_string (str);
     }
 
-    void slot_forward_key_event     (IMEngineInstanceBase * si, const KeyEvent & key) {
+    void slot_forward_key_event     (IMEngineInstanceBase * /* si */, const KeyEvent & key) {
         m_parent->filter_forward_key_event (key);
     }
 
-    void slot_register_properties   (IMEngineInstanceBase * si, const PropertyList & properties) {
+    void slot_register_properties   (IMEngineInstanceBase * /* si */, const PropertyList & properties) {
         m_parent->filter_register_properties (properties);
     }
 
-    void slot_update_property       (IMEngineInstanceBase * si, const Property & property) {
+    void slot_update_property       (IMEngineInstanceBase * /* si */, const Property & property) {
         m_parent->filter_update_property (property);
     }
 
-    void slot_beep                  (IMEngineInstanceBase * si) {
+    void slot_beep                  (IMEngineInstanceBase * /* si */) {
         m_parent->filter_beep ();
     }
 
-    void slot_start_helper          (IMEngineInstanceBase * si, const String & helper_uuid) {
+    void slot_start_helper          (IMEngineInstanceBase * /* si */, const String & helper_uuid) {
         m_parent->filter_start_helper (helper_uuid);
     }
 
-    void slot_stop_helper           (IMEngineInstanceBase * si, const String & helper_uuid) {
+    void slot_stop_helper           (IMEngineInstanceBase * /* si */, const String & helper_uuid) {
         m_parent->filter_stop_helper (helper_uuid);
     }
 
-    void slot_send_helper_event     (IMEngineInstanceBase * si, const String & helper_uuid, const Transaction & trans) {
+    void slot_send_helper_event     (IMEngineInstanceBase * /* si */, const String & helper_uuid, const Transaction & trans) {
         m_parent->filter_send_helper_event (helper_uuid, trans);
     }
 
-    bool slot_get_surrounding_text  (IMEngineInstanceBase * si, WideString &text, int &cursor, int maxlen_before, int maxlen_after) {
+    bool slot_get_surrounding_text  (IMEngineInstanceBase * /* si */, WideString &text, int &cursor, int maxlen_before, int maxlen_after) {
         return m_parent->filter_get_surrounding_text (text, cursor, maxlen_before, maxlen_after);
     }
 
-    bool slot_delete_surrounding_text(IMEngineInstanceBase * si, int offset, int len) {
+    bool slot_delete_surrounding_text(IMEngineInstanceBase * /* si */, int offset, int len) {
         return m_parent->filter_delete_surrounding_text (offset, len);
     }
 };

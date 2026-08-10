@@ -202,79 +202,79 @@ DummyConfig::get_name () const
 
 // String
 bool
-DummyConfig::read (const String& key, String *pStr) const
+DummyConfig::read (const String& /* key */, String */* pStr */) const
 {
     return false;
 }
 
 // int
 bool
-DummyConfig::read (const String& key, int *pl) const
+DummyConfig::read (const String& /* key */, int */* pl */) const
 {
     return false;
 }
 
 // double
 bool
-DummyConfig::read (const String& key, double* val) const
+DummyConfig::read (const String& /* key */, double* /* val */) const
 {
     return false;
 }
 
 // bool
 bool
-DummyConfig::read (const String& key, bool* val) const
+DummyConfig::read (const String& /* key */, bool* /* val */) const
 {
     return false;
 }
 
 //String list
 bool
-DummyConfig::read (const String& key, std::vector <String>* val) const
+DummyConfig::read (const String& /* key */, std::vector <String>* /* val */) const
 {
     return false;
 }
 
 //int list
 bool
-DummyConfig::read (const String& key, std::vector <int>* val) const
+DummyConfig::read (const String& /* key */, std::vector <int>* /* val */) const
 {
     return false;
 }
 
 // write the value (return true on success)
 bool
-DummyConfig::write (const String& key, const String& value)
+DummyConfig::write (const String& /* key */, const String& /* value */)
 {
     return true;
 }
 
 bool
-DummyConfig::write (const String& key, int value)
+DummyConfig::write (const String& /* key */, int /* value */)
 {
     return true;
 }
 
 bool
-DummyConfig::write (const String& key, double value)
+DummyConfig::write (const String& /* key */, double /* value */)
 {
     return true;
 }
 
 bool
-DummyConfig::write (const String& key, bool value)
+DummyConfig::write (const String& /* key */, bool /* value */)
 {
     return true;
 }
 
 bool
-DummyConfig::write (const String& key, const std::vector <String>& value)
+DummyConfig::write (const String& /* key */, const std::vector <String>& /* value */)
 {
     return true;
 }
 
 bool
-DummyConfig::write (const String& key, const std::vector <int>& value)
+DummyConfig::write (const String& /* key */, const std::vector <int>& /* value */)
 {
     return true;
 }
@@ -289,7 +289,7 @@ DummyConfig::flush()
 
 // delete entries
 bool
-DummyConfig::erase (const String& key)
+DummyConfig::erase (const String& /* key */)
 {
     return true;
 }

@@ -571,8 +571,8 @@ on_default_check_button_toggled (GtkCheckButton *checkbutton,
 }
 
 static void
-on_keyboard_layout_changed (GtkComboBox *combobox,
-                            gpointer     user_data)
+on_keyboard_layout_changed (GtkComboBox */* combobox */,
+                            gpointer     /* user_data */)
 {
     __have_changed = true;
 }

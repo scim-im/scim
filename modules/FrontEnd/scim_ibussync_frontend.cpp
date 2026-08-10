@@ -208,8 +208,10 @@ private:
                 result.push_back (String (name));
         }
 
-        g_list_foreach (engines, (GFunc) g_object_unref, 0);
-        g_list_free (engines);
+        // g_list_free_full () takes a GDestroyNotify, which is g_object_unref's
+        // actual type -- g_list_foreach () wanted a GFunc and needed a cast
+        // between incompatible function types to get there.
+        g_list_free_full (engines, g_object_unref);
 
         return result;
     }

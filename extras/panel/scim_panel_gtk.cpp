@@ -69,7 +69,6 @@
 
 using namespace scim;
 
-#include "icons/setup.xpm"
 #include "icons/help.xpm"
 #include "icons/trademark.xpm"
 #include "icons/pin-up.xpm"
@@ -312,9 +311,6 @@ static bool       ui_any_menu_activated                (void);
 
 static void       ui_show_help                         (const String   &help);
 
-static PangoAttrList * create_pango_attrlist           (const String    &str,
-                                                        const AttributeList &attrs);
-
 // Action function
 static void       action_request_help                  (void);
 static void       action_toggle_window_stick           (void);
@@ -388,8 +384,6 @@ static void       update_property                      (PropertyRepository &repo
 
 static void       restore_properties                   (void);
 
-static gboolean   check_exit_timeout_cb                (gpointer data);
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Declaration of internal variables.
@@ -462,10 +456,6 @@ static GdkRGBA            _active_text;
 static ConfigModule      *_config_module               = 0;
 static ConfigPointer      _config;
 
-static guint              _check_exit_timeout          = 0;
-
-static bool               _should_exit                 = false;
-
 static bool               _panel_is_on                 = false;
 
 static GThread           *_panel_agent_thread          = 0;
@@ -487,7 +477,6 @@ static PropertyRepository            _frontend_property_repository;
 static HelperPropertyRepository      _helper_property_repository;
 static std::vector<HelperInfo>       _helper_list;
 
-G_LOCK_DEFINE_STATIC     (_global_resource_lock);
 G_LOCK_DEFINE_STATIC     (_panel_agent_lock);
 
 
@@ -645,10 +634,9 @@ ui_load_config (void)
 // GTK4 removed gtk_widget_modify_font/fg/bg; push the configured panel font and
 // normal fg/bg to the text widgets (tagged SCIM_PANEL_TEXT_CSS_CLASS) through a
 // display-wide CSS provider instead. Called from ui_load_config (), so it also
-// re-applies on the fly when the config is reloaded. The per-run reverse and
-// highlight candidate colors are still applied via Pango attributes at draw
-// time (see create_pango_attrlist); this only sets the base font and the colors
-// those widgets would otherwise inherit from the GTK theme.
+// re-applies on the fly when the config is reloaded. Only the base font and the
+// colors those widgets would otherwise inherit from the GTK theme: the panel no
+// longer draws candidates, so there are no per-run attributes left to apply.
 static void
 ui_apply_panel_style (void)
 {
@@ -1385,8 +1373,8 @@ ui_create_factory_menu_entry (const PanelFactoryInfo &info,
 
 /* Implementation of callback functions */
 static void
-ui_help_button_click_cb (GtkButton *button,
-                         gpointer   user_data)
+ui_help_button_click_cb (GtkButton */* button */,
+                         gpointer   /* user_data */)
 {
     SCIM_DEBUG_MAIN (3) << "  ui_help_button_click_cb...\n";
 
@@ -1398,8 +1386,8 @@ ui_help_button_click_cb (GtkButton *button,
 }
 
 static void
-ui_menu_button_click_cb (GtkButton *button,
-                         gpointer   user_data)
+ui_menu_button_click_cb (GtkButton */* button */,
+                         gpointer   /* user_data */)
 {
     SCIM_DEBUG_MAIN (3) << "  ui_menu_button_click_cb...\n";
 
@@ -1416,10 +1404,10 @@ ui_menu_button_click_cb (GtkButton *button,
 
 static void
 ui_factory_button_released_cb (GtkGestureClick *gesture,
-                               int              n_press,
-                               double           x,
-                               double           y,
-                               gpointer         user_data)
+                               int              /* n_press */,
+                               double           /* x */,
+                               double           /* y */,
+                               gpointer         /* user_data */)
 {
     SCIM_DEBUG_MAIN (3) << "  ui_factory_button_released_cb...\n";
 
@@ -1440,7 +1428,7 @@ ui_factory_button_released_cb (GtkGestureClick *gesture,
 }
 
 static void
-ui_factory_menu_activate_cb (GtkButton *item,
+ui_factory_menu_activate_cb (GtkButton */* item */,
                              gpointer     user_data)
 {
     int id = GPOINTER_TO_INT (user_data);
@@ -1455,8 +1443,8 @@ ui_factory_menu_activate_cb (GtkButton *item,
 }
 
 static void
-ui_factory_menu_deactivate_cb (GtkWidget *item,
-                               gpointer     user_data)
+ui_factory_menu_deactivate_cb (GtkWidget */* item */,
+                               gpointer     /* user_data */)
 {
     _factory_menu_activated = false;
     gettimeofday (&_last_menu_deactivate_time, 0);
@@ -1465,7 +1453,7 @@ ui_factory_menu_deactivate_cb (GtkWidget *item,
 // Open a nested submenu popover attached to a submenu button.
 static void
 ui_submenu_button_cb (GtkButton *button,
-                      gpointer   user_data)
+                      gpointer   /* user_data */)
 {
     GtkWidget *submenu = (GtkWidget *) g_object_get_data (G_OBJECT (button), "submenu");
     if (submenu)
@@ -1476,8 +1464,8 @@ ui_submenu_button_cb (GtkButton *button,
 // window, which is not built when candidates are drawn in-process.
 
 static void
-ui_window_stick_button_click_cb (GtkButton *button,
-                                 gpointer user_data)
+ui_window_stick_button_click_cb (GtkButton */* button */,
+                                 gpointer /* user_data */)
 {
     action_toggle_window_stick ();
 }
@@ -1495,9 +1483,9 @@ ui_drag_get_context (int target, GtkWidget **win, gint **px, gint **py)
 }
 
 static void
-ui_window_drag_begin_cb (GtkGestureDrag *gesture,
-                         double          start_x,
-                         double          start_y,
+ui_window_drag_begin_cb (GtkGestureDrag */* gesture */,
+                         double          /* start_x */,
+                         double          /* start_y */,
                          gpointer        user_data)
 {
     int target = GPOINTER_TO_INT (user_data);
@@ -1511,7 +1499,7 @@ ui_window_drag_begin_cb (GtkGestureDrag *gesture,
 }
 
 static void
-ui_window_drag_update_cb (GtkGestureDrag *gesture,
+ui_window_drag_update_cb (GtkGestureDrag */* gesture */,
                           double          offset_x,
                           double          offset_y,
                           gpointer        user_data)
@@ -1529,7 +1517,7 @@ ui_window_drag_update_cb (GtkGestureDrag *gesture,
 }
 
 static void
-ui_window_drag_end_cb (GtkGestureDrag *gesture,
+ui_window_drag_end_cb (GtkGestureDrag */* gesture */,
                        double          offset_x,
                        double          offset_y,
                        gpointer        user_data)
@@ -1557,11 +1545,11 @@ ui_window_drag_end_cb (GtkGestureDrag *gesture,
 }
 
 static void
-ui_toolbar_secondary_pressed_cb (GtkGestureClick *gesture,
-                                 int              n_press,
-                                 double           x,
-                                 double           y,
-                                 gpointer         user_data)
+ui_toolbar_secondary_pressed_cb (GtkGestureClick */* gesture */,
+                                 int              /* n_press */,
+                                 double           /* x */,
+                                 double           /* y */,
+                                 gpointer         /* user_data */)
 {
     action_show_command_menu ();
 }
@@ -1586,8 +1574,8 @@ ui_toolbar_add_drag_controllers (GtkWidget *window, int drag_target)
 }
 
 static void
-ui_toolbar_enter_cb (GtkEventControllerMotion *controller,
-                     double x, double y, gpointer user_data)
+ui_toolbar_enter_cb (GtkEventControllerMotion */* controller */,
+                     double /* x */, double /* y */, gpointer /* user_data */)
 {
     if (!_toolbar_always_show || _panel_is_on || _toolbar_window_draging)
         return;
@@ -1615,8 +1603,8 @@ ui_toolbar_enter_cb (GtkEventControllerMotion *controller,
 }
 
 static void
-ui_toolbar_leave_cb (GtkEventControllerMotion *controller,
-                     gpointer user_data)
+ui_toolbar_leave_cb (GtkEventControllerMotion */* controller */,
+                     gpointer /* user_data */)
 {
     if (!_toolbar_always_show || _panel_is_on || _toolbar_window_draging)
         return;
@@ -1625,7 +1613,7 @@ ui_toolbar_leave_cb (GtkEventControllerMotion *controller,
 }
 
 static gboolean
-ui_hide_window_timeout_cb (gpointer data)
+ui_hide_window_timeout_cb (gpointer /* data */)
 {
     if (!_toolbar_always_show) {
         return TRUE;
@@ -1673,7 +1661,7 @@ ui_any_menu_activated (void)
 }
 
 static gboolean
-ui_help_close_request_cb (GtkWindow *window, gpointer user_data)
+ui_help_close_request_cb (GtkWindow *window, gpointer /* user_data */)
 {
     gtk_widget_hide (GTK_WIDGET (window));
     return TRUE; // do not destroy
@@ -1710,79 +1698,9 @@ ui_show_help (const String &help)
     gtk_window_present (GTK_WINDOW (_help_dialog));
 }
 
-static PangoAttrList *
-create_pango_attrlist (const String        &mbs,
-                       const AttributeList &attrs)
-{
-    PangoAttrList  *attrlist = pango_attr_list_new ();
-    PangoAttribute *attr;
-
-    guint start_index, end_index;
-    guint wlen = g_utf8_strlen (mbs.c_str (), mbs.length ());
-
-    guint16 _normal_bg_rgb[] = { (guint16)(65536*_normal_bg.red), (guint16)(65536*_normal_bg.green), (guint16)(65536*_normal_bg.blue) };
-    guint16 _active_bg_rgb[] = { (guint16)(65536*_active_bg.red), (guint16)(65536*_active_bg.green), (guint16)(65536*_active_bg.blue) };
-    guint16 _normal_text_rgb[] = { (guint16)(65536*_normal_text.red), (guint16)(65536*_normal_text.green), (guint16)(65536*_normal_text.blue) };
-    guint16 _active_text_rgb[] = { (guint16)(65536*_active_text.red), (guint16)(65536*_active_text.green), (guint16)(65536*_active_text.blue) };
-
-    for (int i=0; i < (int) attrs.size (); ++i) {
-        start_index = attrs[i].get_start ();
-        end_index = attrs[i].get_end ();
-
-        if (end_index <= wlen && start_index < end_index) {
-            start_index = g_utf8_offset_to_pointer (mbs.c_str (), attrs[i].get_start ()) - mbs.c_str ();
-            end_index = g_utf8_offset_to_pointer (mbs.c_str (), attrs[i].get_end ()) - mbs.c_str ();
-
-            if (attrs[i].get_type () == SCIM_ATTR_DECORATE) {
-                if (attrs[i].get_value () == SCIM_ATTR_DECORATE_UNDERLINE) {
-                    attr = pango_attr_underline_new (PANGO_UNDERLINE_SINGLE);
-                    attr->start_index = start_index;
-                    attr->end_index = end_index;
-                    pango_attr_list_insert (attrlist, attr);
-                } else if (attrs[i].get_value () == SCIM_ATTR_DECORATE_REVERSE) {
-                    attr = pango_attr_foreground_new (_normal_bg_rgb[0], _normal_bg_rgb[1], _normal_bg_rgb[2]);
-                    attr->start_index = start_index;
-                    attr->end_index = end_index;
-                    pango_attr_list_insert (attrlist, attr);
-
-                    attr = pango_attr_background_new (_normal_text_rgb[0], _normal_text_rgb[1], _normal_text_rgb[2]);
-                    attr->start_index = start_index;
-                    attr->end_index = end_index;
-                    pango_attr_list_insert (attrlist, attr);
-                } else if (attrs[i].get_value () == SCIM_ATTR_DECORATE_HIGHLIGHT) {
-                    attr = pango_attr_foreground_new (_active_text_rgb[0], _active_text_rgb[1], _active_text_rgb[2]);
-                    attr->start_index = start_index;
-                    attr->end_index = end_index;
-                    pango_attr_list_insert (attrlist, attr);
-
-                    attr = pango_attr_background_new (_active_bg_rgb[0], _active_bg_rgb[1], _active_bg_rgb[2]);
-                    attr->start_index = start_index;
-                    attr->end_index = end_index;
-                    pango_attr_list_insert (attrlist, attr);
-                }
-            } else if (attrs[i].get_type () == SCIM_ATTR_FOREGROUND) {
-                unsigned int color = attrs[i].get_value ();
-
-                attr = pango_attr_foreground_new (SCIM_RGB_COLOR_RED(color) * 256, SCIM_RGB_COLOR_GREEN(color) * 256, SCIM_RGB_COLOR_BLUE(color) * 256);
-                attr->start_index = start_index;
-                attr->end_index = end_index;
-                pango_attr_list_insert (attrlist, attr);
-            } else if (attrs[i].get_type () == SCIM_ATTR_BACKGROUND) {
-                unsigned int color = attrs[i].get_value ();
-
-                attr = pango_attr_background_new (SCIM_RGB_COLOR_RED(color) * 256, SCIM_RGB_COLOR_GREEN(color) * 256, SCIM_RGB_COLOR_BLUE(color) * 256);
-                attr->start_index = start_index;
-                attr->end_index = end_index;
-                pango_attr_list_insert (attrlist, attr);
-            }
-        }
-    }
-    return attrlist;
-}
-
 static void
-ui_command_menu_exit_activate_cb (GtkWidget *item,
-                                  gpointer     user_data)
+ui_command_menu_exit_activate_cb (GtkWidget */* item */,
+                                  gpointer     /* user_data */)
 {
     if (_command_menu)
         gtk_popover_popdown (GTK_POPOVER (_command_menu));
@@ -1790,8 +1708,8 @@ ui_command_menu_exit_activate_cb (GtkWidget *item,
 }
 
 static void
-ui_command_menu_reload_activate_cb (GtkWidget *item,
-                                    gpointer     user_data)
+ui_command_menu_reload_activate_cb (GtkWidget */* item */,
+                                    gpointer     /* user_data */)
 {
     if (_command_menu)
         gtk_popover_popdown (GTK_POPOVER (_command_menu));
@@ -1802,15 +1720,15 @@ ui_command_menu_reload_activate_cb (GtkWidget *item,
 }
 
 static void
-ui_command_menu_stick_activate_cb (GtkWidget *item,
-                                   gpointer     user_data)
+ui_command_menu_stick_activate_cb (GtkWidget */* item */,
+                                   gpointer     /* user_data */)
 {
     action_toggle_window_stick ();
 }
 
 static void
-ui_command_menu_hide_toolbar_toggled_cb (GtkWidget *item,
-                                         gpointer     user_data)
+ui_command_menu_hide_toolbar_toggled_cb (GtkWidget */* item */,
+                                         gpointer     /* user_data */)
 {
     _toolbar_always_hidden = ! _toolbar_always_hidden;
 
@@ -1824,8 +1742,8 @@ ui_command_menu_hide_toolbar_toggled_cb (GtkWidget *item,
 }
 
 static void
-ui_command_menu_help_activate_cb (GtkWidget *item,
-                                  gpointer     user_data)
+ui_command_menu_help_activate_cb (GtkWidget */* item */,
+                                  gpointer     /* user_data */)
 {
     if (_command_menu)
         gtk_popover_popdown (GTK_POPOVER (_command_menu));
@@ -1838,7 +1756,7 @@ ui_command_menu_help_activate_cb (GtkWidget *item,
 }
 
 static void
-ui_command_menu_helper_activate_cb (GtkWidget *item,
+ui_command_menu_helper_activate_cb (GtkWidget */* item */,
                                     gpointer   user_data)
 {
     size_t i = (size_t) GPOINTER_TO_INT (user_data);
@@ -1851,8 +1769,8 @@ ui_command_menu_helper_activate_cb (GtkWidget *item,
 }
 
 static void
-ui_command_menu_deactivate_cb (GtkWidget   *item,
-                               gpointer     user_data)
+ui_command_menu_deactivate_cb (GtkWidget   */* item */,
+                               gpointer     /* user_data */)
 {
     _command_menu_activated = false;
     gettimeofday (&_last_menu_deactivate_time, 0);
@@ -1883,8 +1801,8 @@ ui_property_activate_cb (GtkWidget      *widget,
 }
 
 static void
-ui_property_menu_deactivate_cb (GtkWidget   *item,
-                                gpointer     user_data)
+ui_property_menu_deactivate_cb (GtkWidget   */* item */,
+                                gpointer     /* user_data */)
 {
     _property_menu_activated = false;
 }
@@ -2075,7 +1993,7 @@ sni_emit (const char *signal_name)
 static void
 sni_method_call (GDBusConnection * /*conn*/, const gchar * /*sender*/,
                  const gchar * /*path*/, const gchar * /*iface*/,
-                 const gchar *method, GVariant * /*params*/,
+                 const gchar */* method */, GVariant * /*params*/,
                  GDBusMethodInvocation *invocation, gpointer /*data*/)
 {
     // ItemIsMenu is true, so a well-behaved host opens the menu itself on
@@ -2919,7 +2837,7 @@ run_panel_agent (void)
 }
 
 static gpointer
-panel_agent_thread_func (gpointer data)
+panel_agent_thread_func (gpointer /* data */)
 {
     SCIM_DEBUG_MAIN(1) << "panel_agent_thread_func ()\n";
 
@@ -3046,7 +2964,7 @@ slot_update_helper_property (int id, const Property &prop)
 }
 
 static void
-slot_register_helper (int id, const HelperInfo &helper)
+slot_register_helper (int /* id */, const HelperInfo &/* helper */)
 {
 }
 
@@ -3693,21 +3611,8 @@ restore_properties (void)
     }
 }
 
-static gboolean
-check_exit_timeout_cb (gpointer data)
-{
-    G_LOCK (_global_resource_lock);
-    if (_should_exit) {
-        if (_main_loop)
-            g_main_loop_quit (_main_loop);
-    }
-    G_UNLOCK (_global_resource_lock);
-
-    return TRUE;
-}
-
 static void
-signalhandler(int sig)
+signalhandler(int /* sig */)
 {
     SCIM_DEBUG_MAIN (1) << "In signal handler...\n";
     if (_panel_agent != NULL) {
@@ -3906,8 +3811,6 @@ int main (int argc, char *argv [])
     }
 
     start_auto_start_helpers ();
-
-    // _check_exit_timeout = g_timeout_add (500, check_exit_timeout_cb, NULL);
 
     _main_loop = g_main_loop_new (NULL, FALSE);
     g_main_loop_run (_main_loop);

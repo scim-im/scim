@@ -490,9 +490,9 @@ SetupUI::create_module_list_model ()
 
 gboolean
 SetupUI::module_list_hide_widget_iter_func (GtkTreeModel *model,
-                                            GtkTreePath *path,
+                                            GtkTreePath */* path */,
                                             GtkTreeIter *iter,
-                                            gpointer data)
+                                            gpointer /* data */)
 {
     GtkWidget *widget = 0;
     gtk_tree_model_get (model, iter, MODULE_LIST_WIDGET, &widget, -1);
@@ -558,7 +558,7 @@ SetupUI::module_list_selection_changed_callback (GtkTreeSelection *selection, gp
 }
 
 void
-SetupUI::restore_button_clicked_callback (GtkButton *button, gpointer user_data)
+SetupUI::restore_button_clicked_callback (GtkButton */* button */, gpointer user_data)
 {
     SetupUI *ui = (SetupUI*) user_data;
 
@@ -573,7 +573,7 @@ SetupUI::restore_button_clicked_callback (GtkButton *button, gpointer user_data)
 }
 
 void
-SetupUI::apply_button_clicked_callback (GtkButton *button, gpointer user_data)
+SetupUI::apply_button_clicked_callback (GtkButton */* button */, gpointer user_data)
 {
     SetupUI *ui = (SetupUI*) user_data;
 
@@ -601,7 +601,7 @@ SetupUI::apply_button_clicked_callback (GtkButton *button, gpointer user_data)
 
 gboolean
 SetupUI::module_list_save_config_iter_func (GtkTreeModel *model,
-                                            GtkTreePath *path,
+                                            GtkTreePath */* path */,
                                             GtkTreeIter *iter,
                                             gpointer data)
 {
@@ -621,7 +621,7 @@ SetupUI::module_list_save_config_iter_func (GtkTreeModel *model,
 
 gboolean
 SetupUI::module_list_load_config_iter_func (GtkTreeModel *model,
-                                            GtkTreePath *path,
+                                            GtkTreePath */* path */,
                                             GtkTreeIter *iter,
                                             gpointer data)
 {
@@ -638,7 +638,7 @@ SetupUI::module_list_load_config_iter_func (GtkTreeModel *model,
 }
 
 void
-SetupUI::ok_button_clicked_callback (GtkButton *button, gpointer user_data)
+SetupUI::ok_button_clicked_callback (GtkButton */* button */, gpointer user_data)
 {
     SetupUI *ui = (SetupUI *) user_data;
 
@@ -658,14 +658,14 @@ SetupUI::ok_button_clicked_callback (GtkButton *button, gpointer user_data)
 }
 
 void
-SetupUI::exit_button_clicked_callback (GtkButton *button, gpointer user_data)
+SetupUI::exit_button_clicked_callback (GtkButton */* button */, gpointer user_data)
 {
     SetupUI *ui = (SetupUI*) user_data;
     ui->request_quit ();
 }
 
 void
-SetupUI::legacy_launch_clicked_callback (GtkButton *button, gpointer user_data)
+SetupUI::legacy_launch_clicked_callback (GtkButton */* button */, gpointer user_data)
 {
     SetupUI *ui = (SetupUI*) user_data;
 
@@ -696,7 +696,7 @@ SetupUI::legacy_launch_clicked_callback (GtkButton *button, gpointer user_data)
 }
 
 gboolean
-SetupUI::main_window_close_request_callback (GtkWindow *window, gpointer user_data)
+SetupUI::main_window_close_request_callback (GtkWindow */* window */, gpointer user_data)
 {
     SetupUI *ui = (SetupUI*) user_data;
     ui->request_quit ();

@@ -639,7 +639,8 @@ WaylandFrontEnd::reload_config_callback (const ConfigPointer &config)
     scim_string_to_key (mask_key,
         config->read (String (SCIM_CONFIG_HOTKEYS_FRONTEND_VALID_KEY_MASK),
                       String ("Shift+Control+Alt+Lock")));
-    m_valid_key_mask = (mask_key.mask > 0) ? mask_key.mask : SCIM_KEY_AllMasks;
+    m_valid_key_mask = (mask_key.mask > 0) ? mask_key.mask
+                                           : (uint16) SCIM_KEY_AllMasks;
     m_valid_key_mask |= SCIM_KEY_ReleaseMask;
 
     // The SCIM_DEBUG macros filter by mask/level themselves, so this costs

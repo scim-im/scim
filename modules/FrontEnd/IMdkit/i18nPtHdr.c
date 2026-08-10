@@ -1661,9 +1661,9 @@ void PreeditCaretReplyMessageProc (XIMS ims,
     /*endif*/
 }
 
-void StrConvReplyMessageProc (XIMS ims,
-                              IMProtocol *call_data,
-                              unsigned char *p)
+void StrConvReplyMessageProc (XIMS /* ims */,
+                              IMProtocol */* call_data */,
+                              unsigned char */* p */)
 {
     return;
 }

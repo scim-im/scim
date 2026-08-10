@@ -1368,7 +1368,7 @@ hotkey_dialog_response_cb (GtkDialog *dialog, gint response, gpointer user_data)
 }
 
 static void
-on_hotkey_button_clicked (GtkButton *button, gpointer user_data)
+on_hotkey_button_clicked (GtkButton *button, gpointer /* user_data */)
 {
     if (!__selected_factory) return;
 
@@ -1456,7 +1456,7 @@ factory_list_selection_changed_callback (GObject *selection, GParamSpec * /*pspe
 }
 
 static void
-on_toggle_all_button_clicked (GtkButton *button, gpointer user_data)
+on_toggle_all_button_clicked (GtkButton */* button */, gpointer user_data)
 {
     gboolean enable = (user_data != 0);
 
@@ -1600,7 +1600,7 @@ filter_dialog_response_cb (GtkDialog *dialog, gint response, gpointer user_data)
 }
 
 static void
-on_filter_button_clicked (GtkButton *button, gpointer user_data)
+on_filter_button_clicked (GtkButton */* button */, gpointer /* user_data */)
 {
     if (!__selected_factory) return;
 

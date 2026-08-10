@@ -30,8 +30,8 @@ struct KeyGrabData {
 /* GObject methods
  */
 
-static void scim_key_selection_class_init              (ScimKeySelectionClass *klass);
-static void scim_key_selection_init                    (ScimKeySelection      *keyselection);
+static void scim_key_selection_class_init              (gpointer klass_ptr, gpointer klass_data);
+static void scim_key_selection_init                    (GTypeInstance *instance, gpointer klass);
 static void scim_key_selection_finalize                (GObject               *object);
 
 static void scim_key_selection_add_key_button_callback (GtkButton             *button,
@@ -63,12 +63,12 @@ scim_key_selection_register_type (GTypeModule *type_module)
         sizeof (ScimKeySelectionClass),
         NULL,
         NULL,
-        (GClassInitFunc) scim_key_selection_class_init,
+        scim_key_selection_class_init,
         NULL,
         NULL,
         sizeof (ScimKeySelection),
         0,
-        (GInstanceInitFunc) scim_key_selection_init,
+        scim_key_selection_init,
         0
     };
 
@@ -99,8 +99,10 @@ scim_key_selection_get_type (void)
 }
 
 static void
-scim_key_selection_class_init (ScimKeySelectionClass *klass)
+scim_key_selection_class_init (gpointer klass_ptr,
+                               gpointer /* klass_data */)
 {
+    ScimKeySelectionClass *klass = (ScimKeySelectionClass *) klass_ptr;
     GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
     parent_class = (GtkWidgetClass*) g_type_class_peek_parent (klass);
@@ -121,8 +123,10 @@ scim_key_selection_class_init (ScimKeySelectionClass *klass)
 }
 
 static void
-scim_key_selection_init (ScimKeySelection *keyselection)
+scim_key_selection_init (GTypeInstance *instance,
+                         gpointer /* klass */)
 {
+    ScimKeySelection *keyselection = (ScimKeySelection *) instance;
     GtkWidget *grid;
     GtkWidget *hbox;
     GtkWidget *frame;
@@ -273,7 +277,7 @@ scim_key_selection_finalize (GObject *object)
 }
 
 static void
-scim_key_selection_add_key_button_callback (GtkButton        *button,
+scim_key_selection_add_key_button_callback (GtkButton        */* button */,
                                             ScimKeySelection *keyselection)
 {
     GtkTreeIter iter;
@@ -329,7 +333,7 @@ scim_key_selection_add_key_button_callback (GtkButton        *button,
 }
 
 static void
-scim_key_selection_del_key_button_callback (GtkButton       *button,
+scim_key_selection_del_key_button_callback (GtkButton       */* button */,
                                            ScimKeySelection *keyselection)
 {
     GtkTreeIter iter;
@@ -363,8 +367,8 @@ keyevent_gtk_to_scim (guint keyval, GdkModifierType state, gboolean release)
 }
 
 static gboolean
-scim_key_grab_key_pressed (GtkEventControllerKey *controller,
-                           guint keyval, guint keycode, GdkModifierType state,
+scim_key_grab_key_pressed (GtkEventControllerKey */* controller */,
+                           guint keyval, guint /* keycode */, GdkModifierType state,
                            KeyGrabData *data)
 {
     data->key = keyevent_gtk_to_scim (keyval, state, FALSE);
@@ -374,8 +378,8 @@ scim_key_grab_key_pressed (GtkEventControllerKey *controller,
 }
 
 static void
-scim_key_grab_key_released (GtkEventControllerKey *controller,
-                            guint keyval, guint keycode, GdkModifierType state,
+scim_key_grab_key_released (GtkEventControllerKey */* controller */,
+                            guint keyval, guint /* keycode */, GdkModifierType state,
                             KeyGrabData *data)
 {
     KeyEvent key = keyevent_gtk_to_scim (keyval, state, FALSE);
@@ -400,7 +404,7 @@ scim_key_grab_data_free (gpointer data, GObject * /*where_the_object_was*/)
 }
 
 static void
-scim_key_grab_button_callback (GtkButton        *button,
+scim_key_grab_button_callback (GtkButton        */* button */,
                                ScimKeySelection *keyselection)
 {
     KeyGrabData *data = g_new0 (KeyGrabData, 1);
@@ -581,8 +585,8 @@ static GtkWidgetClass *dialog_parent_class = NULL;
 
 static GType key_selection_dialog_type = 0;
 
-static void scim_key_selection_dialog_class_init (ScimKeySelectionDialogClass *klass);
-static void scim_key_selection_dialog_init (ScimKeySelectionDialog *keyseldialog);
+static void scim_key_selection_dialog_class_init (gpointer klass_ptr, gpointer klass_data);
+static void scim_key_selection_dialog_init (GTypeInstance *instance, gpointer klass);
 
 void
 scim_key_selection_dialog_register_type (GTypeModule *type_module)
@@ -592,12 +596,12 @@ scim_key_selection_dialog_register_type (GTypeModule *type_module)
         sizeof (ScimKeySelectionDialogClass),
         NULL,
         NULL,
-        (GClassInitFunc) scim_key_selection_dialog_class_init,
+        scim_key_selection_dialog_class_init,
         NULL,
         NULL,
         sizeof (ScimKeySelectionDialog),
         0,
-        (GInstanceInitFunc) scim_key_selection_dialog_init,
+        scim_key_selection_dialog_init,
         0
     };
 
@@ -628,14 +632,18 @@ scim_key_selection_dialog_get_type (void)
 }
 
 static void
-scim_key_selection_dialog_class_init (ScimKeySelectionDialogClass *klass)
+scim_key_selection_dialog_class_init (gpointer klass_ptr,
+                                      gpointer /* klass_data */)
 {
+    ScimKeySelectionDialogClass *klass = (ScimKeySelectionDialogClass *) klass_ptr;
     dialog_parent_class = (GtkWidgetClass*) g_type_class_peek_parent (klass);
 }
 
 static void
-scim_key_selection_dialog_init (ScimKeySelectionDialog *keyseldialog)
+scim_key_selection_dialog_init (GTypeInstance *instance,
+                                gpointer /* klass */)
 {
+    ScimKeySelectionDialog *keyseldialog = (ScimKeySelectionDialog *) instance;
     GtkDialog *dialog = GTK_DIALOG (keyseldialog);
 
     gtk_window_set_resizable (GTK_WINDOW (keyseldialog), TRUE);

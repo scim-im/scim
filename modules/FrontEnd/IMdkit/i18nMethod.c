@@ -728,8 +728,8 @@ static void ReturnSelectionNotify (Xi18n i18n_core, XSelectionRequestEvent *ev)
     XFlush (i18n_core->address.dpy);
 }
 
-static Bool WaitXSelectionRequest (Display *dpy,
-                                   Window win,
+static Bool WaitXSelectionRequest (Display */* dpy */,
+                                   Window /* win */,
                                    XEvent *ev,
                                    XPointer client_data)
 {

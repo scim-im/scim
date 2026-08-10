@@ -145,12 +145,15 @@ utf8_wctomb (unsigned char *dest, ucs4_t wc, int dest_size)
         return RET_ILSEQ;
     if (dest_size < count)
         return RET_TOOSMALL;
-    switch (count) { /* note: code falls through cases! */
-        case 6: dest [5] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x4000000;
-        case 5: dest [4] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x200000;
-        case 4: dest [3] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x10000;
-        case 3: dest [2] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x800;
-        case 2: dest [1] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0xc0;
+    /* Falling through each case is the point: a 6-byte sequence writes all six
+       trailing bytes, a 2-byte one only the last two. Marked so the compiler
+       knows it is deliberate. */
+    switch (count) {
+        case 6: dest [5] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x4000000; [[fallthrough]];
+        case 5: dest [4] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x200000;  [[fallthrough]];
+        case 4: dest [3] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x10000;   [[fallthrough]];
+        case 3: dest [2] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x800;     [[fallthrough]];
+        case 2: dest [1] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0xc0;      [[fallthrough]];
         case 1: dest [0] = wc;
     }
     return count;
@@ -791,7 +794,7 @@ static __Language __languages [] = {
     { "hr_HR",    NULL, N_("Croatian"), "Hrvatski", NULL },
     { "hu_HU",    NULL, N_("Hungarian"), "Magyar", NULL },
     { "hy_AM",    NULL, N_("Armenian"), "Հայերէն", NULL },
-    { "ia"   ,    NULL, N_("Interlingua"), NULL },
+    { "ia"   ,    NULL, N_("Interlingua"), NULL, NULL },
     { "id_ID",    NULL, N_("Indonesian"), "Bahasa Indonesia", NULL },
     { "is_IS",    NULL, N_("Icelandic"), NULL, NULL },
     { "it_IT",    NULL, N_("Italian"), "Italiano", "@euro" },

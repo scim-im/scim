@@ -607,84 +607,84 @@ FrontEndBase::update_client_capabilities (int id, unsigned int cap) const
 }
 
 void
-FrontEndBase::show_preedit_string (int id)
+FrontEndBase::show_preedit_string (int /* id */)
 {
 }
 void
-FrontEndBase::show_aux_string     (int id)
+FrontEndBase::show_aux_string     (int /* id */)
 {
 }
 void
-FrontEndBase::show_lookup_table   (int id)
+FrontEndBase::show_lookup_table   (int /* id */)
 {
 }
 void
-FrontEndBase::hide_preedit_string (int id)
+FrontEndBase::hide_preedit_string (int /* id */)
 {
 }
 void
-FrontEndBase::hide_aux_string     (int id)
+FrontEndBase::hide_aux_string     (int /* id */)
 {
 }
 void
-FrontEndBase::hide_lookup_table   (int id)
+FrontEndBase::hide_lookup_table   (int /* id */)
 {
 }
 void
-FrontEndBase::update_preedit_caret  (int id, int caret)
+FrontEndBase::update_preedit_caret  (int /* id */, int /* caret */)
 {
 }
 void
-FrontEndBase::update_preedit_string (int id, const WideString & str, const AttributeList & attrs)
+FrontEndBase::update_preedit_string (int /* id */, const WideString & /* str */, const AttributeList & /* attrs */)
 {
 }
 void
-FrontEndBase::update_aux_string     (int id, const WideString & str, const AttributeList & attrs)
+FrontEndBase::update_aux_string     (int /* id */, const WideString & /* str */, const AttributeList & /* attrs */)
 {
 }
 void
-FrontEndBase::update_lookup_table   (int id, const LookupTable & table)
+FrontEndBase::update_lookup_table   (int /* id */, const LookupTable & /* table */)
 {
 }
 void
-FrontEndBase::commit_string         (int id, const WideString & str)
+FrontEndBase::commit_string         (int /* id */, const WideString & /* str */)
 {
 }
 void
-FrontEndBase::forward_key_event      (int id, const KeyEvent & key)
+FrontEndBase::forward_key_event      (int /* id */, const KeyEvent & /* key */)
 {
 }
 void
-FrontEndBase::register_properties   (int id, const PropertyList & properties)
+FrontEndBase::register_properties   (int /* id */, const PropertyList & /* properties */)
 {
 }
 void
-FrontEndBase::update_property       (int id, const Property & property)
+FrontEndBase::update_property       (int /* id */, const Property & /* property */)
 {
 }
 void
-FrontEndBase::beep                  (int id)
+FrontEndBase::beep                  (int /* id */)
 {
 }
 void
-FrontEndBase::start_helper          (int id, const String &helper_uuid)
+FrontEndBase::start_helper          (int /* id */, const String &/* helper_uuid */)
 {
 }
 void
-FrontEndBase::stop_helper           (int id, const String &helper_uuid)
+FrontEndBase::stop_helper           (int /* id */, const String &/* helper_uuid */)
 {
 }
 void
-FrontEndBase::send_helper_event     (int id, const String &helper_uuid, const Transaction &trans)
+FrontEndBase::send_helper_event     (int /* id */, const String &/* helper_uuid */, const Transaction &/* trans */)
 {
 }
 bool
-FrontEndBase::get_surrounding_text  (int id, WideString &text, int &cursor, int maxlen_before, int maxlen_after)
+FrontEndBase::get_surrounding_text  (int /* id */, WideString &/* text */, int &/* cursor */, int /* maxlen_before */, int /* maxlen_after */)
 {
     return false;
 }
 bool
-FrontEndBase::delete_surrounding_text  (int id, int offset, int len)
+FrontEndBase::delete_surrounding_text  (int /* id */, int /* offset */, int /* len */)
 {
     return false;
 }

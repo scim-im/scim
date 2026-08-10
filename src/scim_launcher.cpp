@@ -43,7 +43,7 @@ using namespace scim;
 ConfigModule   *config_module = 0;
 ConfigPointer   config;
 
-void signalhandler(int sig)
+void signalhandler(int /* sig */)
 {
     if (config != NULL) {
         config->flush ();

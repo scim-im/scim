@@ -274,7 +274,6 @@ static void     open_specific_factory                   (GtkIMContextSCIM       
 
 static void     attach_instance                         (const IMEngineInstancePointer &si);
 
-static IMEngineInstancePointer get_default_instance     ();
 
 /* slot functions */
 static void     slot_show_preedit_string                (IMEngineInstanceBase   *si);
@@ -548,6 +547,7 @@ gtk_im_context_scim_register_type (GTypeModule *type_module)
         sizeof               (GtkIMContextSCIM),
         0,
         (GInstanceInitFunc)  gtk_im_context_scim_init,
+        NULL,                 /* value_table */
     };
 
     SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_register_type...\n";
@@ -578,7 +578,7 @@ gtk_im_context_scim_shutdown (void)
 /* Private functions */
 static void
 gtk_im_context_scim_class_init (GtkIMContextSCIMClass *klass,
-                                gpointer              *klass_data)
+                                gpointer              */* klass_data */)
 {
     SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_class_init...\n";
 
@@ -605,7 +605,7 @@ gtk_im_context_scim_class_init (GtkIMContextSCIMClass *klass,
 
 static void
 gtk_im_context_scim_init (GtkIMContextSCIM      *context_scim,
-                          GtkIMContextSCIMClass *klass)
+                          GtkIMContextSCIMClass */* klass */)
 {
     SCIM_DEBUG_FRONTEND(1) << "gtk_im_context_scim_init...\n";
 
@@ -1065,7 +1065,6 @@ gtk_im_context_scim_get_preedit_string (GtkIMContext   *context,
 
                 PangoAttribute *attr;
                 AttributeList::const_iterator i;
-                bool underline = false;
                 bool *attrs_flag = new bool [mbs.length ()];
 
                 memset (attrs_flag, 0, mbs.length () * sizeof (bool));
@@ -1085,7 +1084,6 @@ gtk_im_context_scim_get_preedit_string (GtkIMContext   *context,
                                 attr->start_index = start_index;
                                 attr->end_index = end_index;
                                 pango_attr_list_insert (*attrs, attr);
-                                underline = true;
                             } else if (i->get_value () == SCIM_ATTR_DECORATE_REVERSE) {
                                 attr = pango_attr_foreground_new (_normal_bg.red, _normal_bg.green, _normal_bg.blue);
                                 attr->start_index = start_index;
@@ -1134,8 +1132,10 @@ gtk_im_context_scim_get_preedit_string (GtkIMContext   *context,
                     if (!attrs_flag [pos]) {
                         guint begin_pos = pos;
 
-                        for (; pos < mbs.length () && !attrs_flag [pos]; ++pos)
-                            NULL;
+                        // Empty body: the loop only advances pos to the end of
+                        // the unattributed run.
+                        while (pos < mbs.length () && !attrs_flag [pos])
+                            ++pos;
 
                         attr = pango_attr_underline_new (PANGO_UNDERLINE_SINGLE);
                         attr->start_index = begin_pos;
@@ -1160,7 +1160,7 @@ gtk_im_context_scim_get_preedit_string (GtkIMContext   *context,
 static gboolean
 gtk_scim_key_snooper (GtkWidget    *grab_widget,
                       GdkEventKey  *event,
-                      gpointer      data)
+                      gpointer      /* data */)
 {
     SCIM_DEBUG_FRONTEND(3) << "gtk_scim_key_snooper...\n";
 
@@ -1204,7 +1204,7 @@ gtk_scim_key_snooper (GtkWidget    *grab_widget,
 }
 
 static void
-gtk_im_slave_commit_cb (GtkIMContext     *context,
+gtk_im_slave_commit_cb (GtkIMContext     */* context */,
                         const char       *str,
                         GtkIMContextSCIM *context_scim)
 {
@@ -1213,7 +1213,7 @@ gtk_im_slave_commit_cb (GtkIMContext     *context,
 }
 
 static void
-gtk_im_slave_preedit_changed_cb (GtkIMContext     *context,
+gtk_im_slave_preedit_changed_cb (GtkIMContext     */* context */,
                         GtkIMContextSCIM *context_scim)
 {
     context_scim->slave_preedit = true;
@@ -1221,7 +1221,7 @@ gtk_im_slave_preedit_changed_cb (GtkIMContext     *context,
 }
 
 static void
-gtk_im_slave_preedit_start_cb (GtkIMContext     *context,
+gtk_im_slave_preedit_start_cb (GtkIMContext     */* context */,
                         GtkIMContextSCIM *context_scim)
 {
     context_scim->slave_preedit = true;
@@ -1229,7 +1229,7 @@ gtk_im_slave_preedit_start_cb (GtkIMContext     *context,
 }
 
 static void
-gtk_im_slave_preedit_end_cb (GtkIMContext     *context,
+gtk_im_slave_preedit_end_cb (GtkIMContext     */* context */,
                         GtkIMContextSCIM *context_scim)
 {
     context_scim->slave_preedit = false;
@@ -1238,7 +1238,7 @@ gtk_im_slave_preedit_end_cb (GtkIMContext     *context,
 
 /* Panel Slot functions */
 static void
-panel_slot_reload_config (int context)
+panel_slot_reload_config (int /* context */)
 {
     SCIM_DEBUG_FRONTEND(1) << "panel_slot_reload_config...\n";
     _config->reload ();
@@ -1627,7 +1627,7 @@ panel_finalize ()
 }
 
 static gboolean
-panel_iochannel_handler (GIOChannel *source, GIOCondition condition, gpointer user_data)
+panel_iochannel_handler (GIOChannel */* source */, GIOCondition condition, gpointer /* user_data */)
 {
     if (condition == G_IO_IN) {
         if (!_panel_client.filter_event ()) {
@@ -3059,10 +3059,12 @@ slot_get_surrounding_text (IMEngineInstanceBase *si,
             SCIM_DEBUG_FRONTEND(2) << "Cursor Index    : " << cursor_index <<"\n";
             WideString before (utf8_mbstowcs (String (surrounding, surrounding + cursor_index)));
             WideString after (utf8_mbstowcs (String (surrounding + cursor_index)));
-            if (maxlen_before > 0 && maxlen_before < before.length ())
+            if (maxlen_before > 0 &&
+                (WideString::size_type) maxlen_before < before.length ())
                 before = WideString (before.begin () + (before.length () - maxlen_before), before.end ());
             else if (maxlen_before == 0) before = WideString ();
-            if (maxlen_after > 0 && maxlen_after < after.length ())
+            if (maxlen_after > 0 &&
+                (WideString::size_type) maxlen_after < after.length ())
                 after = WideString (after.begin (), after.begin () + maxlen_after);
             else if (maxlen_after == 0) after = WideString ();
             text = before + after;
@@ -3129,7 +3131,7 @@ reload_config_callback (const ConfigPointer &config)
 }
 
 static void
-fallback_commit_string_cb (IMEngineInstanceBase  *si,
+fallback_commit_string_cb (IMEngineInstanceBase  */* si */,
                            const WideString      &str)
 {
     if (_focused_ic && _focused_ic->impl)

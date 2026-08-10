@@ -200,7 +200,7 @@ IMEngineFactoryBase::set_symbol (const String &symbol)
 }
 
 WideString
-IMEngineFactoryBase::inverse_query (const WideString &str)
+IMEngineFactoryBase::inverse_query (const WideString &/* str */)
 {
     return WideString ();
 }
@@ -702,13 +702,13 @@ DummyIMEngineFactory::get_icon_file () const
 }
 
 bool
-DummyIMEngineFactory::validate_encoding (const String& encoding) const
+DummyIMEngineFactory::validate_encoding (const String& /* encoding */) const
 {
     return true;
 }
 
 bool
-DummyIMEngineFactory::validate_locale (const String& locale) const
+DummyIMEngineFactory::validate_locale (const String& /* locale */) const
 {
     return true;
 }
@@ -731,7 +731,7 @@ DummyIMEngineInstance::~DummyIMEngineInstance ()
 }
 
 bool
-DummyIMEngineInstance::process_key_event (const KeyEvent& key)
+DummyIMEngineInstance::process_key_event (const KeyEvent& /* key */)
 {
     return false;
 }

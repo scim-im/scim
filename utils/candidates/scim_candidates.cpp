@@ -423,7 +423,7 @@ build_byte_offsets (const WideString &wstr, std::vector<int> &offsets)
 // its utf8 rendering. Returns null when there is nothing to apply.
 PangoAttrList *
 make_pango_attrs (const WideString &wstr, const AttributeList &attrs,
-                  const CandidatesColor &fg,
+                  const CandidatesColor &/* fg */,
                   const CandidatesColor &sel_bg, const CandidatesColor &sel_fg)
 {
     if (attrs.empty ())

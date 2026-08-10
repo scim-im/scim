@@ -111,7 +111,7 @@ extern "C" {
         }
     }
 
-    unsigned int scim_imengine_module_init (const ConfigPointer &config)
+    unsigned int scim_imengine_module_init (const ConfigPointer &/* config */)
     {
         if (global)
             return global->number_of_factories ();

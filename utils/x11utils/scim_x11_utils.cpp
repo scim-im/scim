@@ -14,11 +14,14 @@ static Time get_time                 (void);
 static void initialize_modifier_bits (Display *display);
 
 static Display *__current_display      = 0;
-static int      __current_alt_mask     = Mod1Mask;
-static int      __current_meta_mask    = 0;
-static int      __current_super_mask   = 0;
-static int      __current_hyper_mask   = 0;
-static int      __current_numlock_mask = Mod2Mask;
+// X11 modifier masks: bit sets, compared and combined with an event's
+// unsigned state field. Signed only by history, which made every one of
+// those comparisons mix signedness.
+static unsigned int __current_alt_mask     = Mod1Mask;
+static unsigned int __current_meta_mask    = 0;
+static unsigned int __current_super_mask   = 0;
+static unsigned int __current_hyper_mask   = 0;
+static unsigned int __current_numlock_mask = Mod2Mask;
 
 static Time
 get_time (void)
