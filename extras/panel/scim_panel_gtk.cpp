@@ -34,8 +34,11 @@
 #include <sys/time.h>
 #include <signal.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <errno.h>
+#include <cstring>
 #include <glib.h>
+#include <glib-unix.h>
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 #if defined(GDK_WINDOWING_X11) && defined(SCIM_ENABLE_X11)
@@ -3628,13 +3631,82 @@ restore_properties (void)
     }
 }
 
+// Self-pipe, watched by the main loop: the only way a handler can hand work to
+// ordinary code without doing any of it itself.
+static int _signal_pipe [2] = { -1, -1 };
+
+// One byte down the pipe, nothing else. This used to log through
+// SCIM_DEBUG_MAIN, a C++ stream, and call PanelAgent::stop (), which takes the
+// agent's lock and touches its socket -- neither may run from a handler that
+// may well have interrupted the very same code.
 static void
-signalhandler(int /* sig */)
+signalhandler (int sig)
 {
+    char byte = (char) sig;
+
+    if (_signal_pipe [1] >= 0) {
+        ssize_t ignored = write (_signal_pipe [1], &byte, 1);
+        (void) ignored;   // a full pipe already carries the message
+    }
+}
+
+// Dispatched from the main loop, so the real work is merely ordinary code.
+// Stopping the agent ends its thread, and panel_agent_thread_func () quits the
+// main loop, which is what gets main () to its cleanup.
+static gboolean
+signal_pipe_dispatch (gint fd, GIOCondition /* condition */, gpointer /* data */)
+{
+    char byte;
+
+    while (read (fd, &byte, 1) == 1)
+        ;   // drain: one shutdown is as good as several
+
     SCIM_DEBUG_MAIN (1) << "In signal handler...\n";
     if (_panel_agent != NULL) {
         _panel_agent->stop ();
     }
+
+    // Stays armed rather than removing itself. Anything that iterates the
+    // default context before the loop proper -- sni_start () and GIO do -- can
+    // dispatch this while _panel_agent is still null, and a watch that retired
+    // there would leave the panel deaf to every later signal.
+    return G_SOURCE_CONTINUE;
+}
+
+// Installed after the daemonizing fork, not before it: the watch belongs to the
+// main context of the process that will actually run the loop. A signal
+// arriving during startup therefore lands on the default disposition and ends
+// the process -- which is the honest answer, where the old handler took the
+// signal and did nothing with it, _panel_agent being null until much later.
+static void
+install_signal_handlers (void)
+{
+    if (pipe (_signal_pipe) == 0) {
+        fcntl (_signal_pipe [0], F_SETFD, FD_CLOEXEC);
+        fcntl (_signal_pipe [1], F_SETFD, FD_CLOEXEC);
+        fcntl (_signal_pipe [0], F_SETFL, O_NONBLOCK);
+        // The handler must never block on a pipe nobody is draining.
+        fcntl (_signal_pipe [1], F_SETFL, O_NONBLOCK);
+
+        g_unix_fd_add (_signal_pipe [0], G_IO_IN, signal_pipe_dispatch, 0);
+    }
+
+    struct sigaction sa;
+
+    memset (&sa, 0, sizeof (sa));
+    sa.sa_handler = signalhandler;
+    sigemptyset (&sa.sa_mask);
+    // SA_RESTART here, unlike the launcher's: the main loop is what reacts, so
+    // there is nothing to be gained from tearing up an unrelated syscall.
+    sa.sa_flags = SA_RESTART;
+
+    // g_unix_signal_add () would be the idiomatic spelling, but it refuses
+    // anything outside SIGHUP/INT/TERM/USR1/USR2/WINCH -- SIGQUIT, which this
+    // has always taken, trips its assertion and installs nothing at all.
+    sigaction (SIGQUIT, &sa, 0);
+    sigaction (SIGTERM, &sa, 0);
+    sigaction (SIGINT,  &sa, 0);
+    sigaction (SIGHUP,  &sa, 0);
 }
 
 int main (int argc, char *argv [])
@@ -3777,11 +3849,6 @@ int main (int argc, char *argv [])
         return -1;
     }
 
-    signal(SIGQUIT, signalhandler);
-    signal(SIGTERM, signalhandler);
-    signal(SIGINT,  signalhandler);
-    signal(SIGHUP,  signalhandler);
-
     // Daemonize before touching GTK or D-Bus. Both cache a shared session-bus
     // connection whose I/O is served by a worker thread, and fork () does not
     // carry threads over -- so a connection opened before the fork is inert in
@@ -3793,6 +3860,10 @@ int main (int argc, char *argv [])
         scim_daemon ();
 
     gtk_init ();
+
+    // After the fork above, so the pipe watch lands in the main context of the
+    // process that runs the loop.
+    install_signal_handlers ();
 
     ui_initialize ();
 

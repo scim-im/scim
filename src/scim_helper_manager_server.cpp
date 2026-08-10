@@ -38,6 +38,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <unistd.h>
+#include <cstring>
 #include "scim_private.h"
 #include "scim.h"
 #include "scim_stl_map.h"
@@ -331,11 +332,36 @@ bool initialize_socket_server ()
     return true;
 }
 
-void signalhandler(int /* sig */)
-{
-    SCIM_DEBUG_MAIN (1) << "signalhandler ()\n";
+// Set by the handler, read once the server loop has returned.
+static volatile sig_atomic_t __signal_received = 0;
 
-    __socket_server.shutdown ();
+// Nothing but the flag: SCIM_DEBUG_MAIN is a C++ stream, and
+// SocketServer::shutdown () walks the server's containers and closes its
+// descriptors. Neither may run from a handler on top of whatever it
+// interrupted. The shutdown happens in main () instead, where it is ordinary
+// code, and shutdown () is guarded on "created" so the late call is a no-op if
+// the server had already gone.
+static void signalhandler (int sig)
+{
+    __signal_received = sig;
+}
+
+static void install_signal_handlers ()
+{
+    struct sigaction sa;
+
+    memset (&sa, 0, sizeof (sa));
+    sa.sa_handler = signalhandler;
+    sigemptyset (&sa.sa_mask);
+    // Deliberately no SA_RESTART, which signal (2) implies on glibc: the flag
+    // alone would never be seen, because the only thing that ends
+    // SocketServer::run () from outside is its select () failing with EINTR.
+    sa.sa_flags = 0;
+
+    sigaction (SIGQUIT, &sa, 0);
+    sigaction (SIGTERM, &sa, 0);
+    sigaction (SIGINT,  &sa, 0);
+    sigaction (SIGHUP,  &sa, 0);
 }
 
 int main (int argc, char * argv [])
@@ -401,12 +427,13 @@ int main (int argc, char * argv [])
 
     if (daemon) scim_daemon ();
 
-    signal(SIGQUIT, signalhandler);
-    signal(SIGTERM, signalhandler);
-    signal(SIGINT,  signalhandler);
-    signal(SIGHUP,  signalhandler);
+    install_signal_handlers ();
 
     __socket_server.run ();
+
+    // The teardown the handler used to do, now back in ordinary code.
+    if (__signal_received)
+        __socket_server.shutdown ();
 
     SCIM_DEBUG_MAIN (1) << "exit scim-helper-manager.\n";
 }

@@ -115,8 +115,10 @@ int main (int argc, char *argv [])
     bool ibus_session = false;    // GNOME / ibus: run the sync coordinator
     bool frontend_forced = false; // an explicit -f overrides env detection
 
-    int   new_argc = 0;
-    char *new_argv [80];
+    // Grown as needed: the loop that fills this from the arguments after "--"
+    // had no bound, and the terminating null went one past the end once the
+    // array was full. Only scim_launch () reads it, and only to the null.
+    std::vector<char *> new_argv;
 
     //Display version info (to stderr, so stdout stays clean for --xml / --list)
     cerr << "Smart Common Input Method " << SCIM_VERSION << "\n\n";
@@ -294,11 +296,10 @@ int main (int argc, char *argv [])
     } //End of command line parsing.
 
     // Store the rest argvs into new_argv.
-    for (++i; i < (size_t) argc; ++i) {
-        new_argv [new_argc ++] = argv [i];
-    }
+    for (++i; i < (size_t) argc; ++i)
+        new_argv.push_back (argv [i]);
 
-    new_argv [new_argc] = 0;
+    new_argv.push_back (0);
 
     // Get the imengine module list which should be loaded.
     if (exclude_engine_list.size ()) {
@@ -349,7 +350,7 @@ int main (int argc, char *argv [])
             if (!have_ibussync) {
                 // Nothing to coordinate: just keep the warm backend running.
                 int rc = run_supervised (daemon, [&] () {
-                    return scim_launch (false, def_config, "all", "socket", new_argv);
+                    return scim_launch (false, def_config, "all", "socket", new_argv.data ());
                 });
                 return rc == 0 ? 0 : rc;
             }
@@ -382,7 +383,7 @@ int main (int argc, char *argv [])
             int rc = run_supervised (daemon, [&] () {
                 ensure_backend ();
                 return scim_launch (false, co_config, co_engines,
-                                    String ("ibussync"), new_argv);
+                                    String ("ibussync"), new_argv.data ());
             });
             return rc == 0 ? 0 : rc;
         }
@@ -460,7 +461,7 @@ int main (int argc, char *argv [])
     String engines = load_engine_list.size ()
                      ? scim_combine_string_list (load_engine_list, ',') : "all";
     int rc = run_supervised (daemon, [&] () {
-        return scim_launch (false, def_config, engines, def_frontend, new_argv);
+        return scim_launch (false, def_config, engines, def_frontend, new_argv.data ());
     });
 
     if (rc == 0) {

@@ -1022,8 +1022,12 @@ int  scim_launch (bool          daemon,
     if (!config.length () || !imengines.length () || !frontend.length ())
         return -1;
 
+    // One slot is reserved for the terminating null, which ends the arguments
+    // rather than being one of them; the loops below stop at MAX_ARGS - 1.
+    const int MAX_ARGS = 40;
+
     int   new_argc = 0;
-    char *new_argv [40];
+    char *new_argv [MAX_ARGS];
 
     new_argv [new_argc ++] = strdup (SCIM_LAUNCHER);
 
@@ -1038,7 +1042,7 @@ int  scim_launch (bool          daemon,
     new_argv [new_argc ++] = strdup (frontend.c_str ());
 
     if (argv) {
-        for (int i = 0; argv [i] && new_argc < 40 ; ++i, ++new_argc)
+        for (int i = 0; argv [i] && new_argc < MAX_ARGS - 1; ++i, ++new_argc)
             new_argv [new_argc] = strdup (argv [i]);
     }
 
@@ -1053,7 +1057,11 @@ int  scim_launch (bool          daemon,
 
     // In child process, start scim-launcher.
     if (child_pid == 0) {
-        return execv (SCIM_LAUNCHER, new_argv);
+        execv (SCIM_LAUNCHER, new_argv);
+        // Never return: the caller may be a supervisor loop, and a child that
+        // came back from here would run it too -- forking again on every
+        // restart, doubling the process count each round.
+        _exit (127);
     }
 
     // In parent process, wait the child exit.
@@ -1098,8 +1106,11 @@ int scim_launch_panel (bool          daemon,
     if (access (panel_program.c_str (), X_OK) != 0)
             panel_program = String (SCIM_PANEL_PROGRAM);
 
+    // As in scim_launch (): the last slot belongs to the terminating null.
+    const int MAX_ARGS = 80;
+
     int   new_argc = 0;
-    char *new_argv [80];
+    char *new_argv [MAX_ARGS];
 
     new_argv [new_argc ++] = strdup (panel_program.c_str ());
 
@@ -1110,7 +1121,7 @@ int scim_launch_panel (bool          daemon,
         new_argv [new_argc ++] = strdup ("-d");
 
     if (argv) {
-        for (int i = 0; argv [i] && new_argc < 40; ++i, ++new_argc)
+        for (int i = 0; argv [i] && new_argc < MAX_ARGS - 1; ++i, ++new_argc)
             new_argv [new_argc] = strdup (argv [i]);
     }
 
@@ -1123,9 +1134,10 @@ int scim_launch_panel (bool          daemon,
     // Error fork.
     if (child_pid < 0) return -1;
 
-    // In child process, start scim-launcher.
+    // In child process, start the panel.
     if (child_pid == 0) {
-        return execv (panel_program.c_str (), new_argv);
+        execv (panel_program.c_str (), new_argv);
+        _exit (127);   // see scim_launch ()
     }
 
     // In parent process, wait the child exit.

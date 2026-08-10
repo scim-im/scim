@@ -34,8 +34,10 @@
 #include <sys/types.h>
 #include <sys/select.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <errno.h>
+#include <cstring>
 #include <ctime>
 
 using namespace scim;
@@ -43,39 +45,106 @@ using namespace scim;
 ConfigModule   *config_module = 0;
 ConfigPointer   config;
 
-void signalhandler(int /* sig */)
+// Set by the handler, read by the run loop below. volatile sig_atomic_t is what
+// a handler is allowed to touch.
+static volatile sig_atomic_t _signal_received = 0;
+
+// Self-pipe, so the handler can wake a blocked select () by writing a byte --
+// which is async-signal-safe, where anything that would otherwise do the job is
+// not.
+static int _signal_pipe [2] = { -1, -1 };
+
+// Nothing here but a flag and one byte down the pipe.
+//
+// This used to flush the config, write to std::cerr and exit (0). None of the
+// three may be called from a handler: they take locks and run buffered I/O, and
+// exit () additionally runs the static destructors -- so a signal arriving
+// inside any of that deadlocked or double-freed on the way out, which is a
+// logout that hangs rather than ends. The shutdown now happens in main (),
+// where it is merely ordinary code. The flush is not lost either way: returning
+// from main () destroys the config, and ~SimpleConfig () flushes.
+static void signalhandler (int sig)
 {
-    if (config != NULL) {
-        config->flush ();
+    _signal_received = sig;
+
+    if (_signal_pipe [1] >= 0) {
+        char byte = 1;
+        ssize_t ignored = write (_signal_pipe [1], &byte, 1);
+        (void) ignored;   // a full pipe already carries the message
+    }
+}
+
+static void install_signal_handlers ()
+{
+    if (pipe (_signal_pipe) == 0) {
+        fcntl (_signal_pipe [0], F_SETFD, FD_CLOEXEC);
+        fcntl (_signal_pipe [1], F_SETFD, FD_CLOEXEC);
+        // The handler must never block on a pipe nobody is draining.
+        fcntl (_signal_pipe [1], F_SETFL, O_NONBLOCK);
     }
 
-    std::cerr << "SCIM successfully exited.\n";
+    struct sigaction sa;
+    memset (&sa, 0, sizeof (sa));
+    sa.sa_handler = signalhandler;
+    sigemptyset (&sa.sa_mask);
+    // Deliberately no SA_RESTART, which is what signal (2) gives on glibc and
+    // the reason the old handler had to exit () rather than return: a frontend
+    // blocked in a select () of its own reads no flag of ours, and only an
+    // interrupted syscall hands control back to main ().
+    sa.sa_flags = 0;
 
-    exit (0);
+    sigaction (SIGQUIT, &sa, 0);
+    sigaction (SIGTERM, &sa, 0);
+    sigaction (SIGINT,  &sa, 0);
+    sigaction (SIGHUP,  &sa, 0);
 }
 
 // Service several frontends in one process via a shared select() loop, so a
 // Wayland session can run wayland.so (native apps) and x11.so (XWayland apps)
 // against one backend. Each frontend drains its own fds non-blocking.
-static void
-run_frontends_cooperatively (const std::vector<FrontEndModule *> &modules)
+//
+// A frontend that asks to stop is dropped from the loop, not taken as a reason
+// to stop the others: the two serve different sets of applications, and the
+// wayland one exits for causes that say nothing about the x11 one -- the seat
+// going away, a dispatch error, another input method claiming the seat. Letting
+// it end the process took XWayland and XIM input down with it. The loop ends
+// when the last frontend is gone.
+//
+// @return true if it ended for any reason other than a signal, i.e. the
+// frontends ran out. main () turns that into a non-zero exit so the supervisor
+// restarts us -- a compositor being replaced under a running session is the
+// ordinary way every frontend goes at once, and it used to leave the session
+// with no input method until the next login, because returning 0 read as a
+// clean shutdown.
+static bool
+run_frontends_cooperatively (const std::vector<FrontEndModule *> &modules,
+                             const std::vector<String> &names)
 {
-    bool exited = false;
+    // Indices into modules/names of the frontends still running.
+    std::vector<size_t> live;
+    for (size_t i = 0; i < modules.size (); ++i)
+        live.push_back (i);
 
-    while (!exited) {
+    while (!live.empty () && !_signal_received) {
         std::vector<int> fds;
 
         // Drain anything already buffered, then gather the fds to watch.
-        for (size_t i = 0; i < modules.size (); ++i) {
-            modules[i]->process_events ();
-            if (modules[i]->has_exited ())
-                exited = true;
+        for (size_t i = 0; i < live.size (); ) {
+            modules[live[i]]->process_events ();
+            if (modules[live[i]]->has_exited ()) {
+                std::cerr << names[live[i]] << " FrontEnd has stopped"
+                          << (live.size () > 1 ? "; continuing with the others.\n"
+                                               : ".\n");
+                live.erase (live.begin () + i);
+            } else {
+                ++i;
+            }
         }
-        if (exited)
+        if (live.empty ())
             break;
 
-        for (size_t i = 0; i < modules.size (); ++i)
-            modules[i]->poll_fds (fds);
+        for (size_t i = 0; i < live.size (); ++i)
+            modules[live[i]]->poll_fds (fds);
 
         if (fds.empty ())
             break;
@@ -88,13 +157,25 @@ run_frontends_cooperatively (const std::vector<FrontEndModule *> &modules)
             if (fds[i] > max_fd) max_fd = fds[i];
         }
 
+        // Watched alongside the frontends: a signal that arrives while we are
+        // already inside select () shows up as EINTR, but one that arrives
+        // between the flag test above and the call would otherwise wait for
+        // unrelated input before being noticed.
+        if (_signal_pipe [0] >= 0) {
+            FD_SET (_signal_pipe [0], &read_fds);
+            if (_signal_pipe [0] > max_fd) max_fd = _signal_pipe [0];
+        }
+
         if (select (max_fd + 1, &read_fds, NULL, NULL, NULL) < 0) {
             if (errno == EINTR)
                 continue;
+            std::cerr << "SCIM: select failed: " << strerror (errno) << "\n";
             break;
         }
         // Ready events are handled by process_events() at the top of the loop.
     }
+
+    return !_signal_received;
 }
 
 int main (int argc, char *argv [])
@@ -106,13 +187,16 @@ int main (int argc, char *argv [])
     String config_name   ("simple");
     String frontend_name ("socket");   // may be a comma-separated list
 
-    int   new_argc = 0;
-    char *new_argv [40];
+    // Grown as needed. As a fixed array this had no bound at all on the loop
+    // below that appends unrecognised options, and the two loops that did check
+    // still let new_argc reach the array's length, so the terminating null went
+    // one past the end exactly when the array was full.
+    std::vector<char *> new_argv;
 
     int i = 0;
     bool daemon = false;
 
-    new_argv [new_argc ++] = argv [0];
+    new_argv.push_back (argv [0]);
 
     while (i<argc) {
         if (++i >= argc) break;
@@ -202,19 +286,22 @@ int main (int argc, char *argv [])
         if (String ("--") == argv [i])
             break;
 
-        new_argv [new_argc ++] = argv [i];
+        new_argv.push_back (argv [i]);
     } //End of command line parsing.
 
-    // Construct new argv array for FrontEnd.
-    new_argv [new_argc ++] = const_cast <char *> ("-c");
-    new_argv [new_argc ++] = const_cast <char *> (config_name.c_str ());
+    // Construct new argv array for FrontEnd. config_name is settled by the
+    // parsing above and not touched again, so holding its buffer is safe.
+    new_argv.push_back (const_cast <char *> ("-c"));
+    new_argv.push_back (const_cast <char *> (config_name.c_str ()));
 
     // Store the rest argvs into new_argv.
-    for (++i; i < argc && new_argc < 40; ++i) {
-        new_argv [new_argc ++] = argv [i];
-    }
+    for (++i; i < argc; ++i)
+        new_argv.push_back (argv [i]);
 
-    new_argv [new_argc] = 0;
+    // Counted before the terminator goes on: the null ends the arguments, it is
+    // not one of them.
+    int new_argc = (int) new_argv.size ();
+    new_argv.push_back (0);
 
     // Both socket clients ask the backend one question at startup and neither
     // retries: SocketConfig for the configuration, SocketIMEngine for the
@@ -257,6 +344,11 @@ int main (int argc, char *argv [])
             std::cerr << "The SCIM backend is not serving engines; "
                          "continuing without them.\n";
     }
+
+    // Set when the run loop ends because every frontend stopped, rather than
+    // because we were signalled. Declared out here so the exit code below can
+    // see it.
+    bool frontends_exhausted = false;
 
     try {
         // Try to load config module
@@ -301,10 +393,12 @@ int main (int argc, char *argv [])
         bool multi = frontend_names.size () > 1;
 
         std::vector<FrontEndModule *> frontend_modules;
+        std::vector<String>           loaded_names;   // parallel to the above
         for (size_t n = 0; n < frontend_names.size (); ++n) {
             std::cerr << "Loading " << frontend_names[n] << " FrontEnd module ...\n";
             FrontEndModule *fem =
-                new FrontEndModule (frontend_names[n], backend, config, new_argc, new_argv);
+                new FrontEndModule (frontend_names[n], backend, config,
+                                    new_argc, new_argv.data ());
 
             if (!fem || !fem->valid ()) {
                 std::cerr << "Failed to load " << frontend_names[n]
@@ -320,6 +414,7 @@ int main (int argc, char *argv [])
                 continue;
             }
             frontend_modules.push_back (fem);
+            loaded_names.push_back (frontend_names[n]);
         }
 
         if (frontend_modules.empty ()) {
@@ -329,7 +424,14 @@ int main (int argc, char *argv [])
 
         // Running several frontends at once requires each to support the
         // cooperative (poll-fds / process-events) interface.
-        bool cooperative = frontend_modules.size () > 1;
+        //
+        // Used for a lone frontend too, where it is not about sharing the loop:
+        // a frontend blocked in its own run () sees no termination flag of ours,
+        // and x11.so and wayland.so both retry their select () on EINTR, so a
+        // signal would leave them running. This loop is the one that checks.
+        // It is the same loop either way -- X11FrontEnd::run () is
+        // process_events / poll_fds / select, exactly as below.
+        bool cooperative = true;
         for (size_t n = 0; n < frontend_modules.size (); ++n) {
             if (!frontend_modules[n]->supports_cooperative_run ())
                 cooperative = false;
@@ -345,10 +447,7 @@ int main (int argc, char *argv [])
         //reset backend pointer, in order to destroy backend automatically.
         backend.reset ();
 
-        signal(SIGQUIT, signalhandler);
-        signal(SIGTERM, signalhandler);
-        signal(SIGINT,  signalhandler);
-        signal(SIGHUP,  signalhandler);
+        install_signal_handlers ();
 
         if (daemon) {
             std::cerr << "Starting SCIM as daemon ...\n";
@@ -358,11 +457,27 @@ int main (int argc, char *argv [])
         }
 
         if (cooperative)
-            run_frontends_cooperatively (frontend_modules);
+            frontends_exhausted =
+                run_frontends_cooperatively (frontend_modules, loaded_names);
         else
             frontend_modules[0]->run ();
     } catch (const std::exception & err) {
         std::cerr << err.what () << "\n";
+        return 1;
+    }
+
+    // The shutdown the handler used to do, now that we are back in ordinary
+    // code and may take a lock. Returning would flush anyway, through the
+    // config's own destructor; doing it here keeps that from depending on when
+    // a static is torn down.
+    if (config != NULL)
+        config->flush ();
+
+    if (_signal_received)
+        std::cerr << "SCIM successfully exited.\n";
+
+    if (frontends_exhausted) {
+        std::cerr << "SCIM: no FrontEnd is left running.\n";
         return 1;
     }
 
