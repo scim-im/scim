@@ -151,12 +151,18 @@ not choose XIM in a latin one, so it needs the variable as well.
 
 On KDE Plasma, the "Input Method Panel" applet -- kimpanel -- lets Plasma draw
 the candidate window instead of SCIM, and SCIM uses it whenever it is there,
-adding or removing the applet taking effect as you do it.  Two things differ
+adding or removing the applet taking effect as you do it.  One thing differs
 from SCIM's own window: the applet pages the list only with the engine's own
-keys, not the scroll wheel, and on Wayland it may place the window at the
-top-left corner of the screen.  Leave the applet off the panel, or set
+keys, not the scroll wheel.  Leave the applet off the panel, or set
 /Panel/UseKimpanel to false in ~/.config/scim/config, and SCIM draws the
 candidates itself.
+
+A native Wayland application is the exception.  There SCIM is the compositor's
+input method and draws the candidates on a surface the compositor places against
+the text cursor, because the applet cannot be placed at all: it is told where to
+draw in screen coordinates, which no Wayland client can know.  The applet still
+shows which engine is active, so the indicator is the same wherever you type;
+only the list moves.
 
 GNOME on X11 can be an IBus session, but it does not have to be: 2.1 is one
 option there, and setting these variables so SCIM is the input method itself is

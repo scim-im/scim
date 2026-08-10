@@ -179,6 +179,7 @@ WaylandFrontEnd::WaylandFrontEnd (const BackEndPointer &backend,
       m_focused (false),
       m_instance_warned (false),
       m_im_on (false),
+      m_password_field (false),
       m_valid_key_mask (SCIM_KEY_AllMasks),
       m_display (0),
       m_registry (0),
@@ -211,14 +212,17 @@ WaylandFrontEnd::WaylandFrontEnd (const BackEndPointer &backend,
       m_current_key_state (0),
       m_current_key_forwarded (false),
       m_should_exit (false),
+      // Not under an #ifdef: the member is declared unconditionally, and
+      // select_sink () both reads and dereferences it before anything assigns
+      // one. Initialising it only where kimpanel was built left a build without
+      // it (--disable-kimpanel, or a host with no libdbus) starting up on an
+      // indeterminate pointer -- silently, since the file still compiles.
+      m_sink (0),
+      m_sink_selected (false),
       m_panel_open (false)
 {
     if (!_scim_frontend.null () && _scim_frontend != this)
         throw FrontEndError (String ("Wayland -- only one frontend can be created!"));
-
-#ifdef SCIM_HAS_KIMPANEL
-    m_sink = 0;
-#endif
 }
 
 WaylandFrontEnd::~WaylandFrontEnd ()
@@ -314,6 +318,21 @@ WaylandFrontEnd::init (int argc, char **argv)
     if (m_proto == PROTO_V2 && !m_seat)
         throw FrontEndError (String ("Wayland -- no wl_seat available."));
 
+    // Refuse v2 without a virtual keyboard rather than starting half-working.
+    // The grab below routes every key to us, and on v2 the only way back to the
+    // application is zwp_virtual_keyboard_v1: with no manager to create one,
+    // proto_forward_key () has nothing to send through and silently drops the
+    // lot. That is not a missing feature, it is a dead keyboard the user cannot
+    // even type their way out of -- the trigger hotkey turns the engine off and
+    // the keys still go nowhere. Declining here leaves the launcher to fall back
+    // to x11.so, which at least serves XWayland clients.
+    if (m_proto == PROTO_V2 && !m_vk_manager)
+        throw FrontEndError (String ("Wayland -- the compositor offers "
+                                     "zwp_input_method_manager_v2 but no "
+                                     "zwp_virtual_keyboard_manager_v1; there would be "
+                                     "no way to return unconsumed keys to the "
+                                     "application."));
+
     m_xkb_context = xkb_context_new (XKB_CONTEXT_NO_FLAGS);
     if (!m_xkb_context)
         throw FrontEndError (String ("Wayland -- cannot create xkb context."));
@@ -329,9 +348,12 @@ WaylandFrontEnd::init (int argc, char **argv)
             zwp_input_method_manager_v2_get_input_method (m_v2_manager, m_seat);
         zwp_input_method_v2_add_listener (m_v2_input_method, &v2_im_listener, this);
 
-        if (m_vk_manager)
-            m_virtual_keyboard =
-                zwp_virtual_keyboard_manager_v1_create_virtual_keyboard (m_vk_manager, m_seat);
+        m_virtual_keyboard =
+            zwp_virtual_keyboard_manager_v1_create_virtual_keyboard (m_vk_manager, m_seat);
+
+        // Grab only once there is a route back to the application; see above.
+        if (!m_virtual_keyboard)
+            throw FrontEndError (String ("Wayland -- cannot create a virtual keyboard."));
 
         proto_start_grab ();
     }
@@ -899,6 +921,16 @@ WaylandFrontEnd::panel_req_update_factory_info ()
     if (m_sink)
         m_sink->update_engine_property (info.symbol, info.name);
 
+#ifdef SCIM_HAS_KIMPANEL
+    // The indicator is sent to kimpanel even when the candidates are not: on
+    // Wayland select_sink () leaves the list to the compositor-placed popup (see
+    // there), but the indicator is drawn in the panel itself, where placement
+    // never came into it.
+    if (m_kimpanel.is_connected () && m_kimpanel.panel_present () &&
+        m_sink != &m_kimpanel)
+        m_kimpanel.update_engine_property (info.symbol, info.name);
+#endif
+
     if (!m_panel_open)
         return;
 
@@ -1064,6 +1096,10 @@ WaylandFrontEnd::enter_focus ()
     m_preedit_str = WideString ();
     m_preedit_caret = 0;
     m_focused = true;
+    // Belongs to the text input we just left. The new one says so itself with a
+    // content_type event; until then assume an ordinary field, which is what
+    // both protocols' initial purpose ("normal") means.
+    m_password_field = false;
     SCIM_DEBUG_FRONTEND (2) << "Wayland -- activate: protocol=" << proto_name ()
                             << " siid=" << m_instance
                             << " xkb=" << (m_xkb_state ? 1 : 0) << "\n";
@@ -1077,8 +1113,13 @@ WaylandFrontEnd::enter_focus ()
         if (m_im_on) m_panel_client.turn_on  (m_instance);
         else         m_panel_client.turn_off (m_instance);
         m_panel_client.send ();
-        panel_req_update_factory_info ();
     }
+    // Outside the block above: this also drives the kimpanel engine indicator,
+    // which is there whether or not scim-panel-gtk is running. Gating it on the
+    // panel connection left the Plasma indicator stale on every focus change in
+    // a session without one.
+    panel_req_update_factory_info ();
+
     if (m_sink)
         m_sink->enable (true);
 #ifdef SCIM_HAS_CANDIDATES_WAYLAND
@@ -1106,6 +1147,7 @@ WaylandFrontEnd::leave_focus ()
     }
 
     m_focused = false;
+    m_password_field = false;
     m_preedit_str = WideString ();
     m_preedit_attrs = AttributeList ();
     m_preedit_caret = 0;
@@ -1165,10 +1207,54 @@ WaylandFrontEnd::ctx_reset ()
 }
 
 void
-WaylandFrontEnd::ctx_content_type (uint32_t /*hint*/, uint32_t /*purpose*/)
+WaylandFrontEnd::ctx_content_type (uint32_t /*hint*/, uint32_t purpose)
 {
-    // TODO: suppress the engine for password / digit-only fields once the
-    // backend exposes a way to bypass conversion per context.
+    // Neither input-method XML carries the content_purpose enum -- both defer to
+    // the text-input protocol, which lives on the compositor's side and is not
+    // vendored here -- so the two values acted on are spelled out.
+    // zwp_text_input_v1 (what v1's content_type reports) and zwp_text_input_v3
+    // (v2's) agree that password is 8. Only v3 defines 9 as pin; v1 numbers date
+    // there, which is why it is read on v2 alone.
+    const uint32_t PURPOSE_PASSWORD = 8;
+    const uint32_t PURPOSE_V3_PIN   = 9;
+
+    bool sensitive = (purpose == PURPOSE_PASSWORD) ||
+                     (m_proto == PROTO_V2 && purpose == PURPOSE_V3_PIN);
+
+    if (sensitive == m_password_field)
+        return;
+
+    m_password_field = sensitive;
+    if (!m_password_field)
+        return;
+
+    // Entering the field: drop anything the engine was composing before it can
+    // be drawn anywhere. Everything from here on is forwarded untouched, so
+    // nothing would come along later to clear it.
+    if (m_instance >= 0)
+        reset (m_instance);
+    m_preedit_str   = WideString ();
+    m_preedit_attrs = AttributeList ();
+    m_preedit_caret = 0;
+    m_preedit_shown = false;
+    if (m_on_the_spot) clear_preedit_on_app ();
+    else               preedit_to_panel (false);
+    if (m_sink) {
+        m_sink->show_aux_string (false);
+        m_sink->show_lookup_table (false);
+    }
+    if (m_display)
+        wl_display_flush (m_display);
+
+    // The hint is only as good as the toolkit that sets it, so say when it was
+    // honoured; "the IME did nothing in that one field" is otherwise a puzzle.
+    SCIM_DEBUG_FRONTEND (2) << "Wayland -- password/PIN field: "
+                               "passing keys through untouched.\n";
+
+    // TODO: the remaining purposes and hints (digits-only, URL, e-mail) could
+    // pick a conversion mode per field once the backend exposes one. Only the
+    // sensitive ones are acted on here, because those are the ones where doing
+    // nothing is a leak rather than a missing convenience.
 }
 
 void
@@ -1266,12 +1352,15 @@ WaylandFrontEnd::kb_key (uint32_t serial, uint32_t time, uint32_t key, uint32_t 
     // Focus is still required: with no active text input there is nowhere to
     // send a commit, so toggling the engine could only mislead, and consuming
     // the key would take it from an application that may use it as a shortcut.
+    // A password or PIN field takes nothing but the hotkeys: the engine never
+    // sees the keys, so nothing is composed and nothing is drawn. The hotkeys
+    // stay live so the user can still toggle the engine for the next field.
     bool consumed = false;
     bool hotkey = false;
     if (m_focused && filter_hotkeys (scimkey)) {
         consumed = true;
         hotkey = true;
-    } else if (m_focused && m_im_on) {
+    } else if (m_focused && m_im_on && !m_password_field) {
         consumed = process_key_event (m_instance, scimkey);
     }
 
@@ -1662,19 +1751,37 @@ WaylandFrontEnd::select_sink ()
 {
     CandidatesSink *want = 0;
 
+    // Our own surface first, and kimpanel only as the fallback -- the reverse of
+    // what the IM modules do, for a reason that is specific to being the
+    // compositor's input method.
+    //
+    // A candidate list has to sit next to the text being typed, and on Wayland
+    // only the compositor knows where that is. Our surface is placed by the
+    // compositor for exactly that purpose (zwp_input_popup_surface_v2 is
+    // anchored to the text cursor, and a v1 overlay panel is positioned against
+    // the focused text input). kimpanel is told where to draw with
+    // UpdateSpotLocation in screen coordinates -- a number no Wayland client can
+    // learn, and which no Wayland client could act on if it did -- so it puts
+    // the list wherever it last was, typically the corner of the screen.
+    //
+    // The IM modules are a different case and rightly prefer kimpanel: a toolkit
+    // widget does know its cursor position, so the panel can be told. Here the
+    // indicator still goes to kimpanel either way, which is the part of it that
+    // never depended on placement; see panel_req_update_factory_info ().
+#ifdef SCIM_HAS_CANDIDATES_WAYLAND
+    if (m_candidates_ui.is_ready ())
+        want = &m_candidates_ui;
+#endif
 #ifdef SCIM_HAS_KIMPANEL
     // Only while a panel widget is actually listening; kimpanel draws nothing
     // itself, so without one every update would go nowhere.
-    if (m_kimpanel.is_connected () && m_kimpanel.panel_present ())
+    if (!want && m_kimpanel.is_connected () && m_kimpanel.panel_present ())
         want = &m_kimpanel;
 #endif
-#ifdef SCIM_HAS_CANDIDATES_WAYLAND
-    if (!want && m_candidates_ui.is_ready ())
-        want = &m_candidates_ui;
-#endif
 
-    if (want == m_sink)
+    if (m_sink_selected && want == m_sink)
         return;
+    m_sink_selected = true;
 
     // Take down whatever the outgoing one is showing: it has no idea it is being
     // replaced and would leave a candidate window on screen for good.
@@ -1687,24 +1794,34 @@ WaylandFrontEnd::select_sink ()
     }
 
     m_sink = want;
-    if (!m_sink)
-        return;
 
-    m_sink->signal_connect_select_candidate (
-        [this] (int idx) { sink_select_candidate (idx); });
-    m_sink->signal_connect_page_up (
-        [this] () { sink_page_up (); });
-    m_sink->signal_connect_page_down (
-        [this] () { sink_page_down (); });
-    m_sink->signal_connect_move_preedit_caret (
-        [this] (int pos) { sink_move_preedit_caret (pos); });
+    if (m_sink) {
+        m_sink->signal_connect_select_candidate (
+            [this] (int idx) { sink_select_candidate (idx); });
+        m_sink->signal_connect_page_up (
+            [this] () { sink_page_up (); });
+        m_sink->signal_connect_page_down (
+            [this] () { sink_page_down (); });
+        m_sink->signal_connect_move_preedit_caret (
+            [this] (int pos) { sink_move_preedit_caret (pos); });
 
-    // Nothing in flight is replayed: the frontend keeps no copy of the aux string
-    // or lookup table, and this happens when a panel widget is added or removed
-    // rather than mid-composition. The engine indicator is re-sent, since that is
-    // the one piece of state a panel cannot rediscover on its own.
-    if (m_im_on && m_focused)
-        m_sink->enable (true);
+        // Nothing in flight is replayed: the frontend keeps no copy of the aux
+        // string or lookup table, and this happens when a panel widget is added
+        // or removed rather than mid-composition.
+        if (m_im_on && m_focused)
+            m_sink->enable (true);
+    } else {
+        // Preedit still reaches the application, so the user can type and see
+        // something -- but any engine that converts through a candidate list is
+        // unusable, and silence here makes that look like a broken engine.
+        std::cerr << "Wayland -- no candidate UI: the compositor offers no "
+                     "surface to draw one on and no kimpanel applet is present. "
+                     "Candidates and the aux string will not be shown.\n";
+    }
+
+    // Last, and outside the branch: the engine indicator is the one piece of
+    // state a panel cannot rediscover on its own, and it goes to kimpanel
+    // whether or not kimpanel is the sink.
     panel_req_update_factory_info ();
 }
 

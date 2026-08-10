@@ -100,6 +100,14 @@ class WaylandFrontEnd : public FrontEndBase
     // trigger hotkey below there would be no way out of the engine at all.
     bool            m_im_on;
 
+    // Whether the focused text input said it holds a password or a PIN. Keys
+    // then pass straight to the application however the engine is configured:
+    // conversion in a password field is not merely unwanted, it would put the
+    // characters on screen in the preedit and in the candidate list, where a
+    // password has no business being. Reset on every focus change, since the
+    // content type is a property of the text input we are leaving.
+    bool            m_password_field;
+
     FrontEndHotkeyMatcher   m_frontend_hotkey_matcher;
     IMEngineHotkeyMatcher   m_imengine_hotkey_matcher;
 
@@ -186,6 +194,11 @@ class WaylandFrontEnd : public FrontEndBase
     // it without asking which; select_sink () is the only thing that changes it,
     // and it can change while running, when a panel widget is added or removed.
     CandidatesSink *m_sink;
+
+    // Whether select_sink () has run once. Without it the very first call --
+    // where m_sink is still null -- would take the "nothing changed" exit when
+    // there is no candidate UI to be had, which is the one case worth reporting.
+    bool            m_sink_selected;
 
     // Panel client for the status/property UI (tray item or toolbar). Serviced
     // from poll_fds () / process_events () along with the wayland fd.
