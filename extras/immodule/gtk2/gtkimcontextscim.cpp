@@ -2637,6 +2637,9 @@ slot_get_surrounding_text (IMEngineInstanceBase *si,
             SCIM_DEBUG_FRONTEND(2) << "Cursor Index    : " << cursor_index <<"\n";
             WideString before (utf8_mbstowcs (String (surrounding, surrounding + cursor_index)));
             WideString after (utf8_mbstowcs (String (surrounding + cursor_index)));
+            // The text is ours: the getter transfers it. Freed here rather than
+            // at the end, since everything below works off the two copies above.
+            g_free (surrounding);
             if (maxlen_before > 0 &&
                 (WideString::size_type) maxlen_before < before.length ())
                 before = WideString (before.begin () + (before.length () - maxlen_before), before.end ());

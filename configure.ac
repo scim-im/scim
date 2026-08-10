@@ -327,6 +327,17 @@ if test "$SCIM_HAS_QT5" = "yes"; then
   QT5_INCDIR=`$PKG_CONFIG --variable=includedir Qt5Core`
   QT5_VERSION=`$PKG_CONFIG --modversion Qt5Core`
   QT5_CFLAGS="$QT5_CFLAGS -I$QT5_INCDIR/QtCore/$QT5_VERSION -I$QT5_INCDIR/QtCore/$QT5_VERSION/QtCore -I$QT5_INCDIR/QtGui/$QT5_VERSION"
+  # moc needs the same headers the compiler gets, or QT_VERSION and the feature
+  # macros are simply undefined while it parses. It reads -I/-D/-U/-F and
+  # rejects anything else outright, so hand it only those: a .pc file is free
+  # to carry -std= or -O, which would abort the run.
+  QT5_MOC_CFLAGS=
+  for scim_qt_flag in $QT5_CFLAGS; do
+    case $scim_qt_flag in
+      -I*|-D*|-U*|-F*) QT5_MOC_CFLAGS="$QT5_MOC_CFLAGS $scim_qt_flag" ;;
+    esac
+  done
+  AC_SUBST(QT5_MOC_CFLAGS)
   QT5_MOC=`$PKG_CONFIG --variable=host_bins Qt5Core`/moc
   QT5_IM_MODULEDIR=$QT5_LIBDIR/qt5/plugins/platforminputcontexts
   AC_SUBST(QT5_MOC)
@@ -356,6 +367,14 @@ if test "$SCIM_HAS_QT6" = "yes"; then
   QT6_INCDIR=`$PKG_CONFIG --variable=includedir Qt6Core`
   QT6_VERSION=`$PKG_CONFIG --modversion Qt6Core`
   QT6_CFLAGS="$QT6_CFLAGS -I$QT6_INCDIR/QtCore/$QT6_VERSION -I$QT6_INCDIR/QtCore/$QT6_VERSION/QtCore -I$QT6_INCDIR/QtGui/$QT6_VERSION"
+  # Only what moc can read; see the QT5_MOC_CFLAGS note above.
+  QT6_MOC_CFLAGS=
+  for scim_qt_flag in $QT6_CFLAGS; do
+    case $scim_qt_flag in
+      -I*|-D*|-U*|-F*) QT6_MOC_CFLAGS="$QT6_MOC_CFLAGS $scim_qt_flag" ;;
+    esac
+  done
+  AC_SUBST(QT6_MOC_CFLAGS)
   QT6_MOC=`$PKG_CONFIG --variable=libexecdir Qt6Core`/moc
   QT6_IM_MODULEDIR=$QT6_LIBDIR/qt6/plugins/platforminputcontexts
   AC_SUBST(QT6_MOC)

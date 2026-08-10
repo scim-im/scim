@@ -62,8 +62,17 @@ libscimqtinputcontextplugin_la_LDFLAGS = -rpath $(moduledir) \
 libscimqtinputcontextplugin_la_LIBADD = $(top_builddir)/src/libscim@SCIM_EPOCH@.la $(CANDIDATES_LIBS) $(KIMPANEL_LIBS)
 
 MOC = @QT5_MOC@
+MOC_CFLAGS = @QT5_MOC_CFLAGS@
 
-moc_scimqtinputcontext.cpp: scimqtinputcontext.h scim.json
-	$(AM_V_GEN) $(MOC) -DQT_VERSION=0x050000 $(srcdir)/scimqtinputcontext.h -o $@
+# moc gets the compiler's include paths so QT_VERSION and the feature macros
+# reach it from qglobal.h, matching what the compiler sees. Without them moc
+# cannot resolve the Qt includes and quietly parses on with those macros
+# undefined -- a #if guarding a slot then drops it from the metaobject while
+# the compiler keeps it, with no diagnostic from either.
+#
+# On the Makefile too, since that is where those flags arrive: a Qt upgrade
+# moves the versioned include paths, and the header alone would not say so.
+moc_scimqtinputcontext.cpp: scimqtinputcontext.h scim.json Makefile
+	$(AM_V_GEN) $(MOC) $(MOC_CFLAGS) $(srcdir)/scimqtinputcontext.h -o $@
 
 include $(top_srcdir)/dlopen-module.am
