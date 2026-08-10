@@ -1003,19 +1003,28 @@ widget_point_to_root (GtkWidget *widget, int wx, int wy, int *rx, int *ry)
     if (!surface || !GDK_IS_X11_SURFACE (surface))
         return false;
 
-    double nx = 0, ny = 0;
-    if (!gtk_widget_translate_coordinates (widget, GTK_WIDGET (native),
-                                           wx, wy, &nx, &ny))
+    graphene_point_t wpoint = GRAPHENE_POINT_INIT ((float) wx, (float) wy);
+    graphene_point_t npoint;
+    if (!gtk_widget_compute_point (widget, GTK_WIDGET (native), &wpoint, &npoint))
         return false;
+
+    double nx = npoint.x, ny = npoint.y;
 
     // The native's surface is bigger than the native widget when the toolkit
     // draws a shadow around it; without this the spot is off by that margin.
     double ox = 0, oy = 0;
     gtk_native_get_surface_transform (native, &ox, &oy);
 
+    // GTK 4.18 deprecated its whole X11 backend API and offers nothing in its
+    // place: reaching the Xlib Display and Window is the only way to ask the
+    // server for a root-relative point, and that is the one thing this function
+    // exists to do. Scoped so a real deprecation elsewhere in the file is still
+    // reported.
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     Display *xdisplay =
         gdk_x11_display_get_xdisplay (gdk_surface_get_display (surface));
     Window   xwindow = gdk_x11_surface_get_xid (surface);
+    G_GNUC_END_IGNORE_DEPRECATIONS
     Window   child = 0;
     int      tx = 0, ty = 0;
 
@@ -3018,7 +3027,13 @@ slot_get_surrounding_text (IMEngineInstanceBase *si,
     if (ic && ic->impl && _focused_ic == ic) {
         gchar *surrounding;
         gint   cursor_index;
-        if (gtk_im_context_get_surrounding (GTK_IM_CONTEXT (_focused_ic), &surrounding, &cursor_index)) {
+        // The anchor is the other end of the selection. SCIM's slot has no
+        // notion of one -- it asks for text around a caret -- so it is taken
+        // and dropped; the call is still the non-deprecated spelling.
+        gint   anchor_index;
+        if (gtk_im_context_get_surrounding_with_selection (GTK_IM_CONTEXT (_focused_ic),
+                                                           &surrounding, &cursor_index,
+                                                           &anchor_index)) {
             SCIM_DEBUG_FRONTEND(2) << "Surrounding text: " << surrounding <<"\n";
             SCIM_DEBUG_FRONTEND(2) << "Cursor Index    : " << cursor_index <<"\n";
             WideString before (utf8_mbstowcs (String (surrounding, surrounding + cursor_index)));

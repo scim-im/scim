@@ -765,9 +765,15 @@ panel_window_move (GtkWidget *w, int x, int y)
 
         GdkSurface *s = gtk_native_get_surface (GTK_NATIVE (w));
         if (s && GDK_IS_X11_SURFACE (s)) {
+            // GTK 4.18 deprecated its whole X11 backend API with no replacement.
+            // Placing a window at an absolute position is an X11-only ability in
+            // the first place -- the Wayland path below does not go through here
+            // -- so the Xlib call is the point, not an implementation detail.
+            G_GNUC_BEGIN_IGNORE_DEPRECATIONS
             XMoveWindow (GDK_SURFACE_XDISPLAY (s),
                          gdk_x11_surface_get_xid (s), x, y);
             XFlush (GDK_SURFACE_XDISPLAY (s));
+            G_GNUC_END_IGNORE_DEPRECATIONS
         }
         return;
     }

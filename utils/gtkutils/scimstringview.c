@@ -727,13 +727,23 @@ scim_string_view_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
       gint start_index = g_utf8_offset_to_pointer (text, start_pos) - text;
       gint end_index = g_utf8_offset_to_pointer (text, end_pos) - text;
       PangoLayoutLine *line = pango_layout_get_lines_readonly (layout)->data;
-      GtkStyleContext *ctx = gtk_widget_get_style_context (widget);
       GdkRGBA sel_bg, sel_fg;
+
+      /* Deprecated in GTK 4.10 with nothing put in their place: GTK4 offers no
+       * way to read a theme's named colours, and gtk_widget_get_color() answers
+       * only for the widget's own state, which is never "selected" here -- the
+       * highlight is a range inside one unfocusable view, not a widget state.
+       * The hardcoded fallbacks below already cover a theme that defines
+       * neither, so the worst this can decay to is those. Scoped, so a real
+       * deprecation elsewhere in the file is still reported. */
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+      GtkStyleContext *ctx = gtk_widget_get_style_context (widget);
 
       if (!gtk_style_context_lookup_color (ctx, "theme_selected_bg_color", &sel_bg))
         sel_bg = (GdkRGBA){ 0.2, 0.4, 0.85, 1.0 };
       if (!gtk_style_context_lookup_color (ctx, "theme_selected_fg_color", &sel_fg))
         sel_fg = (GdkRGBA){ 1.0, 1.0, 1.0, 1.0 };
+      G_GNUC_END_IGNORE_DEPRECATIONS
 
       pango_layout_line_get_x_ranges (line, start_index, end_index, &ranges, &n_ranges);
       pango_layout_get_extents (layout, NULL, &logical_rect);

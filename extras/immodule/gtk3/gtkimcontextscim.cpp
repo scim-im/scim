@@ -1412,13 +1412,11 @@ panel_slot_change_factory (int context, const String &uuid)
 static void
 panel_req_update_screen (GtkIMContextSCIM *ic)
 {
-    if (ic->impl->client_window) {
-        GdkScreen *screen = gdk_window_get_screen (ic->impl->client_window);
-        if (screen) {
-            int number = gdk_screen_get_number (screen);
-            _panel_client.update_screen (ic->id, number);
-        }
-    }
+    // GTK 3.22 gave a display exactly one screen and deprecated the numbering
+    // with nothing to replace it, so there is only ever screen 0 to report.
+    // Same answer as the GTK4 and Qt modules.
+    if (ic->impl->client_window)
+        _panel_client.update_screen (ic->id, 0);
 }
 
 static void
@@ -2250,7 +2248,9 @@ get_gdk_keymap (GdkWindow *window)
     if (window)
         keymap = gdk_keymap_get_for_display (gdk_window_get_display (window));
     else
-        keymap = gdk_keymap_get_default ();
+        // What gdk_keymap_get_default () did before 3.22 deprecated it, spelled
+        // the same way as the branch above.
+        keymap = gdk_keymap_get_for_display (gdk_display_get_default ());
 
     return keymap;
 }
